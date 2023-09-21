@@ -1,0 +1,236 @@
+<html>
+  <head>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous"
+    />
+
+    <!-- Optional theme -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
+      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+      integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="automatches.css" />
+  </head>
+  <body>
+    <div class="col-md-6">
+      <canvas
+        id="myCanvas"
+        width="1080"
+        height="1080"
+        style="border: 1px solid #d3d3d3"
+      ></canvas>
+    </div>
+
+    <div class="col-md-3">
+      <div class="row">
+        <select
+          name="leagues"
+          class="form-select form-select-lg mb-3"
+          aria-label=".form-select-lg example"
+          id="leagues"
+        >
+          <option value="39">England - Premier League</option>
+          <option value="140">Spain - La Liga</option>
+          <option value="78">Germany - Bundesliga</option>
+          <option value="135">Italy - Serie A</option>
+          <option value="61">France - Ligue 1</option>
+          <option value="2">UEFA Champions League</option>
+          <option value="15">Club World Cup</option>
+        </select>
+      </div>
+      <br />
+      <div class="row">
+        <div class="col-md-6">
+          <input type="text" placeholder="Round Number" id="roundnr" />
+          <button id="getRound">Get Round #</button>
+        </div>
+        <div class="col-md-6">
+          <fieldset>
+            <div>
+              <input
+                type="checkbox"
+                id="get-results"
+                name="get-results"
+                checked
+              />
+              <label for="get-results">Results</label>
+            </div>
+
+            <div>
+              <input
+                type="checkbox"
+                id="get-standings"
+                name="get-standings"
+                checked
+              />
+              <label for="get-standings">Standings</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="get-top-scorers"
+                name="get-top-scorers"
+              />
+              <label for="get-top-scorers">Top Scorers</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="get-top-assists"
+                name="get-top-assists"
+              />
+              <label for="get-top-assists">Top Assists</label>
+            </div>
+          </fieldset>
+        </div>
+        <button id="submit-league-info" class="btn btn-primary btn-block">
+          Get league info
+        </button>
+        <br />
+        <div class="roundandmatch">
+          <input type="string" placeholder="2023-08-23" id="dateStart" />
+          <input type="string" placeholder="2023-08-26" id="dateEnd" />
+          <button id="submit-match-list">Get Match list</button>
+          <input type="number" placeholder="Match ID" id="fixtureID" />
+          <button id="getMatch">Get Match info</button><br />
+          <input type="number" placeholder="276" id="playerID" />
+          <input type="number" placeholder="276" id="playerID2" />
+          <button id="getPlayerStats">Get Player Stats</button><br />
+          <input type="number" placeholder="541" id="teamID" />
+          <button id="getSquad">Get Squad</button>
+        </div>
+      </div>
+
+      <br />
+
+      <textarea
+        rows="5"
+        cols="50"
+        placeholder="This is the default text"
+        id="textOnPic"
+        onkeyup="keyPressed()"
+      ></textarea>
+      <textarea
+        id="pasteArea"
+        rows="5"
+        placeholder="Paste Image Here"
+        onpaste="pasteImage(event)"
+      ></textarea>
+      <fieldset>
+        <table>
+          <tr>
+            <td>
+              <input
+                type="radio"
+                id="official"
+                name="bigred"
+                value="official"
+                checked
+              />
+              <label for="official">Official</label>
+            </td>
+            <td>
+              <input
+                type="radio"
+                id="breaking"
+                name="bigred"
+                value="breaking"
+              />
+              <label for="breaking">Breaking</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="radio" id="rumour" name="bigred" value="rumour" />
+              <label for="rumour">Rumour</label>
+            </td>
+            <td>
+              <input type="radio" id="eleven" name="bigred" value="eleven" />
+              <label for="eleven">Eleven</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="radio" id="none" name="bigred" value="none" />
+              <label for="none">None</label>
+            </td>
+            <td>
+              <input type="radio" id="half" name="bigred" value="half" />
+              <label for="half">Half</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="radio" id="alltext" name="bigred" value="alltext" />
+              <label for="alltext">Alltext</label>
+            </td>
+            <td>
+              <input type="radio" id="table" name="bigred" value="table" />
+              <label for="table">Table</label>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <div class="row">
+        <button
+          type="button"
+          class="btn btn-primary btn-block"
+          onclick="download()"
+        >
+          Download
+        </button>
+        <textarea
+          rows="5"
+          cols="50"
+          placeholder="This is the default text"
+          id="cleanTmarks"
+          onkeyup="keyPresszer()"
+        ></textarea>
+      </div>
+      <div class="row">
+        <button
+          type="button"
+          class="btn btn-primary btn-block"
+          onclick="copystats()"
+        >
+          Copy stats
+        </button>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div id="fixtures-info"></div>
+      <h2 id="league-name"></h2>
+      <h3>Results</h3>
+      <div id="results"></div>
+      <div id="results_text"></div>
+      <h3>Standings</h3>
+      <div id="standings"></div>
+      <div id="standings_text"></div>
+      <h3>Team of the Week</h3>
+      <h3>Top Scorers</h3>
+      <div id="top-scorers"></div>
+      <h3>Assists</h3>
+      <div id="top-assists"></div>
+
+      <div id="one-fixture"></div>
+    </div>
+  </body>
+  <footer>
+    <script src="common-functions.js"></script>
+    <script src="automatches.js" type="module"></script>
+    <script src="instapics.js"></script>
+  </footer>
+</html>

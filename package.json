@@ -1,0 +1,11 @@
+{
+  "name": "automatches",
+  "version": "1.0.0",
+  "description": "A tool to help me fetch data from an api and use it for my website",
+  "main": "automatches.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zoltan Simon",
+  "license": "ISC"
+}

@@ -1,0 +1,31 @@
+table,
+th,
+td {
+  border: 1px solid;
+  border-collapse: collapse;
+  padding: 2px;
+}
+th,
+td {
+  border-color: #1d3557;
+}
+
+table {
+  margin: 0 auto;
+}
+tr:hover {
+  background: #f1faee;
+  cursor: pointer;
+}
+td a {
+  display: block;
+  border: 1px solid black;
+  padding: 16px;
+}
+
+#headertext {
+  text-align: center;
+}
+#info {
+  padding-top: 25px;
+}
