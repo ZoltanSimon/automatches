@@ -1,0 +1,235 @@
+[
+  {
+    "team": {
+      "id": 529,
+      "name": "Barcelona",
+      "logo": "https://media-4.api-sports.io/football/teams/529.png"
+    },
+    "players": [
+      {
+        "id": 127,
+        "name": "M. ter Stegen",
+        "age": 31,
+        "number": 1,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/127.png"
+      },
+      {
+        "id": 126,
+        "name": "Iñaki Peña",
+        "age": 24,
+        "number": 13,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/126.png"
+      },
+      {
+        "id": 336653,
+        "name": "Ander Astralaga",
+        "age": 19,
+        "number": 26,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/336653.png"
+      },
+      {
+        "id": 383647,
+        "name": "D. Kochen",
+        "age": 17,
+        "number": 31,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/383647.png"
+      },
+      {
+        "id": 855,
+        "name": "João Cancelo",
+        "age": 29,
+        "number": 2,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/855.png"
+      },
+      {
+        "id": 161928,
+        "name": "Alejandro Balde",
+        "age": 20,
+        "number": 3,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/161928.png"
+      },
+      {
+        "id": 101814,
+        "name": "R. Araújo",
+        "age": 24,
+        "number": 4,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/101814.png"
+      },
+      {
+        "id": 2670,
+        "name": "Íñigo Martínez",
+        "age": 32,
+        "number": 5,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/2670.png"
+      },
+      {
+        "id": 2282,
+        "name": "A. Christensen",
+        "age": 27,
+        "number": 15,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/2282.png"
+      },
+      {
+        "id": 2278,
+        "name": "Marcos Alonso",
+        "age": 33,
+        "number": 17,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/2278.png"
+      },
+      {
+        "id": 137,
+        "name": "Sergi Roberto",
+        "age": 31,
+        "number": 20,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/137.png"
+      },
+      {
+        "id": 1257,
+        "name": "J. Koundé",
+        "age": 25,
+        "number": 23,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/1257.png"
+      },
+      {
+        "id": 396623,
+        "name": "Pau Cubarsí Paredes",
+        "age": 15,
+        "number": 33,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/396623.png"
+      },
+      {
+        "id": 296667,
+        "name": "Gavi",
+        "age": 19,
+        "number": 6,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/296667.png"
+      },
+      {
+        "id": 133609,
+        "name": "Pedri",
+        "age": 21,
+        "number": 8,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/133609.png"
+      },
+      {
+        "id": 18949,
+        "name": "Oriol Romeu",
+        "age": 32,
+        "number": 18,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/18949.png"
+      },
+      {
+        "id": 538,
+        "name": "F. de Jong",
+        "age": 26,
+        "number": 21,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/538.png"
+      },
+      {
+        "id": 633,
+        "name": "İ. Gündoğan",
+        "age": 33,
+        "number": 22,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/633.png"
+      },
+      {
+        "id": 329728,
+        "name": "Marc Casadó",
+        "age": 20,
+        "number": 30,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/329728.png"
+      },
+      {
+        "id": 340626,
+        "name": "Fermín",
+        "age": 20,
+        "number": 32,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/340626.png"
+      },
+      {
+        "id": 336557,
+        "name": "Aleix Garrido",
+        "age": 19,
+        "number": null,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/336557.png"
+      },
+      {
+        "id": 348539,
+        "name": "Unai Hernández",
+        "age": 19,
+        "number": null,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/348539.png"
+      },
+      {
+        "id": 931,
+        "name": "Ferran Torres",
+        "age": 23,
+        "number": 7,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/931.png"
+      },
+      {
+        "id": 521,
+        "name": "R. Lewandowski",
+        "age": 35,
+        "number": 9,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/521.png"
+      },
+      {
+        "id": 1496,
+        "name": "Raphinha",
+        "age": 27,
+        "number": 11,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/1496.png"
+      },
+      {
+        "id": 583,
+        "name": "João Félix",
+        "age": 24,
+        "number": 14,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/583.png"
+      },
+      {
+        "id": 386828,
+        "name": "Lamine Yamal",
+        "age": 16,
+        "number": 27,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/386828.png"
+      },
+      {
+        "id": 386827,
+        "name": "Ángel Alarcón",
+        "age": 19,
+        "number": null,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/386827.png"
+      }
+    ]
+  }
+]

@@ -15,9 +15,7 @@ let download = function () {
 };
 
 function imagePath(teamName) {
-  return `"https://generationfootball.net/wp-content/uploads/Logos//${teamName
-    .replaceAll(" ", "_")
-    .toLowerCase()}.png"`;
+  return `../Logos//${teamName.replaceAll(" ", "_").toLowerCase()}.png`;
 }
 
 function removeNewlines(str) {

@@ -10,7 +10,7 @@ import {
   getSquad,
 } from "/webapi-handler.js";
 import { addText } from "./autotext.js";
-import { addStats } from "./components/statistics.js";
+import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
 import { addSquad } from "./components/team-squad.js";
 
@@ -355,7 +355,7 @@ function oneFixture(response) {
   Subs: ${subs(awayTeam.subs)}`;
 
   document.getElementById("one-fixture").innerHTML += addToPage;
-  addStats(fixture.statistics);
+  addMatchStats(fixture);
 }
 
 function oneMatch(matchId) {

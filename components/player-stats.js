@@ -1,8 +1,10 @@
 //129718, 1100
 //sfsdfdsfwefwefwefwefew<table style='border-collapse: collapse;' border='1'> <thead> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>J. Bellingham</td> </tr> </thead> <tbody> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Games</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>undefined</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Goals</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>5</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Assists</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>1</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Shots</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>7/8</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Dribbles</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>6/11</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Fouls drawn</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>14</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Yellow cards</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>0</td> </tr> </tbody> </table>
+
 let width = 50;
 
 export function addPlayerStats(statsAPI, statsAPI2 = null) {
+  console.log(statsAPI);
   if (statsAPI) width = 33;
   let tds = `<td width='${width}%' style='text-align: center; border-color: #1D3557; padding: 18px;'>`;
   let goals1 = statsAPI[0].statistics[0].goals.total;
@@ -16,6 +18,9 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
   let addToPage = `
     <table style='border-collapse: collapse;' border='1'>
         <thead>
+        ${tds}${statsAPI[0].player.name}</td>
+        ${tds}Name</td>
+        ${tds}${statsAPI2[0].player.name}</td>
         </thead>
         <tbody>
           <tr>

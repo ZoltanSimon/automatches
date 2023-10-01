@@ -3,6 +3,7 @@ let ctx = c.getContext("2d");
 const font = "Source Sans Pro";
 const fontSize = "46px";
 const backgroundImageName = "insta_new_no_pic.png";
+const borderImage = "border.png";
 const sirens = "officialbreakingetc.png";
 const lineheight = 50;
 let inputTextValue,
@@ -13,6 +14,21 @@ let inputTextValue,
   radioValue,
   fontHeight,
   red_image;
+let imgs = {};
+let clubs = [
+  "Real Madrid",
+  "Atletico Madrid",
+  "Manchester United",
+  "Newcastle",
+  "Sheffield Utd",
+  "Arsenal",
+  "Liverpool",
+  "West Ham",
+  "Mallorca",
+  "Barcelona",
+  "Wolves",
+  "Manchester City",
+];
 
 make_base("test");
 
@@ -62,7 +78,6 @@ function make_base(text) {
 
 function keyPressed() {
   inputTextValue = document.getElementById("textOnPic").value;
-  console.log(inputTextValue);
   make_base(inputTextValue);
 }
 
@@ -139,14 +154,63 @@ function pasteImage(event) {
       base_image = new Image();
       base_image.src = event.target.result;
       base_image.onload = function () {
-        drawResizedImage(base_image, imgHeight);
+        drawResizedImage(base_image, imgHeight, 1080, 90);
+        let border_image = new Image();
+        border_image.src = borderImage;
+        border_image.onload = function () {
+          ctx.drawImage(border_image, 0, 0);
+        };
       };
     };
     reader.readAsDataURL(blob);
   }
 }
 
-function drawResizedImage(image, imgHeight) {
+function addLogos() {
+  inputTextValue = document.getElementById("textOnPic").value;
+  let texty = inputTextValue.split("\n");
+  console.log(imgs);
+  for (let j = 0; j < texty.length; j++) {
+    for (let i = 0; i < clubs.length; i++) {
+      if (texty[j].indexOf(clubs[i]) > -1) {
+        drawResizedImage(imgs[clubs[i]], 60, 100 + j * 50, 200 + j * 50);
+      }
+    }
+  }
+}
+
+function buildTableForTableType(lines, yPos = 200) {
+  let imgToAdd = [];
+
+  for (let i = 0; i < clubs.length; i++) {
+    if (lines.indexOf(`*${clubs[i]}*`) > -1) {
+      imgToAdd.push(imgs[clubs[i]]);
+      lines = lines.replace(`*${clubs[i]}*`, "");
+    }
+  }
+  console.log(imgToAdd);
+  let theTable = "<table" + lines.split("<table")[1];
+  let theText = lines.split("<table")[0];
+  var data = `<svg xmlns='http://www.w3.org/2000/svg' width='546'>
+    <foreignObject width='100%' height='100%'>
+    <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>
+    ${theTable}
+    </div></foreignObject></svg>`;
+
+  var img = new Image();
+  img.onload = function () {
+    ctx.drawImage(img, (1080 - img.width) / 2, yPos);
+    for (let i = 0; i < imgToAdd.length; i++) {
+      console.log(imgToAdd[i]);
+      console.log(1000 + 250 * i);
+      drawResizedImage(imgToAdd[i], 50, 954 + 250 * i, 202);
+    }
+  };
+  img.src = buildSvgImageUrl(data);
+  ctx.fillText(theText, 540, 160);
+}
+
+function drawResizedImage(image, imgHeight, startX, startY) {
   if (image.height > image.width) {
     newHeight = imgHeight;
     newWidth = imgHeight / (image.height / image.width);
@@ -154,47 +218,20 @@ function drawResizedImage(image, imgHeight) {
     newHeight = imgHeight;
     newWidth = imgHeight * (image.width / image.height);
   }
-  ctx.drawImage(image, (1080 - newWidth) / 2, 80, newWidth, newHeight);
-}
-
-function buildTableForTableType(lines) {
-  /*let tds = `<td style='text-align: center; border-color: #1D3557; padding: 9px;'>`;
-
-  for (let i = 0; i < lines.length; i++) {
-    lines[i] = lines[i].replace("null", 0);
-    lines[i] = `<tr style='border-color: #1D3557;'>${tds}${lines[i]}</td></tr>`;
-    lines[i] = lines[i].replaceAll(/\t/g, `</td>${tds}`);
-    if (i == 0) {
-      lines[
-        i
-      ] = `<table style='border-collapse: collapse;' border='1'>${lines[i]}`;
-    }
-    if (i == lines.length - 1) {
-      lines[i] += "</table>";
-    }
-  }
-  console.log(lines);
-  let lebig = lines.join("");
-  console.log(lebig);*/
-  let theTable = "<table" + lines.split("<table")[1];
-  let theText = lines.split("<table")[0];
-  var data = `<svg xmlns='http://www.w3.org/2000/svg' width='652'>
-    <foreignObject width='100%' height='100%'>
-    <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>
-    ${theTable}
-    </div></foreignObject></svg>`;
-  console.log(data);
-  var img = new Image();
-  img.onload = function () {
-    ctx.drawImage(img, (1080 - img.width) / 2, 200);
-    console.log(img.height);
-    console.log(img.width);
-  };
-  img.src = buildSvgImageUrl(data);
-  ctx.fillText(theText, 540, 160);
+  ctx.drawImage(image, (startX - newWidth) / 2, startY, newWidth, newHeight);
 }
 
 function buildSvgImageUrl(svg) {
   b64 = window.btoa(unescape(encodeURIComponent(svg)));
   return "data:image/svg+xml;base64," + b64;
+}
+
+function preLoadLogos() {
+  for (let i = 0; i < clubs.length; i++) {
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imagePath(clubs[i]);
+    imgs[clubs[i]] = img;
+  }
+  console.log(imgs);
 }

@@ -4,6 +4,7 @@ let opening = [
   `The matchday started with `,
   `The round started with `,
   `The round kicked off with `,
+  `The round began with `,
   `In the first match of the round, it was `,
   `In the first match of the matchday, we had `,
 ];
@@ -17,6 +18,10 @@ let facing = [
   `played versus `,
   `up against `,
   `pitted against `,
+  `confronting `,
+  `encountering `,
+  `battling `,
+  `crossing paths with `,
 ];
 
 let matchEndings = [
@@ -27,6 +32,8 @@ let matchEndings = [
   `After 90 minutes it was `,
   `The final result was `,
   `The game concluded at `,
+  `The match concluded at `,
+  `The game ended `,
 ];
 
 let lastMatches = [
@@ -56,6 +63,7 @@ let wins = [
   `grabbing the crucial win. `,
   `grabbing the win.`,
   `winning the match.`,
+  `coming out as victors. `,
 ];
 
 let losses = [
@@ -67,6 +75,7 @@ let losses = [
   `getting 0 points and another loss to their name. `,
   `getting no points. `,
   `suffering a defeat. `,
+  `being second best on the day. `,
 ];
 
 let matchTransitions = [
@@ -83,6 +92,8 @@ let matchTransitions = [
   `In another key fixture `,
   `In another important fixture `,
   `In one of the key fixtures of the round, we had `,
+  `In a crucial game it was `,
+  `In a crucial game we had `,
 ];
 
 let leadersPlay = [
@@ -90,6 +101,7 @@ let leadersPlay = [
   `1st placed team `,
   `First placed team `,
   `The first placed team `,
+  `First placed `,
 ];
 
 let firsts = [
@@ -98,6 +110,7 @@ let firsts = [
   `is the team with the most points. `,
   `holding strong as leaders. `,
   `are first in the league. `,
+  `occupy first place. `,
 ];
 
 let lasts = [
@@ -106,6 +119,7 @@ let lasts = [
   `still occupy the last position. `,
   `are still last and not looking good. `,
   `are last and looking almost certain to get relegated.`,
+  `are last out of the bunch.`,
 ];
 
 let Napolis = [`Napoli `];

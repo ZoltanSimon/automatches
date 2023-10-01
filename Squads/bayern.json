@@ -1,0 +1,227 @@
+[
+  {
+    "team": {
+      "id": 157,
+      "name": "Bayern Munich",
+      "logo": "https://media-4.api-sports.io/football/teams/157.png"
+    },
+    "players": [
+      {
+        "id": 497,
+        "name": "M. Neuer",
+        "age": 37,
+        "number": 1,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/497.png"
+      },
+      {
+        "id": 126530,
+        "name": "Daniel Peretz",
+        "age": 23,
+        "number": 18,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/126530.png"
+      },
+      {
+        "id": 498,
+        "name": "S. Ulreich",
+        "age": 35,
+        "number": 26,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/498.png"
+      },
+      {
+        "id": 280429,
+        "name": "T. Hülsmann",
+        "age": 19,
+        "number": 43,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/280429.png"
+      },
+      {
+        "id": 344290,
+        "name": "M. Schmitt",
+        "age": 17,
+        "number": null,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/344290.png"
+      },
+      {
+        "id": 1149,
+        "name": "D. Upamecano",
+        "age": 25,
+        "number": 2,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/1149.png"
+      },
+      {
+        "id": 2897,
+        "name": "Kim Min-Jae",
+        "age": 27,
+        "number": 3,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/2897.png"
+      },
+      {
+        "id": 532,
+        "name": "M. de Ligt",
+        "age": 24,
+        "number": 4,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/532.png"
+      },
+      {
+        "id": 509,
+        "name": "A. Davies",
+        "age": 23,
+        "number": 19,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/509.png"
+      },
+      {
+        "id": 1915,
+        "name": "B. Sarr",
+        "age": 31,
+        "number": 20,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/1915.png"
+      },
+      {
+        "id": 8,
+        "name": "Raphaël Guerreiro",
+        "age": 30,
+        "number": 22,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/8.png"
+      },
+      {
+        "id": 330612,
+        "name": "T. Buchmann",
+        "age": 18,
+        "number": 28,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/330612.png"
+      },
+      {
+        "id": 545,
+        "name": "N. Mazraoui",
+        "age": 26,
+        "number": 40,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/545.png"
+      },
+      {
+        "id": 502,
+        "name": "J. Kimmich",
+        "age": 28,
+        "number": 6,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/502.png"
+      },
+      {
+        "id": 511,
+        "name": "L. Goretzka",
+        "age": 28,
+        "number": 8,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/511.png"
+      },
+      {
+        "id": 1157,
+        "name": "K. Laimer",
+        "age": 26,
+        "number": 27,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/1157.png"
+      },
+      {
+        "id": 280335,
+        "name": "F. Krätzig",
+        "age": 20,
+        "number": 41,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/280335.png"
+      },
+      {
+        "id": 328033,
+        "name": "A. Pavlović",
+        "age": 19,
+        "number": 45,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/328033.png"
+      },
+      {
+        "id": 306615,
+        "name": "T. Fukui",
+        "age": 19,
+        "number": 46,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/306615.png"
+      },
+      {
+        "id": 510,
+        "name": "S. Gnabry",
+        "age": 28,
+        "number": 7,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/510.png"
+      },
+      {
+        "id": 184,
+        "name": "H. Kane",
+        "age": 30,
+        "number": 9,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/184.png"
+      },
+      {
+        "id": 644,
+        "name": "L. Sané",
+        "age": 27,
+        "number": 10,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/644.png"
+      },
+      {
+        "id": 508,
+        "name": "K. Coman",
+        "age": 27,
+        "number": 11,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/508.png"
+      },
+      {
+        "id": 275,
+        "name": "E. Choupo-Moting",
+        "age": 34,
+        "number": 13,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/275.png"
+      },
+      {
+        "id": 522,
+        "name": "T. Müller",
+        "age": 34,
+        "number": 25,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/522.png"
+      },
+      {
+        "id": 270510,
+        "name": "M. Tel",
+        "age": 18,
+        "number": 39,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/270510.png"
+      },
+      {
+        "id": 181812,
+        "name": "J. Musiala",
+        "age": 20,
+        "number": 42,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/181812.png"
+      }
+    ]
+  }
+]
