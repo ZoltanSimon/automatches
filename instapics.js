@@ -15,21 +15,9 @@ let inputTextValue,
   fontHeight,
   red_image;
 let imgs = {};
-let clubs = [
-  "Real Madrid",
-  "Atletico Madrid",
-  "Manchester United",
-  "Newcastle",
-  "Sheffield Utd",
-  "Arsenal",
-  "Liverpool",
-  "West Ham",
-  "Mallorca",
-  "Barcelona",
-  "Wolves",
-  "Manchester City",
-];
 
+let border_image = new Image();
+border_image.src = borderImage;
 make_base("test");
 
 function make_base(text) {
@@ -118,6 +106,27 @@ function copystats() {
   document.getElementById("textOnPic").value(clone);
 }
 
+function copyStandings() {
+  let imgToAdd = [];
+  let thisTr, thisTd, thisClub;
+  let standingsTable = document.getElementById("league-standings");
+
+  for (let i = 0; i < standingsTable.rows.length; i++) {
+    thisTr = standingsTable.rows[i];
+    for (let j = 0; j < thisTr.children.length; j++) {
+      thisTd = thisTr.children[j];
+      for (let k = 0; k < clubs.length; k++) {
+        thisClub = clubs[k];
+        if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
+          imgToAdd.push(imgs[thisClub]);
+          thisTd.innerHTML = " ";
+        }
+      }
+    }
+  }
+  buildTableForTableType(removeNewlines(standingsTable.outerHTML), imgToAdd);
+}
+
 function pasteImage(event) {
   // use event.originalEvent.clipboard for newer chrome versions
   var items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -155,11 +164,7 @@ function pasteImage(event) {
       base_image.src = event.target.result;
       base_image.onload = function () {
         drawResizedImage(base_image, imgHeight, 1080, 90);
-        let border_image = new Image();
-        border_image.src = borderImage;
-        border_image.onload = function () {
-          ctx.drawImage(border_image, 0, 0);
-        };
+        ctx.drawImage(border_image, 0, 0);
       };
     };
     reader.readAsDataURL(blob);
@@ -179,19 +184,22 @@ function addLogos() {
   }
 }
 
-function buildTableForTableType(lines, yPos = 200) {
-  let imgToAdd = [];
-
-  for (let i = 0; i < clubs.length; i++) {
+function buildTableForTableType(lines, imgToAdd, yPos = 100) {
+  // let imgToAdd = [];
+  lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
+  /*for (let i = 0; i < clubs.length; i++) {
     if (lines.indexOf(`*${clubs[i]}*`) > -1) {
+      console.log(lines.indexOf(`*${clubs[i]}*`));
       imgToAdd.push(imgs[clubs[i]]);
       lines = lines.replace(`*${clubs[i]}*`, "");
     }
-  }
-  console.log(imgToAdd);
+  }*/
+
+  ctx.drawImage(border_image, 0, 0);
+
   let theTable = "<table" + lines.split("<table")[1];
   let theText = lines.split("<table")[0];
-  var data = `<svg xmlns='http://www.w3.org/2000/svg' width='546'>
+  var data = `<svg xmlns='http://www.w3.org/2000/svg' width='800'>
     <foreignObject width='100%' height='100%'>
     <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>
     ${theTable}
@@ -201,11 +209,10 @@ function buildTableForTableType(lines, yPos = 200) {
   img.onload = function () {
     ctx.drawImage(img, (1080 - img.width) / 2, yPos);
     for (let i = 0; i < imgToAdd.length; i++) {
-      console.log(imgToAdd[i]);
-      console.log(1000 + 250 * i);
-      drawResizedImage(imgToAdd[i], 50, 954 + 250 * i, 202);
+      drawResizedImage(imgToAdd[i], 40, 398, 144 + i * 42);
     }
   };
+
   img.src = buildSvgImageUrl(data);
   ctx.fillText(theText, 540, 160);
 }

@@ -13,6 +13,7 @@ import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
 import { addSquad } from "./components/team-squad.js";
+import { leagueStandings } from "./components/league-standings.js";
 
 let addToPage;
 let standingsFromApi,
@@ -123,44 +124,6 @@ function fixtureData(response) {
   });
   addToPage += `</table>`;
   document.getElementById("results").innerHTML += addToPage;
-}
-
-function leagueStandings(response) {
-  let standings = response.response[0].league.standings;
-  addToPage = ``;
-  standings.forEach((group) => {
-    addToPage += `<table>
-      <thead>    
-      <tr>
-      <th>#</th>
-      <th></th>
-      <th>Team</th>
-      <th>Played</th>
-      <th>Win</th>
-      <th>Draw</th>
-      <th>Lose</th>
-      <th>Goals</th>
-      <th>Points</th>
-    </tr>
-    </thead>`;
-    group.forEach((a) => {
-      addToPage += `
-    <tr>
-        <td>${a.rank}</td>
-        <td><img src=${imagePath(a.team.name)} width="30px"/></td>
-        <td>${a.team.name}</td>
-        <td>${a.all.played}</td>
-        <td>${a.all.win}</td>
-        <td>${a.all.draw}</td>
-        <td>${a.all.lose}</td>
-        <td>${a.all.goals.for} : ${a.all.goals.against}</td>
-        <td>${a.points}</td>
-    </tr>`;
-    });
-    addToPage += `</table>`;
-    console.log(removeNewlines(addToPage));
-  });
-  document.getElementById("standings").innerHTML += addToPage;
 }
 
 function topScorers(response) {
