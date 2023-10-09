@@ -16,7 +16,7 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
     ? statsAPI2[0].statistics[0].goals.assists
     : 0;
   let addToPage = `
-    <table style='border-collapse: collapse;' border='1'>
+    <table style='border-collapse: collapse;' border='1' id='player-stats'>
         <thead>
         ${tds}${statsAPI[0].player.name}</td>
         ${tds}Name</td>

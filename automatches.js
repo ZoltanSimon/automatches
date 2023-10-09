@@ -8,6 +8,7 @@ import {
   getCurrentRound,
   getPlayerStats,
   getSquad,
+  downloadResultFromApi,
 } from "/webapi-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
@@ -39,6 +40,12 @@ document.getElementById("getMatch").onclick = async function () {
   let fixtureID = document.getElementById("fixtureID").value;
   matchFromApi = await getResultFromApi(fixtureID);
   oneFixture(matchFromApi);
+};
+
+document.getElementById("downloadMatch").onclick = async function () {
+  let fixtureID = document.getElementById("fixtureID").value;
+  matchFromApi = await downloadResultFromApi(fixtureID);
+  //oneFixture(matchFromApi);
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
@@ -197,7 +204,6 @@ function teamLink(name) {
 
 function fixturesInfo(response) {
   let fixtures = response.response;
-  console.log(fixtures);
   fixtures.sort(function (a, b) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);
   });
@@ -242,7 +248,6 @@ const subs = (subs) => {
 };
 
 function oneFixture(response) {
-  console.log(response);
   let fixture = response.response[0];
   let players = [];
   let homeTeam = fixture.teams.home;
@@ -275,7 +280,6 @@ function oneFixture(response) {
   fixture.lineups.forEach((team, index) => {
     players = [];
     for (let i = 0; i < team.startXI.length; i++) {
-      console.log(team.startXI[i]);
       players.push(team.startXI[i].player.name);
     }
     if (index == 0) {

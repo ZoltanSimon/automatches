@@ -7,7 +7,6 @@ export class Stat {
   }
 
   getValues() {
-    console.log(this);
     let bold1, bold2;
     if (this.homeTeam > this.awayTeam) {
       bold1 = `<b>${this.homeTeam}</b>`;

@@ -96,4 +96,6 @@ let clubs = [
   "Salernitana",
   "Empoli",
   "Cagliari",
+  "Feyenoord",
+  "Paris Saint Germain",
 ];

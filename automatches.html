@@ -106,6 +106,7 @@
           <button id="submit-match-list">Get Match list</button>
           <input type="number" placeholder="Match ID" id="fixtureID" />
           <button id="getMatch">Get Match info</button><br />
+          <button id="downloadMatch">Download Match info</button><br />
           <input type="number" placeholder="276" id="playerID" />
           <input type="number" placeholder="276" id="playerID2" />
           <button id="getPlayerStats">Get Player Stats</button><br />
@@ -201,8 +202,12 @@
         ></textarea>
       </div>
       <div class="row">
-        <button type="button" class="btn btn-primary" onclick="copystats()">
-          Copy stats
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="copyMatchStats()"
+        >
+          Copy match stats
         </button>
         <button type="button" class="btn btn-primary" onclick="preLoadLogos()">
           Preload logos

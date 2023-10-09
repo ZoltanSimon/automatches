@@ -41,18 +41,27 @@ export function addMatchStats(apiResponse) {
       }
     }
   }
-  console.log(stats);
 
-  addToPage = `<div id="match-stats"><table style='border-collapse: collapse;' border='1'><thead><tr>${tds}${homeTeamName}</td>${tds}*${homeTeamName}* - *${awayTeamName}*</td>${tds}${awayTeamName}</td></tr></thead><tbody>`;
+  addToPage = `
+  <table id='match-stats' style='border-collapse: collapse;' border='1'><thead>
+  <tr>
+  <td style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${homeTeamName}</td>
+  <td style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>*${homeTeamName}* - *${awayTeamName}*</td>
+  <td style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${awayTeamName}</td>
+  </tr></thead><tbody>`;
 
   for (let i = 0; i < stats.length; i++) {
     values = stats[i].getValues();
-    console.log(values);
     addToPage += `<tr>${tds}${values[0]}</td>${tds}${stats[i].title}</td>${tds}${values[1]}</td></tr>`;
   }
-  addToPage += `</tbody></table></div>`;
-  console.log(addToPage);
+  addToPage += `</tbody></table>`;
   document.getElementById("one-fixture").innerHTML += addToPage;
+  document.getElementById(
+    "one-fixture"
+  ).innerHTML += `<div id='league-match-stats'>${apiResponse.league.round.replace(
+    "Regular Season - ",
+    "Round "
+  )} - ${apiResponse.league.name}</div>`;
   //1035067
   //1035093
   //1038016

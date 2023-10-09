@@ -33,6 +33,9 @@ function make_base(text) {
       .querySelector('input[name="bigred"]:checked')
       .value.toUpperCase();
 
+    if (radioValue == "ALLTEXT") {
+      ctx.drawImage(border_image, 0, 0);
+    }
     if (!["NONE", "ELEVEN", "ALLTEXT", "HALF", "TABLE"].includes(radioValue)) {
       ctx.fillText(radioValue, 540, 860);
       red_image = new Image();
@@ -99,34 +102,6 @@ function keyPresszer() {
   console.log(players);
 }
 
-function copystats() {
-  const node = document.getElementById("match-stats").lastChild;
-  const clone = node.cloneNode(true);
-
-  document.getElementById("textOnPic").value(clone);
-}
-
-function copyStandings() {
-  let imgToAdd = [];
-  let thisTr, thisTd, thisClub;
-  let standingsTable = document.getElementById("league-standings");
-
-  for (let i = 0; i < standingsTable.rows.length; i++) {
-    thisTr = standingsTable.rows[i];
-    for (let j = 0; j < thisTr.children.length; j++) {
-      thisTd = thisTr.children[j];
-      for (let k = 0; k < clubs.length; k++) {
-        thisClub = clubs[k];
-        if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
-          imgToAdd.push(imgs[thisClub]);
-          thisTd.innerHTML = " ";
-        }
-      }
-    }
-  }
-  buildTableForTableType(removeNewlines(standingsTable.outerHTML), imgToAdd);
-}
-
 function pasteImage(event) {
   // use event.originalEvent.clipboard for newer chrome versions
   var items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -171,30 +146,67 @@ function pasteImage(event) {
   }
 }
 
-function addLogos() {
-  inputTextValue = document.getElementById("textOnPic").value;
-  let texty = inputTextValue.split("\n");
-  console.log(imgs);
-  for (let j = 0; j < texty.length; j++) {
-    for (let i = 0; i < clubs.length; i++) {
-      if (texty[j].indexOf(clubs[i]) > -1) {
-        drawResizedImage(imgs[clubs[i]], 60, 100 + j * 50, 200 + j * 50);
+function copyMatchStats() {
+  let imgToAdd = [];
+  let statisticsTable = document.getElementById("match-stats");
+  let teamLogos = statisticsTable.rows[0].children[1].innerHTML.split(" - ");
+  let leagueName = document.getElementById("league-match-stats").innerHTML;
+
+  for (let i = 0; i < teamLogos.length; i++) {
+    for (let j = 0; j < clubs.length; j++) {
+      if (teamLogos[i].indexOf(`*${clubs[j]}*`) > -1) {
+        imgToAdd.push({
+          img: imgs[clubs[j]],
+          imgHeight: 50,
+          startX: 920 + i * 320,
+          startY: 181,
+        });
       }
     }
   }
+
+  statisticsTable.rows[0].children[1].innerHTML = "-";
+
+  buildTableForTableType(
+    removeNewlines(statisticsTable.outerHTML),
+    imgToAdd,
+    180
+  );
+  ctx.fillText(leagueName, 540, 960);
+}
+
+function copyStandings() {
+  let imgToAdd = [];
+  let thisTr,
+    thisTd,
+    thisClub,
+    l = 0;
+  let standingsTable = document.getElementById("league-standings");
+
+  for (let i = 0; i < standingsTable.rows.length; i++) {
+    thisTr = standingsTable.rows[i];
+    for (let j = 0; j < thisTr.children.length; j++) {
+      thisTd = thisTr.children[j];
+      for (let k = 0; k < clubs.length; k++) {
+        thisClub = clubs[k];
+        if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
+          imgToAdd.push({
+            img: imgs[thisClub],
+            imgHeight: 40,
+            startX: 398,
+            startY: 144 + l * 42,
+          });
+          l++;
+          thisTd.innerHTML = " ";
+        }
+      }
+    }
+  }
+  buildTableForTableType(removeNewlines(standingsTable.outerHTML), imgToAdd);
 }
 
 function buildTableForTableType(lines, imgToAdd, yPos = 100) {
-  // let imgToAdd = [];
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
-  /*for (let i = 0; i < clubs.length; i++) {
-    if (lines.indexOf(`*${clubs[i]}*`) > -1) {
-      console.log(lines.indexOf(`*${clubs[i]}*`));
-      imgToAdd.push(imgs[clubs[i]]);
-      lines = lines.replace(`*${clubs[i]}*`, "");
-    }
-  }*/
-
   ctx.drawImage(border_image, 0, 0);
 
   let theTable = "<table" + lines.split("<table")[1];
@@ -209,12 +221,29 @@ function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   img.onload = function () {
     ctx.drawImage(img, (1080 - img.width) / 2, yPos);
     for (let i = 0; i < imgToAdd.length; i++) {
-      drawResizedImage(imgToAdd[i], 40, 398, 144 + i * 42);
+      drawResizedImage(
+        imgToAdd[i].img,
+        imgToAdd[i].imgHeight,
+        imgToAdd[i].startX,
+        imgToAdd[i].startY
+      );
     }
   };
 
   img.src = buildSvgImageUrl(data);
   ctx.fillText(theText, 540, 160);
+}
+
+function addLogos() {
+  inputTextValue = document.getElementById("textOnPic").value;
+  let texty = inputTextValue.split("\n");
+  for (let j = 0; j < texty.length; j++) {
+    for (let i = 0; i < clubs.length; i++) {
+      if (texty[j].indexOf(clubs[i]) > -1) {
+        drawResizedImage(imgs[clubs[i]], 60, 100 + j * 50, 200 + j * 50);
+      }
+    }
+  }
 }
 
 function drawResizedImage(image, imgHeight, startX, startY) {
@@ -240,5 +269,4 @@ function preLoadLogos() {
     img.src = imagePath(clubs[i]);
     imgs[clubs[i]] = img;
   }
-  console.log(imgs);
 }
