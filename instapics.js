@@ -51,7 +51,7 @@ function make_base(text) {
     if (radioValue == "ALLTEXT") {
       fontHeight = 200;
     } else if (radioValue == "HALF") {
-      fontHeight = 720;
+      fontHeight = 628;
     } else {
       fontHeight = 920;
     }
@@ -122,23 +122,23 @@ function pasteImage(event) {
 
       switch (radioValue) {
         case "NONE":
-          imgHeight = 735;
+          imgHeight = 740;
           break;
         case "ELEVEN":
-          imgHeight = 920;
+          imgHeight = 934;
           break;
         case "HALF":
-          imgHeight = 570;
+          imgHeight = 492;
           break;
         default:
-          imgHeight = 680;
+          imgHeight = 696;
           break;
       }
 
       base_image = new Image();
       base_image.src = event.target.result;
       base_image.onload = function () {
-        drawResizedImage(base_image, imgHeight, 1080, 90);
+        drawResizedImage(base_image, imgHeight, 1080, 76);
         ctx.drawImage(border_image, 0, 0);
       };
     };
@@ -203,6 +203,31 @@ function copyStandings() {
     }
   }
   buildTableForTableType(removeNewlines(standingsTable.outerHTML), imgToAdd);
+}
+
+function getLocalMatches() {
+  fetch("Allmatches/premier-league.json")
+    .then((response) => response.json())
+    .then((json) => {
+      //console.log(json);
+      for (let i = 0; i < json.length; i++) {
+        if (json[i].fixture.status.short == "FT") {
+          fetch(`Matches/${json[i].fixture.id}.json`)
+            .then((response2) => {
+              if (response2.ok) {
+                return response2.json();
+              }
+              throw new Error("Something went wrong");
+            })
+            .then((matchJson) => console.log(matchJson))
+            .catch((error) => {
+              console.log(error);
+              console.log(json[i].fixture.id);
+              //1100
+            });
+        }
+      }
+    });
 }
 
 function buildTableForTableType(lines, imgToAdd, yPos = 100) {
