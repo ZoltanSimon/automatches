@@ -238,28 +238,7 @@ document.getElementById("get-local-matches").onclick = function () {
               throw new Error("Something went wrong");
             })
             .then((matchJson) => {
-              //console.log(matchJson);
-              for (let { players } of matchJson) {
-                //console.log(players[0].players);
-
-                playerFound = players[0].players.find(
-                  (x) => x.player.id == 1100
-                );
-                if (!playerFound)
-                  playerFound = players[1].players.find(
-                    (x) => x.player.id == 1100
-                  );
-                if (playerFound) {
-                  console.log(playerFound.statistics[0]);
-                  if (playerFound.statistics[0].goals.total)
-                    goals += playerFound.statistics[0].goals.total;
-                  apps++;
-                  minutes += playerFound.statistics[0].games.minutes;
-                }
-              }
-              console.log("apps " + apps);
-              console.log("goals " + goals);
-              console.log("minutes " + minutes);
+              getPlayerStatsFromJson(matchJson);
             })
             .catch((error) => {
               console.log(error);
@@ -271,6 +250,27 @@ document.getElementById("get-local-matches").onclick = function () {
       }
     });
 };
+
+function getPlayerStatsFromJson(matchJson) {
+  //console.log(matchJson);
+  for (let { players } of matchJson) {
+    //console.log(players[0].players);
+
+    playerFound = players[0].players.find((x) => x.player.id == 1100);
+    if (!playerFound)
+      playerFound = players[1].players.find((x) => x.player.id == 1100);
+    if (playerFound) {
+      console.log(playerFound.statistics[0]);
+      if (playerFound.statistics[0].goals.total)
+        goals += playerFound.statistics[0].goals.total;
+      apps++;
+      minutes += playerFound.statistics[0].games.minutes;
+    }
+  }
+  console.log("apps " + apps);
+  console.log("goals " + goals);
+  console.log("minutes " + minutes);
+}
 
 function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
