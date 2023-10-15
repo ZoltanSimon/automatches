@@ -1,3 +1,5 @@
+import { downloadResultFromApi } from "/webapi-handler.js";
+
 let c = document.getElementById("myCanvas");
 let ctx = c.getContext("2d");
 const font = "Source Sans Pro";
@@ -16,8 +18,16 @@ let inputTextValue,
   red_image;
 let imgs = {};
 
+//Preload images
 let border_image = new Image();
 border_image.src = borderImage;
+for (let i = 0; i < clubs.length; i++) {
+  var img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = imagePath(clubs[i]);
+  imgs[clubs[i]] = img;
+}
+
 make_base("test");
 
 function make_base(text) {
@@ -52,6 +62,8 @@ function make_base(text) {
       fontHeight = 200;
     } else if (radioValue == "HALF") {
       fontHeight = 628;
+    } else if (radioValue == "NONE") {
+      fontHeight = 900;
     } else {
       fontHeight = 920;
     }
@@ -67,11 +79,13 @@ function make_base(text) {
   };
 }
 
-function keyPressed() {
+document.getElementById("textOnPic").onkeyup = function () {
   inputTextValue = document.getElementById("textOnPic").value;
   make_base(inputTextValue);
-}
+};
 
+/*
+Should convert transfermarkt transfers to tables we can use
 function keyPresszer() {
   inputTextValue = document.getElementById("cleanTmarks").value;
   var lines = inputTextValue.split("\n");
@@ -100,9 +114,9 @@ function keyPresszer() {
     }
   }
   console.log(players);
-}
+}*/
 
-function pasteImage(event) {
+document.getElementById("pasteArea").onpaste = function (event) {
   // use event.originalEvent.clipboard for newer chrome versions
   var items = (event.clipboardData || event.originalEvent.clipboardData).items;
   // find pasted image among pasted items
@@ -122,7 +136,7 @@ function pasteImage(event) {
 
       switch (radioValue) {
         case "NONE":
-          imgHeight = 740;
+          imgHeight = 780;
           break;
         case "ELEVEN":
           imgHeight = 934;
@@ -144,9 +158,9 @@ function pasteImage(event) {
     };
     reader.readAsDataURL(blob);
   }
-}
+};
 
-function copyMatchStats() {
+document.getElementById("copy-match-stats").onclick = function (event) {
   let imgToAdd = [];
   let statisticsTable = document.getElementById("match-stats");
   let teamLogos = statisticsTable.rows[0].children[1].innerHTML.split(" - ");
@@ -173,9 +187,9 @@ function copyMatchStats() {
     180
   );
   ctx.fillText(leagueName, 540, 960);
-}
+};
 
-function copyStandings() {
+document.getElementById("copy-standings").onclick = function (event) {
   let imgToAdd = [];
   let thisTr,
     thisTd,
@@ -203,9 +217,13 @@ function copyStandings() {
     }
   }
   buildTableForTableType(removeNewlines(standingsTable.outerHTML), imgToAdd);
-}
+};
 
-function getLocalMatches() {
+document.getElementById("get-local-matches").onclick = function () {
+  let playerFound;
+  let goals = 0;
+  let apps = 0;
+  let minutes = 0;
   fetch("Allmatches/premier-league.json")
     .then((response) => response.json())
     .then((json) => {
@@ -219,16 +237,40 @@ function getLocalMatches() {
               }
               throw new Error("Something went wrong");
             })
-            .then((matchJson) => console.log(matchJson))
+            .then((matchJson) => {
+              //console.log(matchJson);
+              for (let { players } of matchJson) {
+                //console.log(players[0].players);
+
+                playerFound = players[0].players.find(
+                  (x) => x.player.id == 1100
+                );
+                if (!playerFound)
+                  playerFound = players[1].players.find(
+                    (x) => x.player.id == 1100
+                  );
+                if (playerFound) {
+                  console.log(playerFound.statistics[0]);
+                  if (playerFound.statistics[0].goals.total)
+                    goals += playerFound.statistics[0].goals.total;
+                  apps++;
+                  minutes += playerFound.statistics[0].games.minutes;
+                }
+              }
+              console.log("apps " + apps);
+              console.log("goals " + goals);
+              console.log("minutes " + minutes);
+            })
             .catch((error) => {
               console.log(error);
               console.log(json[i].fixture.id);
+              //downloadResultFromApi(json[i].fixture.id);
               //1100
             });
         }
       }
     });
-}
+};
 
 function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
@@ -259,6 +301,8 @@ function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   ctx.fillText(theText, 540, 160);
 }
 
+/*
+Should add logos when adding club names to text area
 function addLogos() {
   inputTextValue = document.getElementById("textOnPic").value;
   let texty = inputTextValue.split("\n");
@@ -269,7 +313,7 @@ function addLogos() {
       }
     }
   }
-}
+}*/
 
 function drawResizedImage(image, imgHeight, startX, startY) {
   if (image.height > image.width) {
@@ -283,15 +327,6 @@ function drawResizedImage(image, imgHeight, startX, startY) {
 }
 
 function buildSvgImageUrl(svg) {
-  b64 = window.btoa(unescape(encodeURIComponent(svg)));
+  let b64 = window.btoa(unescape(encodeURIComponent(svg)));
   return "data:image/svg+xml;base64," + b64;
-}
-
-function preLoadLogos() {
-  for (let i = 0; i < clubs.length; i++) {
-    var img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = imagePath(clubs[i]);
-    imgs[clubs[i]] = img;
-  }
 }

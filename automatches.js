@@ -335,7 +335,7 @@ function oneMatch(matchId) {
     });
 }
 
-const fs = require("fs");
+/*const fs = require("fs");
 const path = require("path");
 
 const jsonsInDir = fs
@@ -346,4 +346,4 @@ jsonsInDir.forEach((file) => {
   const fileData = fs.readFileSync(path.join("./sw_lbi/categories", file));
   const json = JSON.parse(fileData.toString());
   console.log(json);
-});
+});*/

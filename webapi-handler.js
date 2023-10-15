@@ -89,6 +89,7 @@ export async function getResultsDate(leagueID, from, to) {
     }
   );
   const data = await response.json();
+  console.log(data);
   return data;
 }
 
