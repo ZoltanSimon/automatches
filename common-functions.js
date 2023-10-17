@@ -110,3 +110,11 @@ let clubs = [
   "FSV Mainz 05",
   "FC Koln",
 ];
+
+let allLeagues = [
+  "bundesliga",
+  "la-liga",
+  "premier-league",
+  "uefa-champions-league",
+  "serie-a",
+];
