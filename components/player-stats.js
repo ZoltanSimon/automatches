@@ -1,3 +1,5 @@
+import { Stat } from "../stat.js";
+
 //129718, 1100
 //sfsdfdsfwefwefwefwefew<table style='border-collapse: collapse;' border='1'> <thead> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>J. Bellingham</td> </tr> </thead> <tbody> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Games</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>undefined</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Goals</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>5</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Assists</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>1</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Shots</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>7/8</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Dribbles</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>6/11</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Fouls drawn</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>14</td> </tr> <tr> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>Yellow cards</td> <td width='50%' style='text-align: center; border-color: #1D3557; padding: 20px;'>0</td> </tr> </tbody> </table>
 
@@ -15,6 +17,19 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
   let assists2 = statsAPI2[0].statistics[0].goals.assists
     ? statsAPI2[0].statistics[0].goals.assists
     : 0;
+
+  let stats = [];
+  stats.push(new Stat("apps", "Appearences"));
+  stats.push(new Stat("minutes", "Minutes"));
+  stats.push(new Stat("goals", "Goals"));
+  stats.push(new Stat("assists", "Assists"));
+  stats.push(new Stat("gap90", "GA per 90"));
+  stats.push(new Stat("shots", "Shots on Target / Total"));
+  stats.push(new Stat("dribbles", "Dribbles Succeeded / Attempted"));
+  stats.push(new Stat("duels", "Duels Won / Total"));
+  stats.push(new Stat("key_passes", "Key Passes"));
+  stats.push(new Stat("fouls_drawn", "Fouls Drawn"));
+
   let addToPage = `
     <table style='border-collapse: collapse;' border='1' id='player-stats'>
         <thead>

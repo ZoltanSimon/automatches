@@ -10,6 +10,7 @@ import {
   getSquad,
   downloadResultFromApi,
 } from "/webapi-handler.js";
+import { getLocalPlayerStats } from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
@@ -49,11 +50,13 @@ document.getElementById("downloadMatch").onclick = async function () {
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
-  let playerID = document.getElementById("playerID").value;
+  /*let playerID = document.getElementById("playerID").value;
   let playerID2 = document.getElementById("playerID2").value;
   playerFromApi = await getPlayerStats(playerID);
   playerFromApi2 = await getPlayerStats(playerID2);
-  addPlayerStats(playerFromApi.response, playerFromApi2.response);
+  addPlayerStats(playerFromApi.response, playerFromApi2.response);*/
+  playerFromApi = await getLocalPlayerStats(1100);
+  console.log(playerFromApi);
 };
 
 document.getElementById("getSquad").onclick = async function () {

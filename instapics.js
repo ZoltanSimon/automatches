@@ -219,58 +219,7 @@ document.getElementById("copy-standings").onclick = function (event) {
   buildTableForTableType(removeNewlines(standingsTable.outerHTML), imgToAdd);
 };
 
-document.getElementById("get-local-matches").onclick = function () {
-  let playerFound;
-  let goals = 0;
-  let apps = 0;
-  let minutes = 0;
-  fetch("Allmatches/premier-league.json")
-    .then((response) => response.json())
-    .then((json) => {
-      //console.log(json);
-      for (let i = 0; i < json.length; i++) {
-        if (json[i].fixture.status.short == "FT") {
-          fetch(`Matches/${json[i].fixture.id}.json`)
-            .then((response2) => {
-              if (response2.ok) {
-                return response2.json();
-              }
-              throw new Error("Something went wrong");
-            })
-            .then((matchJson) => {
-              getPlayerStatsFromJson(matchJson);
-            })
-            .catch((error) => {
-              console.log(error);
-              console.log(json[i].fixture.id);
-              //downloadResultFromApi(json[i].fixture.id);
-              //1100
-            });
-        }
-      }
-    });
-};
-
-function getPlayerStatsFromJson(matchJson) {
-  //console.log(matchJson);
-  for (let { players } of matchJson) {
-    //console.log(players[0].players);
-
-    playerFound = players[0].players.find((x) => x.player.id == 1100);
-    if (!playerFound)
-      playerFound = players[1].players.find((x) => x.player.id == 1100);
-    if (playerFound) {
-      console.log(playerFound.statistics[0]);
-      if (playerFound.statistics[0].goals.total)
-        goals += playerFound.statistics[0].goals.total;
-      apps++;
-      minutes += playerFound.statistics[0].games.minutes;
-    }
-  }
-  console.log("apps " + apps);
-  console.log("goals " + goals);
-  console.log("minutes " + minutes);
-}
+function getPlayerStatsFromJson(matchJson) {}
 
 function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
