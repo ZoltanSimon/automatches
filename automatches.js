@@ -9,13 +9,14 @@ import {
   getPlayerStats,
   getSquad,
   downloadResultFromApi,
-} from "/webapi-handler.js";
+} from "./webapi-handler.js";
 import { getLocalPlayerStats } from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
 import { addSquad } from "./components/team-squad.js";
 import { leagueStandings } from "./components/league-standings.js";
+import { matchList } from "./components/match-list.js";
 
 let addToPage;
 let standingsFromApi,
@@ -50,13 +51,15 @@ document.getElementById("downloadMatch").onclick = async function () {
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
-  /*let playerID = document.getElementById("playerID").value;
-  let playerID2 = document.getElementById("playerID2").value;
-  playerFromApi = await getPlayerStats(playerID);
-  playerFromApi2 = await getPlayerStats(playerID2);
-  addPlayerStats(playerFromApi.response, playerFromApi2.response);*/
-  playerFromApi = await getLocalPlayerStats(1100);
-  console.log(playerFromApi);
+  let player1 = players.find(
+    (x) => x.id == document.getElementById("playerID").value
+  );
+  let player2 = players.find(
+    (x) => x.id == document.getElementById("playerID2").value
+  );
+  playerFromApi = await getLocalPlayerStats(player1);
+  playerFromApi2 = await getLocalPlayerStats(player2);
+  addPlayerStats(playerFromApi, playerFromApi2);
 };
 
 document.getElementById("getSquad").onclick = async function () {
@@ -70,7 +73,7 @@ async function submitRequest_matchList() {
   let startDate = document.getElementById("dateStart").value;
   let endDate = document.getElementById("dateEnd").value;
   getResultsDate(leagueID, startDate, endDate).then((response) =>
-    fixturesInfo(response)
+    matchList(response)
   );
 }
 
@@ -203,35 +206,6 @@ function topAssists(response) {
 
 function teamLink(name) {
   return `https://generationfootball.net/world-cup-2022-qatar/world-cup-2022-teams/${name}`;
-}
-
-function fixturesInfo(response) {
-  let fixtures = response.response;
-  fixtures.sort(function (a, b) {
-    return new Date(a.fixture.date) - new Date(b.fixture.date);
-  });
-  addToPage = `<table>`;
-  fixtures.forEach((element) => {
-    addToPage += `<tr>
-    <td>${new Date(element.fixture.date).toDateString()}</td>
-    <td><img src=${imagePath(element.teams.home.name)} width="30px"></td>
-    <td><a href="${teamLink(element.teams.home.name)}/">${
-      element.teams.home.name
-    }</a></td>
-    <td width="30px">${
-      !isNaN(parseInt(element.goals.home)) ? element.goals.home : ""
-    }</td>
-    <td><img src=${imagePath(element.teams.away.name)} width="30px"</td>
-    <td><a href="${teamLink(element.teams.away.name)}/">${
-      element.teams.away.name
-    }</a></td>
-    <td width="30px">${
-      !isNaN(parseInt(element.goals.away)) ? element.goals.away : ""
-    }</td><td>${element.fixture.id}</td>
-    </tr>`;
-  });
-  addToPage += `</table>`;
-  document.getElementById("fixtures-info").innerHTML += addToPage;
 }
 
 function addGoals(goals) {

@@ -2,7 +2,7 @@
   {
     "fixture": {
       "id": 1048881,
-      "referee": "F. Zwayer",
+      "referee": "Felix Zwayer, Germany",
       "timezone": "UTC",
       "date": "2023-08-18T18:30:00+00:00",
       "timestamp": 1692383400,
@@ -70,7 +70,7 @@
   {
     "fixture": {
       "id": 1048884,
-      "referee": "F. Brych",
+      "referee": "Felix Brych, Germany",
       "timezone": "UTC",
       "date": "2023-08-19T13:30:00+00:00",
       "timestamp": 1692451800,
@@ -138,7 +138,7 @@
   {
     "fixture": {
       "id": 1048886,
-      "referee": "F. Badstübner",
+      "referee": "Florian Badstubner, Germany",
       "timezone": "UTC",
       "date": "2023-08-19T13:30:00+00:00",
       "timestamp": 1692451800,
@@ -206,7 +206,7 @@
   {
     "fixture": {
       "id": 1048887,
-      "referee": "S. Jablonski",
+      "referee": "Sven Jablonski, Germany",
       "timezone": "UTC",
       "date": "2023-08-19T13:30:00+00:00",
       "timestamp": 1692451800,
@@ -274,7 +274,7 @@
   {
     "fixture": {
       "id": 1048888,
-      "referee": "D. Schlager",
+      "referee": "Daniel Schlager, Germany",
       "timezone": "UTC",
       "date": "2023-08-19T13:30:00+00:00",
       "timestamp": 1692451800,
@@ -342,7 +342,7 @@
   {
     "fixture": {
       "id": 1048889,
-      "referee": "D. Siebert",
+      "referee": "Daniel Siebert, Germany",
       "timezone": "UTC",
       "date": "2023-08-19T13:30:00+00:00",
       "timestamp": 1692451800,
@@ -410,7 +410,7 @@
   {
     "fixture": {
       "id": 1048882,
-      "referee": "D. Aytekin",
+      "referee": "Deniz Aytekin, Germany",
       "timezone": "UTC",
       "date": "2023-08-19T16:30:00+00:00",
       "timestamp": 1692462600,
@@ -478,7 +478,7 @@
   {
     "fixture": {
       "id": 1048883,
-      "referee": "T. Stieler",
+      "referee": "Tobias Stieler, Germany",
       "timezone": "UTC",
       "date": "2023-08-20T13:30:00+00:00",
       "timestamp": 1692538200,
@@ -546,7 +546,7 @@
   {
     "fixture": {
       "id": 1048885,
-      "referee": "H. Osmers",
+      "referee": "Harm Osmers, Germany",
       "timezone": "UTC",
       "date": "2023-08-20T15:30:00+00:00",
       "timestamp": 1692545400,
@@ -614,7 +614,7 @@
   {
     "fixture": {
       "id": 1048891,
-      "referee": "F. Willenborg",
+      "referee": "Frank Willenborg, Germany",
       "timezone": "UTC",
       "date": "2023-08-25T18:30:00+00:00",
       "timestamp": 1692988200,
@@ -682,7 +682,7 @@
   {
     "fixture": {
       "id": 1048892,
-      "referee": "B. Brand",
+      "referee": "Benjamin Brand, Germany",
       "timezone": "UTC",
       "date": "2023-08-26T13:30:00+00:00",
       "timestamp": 1693056600,
@@ -750,7 +750,7 @@
   {
     "fixture": {
       "id": 1048895,
-      "referee": "M. Jöllenbeck",
+      "referee": "Matthias Jollenbeck, Germany",
       "timezone": "UTC",
       "date": "2023-08-26T13:30:00+00:00",
       "timestamp": 1693056600,
@@ -818,7 +818,7 @@
   {
     "fixture": {
       "id": 1048896,
-      "referee": "R. Schröder",
+      "referee": "Robert Schroder, Germany",
       "timezone": "UTC",
       "date": "2023-08-26T13:30:00+00:00",
       "timestamp": 1693056600,
@@ -886,7 +886,7 @@
   {
     "fixture": {
       "id": 1048897,
-      "referee": "R. Hartmann",
+      "referee": "Robert Hartmann, Germany",
       "timezone": "UTC",
       "date": "2023-08-26T13:30:00+00:00",
       "timestamp": 1693056600,
@@ -954,7 +954,7 @@
   {
     "fixture": {
       "id": 1048898,
-      "referee": "P. Ittrich",
+      "referee": "Patrick Ittrich, Germany",
       "timezone": "UTC",
       "date": "2023-08-26T13:30:00+00:00",
       "timestamp": 1693056600,
@@ -1022,7 +1022,7 @@
   {
     "fixture": {
       "id": 1048894,
-      "referee": "C. Dingert",
+      "referee": "Christian Dingert, Germany",
       "timezone": "UTC",
       "date": "2023-08-26T16:30:00+00:00",
       "timestamp": 1693067400,
@@ -1090,7 +1090,7 @@
   {
     "fixture": {
       "id": 1048893,
-      "referee": "B. Dankert",
+      "referee": "Bastian Dankert, Germany",
       "timezone": "UTC",
       "date": "2023-08-27T13:30:00+00:00",
       "timestamp": 1693143000,
@@ -1158,7 +1158,7 @@
   {
     "fixture": {
       "id": 1048890,
-      "referee": "D. Siebert",
+      "referee": "Daniel Siebert, Germany",
       "timezone": "UTC",
       "date": "2023-08-27T15:30:00+00:00",
       "timestamp": 1693150200,
@@ -1226,7 +1226,7 @@
   {
     "fixture": {
       "id": 1048899,
-      "referee": "T. Reichel",
+      "referee": "Tobias Reichel, Germany",
       "timezone": "UTC",
       "date": "2023-09-01T18:30:00+00:00",
       "timestamp": 1693593000,
@@ -1294,7 +1294,7 @@
   {
     "fixture": {
       "id": 1048901,
-      "referee": "S. Jablonski",
+      "referee": "Sven Jablonski, Germany",
       "timezone": "UTC",
       "date": "2023-09-02T13:30:00+00:00",
       "timestamp": 1693661400,
@@ -1362,7 +1362,7 @@
   {
     "fixture": {
       "id": 1048904,
-      "referee": "F. Zwayer",
+      "referee": "Felix Zwayer, Germany",
       "timezone": "UTC",
       "date": "2023-09-02T13:30:00+00:00",
       "timestamp": 1693661400,
@@ -1430,7 +1430,7 @@
   {
     "fixture": {
       "id": 1048905,
-      "referee": "R. Schröder",
+      "referee": "Robert Schroder, Germany",
       "timezone": "UTC",
       "date": "2023-09-02T13:30:00+00:00",
       "timestamp": 1693661400,
@@ -1498,7 +1498,7 @@
   {
     "fixture": {
       "id": 1048906,
-      "referee": "M. Petersen",
+      "referee": "Martin Petersen, Germany",
       "timezone": "UTC",
       "date": "2023-09-02T13:30:00+00:00",
       "timestamp": 1693661400,
@@ -1566,7 +1566,7 @@
   {
     "fixture": {
       "id": 1048907,
-      "referee": "F. Brych",
+      "referee": "Felix Brych, Germany",
       "timezone": "UTC",
       "date": "2023-09-02T13:30:00+00:00",
       "timestamp": 1693661400,
@@ -1634,7 +1634,7 @@
   {
     "fixture": {
       "id": 1048903,
-      "referee": "D. Aytekin",
+      "referee": "Deniz Aytekin, Germany",
       "timezone": "UTC",
       "date": "2023-09-02T16:30:00+00:00",
       "timestamp": 1693672200,
@@ -1702,7 +1702,7 @@
   {
     "fixture": {
       "id": 1048902,
-      "referee": "F. Badstübner",
+      "referee": "Florian Badstubner, Germany",
       "timezone": "UTC",
       "date": "2023-09-03T13:30:00+00:00",
       "timestamp": 1693747800,
@@ -1770,7 +1770,7 @@
   {
     "fixture": {
       "id": 1048900,
-      "referee": "D. Schlager",
+      "referee": "Daniel Schlager, Germany",
       "timezone": "UTC",
       "date": "2023-09-03T15:30:00+00:00",
       "timestamp": 1693755000,
@@ -1838,7 +1838,7 @@
   {
     "fixture": {
       "id": 1048908,
-      "referee": "D. Schlager",
+      "referee": "Daniel Schlager, Germany",
       "timezone": "UTC",
       "date": "2023-09-15T18:30:00+00:00",
       "timestamp": 1694802600,
@@ -1906,7 +1906,7 @@
   {
     "fixture": {
       "id": 1048909,
-      "referee": "S. Stegemann",
+      "referee": "Sascha Stegemann, Germany",
       "timezone": "UTC",
       "date": "2023-09-16T13:30:00+00:00",
       "timestamp": 1694871000,
@@ -1974,7 +1974,7 @@
   {
     "fixture": {
       "id": 1048910,
-      "referee": "T. Stieler",
+      "referee": "Tobias Stieler, Germany",
       "timezone": "UTC",
       "date": "2023-09-16T13:30:00+00:00",
       "timestamp": 1694871000,
@@ -2042,7 +2042,7 @@
   {
     "fixture": {
       "id": 1048911,
-      "referee": "F. Brych",
+      "referee": "Felix Brych, Germany",
       "timezone": "UTC",
       "date": "2023-09-16T13:30:00+00:00",
       "timestamp": 1694871000,
@@ -2110,7 +2110,7 @@
   {
     "fixture": {
       "id": 1048912,
-      "referee": "H. Osmers",
+      "referee": "Harm Osmers, Germany",
       "timezone": "UTC",
       "date": "2023-09-16T13:30:00+00:00",
       "timestamp": 1694871000,
@@ -2178,7 +2178,7 @@
   {
     "fixture": {
       "id": 1048913,
-      "referee": "D. Siebert",
+      "referee": "Daniel Siebert, Germany",
       "timezone": "UTC",
       "date": "2023-09-16T13:30:00+00:00",
       "timestamp": 1694871000,
@@ -2246,7 +2246,7 @@
   {
     "fixture": {
       "id": 1048914,
-      "referee": "B. Brand",
+      "referee": "Benjamin Brand, Germany",
       "timezone": "UTC",
       "date": "2023-09-16T16:30:00+00:00",
       "timestamp": 1694881800,
@@ -2314,7 +2314,7 @@
   {
     "fixture": {
       "id": 1048915,
-      "referee": "P. Ittrich",
+      "referee": "Patrick Ittrich, Germany",
       "timezone": "UTC",
       "date": "2023-09-17T13:30:00+00:00",
       "timestamp": 1694957400,
@@ -2382,7 +2382,7 @@
   {
     "fixture": {
       "id": 1048916,
-      "referee": "T. Gerach",
+      "referee": "Timo Gerach, Germany",
       "timezone": "UTC",
       "date": "2023-09-17T15:30:00+00:00",
       "timestamp": 1694964600,
@@ -2450,7 +2450,7 @@
   {
     "fixture": {
       "id": 1048925,
-      "referee": "M. Jöllenbeck",
+      "referee": "Matthias Jollenbeck, Germany",
       "timezone": "UTC",
       "date": "2023-09-22T18:30:00+00:00",
       "timestamp": 1695407400,
@@ -2518,7 +2518,7 @@
   {
     "fixture": {
       "id": 1048917,
-      "referee": "R. Hartmann",
+      "referee": "Robert Hartmann, Germany",
       "timezone": "UTC",
       "date": "2023-09-23T13:30:00+00:00",
       "timestamp": 1695475800,
@@ -2586,7 +2586,7 @@
   {
     "fixture": {
       "id": 1048918,
-      "referee": "S. Jablonski",
+      "referee": "Sven Jablonski, Germany",
       "timezone": "UTC",
       "date": "2023-09-23T13:30:00+00:00",
       "timestamp": 1695475800,
@@ -2654,7 +2654,7 @@
   {
     "fixture": {
       "id": 1048919,
-      "referee": "D. Aytekin",
+      "referee": "Deniz Aytekin, Germany",
       "timezone": "UTC",
       "date": "2023-09-23T13:30:00+00:00",
       "timestamp": 1695475800,
@@ -2722,7 +2722,7 @@
   {
     "fixture": {
       "id": 1048922,
-      "referee": "R. Schröder",
+      "referee": "Robert Schroder, Germany",
       "timezone": "UTC",
       "date": "2023-09-23T13:30:00+00:00",
       "timestamp": 1695475800,
@@ -2790,7 +2790,7 @@
   {
     "fixture": {
       "id": 1048924,
-      "referee": "M. Fritz",
+      "referee": "Marco Fritz, Germany",
       "timezone": "UTC",
       "date": "2023-09-23T13:30:00+00:00",
       "timestamp": 1695475800,
@@ -2858,7 +2858,7 @@
   {
     "fixture": {
       "id": 1048923,
-      "referee": "B. Dankert",
+      "referee": "Bastian Dankert, Germany",
       "timezone": "UTC",
       "date": "2023-09-23T16:30:00+00:00",
       "timestamp": 1695486600,
@@ -2926,7 +2926,7 @@
   {
     "fixture": {
       "id": 1048920,
-      "referee": "C. Dingert",
+      "referee": "Christian Dingert, Germany",
       "timezone": "UTC",
       "date": "2023-09-24T13:30:00+00:00",
       "timestamp": 1695562200,
@@ -2994,7 +2994,7 @@
   {
     "fixture": {
       "id": 1048921,
-      "referee": "F. Zwayer",
+      "referee": "Felix Zwayer, Germany",
       "timezone": "UTC",
       "date": "2023-09-24T15:30:00+00:00",
       "timestamp": 1695569400,
@@ -3062,7 +3062,7 @@
   {
     "fixture": {
       "id": 1048931,
-      "referee": "F. Badstübner",
+      "referee": "Florian Badstubner, Germany",
       "timezone": "UTC",
       "date": "2023-09-29T18:30:00+00:00",
       "timestamp": 1696012200,
@@ -3130,7 +3130,7 @@
   {
     "fixture": {
       "id": 1048928,
-      "referee": "F. Willenborg",
+      "referee": "Frank Willenborg, Germany",
       "timezone": "UTC",
       "date": "2023-09-30T13:30:00+00:00",
       "timestamp": 1696080600,
@@ -3198,7 +3198,7 @@
   {
     "fixture": {
       "id": 1048929,
-      "referee": "B. Brand",
+      "referee": "Benjamin Brand, Germany",
       "timezone": "UTC",
       "date": "2023-09-30T13:30:00+00:00",
       "timestamp": 1696080600,
@@ -3266,7 +3266,7 @@
   {
     "fixture": {
       "id": 1048930,
-      "referee": "T. Stieler",
+      "referee": "Tobias Stieler, Germany",
       "timezone": "UTC",
       "date": "2023-09-30T13:30:00+00:00",
       "timestamp": 1696080600,
@@ -3334,7 +3334,7 @@
   {
     "fixture": {
       "id": 1048932,
-      "referee": "F. Brych",
+      "referee": "Felix Brych, Germany",
       "timezone": "UTC",
       "date": "2023-09-30T13:30:00+00:00",
       "timestamp": 1696080600,
@@ -3402,7 +3402,7 @@
   {
     "fixture": {
       "id": 1048933,
-      "referee": "S. Stegemann",
+      "referee": "Sascha Stegemann, Germany",
       "timezone": "UTC",
       "date": "2023-09-30T13:30:00+00:00",
       "timestamp": 1696080600,
@@ -3470,7 +3470,7 @@
   {
     "fixture": {
       "id": 1048926,
-      "referee": "M. Fritz",
+      "referee": "Marco Fritz, Germany",
       "timezone": "UTC",
       "date": "2023-09-30T16:30:00+00:00",
       "timestamp": 1696091400,
@@ -3538,7 +3538,7 @@
   {
     "fixture": {
       "id": 1048934,
-      "referee": "M. Petersen",
+      "referee": "Martin Petersen, Germany",
       "timezone": "UTC",
       "date": "2023-10-01T13:30:00+00:00",
       "timestamp": 1696167000,
@@ -3606,7 +3606,7 @@
   {
     "fixture": {
       "id": 1048927,
-      "referee": "H. Osmers",
+      "referee": "Harm Osmers, Germany",
       "timezone": "UTC",
       "date": "2023-10-01T15:30:00+00:00",
       "timestamp": 1696174200,
@@ -3674,7 +3674,7 @@
   {
     "fixture": {
       "id": 1048940,
-      "referee": "S. Jablonski",
+      "referee": "Sven Jablonski, Germany",
       "timezone": "UTC",
       "date": "2023-10-06T18:30:00+00:00",
       "timestamp": 1696617000,
@@ -3742,7 +3742,7 @@
   {
     "fixture": {
       "id": 1048936,
-      "referee": "P. Ittrich",
+      "referee": "Patrick Ittrich, Germany",
       "timezone": "UTC",
       "date": "2023-10-07T13:30:00+00:00",
       "timestamp": 1696685400,
@@ -3810,7 +3810,7 @@
   {
     "fixture": {
       "id": 1048937,
-      "referee": "T. Gerach",
+      "referee": "Timo Gerach, Germany",
       "timezone": "UTC",
       "date": "2023-10-07T13:30:00+00:00",
       "timestamp": 1696685400,
@@ -3878,7 +3878,7 @@
   {
     "fixture": {
       "id": 1048942,
-      "referee": "D. Aytekin",
+      "referee": "Deniz Aytekin, Germany",
       "timezone": "UTC",
       "date": "2023-10-07T13:30:00+00:00",
       "timestamp": 1696685400,
@@ -3946,7 +3946,7 @@
   {
     "fixture": {
       "id": 1048943,
-      "referee": "D. Siebert",
+      "referee": "Daniel Siebert, Germany",
       "timezone": "UTC",
       "date": "2023-10-07T13:30:00+00:00",
       "timestamp": 1696685400,
@@ -4014,7 +4014,7 @@
   {
     "fixture": {
       "id": 1048941,
-      "referee": "C. Dingert",
+      "referee": "Christian Dingert, Germany",
       "timezone": "UTC",
       "date": "2023-10-07T16:30:00+00:00",
       "timestamp": 1696696200,
@@ -4082,7 +4082,7 @@
   {
     "fixture": {
       "id": 1048938,
-      "referee": "F. Zwayer",
+      "referee": "Felix Zwayer, Germany",
       "timezone": "UTC",
       "date": "2023-10-08T13:30:00+00:00",
       "timestamp": 1696771800,
@@ -4150,7 +4150,7 @@
   {
     "fixture": {
       "id": 1048935,
-      "referee": "R. Schröder",
+      "referee": "Robert Schroder, Germany",
       "timezone": "UTC",
       "date": "2023-10-08T15:30:00+00:00",
       "timestamp": 1696779000,
@@ -4218,7 +4218,7 @@
   {
     "fixture": {
       "id": 1048939,
-      "referee": "D. Schlager",
+      "referee": "Daniel Schlager, Germany",
       "timezone": "UTC",
       "date": "2023-10-08T17:30:00+00:00",
       "timestamp": 1696786200,
@@ -4286,13 +4286,13 @@
   {
     "fixture": {
       "id": 1048944,
-      "referee": null,
+      "referee": "Felix Brych, Germany",
       "timezone": "UTC",
       "date": "2023-10-20T18:30:00+00:00",
       "timestamp": 1697826600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697826600,
+        "second": 1697830200
       },
       "venue": {
         "id": 19381,
@@ -4300,9 +4300,9 @@
         "city": "Dortmund"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4319,27 +4319,27 @@
         "id": 165,
         "name": "Borussia Dortmund",
         "logo": "https://media-4.api-sports.io/football/teams/165.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 162,
         "name": "Werder Bremen",
         "logo": "https://media-4.api-sports.io/football/teams/162.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -4354,13 +4354,13 @@
   {
     "fixture": {
       "id": 1048945,
-      "referee": null,
+      "referee": "Bastian Dankert, Germany",
       "timezone": "UTC",
       "date": "2023-10-21T13:30:00+00:00",
       "timestamp": 1697895000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697895000,
+        "second": 1697898600
       },
       "venue": {
         "id": 748,
@@ -4368,9 +4368,9 @@
         "city": "Berlin"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4387,27 +4387,27 @@
         "id": 182,
         "name": "Union Berlin",
         "logo": "https://media-4.api-sports.io/football/teams/182.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 172,
         "name": "VfB Stuttgart",
         "logo": "https://media-4.api-sports.io/football/teams/172.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 0,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -4422,13 +4422,13 @@
   {
     "fixture": {
       "id": 1048946,
-      "referee": null,
+      "referee": "Tobias Reichel, Germany",
       "timezone": "UTC",
       "date": "2023-10-21T13:30:00+00:00",
       "timestamp": 1697895000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697895000,
+        "second": 1697898600
       },
       "venue": {
         "id": 12717,
@@ -4436,9 +4436,9 @@
         "city": "Freiburg im Breisgau"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4455,27 +4455,27 @@
         "id": 160,
         "name": "SC Freiburg",
         "logo": "https://media-4.api-sports.io/football/teams/160.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 176,
         "name": "VfL BOCHUM",
         "logo": "https://media-4.api-sports.io/football/teams/176.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -4490,13 +4490,13 @@
   {
     "fixture": {
       "id": 1048947,
-      "referee": null,
+      "referee": "Marco Fritz, Germany",
       "timezone": "UTC",
       "date": "2023-10-21T13:30:00+00:00",
       "timestamp": 1697895000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697895000,
+        "second": 1697898600
       },
       "venue": {
         "id": 752,
@@ -4504,9 +4504,9 @@
         "city": "Wolfsburg"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4523,27 +4523,27 @@
         "id": 161,
         "name": "VfL Wolfsburg",
         "logo": "https://media-4.api-sports.io/football/teams/161.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 168,
         "name": "Bayer Leverkusen",
         "logo": "https://media-4.api-sports.io/football/teams/168.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -4558,13 +4558,13 @@
   {
     "fixture": {
       "id": 1048950,
-      "referee": null,
+      "referee": "Matthias Jollenbeck, Germany",
       "timezone": "UTC",
       "date": "2023-10-21T13:30:00+00:00",
       "timestamp": 1697895000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697895000,
+        "second": 1697898600
       },
       "venue": {
         "id": 724,
@@ -4572,9 +4572,9 @@
         "city": "Sinsheim"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4591,27 +4591,27 @@
         "id": 167,
         "name": "1899 Hoffenheim",
         "logo": "https://media-4.api-sports.io/football/teams/167.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 169,
         "name": "Eintracht Frankfurt",
         "logo": "https://media-4.api-sports.io/football/teams/169.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 3
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -4626,13 +4626,13 @@
   {
     "fixture": {
       "id": 1048952,
-      "referee": null,
+      "referee": "Harm Osmers, Germany",
       "timezone": "UTC",
       "date": "2023-10-21T13:30:00+00:00",
       "timestamp": 1697895000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697895000,
+        "second": 1697898600
       },
       "venue": {
         "id": 705,
@@ -4640,9 +4640,9 @@
         "city": "Darmstadt"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4659,27 +4659,27 @@
         "id": 181,
         "name": "SV Darmstadt 98",
         "logo": "https://media-4.api-sports.io/football/teams/181.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 173,
         "name": "RB Leipzig",
         "logo": "https://media-4.api-sports.io/football/teams/173.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -4694,13 +4694,13 @@
   {
     "fixture": {
       "id": 1048948,
-      "referee": null,
+      "referee": "Sascha Stegemann, Germany",
       "timezone": "UTC",
       "date": "2023-10-21T16:30:00+00:00",
       "timestamp": 1697905800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697905800,
+        "second": 1697909400
       },
       "venue": {
         "id": 11899,
@@ -4708,9 +4708,9 @@
         "city": "Mainz"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4727,27 +4727,27 @@
         "id": 164,
         "name": "FSV Mainz 05",
         "logo": "https://media-4.api-sports.io/football/teams/164.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 157,
         "name": "Bayern Munich",
         "logo": "https://media-4.api-sports.io/football/teams/157.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -4762,13 +4762,13 @@
   {
     "fixture": {
       "id": 1048949,
-      "referee": null,
+      "referee": "Deniz Aytekin, Germany",
       "timezone": "UTC",
       "date": "2023-10-22T13:30:00+00:00",
       "timestamp": 1697981400,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697981400,
+        "second": 1697985000
       },
       "venue": {
         "id": 731,
@@ -4776,9 +4776,9 @@
         "city": "Köln"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4795,27 +4795,27 @@
         "id": 192,
         "name": "FC Koln",
         "logo": "https://media-4.api-sports.io/football/teams/192.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 163,
         "name": "Borussia Monchengladbach",
         "logo": "https://media-4.api-sports.io/football/teams/163.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 3,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 3,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -4830,13 +4830,13 @@
   {
     "fixture": {
       "id": 1048951,
-      "referee": null,
+      "referee": "Tobias Stieler, Germany",
       "timezone": "UTC",
       "date": "2023-10-22T15:30:00+00:00",
       "timestamp": 1697988600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697988600,
+        "second": 1697992200
       },
       "venue": {
         "id": 723,
@@ -4844,9 +4844,9 @@
         "city": "Heidenheim an der Brenz"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4863,27 +4863,27 @@
         "id": 180,
         "name": "FC Heidenheim",
         "logo": "https://media-4.api-sports.io/football/teams/180.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 170,
         "name": "FC Augsburg",
         "logo": "https://media-4.api-sports.io/football/teams/170.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 5
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 3
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 5
       },
       "extratime": {
         "home": null,
@@ -4898,13 +4898,13 @@
   {
     "fixture": {
       "id": 1048959,
-      "referee": null,
+      "referee": "Patrick Ittrich, Germany",
       "timezone": "UTC",
       "date": "2023-10-27T18:30:00+00:00",
       "timestamp": 1698431400,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698431400,
+        "second": 1698435000
       },
       "venue": {
         "id": 751,
@@ -4912,9 +4912,9 @@
         "city": "Bochum"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4941,17 +4941,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -4966,13 +4966,13 @@
   {
     "fixture": {
       "id": 1048953,
-      "referee": null,
+      "referee": "Martin Petersen, Germany",
       "timezone": "UTC",
       "date": "2023-10-28T13:30:00+00:00",
       "timestamp": 1698499800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698499800,
+        "second": 1698503400
       },
       "venue": {
         "id": 700,
@@ -4980,9 +4980,9 @@
         "city": "München"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -4999,27 +4999,27 @@
         "id": 157,
         "name": "Bayern Munich",
         "logo": "https://media-4.api-sports.io/football/teams/157.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 181,
         "name": "SV Darmstadt 98",
         "logo": "https://media-4.api-sports.io/football/teams/181.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 8,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 8,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -5034,13 +5034,13 @@
   {
     "fixture": {
       "id": 1048957,
-      "referee": null,
+      "referee": "Robert Hartmann, Germany",
       "timezone": "UTC",
       "date": "2023-10-28T13:30:00+00:00",
       "timestamp": 1698499800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698499800,
+        "second": 1698503400
       },
       "venue": {
         "id": 703,
@@ -5048,9 +5048,9 @@
         "city": "Mönchengladbach"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5067,27 +5067,27 @@
         "id": 163,
         "name": "Borussia Monchengladbach",
         "logo": "https://media-4.api-sports.io/football/teams/163.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 180,
         "name": "FC Heidenheim",
         "logo": "https://media-4.api-sports.io/football/teams/180.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -5102,13 +5102,13 @@
   {
     "fixture": {
       "id": 1048958,
-      "referee": null,
+      "referee": "Tobias Stieler, Germany",
       "timezone": "UTC",
       "date": "2023-10-28T13:30:00+00:00",
       "timestamp": 1698499800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698499800,
+        "second": 1698503400
       },
       "venue": {
         "id": 755,
@@ -5116,9 +5116,9 @@
         "city": "Bremen"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5135,27 +5135,27 @@
         "id": 162,
         "name": "Werder Bremen",
         "logo": "https://media-4.api-sports.io/football/teams/162.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 182,
         "name": "Union Berlin",
         "logo": "https://media-4.api-sports.io/football/teams/182.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -5170,13 +5170,13 @@
   {
     "fixture": {
       "id": 1048960,
-      "referee": null,
+      "referee": "Daniel Schlager, Germany",
       "timezone": "UTC",
       "date": "2023-10-28T13:30:00+00:00",
       "timestamp": 1698499800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698499800,
+        "second": 1698503400
       },
       "venue": {
         "id": 698,
@@ -5184,9 +5184,9 @@
         "city": "Augsburg"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5203,27 +5203,27 @@
         "id": 170,
         "name": "FC Augsburg",
         "logo": "https://media-4.api-sports.io/football/teams/170.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 161,
         "name": "VfL Wolfsburg",
         "logo": "https://media-4.api-sports.io/football/teams/161.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 3,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 3,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -5238,13 +5238,13 @@
   {
     "fixture": {
       "id": 1048961,
-      "referee": null,
+      "referee": "Felix Zwayer, Germany",
       "timezone": "UTC",
       "date": "2023-10-28T13:30:00+00:00",
       "timestamp": 1698499800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698499800,
+        "second": 1698503400
       },
       "venue": {
         "id": 19928,
@@ -5252,9 +5252,9 @@
         "city": "Stuttgart"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5271,27 +5271,27 @@
         "id": 172,
         "name": "VfB Stuttgart",
         "logo": "https://media-4.api-sports.io/football/teams/172.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 167,
         "name": "1899 Hoffenheim",
         "logo": "https://media-4.api-sports.io/football/teams/167.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -5306,13 +5306,13 @@
   {
     "fixture": {
       "id": 1048954,
-      "referee": null,
+      "referee": "Benjamin Brand, Germany",
       "timezone": "UTC",
       "date": "2023-10-28T16:30:00+00:00",
       "timestamp": 1698510600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698510600,
+        "second": 1698514200
       },
       "venue": {
         "id": 738,
@@ -5320,9 +5320,9 @@
         "city": "Leipzig"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5339,27 +5339,27 @@
         "id": 173,
         "name": "RB Leipzig",
         "logo": "https://media-4.api-sports.io/football/teams/173.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 192,
         "name": "FC Koln",
         "logo": "https://media-4.api-sports.io/football/teams/192.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 6,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 4,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 6,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -5374,13 +5374,13 @@
   {
     "fixture": {
       "id": 1048956,
-      "referee": null,
+      "referee": "Robert Schroder, Germany",
       "timezone": "UTC",
-      "date": "2023-10-29T13:30:00+00:00",
-      "timestamp": 1698586200,
+      "date": "2023-10-29T14:30:00+00:00",
+      "timestamp": 1698589800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698589800,
+        "second": 1698593400
       },
       "venue": {
         "id": 10491,
@@ -5388,9 +5388,9 @@
         "city": "Frankfurt am Main"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5417,17 +5417,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 3,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 3,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -5442,13 +5442,13 @@
   {
     "fixture": {
       "id": 1048955,
-      "referee": null,
+      "referee": "Daniel Siebert, Germany",
       "timezone": "UTC",
-      "date": "2023-10-29T15:30:00+00:00",
-      "timestamp": 1698593400,
+      "date": "2023-10-29T16:30:00+00:00",
+      "timestamp": 1698597000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698597000,
+        "second": 1698600600
       },
       "venue": {
         "id": 699,
@@ -5456,9 +5456,9 @@
         "city": "Leverkusen"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5475,27 +5475,27 @@
         "id": 168,
         "name": "Bayer Leverkusen",
         "logo": "https://media-4.api-sports.io/football/teams/168.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 160,
         "name": "SC Freiburg",
         "logo": "https://media-4.api-sports.io/football/teams/160.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -5510,13 +5510,13 @@
   {
     "fixture": {
       "id": 1048970,
-      "referee": null,
+      "referee": "Marco Fritz, Germany",
       "timezone": "UTC",
       "date": "2023-11-03T19:30:00+00:00",
       "timestamp": 1699039800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1699039800,
+        "second": 1699043400
       },
       "venue": {
         "id": 705,
@@ -5524,9 +5524,9 @@
         "city": "Darmstadt"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5543,27 +5543,27 @@
         "id": 181,
         "name": "SV Darmstadt 98",
         "logo": "https://media-4.api-sports.io/football/teams/181.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 176,
         "name": "VfL BOCHUM",
         "logo": "https://media-4.api-sports.io/football/teams/176.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -5578,13 +5578,13 @@
   {
     "fixture": {
       "id": 1048963,
-      "referee": null,
+      "referee": "Sven Jablonski, Germany",
       "timezone": "UTC",
       "date": "2023-11-04T14:30:00+00:00",
       "timestamp": 1699108200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1699108200,
+        "second": 1699111800
       },
       "venue": {
         "id": 748,
@@ -5592,9 +5592,9 @@
         "city": "Berlin"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5611,27 +5611,27 @@
         "id": 182,
         "name": "Union Berlin",
         "logo": "https://media-4.api-sports.io/football/teams/182.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 169,
         "name": "Eintracht Frankfurt",
         "logo": "https://media-4.api-sports.io/football/teams/169.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 0,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -5646,13 +5646,13 @@
   {
     "fixture": {
       "id": 1048964,
-      "referee": null,
+      "referee": "Felix Brych, Germany",
       "timezone": "UTC",
       "date": "2023-11-04T14:30:00+00:00",
       "timestamp": 1699108200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1699108200,
+        "second": 1699111800
       },
       "venue": {
         "id": 12717,
@@ -5660,9 +5660,9 @@
         "city": "Freiburg im Breisgau"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5689,17 +5689,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 3,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 3
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 3,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -5714,13 +5714,13 @@
   {
     "fixture": {
       "id": 1048966,
-      "referee": null,
+      "referee": "Bastian Dankert, Germany",
       "timezone": "UTC",
       "date": "2023-11-04T14:30:00+00:00",
       "timestamp": 1699108200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1699108200,
+        "second": 1699111800
       },
       "venue": {
         "id": 11899,
@@ -5728,9 +5728,9 @@
         "city": "Mainz"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5747,27 +5747,27 @@
         "id": 164,
         "name": "FSV Mainz 05",
         "logo": "https://media-4.api-sports.io/football/teams/164.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 173,
         "name": "RB Leipzig",
         "logo": "https://media-4.api-sports.io/football/teams/173.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -5782,13 +5782,13 @@
   {
     "fixture": {
       "id": 1048967,
-      "referee": null,
+      "referee": "Christian Dingert, Germany",
       "timezone": "UTC",
       "date": "2023-11-04T14:30:00+00:00",
       "timestamp": 1699108200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1699108200,
+        "second": 1699111800
       },
       "venue": {
         "id": 731,
@@ -5796,9 +5796,9 @@
         "city": "Köln"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5825,17 +5825,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -5850,13 +5850,13 @@
   {
     "fixture": {
       "id": 1048968,
-      "referee": null,
+      "referee": "Frank Willenborg, Germany",
       "timezone": "UTC",
       "date": "2023-11-04T14:30:00+00:00",
       "timestamp": 1699108200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1699108200,
+        "second": 1699111800
       },
       "venue": {
         "id": 724,
@@ -5864,9 +5864,9 @@
         "city": "Sinsheim"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5883,27 +5883,27 @@
         "id": 167,
         "name": "1899 Hoffenheim",
         "logo": "https://media-4.api-sports.io/football/teams/167.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 168,
         "name": "Bayer Leverkusen",
         "logo": "https://media-4.api-sports.io/football/teams/168.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -5918,13 +5918,13 @@
   {
     "fixture": {
       "id": 1048962,
-      "referee": null,
+      "referee": "Deniz Aytekin, Germany",
       "timezone": "UTC",
       "date": "2023-11-04T17:30:00+00:00",
       "timestamp": 1699119000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1699119000,
+        "second": 1699122600
       },
       "venue": {
         "id": 19381,
@@ -5932,9 +5932,9 @@
         "city": "Dortmund"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -5951,27 +5951,27 @@
         "id": 165,
         "name": "Borussia Dortmund",
         "logo": "https://media-4.api-sports.io/football/teams/165.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 157,
         "name": "Bayern Munich",
         "logo": "https://media-4.api-sports.io/football/teams/157.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 0,
+      "away": 4
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 4
       },
       "extratime": {
         "home": null,
@@ -5986,7 +5986,7 @@
   {
     "fixture": {
       "id": 1048965,
-      "referee": null,
+      "referee": "Tobias Reichel, Germany",
       "timezone": "UTC",
       "date": "2023-11-05T14:30:00+00:00",
       "timestamp": 1699194600,
@@ -6054,7 +6054,7 @@
   {
     "fixture": {
       "id": 1048969,
-      "referee": null,
+      "referee": "F. Badstübner",
       "timezone": "UTC",
       "date": "2023-11-05T16:30:00+00:00",
       "timestamp": 1699201800,

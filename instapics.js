@@ -1,4 +1,4 @@
-import { downloadResultFromApi } from "/webapi-handler.js";
+import { matchesToCanvas } from "./components/match-list.js";
 
 let c = document.getElementById("myCanvas");
 let ctx = c.getContext("2d");
@@ -15,20 +15,27 @@ let inputTextValue,
   imgHeight,
   radioValue,
   fontHeight,
-  red_image;
+  red_image,
+  i;
 let imgs = {};
 
 //Preload images
 let border_image = new Image();
 border_image.src = borderImage;
-for (let i = 0; i < clubs.length; i++) {
+for (i = 0; i < clubs.length; i++) {
   var img = new Image();
   img.crossOrigin = "anonymous";
   img.src = imagePath(clubs[i]);
   imgs[clubs[i]] = img;
 }
+for (i = 0; i < players.length; i++) {
+  var img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = `Players-pictures/${players[i].id}.png`;
+  imgs[players[i].id] = img;
+}
 
-make_base("test");
+make_base("");
 
 function make_base(text) {
   base_image = new Image();
@@ -61,9 +68,9 @@ function make_base(text) {
     if (radioValue == "ALLTEXT") {
       fontHeight = 200;
     } else if (radioValue == "HALF") {
-      fontHeight = 628;
+      fontHeight = 650;
     } else if (radioValue == "NONE") {
-      fontHeight = 900;
+      fontHeight = 908;
     } else {
       fontHeight = 920;
     }
@@ -142,7 +149,7 @@ document.getElementById("pasteArea").onpaste = function (event) {
           imgHeight = 934;
           break;
         case "HALF":
-          imgHeight = 492;
+          imgHeight = 520;
           break;
         default:
           imgHeight = 696;
@@ -190,12 +197,15 @@ document.getElementById("copy-match-stats").onclick = function (event) {
 };
 
 document.getElementById("copy-standings").onclick = function (event) {
+  let yPos = 100;
   let imgToAdd = [];
   let thisTr,
     thisTd,
     thisClub,
     l = 0;
   let standingsTable = document.getElementById("league-standings");
+
+  if (standingsTable.rows.length < 20) yPos = 150;
 
   for (let i = 0; i < standingsTable.rows.length; i++) {
     thisTr = standingsTable.rows[i];
@@ -207,8 +217,8 @@ document.getElementById("copy-standings").onclick = function (event) {
           imgToAdd.push({
             img: imgs[thisClub],
             imgHeight: 40,
-            startX: 398,
-            startY: 144 + l * 42,
+            startX: 394,
+            startY: yPos + 44 + l * 42,
           });
           l++;
           thisTd.innerHTML = " ";
@@ -216,10 +226,38 @@ document.getElementById("copy-standings").onclick = function (event) {
       }
     }
   }
-  buildTableForTableType(removeNewlines(standingsTable.outerHTML), imgToAdd);
+
+  buildTableForTableType(
+    removeNewlines(standingsTable.outerHTML),
+    imgToAdd,
+    yPos
+  );
 };
 
-function getPlayerStatsFromJson(matchJson) {}
+document.getElementById("copy-player-stats").onclick = function (event) {
+  let imgToAdd = [];
+  let statsTable = document.getElementById("player-stats");
+  var tBody = statsTable.getElementsByTagName("tbody")[0];
+  let playerIDs = tBody.getAttribute("id").split("|");
+
+  imgToAdd.push({
+    img: imgs[playerIDs[0]],
+    imgHeight: 200,
+    startX: 550,
+    startY: 60,
+  });
+  imgToAdd.push({
+    img: imgs[playerIDs[1]],
+    imgHeight: 200,
+    startX: 1620,
+    startY: 60,
+  });
+  buildTableForTableType(removeNewlines(statsTable.outerHTML), imgToAdd, 260);
+};
+
+document.getElementById("copy-matches").onclick = function (event) {
+  matchesToCanvas();
+};
 
 function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
@@ -227,7 +265,7 @@ function buildTableForTableType(lines, imgToAdd, yPos = 100) {
 
   let theTable = "<table" + lines.split("<table")[1];
   let theText = lines.split("<table")[0];
-  var data = `<svg xmlns='http://www.w3.org/2000/svg' width='800'>
+  var data = `<svg xmlns='http://www.w3.org/2000/svg' width='880'>
     <foreignObject width='100%' height='100%'>
     <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>
     ${theTable}

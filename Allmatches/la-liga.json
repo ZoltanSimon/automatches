@@ -2,7 +2,7 @@
   {
     "fixture": {
       "id": 1037952,
-      "referee": "Javier Alberola",
+      "referee": "Antonio Alberola Rojas, Spain",
       "timezone": "UTC",
       "date": "2023-08-11T17:30:00+00:00",
       "timestamp": 1691775000,
@@ -70,7 +70,7 @@
   {
     "fixture": {
       "id": 1037956,
-      "referee": "José Sánchez",
+      "referee": "Jose Maria Sanchez Martinez, Spain",
       "timezone": "UTC",
       "date": "2023-08-11T20:00:00+00:00",
       "timestamp": 1691784000,
@@ -138,7 +138,7 @@
   {
     "fixture": {
       "id": 1037960,
-      "referee": "Francisco Hernández",
+      "referee": "Francisco Hernandez Maeso, Spain",
       "timezone": "UTC",
       "date": "2023-08-12T15:00:00+00:00",
       "timestamp": 1691852400,
@@ -206,7 +206,7 @@
   {
     "fixture": {
       "id": 1037957,
-      "referee": "Víctor García",
+      "referee": "Victor Garcia Verdura, Spain",
       "timezone": "UTC",
       "date": "2023-08-12T17:30:00+00:00",
       "timestamp": 1691861400,
@@ -274,7 +274,7 @@
   {
     "fixture": {
       "id": 1037953,
-      "referee": "Jesús Gil",
+      "referee": "Jesus Gil Manzano, Spain",
       "timezone": "UTC",
       "date": "2023-08-12T19:30:00+00:00",
       "timestamp": 1691868600,
@@ -342,7 +342,7 @@
   {
     "fixture": {
       "id": 1037955,
-      "referee": "Pablo González",
+      "referee": "Pablo Gonzales Fuertes, Spain",
       "timezone": "UTC",
       "date": "2023-08-13T15:00:00+00:00",
       "timestamp": 1691938800,
@@ -410,7 +410,7 @@
   {
     "fixture": {
       "id": 1037959,
-      "referee": "Miguel Ortiz",
+      "referee": "Miguel Angel Ortiz Arias, Spain",
       "timezone": "UTC",
       "date": "2023-08-13T17:30:00+00:00",
       "timestamp": 1691947800,
@@ -478,7 +478,7 @@
   {
     "fixture": {
       "id": 1037958,
-      "referee": "César Soto",
+      "referee": "Cesar Soto Grado, Spain",
       "timezone": "UTC",
       "date": "2023-08-13T19:30:00+00:00",
       "timestamp": 1691955000,
@@ -546,7 +546,7 @@
   {
     "fixture": {
       "id": 1037961,
-      "referee": "Isidro Díaz de Mera",
+      "referee": "Isidro Diaz de Mera Escuderos, Spain",
       "timezone": "UTC",
       "date": "2023-08-14T17:30:00+00:00",
       "timestamp": 1692034200,
@@ -614,7 +614,7 @@
   {
     "fixture": {
       "id": 1037954,
-      "referee": "Juan Pulido",
+      "referee": "Juan Luis Pulido Santana, Spain",
       "timezone": "UTC",
       "date": "2023-08-14T19:30:00+00:00",
       "timestamp": 1692041400,
@@ -682,7 +682,7 @@
   {
     "fixture": {
       "id": 1037964,
-      "referee": "Javier Alberola",
+      "referee": "Javier Alberola Rojas, Spain",
       "timezone": "UTC",
       "date": "2023-08-18T17:30:00+00:00",
       "timestamp": 1692379800,
@@ -750,7 +750,7 @@
   {
     "fixture": {
       "id": 1037971,
-      "referee": "Javier Iglesias",
+      "referee": "Javier Iglesias Villanueva, Spain",
       "timezone": "UTC",
       "date": "2023-08-18T19:30:00+00:00",
       "timestamp": 1692387000,
@@ -818,7 +818,7 @@
   {
     "fixture": {
       "id": 1037969,
-      "referee": "Miguel Ortiz",
+      "referee": "Miguel Angel Ortiz Arias, Spain",
       "timezone": "UTC",
       "date": "2023-08-19T15:00:00+00:00",
       "timestamp": 1692457200,
@@ -886,7 +886,7 @@
   {
     "fixture": {
       "id": 1037962,
-      "referee": "José Sánchez",
+      "referee": "Jose Maria Sanchez Martinez, Spain",
       "timezone": "UTC",
       "date": "2023-08-19T17:30:00+00:00",
       "timestamp": 1692466200,
@@ -954,7 +954,7 @@
   {
     "fixture": {
       "id": 1037967,
-      "referee": "José Munuera",
+      "referee": "José Luis Munuera Montero, Spain",
       "timezone": "UTC",
       "date": "2023-08-19T19:30:00+00:00",
       "timestamp": 1692473400,
@@ -1022,7 +1022,7 @@
   {
     "fixture": {
       "id": 1037970,
-      "referee": "Jorge Figueroa",
+      "referee": "Jorge Figueroa Vazquez, Spain",
       "timezone": "UTC",
       "date": "2023-08-20T17:00:00+00:00",
       "timestamp": 1692550800,
@@ -1090,7 +1090,7 @@
   {
     "fixture": {
       "id": 1037963,
-      "referee": "Alejandro Muñiz",
+      "referee": "Alejandro Muniz Ruiz, Spain",
       "timezone": "UTC",
       "date": "2023-08-20T17:30:00+00:00",
       "timestamp": 1692552600,
@@ -1158,7 +1158,7 @@
   {
     "fixture": {
       "id": 1037968,
-      "referee": "Ricardo De Burgos",
+      "referee": "Ricardo De Burgos Bengoetxea, Spain",
       "timezone": "UTC",
       "date": "2023-08-20T19:30:00+00:00",
       "timestamp": 1692559800,
@@ -1226,7 +1226,7 @@
   {
     "fixture": {
       "id": 1037966,
-      "referee": "Guillermo Cuadra",
+      "referee": "Guillermo Cuadra Fernandez, Spain",
       "timezone": "UTC",
       "date": "2023-08-21T17:00:00+00:00",
       "timestamp": 1692637200,
@@ -1294,7 +1294,7 @@
   {
     "fixture": {
       "id": 1037965,
-      "referee": "Pablo González",
+      "referee": "Pablo Gonzales Fuertes, Spain",
       "timezone": "UTC",
       "date": "2023-08-21T19:30:00+00:00",
       "timestamp": 1692646200,
@@ -1362,7 +1362,7 @@
   {
     "fixture": {
       "id": 1037975,
-      "referee": "Guillermo Cuadra",
+      "referee": "Guillermo Cuadra Fernandez, Spain",
       "timezone": "UTC",
       "date": "2023-08-25T17:30:00+00:00",
       "timestamp": 1692984600,
@@ -1430,7 +1430,7 @@
   {
     "fixture": {
       "id": 1037973,
-      "referee": "Isidro Díaz de Mera",
+      "referee": "Isidro Diaz de Mera Escuderos, Spain",
       "timezone": "UTC",
       "date": "2023-08-25T19:30:00+00:00",
       "timestamp": 1692991800,
@@ -1498,7 +1498,7 @@
   {
     "fixture": {
       "id": 1037976,
-      "referee": "Víctor García",
+      "referee": "Victor Garcia Verdura, Spain",
       "timezone": "UTC",
       "date": "2023-08-26T17:00:00+00:00",
       "timestamp": 1693069200,
@@ -1566,7 +1566,7 @@
   {
     "fixture": {
       "id": 1037974,
-      "referee": "Francisco Hernández",
+      "referee": "Francisco Hernandez Maeso, Spain",
       "timezone": "UTC",
       "date": "2023-08-26T17:30:00+00:00",
       "timestamp": 1693071000,
@@ -1634,7 +1634,7 @@
   {
     "fixture": {
       "id": 1037979,
-      "referee": "Jesús Gil",
+      "referee": "Jesus Gil Manzano, Spain",
       "timezone": "UTC",
       "date": "2023-08-26T19:30:00+00:00",
       "timestamp": 1693078200,
@@ -1702,7 +1702,7 @@
   {
     "fixture": {
       "id": 1037978,
-      "referee": "Alejandro Hernández",
+      "referee": "Alejandro Hernandez, Spain",
       "timezone": "UTC",
       "date": "2023-08-27T15:30:00+00:00",
       "timestamp": 1693150200,
@@ -1770,7 +1770,7 @@
   {
     "fixture": {
       "id": 1037980,
-      "referee": "Juan Pulido",
+      "referee": "Juan Luis Pulido Santana, Spain",
       "timezone": "UTC",
       "date": "2023-08-27T17:30:00+00:00",
       "timestamp": 1693157400,
@@ -1838,7 +1838,7 @@
   {
     "fixture": {
       "id": 1037972,
-      "referee": "César Soto",
+      "referee": "Cesar Soto Grado, Spain",
       "timezone": "UTC",
       "date": "2023-08-27T19:30:00+00:00",
       "timestamp": 1693164600,
@@ -1906,7 +1906,7 @@
   {
     "fixture": {
       "id": 1037981,
-      "referee": "Juan Martínez",
+      "referee": "Juan Martinez Munuera, Spain",
       "timezone": "UTC",
       "date": "2023-08-28T17:30:00+00:00",
       "timestamp": 1693243800,
@@ -1974,7 +1974,7 @@
   {
     "fixture": {
       "id": 1037977,
-      "referee": "José Munuera",
+      "referee": "José Luis Munuera Montero, Spain",
       "timezone": "UTC",
       "date": "2023-08-28T19:30:00+00:00",
       "timestamp": 1693251000,
@@ -2042,7 +2042,7 @@
   {
     "fixture": {
       "id": 1037985,
-      "referee": "Juan Pulido",
+      "referee": "Juan Luis Pulido Santana, Spain",
       "timezone": "UTC",
       "date": "2023-09-01T17:30:00+00:00",
       "timestamp": 1693589400,
@@ -2110,7 +2110,7 @@
   {
     "fixture": {
       "id": 1037982,
-      "referee": "Ricardo De Burgos",
+      "referee": "Ricardo De Burgos Bengoetxea, Spain",
       "timezone": "UTC",
       "date": "2023-09-01T20:00:00+00:00",
       "timestamp": 1693598400,
@@ -2178,7 +2178,7 @@
   {
     "fixture": {
       "id": 1037991,
-      "referee": "Javier Iglesias",
+      "referee": "Javier Iglesias Villanueva, Spain",
       "timezone": "UTC",
       "date": "2023-09-02T12:00:00+00:00",
       "timestamp": 1693656000,
@@ -2246,7 +2246,7 @@
   {
     "fixture": {
       "id": 1037990,
-      "referee": "Mario Melero",
+      "referee": "Mario Melero Lopez, Spain",
       "timezone": "UTC",
       "date": "2023-09-02T14:15:00+00:00",
       "timestamp": 1693664100,
@@ -2314,7 +2314,7 @@
   {
     "fixture": {
       "id": 1037987,
-      "referee": "Pablo González",
+      "referee": "Pablo Gonzales Fuertes, Spain",
       "timezone": "UTC",
       "date": "2023-09-02T16:30:00+00:00",
       "timestamp": 1693672200,
@@ -2382,7 +2382,7 @@
   {
     "fixture": {
       "id": 1037984,
-      "referee": "Alejandro Muñiz",
+      "referee": "Alejandro Muniz Ruiz, Spain",
       "timezone": "UTC",
       "date": "2023-09-02T19:00:00+00:00",
       "timestamp": 1693681200,
@@ -2450,7 +2450,7 @@
   {
     "fixture": {
       "id": 1037986,
-      "referee": "Mateo Busquets",
+      "referee": "Mateo Busquets Ferrer, Spain",
       "timezone": "UTC",
       "date": "2023-09-03T12:00:00+00:00",
       "timestamp": 1693742400,
@@ -2518,7 +2518,7 @@
   {
     "fixture": {
       "id": 1037988,
-      "referee": "Jorge Figueroa",
+      "referee": "Jorge Figueroa Vazquez, Spain",
       "timezone": "UTC",
       "date": "2023-09-03T14:15:00+00:00",
       "timestamp": 1693750500,
@@ -2586,7 +2586,7 @@
   {
     "fixture": {
       "id": 1037989,
-      "referee": "Miguel Ortiz",
+      "referee": "Miguel Angel Ortiz Arias, Spain",
       "timezone": "UTC",
       "date": "2023-09-03T19:00:00+00:00",
       "timestamp": 1693767600,
@@ -2654,7 +2654,7 @@
   {
     "fixture": {
       "id": 1038001,
-      "referee": "Víctor García",
+      "referee": "Victor Garcia Verdura, Spain",
       "timezone": "UTC",
       "date": "2023-09-15T19:00:00+00:00",
       "timestamp": 1694804400,
@@ -2722,7 +2722,7 @@
   {
     "fixture": {
       "id": 1037992,
-      "referee": "Guillermo Cuadra",
+      "referee": "Guillermo Cuadra Fernandez, Spain",
       "timezone": "UTC",
       "date": "2023-09-16T12:00:00+00:00",
       "timestamp": 1694865600,
@@ -2790,7 +2790,7 @@
   {
     "fixture": {
       "id": 1037998,
-      "referee": "Jesús Gil",
+      "referee": "Jesus Gil Manzano, Spain",
       "timezone": "UTC",
       "date": "2023-09-16T14:15:00+00:00",
       "timestamp": 1694873700,
@@ -2858,7 +2858,7 @@
   {
     "fixture": {
       "id": 1037994,
-      "referee": "José Munuera",
+      "referee": "José Luis Munuera Montero, Spain",
       "timezone": "UTC",
       "date": "2023-09-16T16:30:00+00:00",
       "timestamp": 1694881800,
@@ -2926,7 +2926,7 @@
   {
     "fixture": {
       "id": 1037993,
-      "referee": "José Sánchez",
+      "referee": "Jose Maria Sanchez Martinez, Spain",
       "timezone": "UTC",
       "date": "2023-09-16T19:00:00+00:00",
       "timestamp": 1694890800,
@@ -2994,7 +2994,7 @@
   {
     "fixture": {
       "id": 1037995,
-      "referee": "Alejandro Hernández",
+      "referee": "Alejandro Hernandez, Spain",
       "timezone": "UTC",
       "date": "2023-09-17T12:00:00+00:00",
       "timestamp": 1694952000,
@@ -3062,7 +3062,7 @@
   {
     "fixture": {
       "id": 1037997,
-      "referee": "Francisco Hernández",
+      "referee": "Francisco Hernandez Maeso, Spain",
       "timezone": "UTC",
       "date": "2023-09-17T14:15:00+00:00",
       "timestamp": 1694960100,
@@ -3130,7 +3130,7 @@
   {
     "fixture": {
       "id": 1038000,
-      "referee": "Juan Martínez",
+      "referee": "Juan Martinez Munuera, Spain",
       "timezone": "UTC",
       "date": "2023-09-17T16:30:00+00:00",
       "timestamp": 1694968200,
@@ -3198,7 +3198,7 @@
   {
     "fixture": {
       "id": 1037996,
-      "referee": "César Soto",
+      "referee": "Cesar Soto Grado, Spain",
       "timezone": "UTC",
       "date": "2023-09-17T19:00:00+00:00",
       "timestamp": 1694977200,
@@ -3266,7 +3266,7 @@
   {
     "fixture": {
       "id": 1037999,
-      "referee": "Isidro Díaz de Mera",
+      "referee": "Isidro Diaz de Mera Escuderos, Spain",
       "timezone": "UTC",
       "date": "2023-09-18T19:00:00+00:00",
       "timestamp": 1695063600,
@@ -3334,7 +3334,7 @@
   {
     "fixture": {
       "id": 1038009,
-      "referee": "Alejandro Muñiz",
+      "referee": "Alejandro Muniz Ruiz, Spain",
       "timezone": "UTC",
       "date": "2023-09-22T19:00:00+00:00",
       "timestamp": 1695409200,
@@ -3402,7 +3402,7 @@
   {
     "fixture": {
       "id": 1038006,
-      "referee": "Pablo González",
+      "referee": "Pablo Gonzales Fuertes, Spain",
       "timezone": "UTC",
       "date": "2023-09-23T12:00:00+00:00",
       "timestamp": 1695470400,
@@ -3470,7 +3470,7 @@
   {
     "fixture": {
       "id": 1038007,
-      "referee": "Javier Iglesias",
+      "referee": "Javier Iglesias Villanueva, Spain",
       "timezone": "UTC",
       "date": "2023-09-23T14:15:00+00:00",
       "timestamp": 1695478500,
@@ -3538,7 +3538,7 @@
   {
     "fixture": {
       "id": 1038004,
-      "referee": "Mario Melero",
+      "referee": "Mario Melero Lopez, Spain",
       "timezone": "UTC",
       "date": "2023-09-23T16:30:00+00:00",
       "timestamp": 1695486600,
@@ -3606,7 +3606,7 @@
   {
     "fixture": {
       "id": 1038002,
-      "referee": "Mateo Busquets",
+      "referee": "Mateo Busquets Ferrer, Spain",
       "timezone": "UTC",
       "date": "2023-09-23T19:00:00+00:00",
       "timestamp": 1695495600,
@@ -3674,7 +3674,7 @@
   {
     "fixture": {
       "id": 1038010,
-      "referee": "Juan Pulido",
+      "referee": "Juan Luis Pulido Santana, Spain",
       "timezone": "UTC",
       "date": "2023-09-24T12:00:00+00:00",
       "timestamp": 1695556800,
@@ -3742,7 +3742,7 @@
   {
     "fixture": {
       "id": 1038008,
-      "referee": "Jorge Figueroa",
+      "referee": "Jorge Figueroa Vazquez, Spain",
       "timezone": "UTC",
       "date": "2023-09-24T14:15:00+00:00",
       "timestamp": 1695564900,
@@ -3810,7 +3810,7 @@
   {
     "fixture": {
       "id": 1038005,
-      "referee": "Miguel Ortiz",
+      "referee": "Miguel Angel Ortiz Arias, Spain",
       "timezone": "UTC",
       "date": "2023-09-24T16:30:00+00:00",
       "timestamp": 1695573000,
@@ -3878,7 +3878,7 @@
   {
     "fixture": {
       "id": 1038011,
-      "referee": "Ricardo De Burgos",
+      "referee": "Ricardo De Burgos Bengoetxea, Spain",
       "timezone": "UTC",
       "date": "2023-09-24T16:30:00+00:00",
       "timestamp": 1695573000,
@@ -3946,7 +3946,7 @@
   {
     "fixture": {
       "id": 1038003,
-      "referee": "Javier Alberola",
+      "referee": "Javier Alberola Rojas, Spain",
       "timezone": "UTC",
       "date": "2023-09-24T19:00:00+00:00",
       "timestamp": 1695582000,
@@ -4014,7 +4014,7 @@
   {
     "fixture": {
       "id": 1038014,
-      "referee": "Guillermo Cuadra",
+      "referee": "Guillermo Cuadra Fernandez, Spain",
       "timezone": "UTC",
       "date": "2023-09-26T17:00:00+00:00",
       "timestamp": 1695747600,
@@ -4082,7 +4082,7 @@
   {
     "fixture": {
       "id": 1038016,
-      "referee": "Alejandro Muñiz",
+      "referee": "Alejandro Ruiz Aguilera, Spain",
       "timezone": "UTC",
       "date": "2023-09-26T19:30:00+00:00",
       "timestamp": 1695756600,
@@ -4150,7 +4150,7 @@
   {
     "fixture": {
       "id": 1038012,
-      "referee": "Isidro Díaz de Mera",
+      "referee": "Isidro Diaz de Mera Escuderos, Spain",
       "timezone": "UTC",
       "date": "2023-09-27T17:00:00+00:00",
       "timestamp": 1695834000,
@@ -4218,7 +4218,7 @@
   {
     "fixture": {
       "id": 1038018,
-      "referee": "José Sánchez",
+      "referee": "Jose Maria Sanchez Martinez, Spain",
       "timezone": "UTC",
       "date": "2023-09-27T17:00:00+00:00",
       "timestamp": 1695834000,
@@ -4286,7 +4286,7 @@
   {
     "fixture": {
       "id": 1038020,
-      "referee": "José Munuera",
+      "referee": "José Luis Munuera Montero, Spain",
       "timezone": "UTC",
       "date": "2023-09-27T17:00:00+00:00",
       "timestamp": 1695834000,
@@ -4354,7 +4354,7 @@
   {
     "fixture": {
       "id": 1038013,
-      "referee": "Francisco Hernández",
+      "referee": "Francisco Hernandez Maeso, Spain",
       "timezone": "UTC",
       "date": "2023-09-27T19:30:00+00:00",
       "timestamp": 1695843000,
@@ -4422,7 +4422,7 @@
   {
     "fixture": {
       "id": 1038019,
-      "referee": "Alejandro Hernández",
+      "referee": "Alejandro Hernandez, Spain",
       "timezone": "UTC",
       "date": "2023-09-27T19:30:00+00:00",
       "timestamp": 1695843000,
@@ -4490,7 +4490,7 @@
   {
     "fixture": {
       "id": 1038017,
-      "referee": "Víctor García",
+      "referee": "Victor Garcia Verdura, Spain",
       "timezone": "UTC",
       "date": "2023-09-28T17:00:00+00:00",
       "timestamp": 1695920400,
@@ -4558,7 +4558,7 @@
   {
     "fixture": {
       "id": 1038021,
-      "referee": "César Soto",
+      "referee": "Cesar Soto Grado, Spain",
       "timezone": "UTC",
       "date": "2023-09-28T17:00:00+00:00",
       "timestamp": 1695920400,
@@ -4626,7 +4626,7 @@
   {
     "fixture": {
       "id": 1038015,
-      "referee": "Juan Martínez",
+      "referee": "Juan Martinez Munuera, Spain",
       "timezone": "UTC",
       "date": "2023-09-28T19:30:00+00:00",
       "timestamp": 1695929400,
@@ -4694,7 +4694,7 @@
   {
     "fixture": {
       "id": 1038024,
-      "referee": "Miguel Ortiz",
+      "referee": "Miguel Angel Ortiz Arias, Spain",
       "timezone": "UTC",
       "date": "2023-09-29T19:00:00+00:00",
       "timestamp": 1696014000,
@@ -4762,7 +4762,7 @@
   {
     "fixture": {
       "id": 1038026,
-      "referee": "Mateo Busquets",
+      "referee": "Mateo Busquets Ferrer, Spain",
       "timezone": "UTC",
       "date": "2023-09-30T12:00:00+00:00",
       "timestamp": 1696075200,
@@ -4830,7 +4830,7 @@
   {
     "fixture": {
       "id": 1038031,
-      "referee": "Mario Melero",
+      "referee": "Mario Melero Lopez, Spain",
       "timezone": "UTC",
       "date": "2023-09-30T14:15:00+00:00",
       "timestamp": 1696083300,
@@ -4898,7 +4898,7 @@
   {
     "fixture": {
       "id": 1038027,
-      "referee": "Juan Pulido",
+      "referee": "Juan Luis Pulido Santana, Spain",
       "timezone": "UTC",
       "date": "2023-09-30T16:30:00+00:00",
       "timestamp": 1696091400,
@@ -4966,7 +4966,7 @@
   {
     "fixture": {
       "id": 1038029,
-      "referee": "Jesús Gil",
+      "referee": "Jesus Gil Manzano, Spain",
       "timezone": "UTC",
       "date": "2023-09-30T19:00:00+00:00",
       "timestamp": 1696100400,
@@ -5034,7 +5034,7 @@
   {
     "fixture": {
       "id": 1038022,
-      "referee": "Pablo González",
+      "referee": "Pablo Gonzales Fuertes, Spain",
       "timezone": "UTC",
       "date": "2023-10-01T12:00:00+00:00",
       "timestamp": 1696161600,
@@ -5102,7 +5102,7 @@
   {
     "fixture": {
       "id": 1038028,
-      "referee": "Jorge Figueroa",
+      "referee": "Jorge Figueroa Vazquez, Spain",
       "timezone": "UTC",
       "date": "2023-10-01T14:15:00+00:00",
       "timestamp": 1696169700,
@@ -5170,7 +5170,7 @@
   {
     "fixture": {
       "id": 1038023,
-      "referee": "Javier Iglesias",
+      "referee": "Javier Iglesias Villanueva, Spain",
       "timezone": "UTC",
       "date": "2023-10-01T19:00:00+00:00",
       "timestamp": 1696186800,
@@ -5238,7 +5238,7 @@
   {
     "fixture": {
       "id": 1038025,
-      "referee": "Ricardo De Burgos",
+      "referee": "Ricardo De Burgos Bengoetxea, Spain",
       "timezone": "UTC",
       "date": "2023-10-01T19:00:00+00:00",
       "timestamp": 1696186800,
@@ -5306,7 +5306,7 @@
   {
     "fixture": {
       "id": 1038030,
-      "referee": "Javier Alberola",
+      "referee": "Javier Alberola Rojas, Spain",
       "timezone": "UTC",
       "date": "2023-10-02T19:00:00+00:00",
       "timestamp": 1696273200,
@@ -5374,7 +5374,7 @@
   {
     "fixture": {
       "id": 1038037,
-      "referee": "Víctor García",
+      "referee": "Victor Garcia Verdura, Spain",
       "timezone": "UTC",
       "date": "2023-10-06T19:00:00+00:00",
       "timestamp": 1696618800,
@@ -5442,7 +5442,7 @@
   {
     "fixture": {
       "id": 1038033,
-      "referee": "Juan Martínez",
+      "referee": "Juan Martinez Munuera, Spain",
       "timezone": "UTC",
       "date": "2023-10-07T12:00:00+00:00",
       "timestamp": 1696680000,
@@ -5510,7 +5510,7 @@
   {
     "fixture": {
       "id": 1038039,
-      "referee": "Guillermo Cuadra",
+      "referee": "Guillermo Cuadra Fernandez, Spain",
       "timezone": "UTC",
       "date": "2023-10-07T14:15:00+00:00",
       "timestamp": 1696688100,
@@ -5578,7 +5578,7 @@
   {
     "fixture": {
       "id": 1038035,
-      "referee": "Francisco Hernández",
+      "referee": "Francisco Hernandez Maeso, Spain",
       "timezone": "UTC",
       "date": "2023-10-07T16:30:00+00:00",
       "timestamp": 1696696200,
@@ -5646,7 +5646,7 @@
   {
     "fixture": {
       "id": 1038040,
-      "referee": "Isidro Díaz de Mera",
+      "referee": "Isidro Diaz de Mera Escuderos, Spain",
       "timezone": "UTC",
       "date": "2023-10-07T19:00:00+00:00",
       "timestamp": 1696705200,
@@ -5714,7 +5714,7 @@
   {
     "fixture": {
       "id": 1038041,
-      "referee": "Alejandro Muñiz",
+      "referee": "Alejandro Muniz Ruiz, Spain",
       "timezone": "UTC",
       "date": "2023-10-08T12:00:00+00:00",
       "timestamp": 1696766400,
@@ -5782,7 +5782,7 @@
   {
     "fixture": {
       "id": 1038032,
-      "referee": "José Munuera",
+      "referee": "José Luis Munuera Montero, Spain",
       "timezone": "UTC",
       "date": "2023-10-08T14:15:00+00:00",
       "timestamp": 1696774500,
@@ -5850,7 +5850,7 @@
   {
     "fixture": {
       "id": 1038034,
-      "referee": "José Sánchez",
+      "referee": "Jose Maria Sanchez Martinez, Spain",
       "timezone": "UTC",
       "date": "2023-10-08T16:30:00+00:00",
       "timestamp": 1696782600,
@@ -5918,7 +5918,7 @@
   {
     "fixture": {
       "id": 1038036,
-      "referee": "Alejandro Hernández",
+      "referee": "Alejandro Hernandez, Spain",
       "timezone": "UTC",
       "date": "2023-10-08T16:30:00+00:00",
       "timestamp": 1696782600,
@@ -5986,7 +5986,7 @@
   {
     "fixture": {
       "id": 1038038,
-      "referee": "César Soto",
+      "referee": "Cesar Soto Grado, Spain",
       "timezone": "UTC",
       "date": "2023-10-08T19:00:00+00:00",
       "timestamp": 1696791600,
@@ -6054,13 +6054,13 @@
   {
     "fixture": {
       "id": 1038050,
-      "referee": null,
+      "referee": "Mateo Busquets Ferrer, Spain",
       "timezone": "UTC",
       "date": "2023-10-20T19:00:00+00:00",
       "timestamp": 1697828400,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697828400,
+        "second": 1697832000
       },
       "venue": {
         "id": 1486,
@@ -6068,9 +6068,9 @@
         "city": "Iruñea"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6087,27 +6087,27 @@
         "id": 727,
         "name": "Osasuna",
         "logo": "https://media-4.api-sports.io/football/teams/727.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 715,
         "name": "Granada CF",
         "logo": "https://media-4.api-sports.io/football/teams/715.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -6122,13 +6122,13 @@
   {
     "fixture": {
       "id": 1038048,
-      "referee": null,
+      "referee": "Jorge Figueroa Vazquez, Spain",
       "timezone": "UTC",
       "date": "2023-10-21T12:00:00+00:00",
       "timestamp": 1697889600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697889600,
+        "second": 1697893200
       },
       "venue": {
         "id": 1491,
@@ -6136,9 +6136,9 @@
         "city": "Donostia-San Sebastián"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6155,27 +6155,27 @@
         "id": 548,
         "name": "Real Sociedad",
         "logo": "https://media-4.api-sports.io/football/teams/548.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 798,
         "name": "Mallorca",
         "logo": "https://media-4.api-sports.io/football/teams/798.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -6190,13 +6190,13 @@
   {
     "fixture": {
       "id": 1038046,
-      "referee": null,
+      "referee": "Cesar Soto Grado, Spain",
       "timezone": "UTC",
       "date": "2023-10-21T14:15:00+00:00",
       "timestamp": 1697897700,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697897700,
+        "second": 1697901300
       },
       "venue": {
         "id": 1476,
@@ -6204,9 +6204,9 @@
         "city": "Getafe"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6233,17 +6233,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -6258,13 +6258,13 @@
   {
     "fixture": {
       "id": 1038049,
-      "referee": null,
+      "referee": "Ricardo De Burgos Bengoetxea, Spain",
       "timezone": "UTC",
       "date": "2023-10-21T16:30:00+00:00",
       "timestamp": 1697905800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697905800,
+        "second": 1697909400
       },
       "venue": {
         "id": 1494,
@@ -6272,9 +6272,9 @@
         "city": "Sevilla"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6301,17 +6301,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -6326,13 +6326,13 @@
   {
     "fixture": {
       "id": 1038045,
-      "referee": null,
+      "referee": "Guillermo Cuadra Fernandez, Spain",
       "timezone": "UTC",
       "date": "2023-10-21T19:00:00+00:00",
       "timestamp": 1697914800,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697914800,
+        "second": 1697918400
       },
       "venue": {
         "id": 1467,
@@ -6340,9 +6340,9 @@
         "city": "Vigo"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6359,27 +6359,27 @@
         "id": 538,
         "name": "Celta Vigo",
         "logo": "https://media-4.api-sports.io/football/teams/538.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 530,
         "name": "Atletico Madrid",
         "logo": "https://media-4.api-sports.io/football/teams/530.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 0,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -6394,13 +6394,13 @@
   {
     "fixture": {
       "id": 1038042,
-      "referee": null,
+      "referee": "Javier Iglesias Villanueva, Spain",
       "timezone": "UTC",
       "date": "2023-10-22T12:00:00+00:00",
       "timestamp": 1697976000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697976000,
+        "second": 1697979600
       },
       "venue": {
         "id": 1481,
@@ -6408,9 +6408,9 @@
         "city": "Las Palmas de Gran Canaria"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6427,27 +6427,27 @@
         "id": 534,
         "name": "Las Palmas",
         "logo": "https://media-4.api-sports.io/football/teams/534.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 728,
         "name": "Rayo Vallecano",
         "logo": "https://media-4.api-sports.io/football/teams/728.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 0,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -6462,13 +6462,13 @@
   {
     "fixture": {
       "id": 1038043,
-      "referee": null,
+      "referee": "Miguel Angel Ortiz Arias, Spain",
       "timezone": "UTC",
       "date": "2023-10-22T14:15:00+00:00",
       "timestamp": 1697984100,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697984100,
+        "second": 1697987700
       },
       "venue": {
         "id": 1478,
@@ -6476,9 +6476,9 @@
         "city": "Girona"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6495,27 +6495,27 @@
         "id": 547,
         "name": "Girona",
         "logo": "https://media-4.api-sports.io/football/teams/547.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 723,
         "name": "Almeria",
         "logo": "https://media-4.api-sports.io/football/teams/723.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 5,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 3,
+        "away": 2
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 5,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -6530,13 +6530,13 @@
   {
     "fixture": {
       "id": 1038051,
-      "referee": null,
+      "referee": "Jesus Gil Manzano, Spain",
       "timezone": "UTC",
       "date": "2023-10-22T16:30:00+00:00",
       "timestamp": 1697992200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1697992200,
+        "second": 1697995800
       },
       "venue": {
         "id": 1498,
@@ -6544,9 +6544,9 @@
         "city": "Villarreal"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6573,17 +6573,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -6598,13 +6598,13 @@
   {
     "fixture": {
       "id": 1038044,
-      "referee": null,
+      "referee": "Juan Martinez Munuera, Spain",
       "timezone": "UTC",
       "date": "2023-10-22T19:00:00+00:00",
       "timestamp": 1698001200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698001200,
+        "second": 1698004800
       },
       "venue": {
         "id": 19939,
@@ -6612,9 +6612,9 @@
         "city": "Barcelona"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6631,27 +6631,27 @@
         "id": 529,
         "name": "Barcelona",
         "logo": "https://media-4.api-sports.io/football/teams/529.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 531,
         "name": "Athletic Club",
         "logo": "https://media-4.api-sports.io/football/teams/531.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -6666,13 +6666,13 @@
   {
     "fixture": {
       "id": 1038047,
-      "referee": null,
+      "referee": "Pablo Gonzales Fuertes, Spain",
       "timezone": "UTC",
       "date": "2023-10-23T19:00:00+00:00",
       "timestamp": 1698087600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698087600,
+        "second": 1698091200
       },
       "venue": {
         "id": 1497,
@@ -6680,9 +6680,9 @@
         "city": "Valencia"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6699,27 +6699,27 @@
         "id": 532,
         "name": "Valencia",
         "logo": "https://media-4.api-sports.io/football/teams/532.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 724,
         "name": "Cadiz",
         "logo": "https://media-4.api-sports.io/football/teams/724.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -6734,13 +6734,13 @@
   {
     "fixture": {
       "id": 1038059,
-      "referee": null,
+      "referee": "Isidro Diaz de Mera Escuderos, Spain",
       "timezone": "UTC",
       "date": "2023-10-27T19:00:00+00:00",
       "timestamp": 1698433200,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698433200,
+        "second": 1698436800
       },
       "venue": {
         "id": 1478,
@@ -6748,9 +6748,9 @@
         "city": "Girona"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6767,27 +6767,27 @@
         "id": 547,
         "name": "Girona",
         "logo": "https://media-4.api-sports.io/football/teams/547.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 538,
         "name": "Celta Vigo",
         "logo": "https://media-4.api-sports.io/football/teams/538.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -6802,13 +6802,13 @@
   {
     "fixture": {
       "id": 1038052,
-      "referee": null,
+      "referee": "Francisco Hernandez Maeso, Spain",
       "timezone": "UTC",
       "date": "2023-10-28T12:00:00+00:00",
       "timestamp": 1698494400,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698494400,
+        "second": 1698498000
       },
       "venue": {
         "id": 19216,
@@ -6816,9 +6816,9 @@
         "city": "Almería"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6835,27 +6835,27 @@
         "id": 723,
         "name": "Almeria",
         "logo": "https://media-4.api-sports.io/football/teams/723.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 534,
         "name": "Las Palmas",
         "logo": "https://media-4.api-sports.io/football/teams/534.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -6870,13 +6870,13 @@
   {
     "fixture": {
       "id": 1038054,
-      "referee": null,
+      "referee": "Jesus Gil Manzano, Spain",
       "timezone": "UTC",
       "date": "2023-10-28T14:15:00+00:00",
       "timestamp": 1698502500,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698502500,
+        "second": 1698506100
       },
       "venue": {
         "id": 19939,
@@ -6884,9 +6884,9 @@
         "city": "Barcelona"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6903,27 +6903,27 @@
         "id": 529,
         "name": "Barcelona",
         "logo": "https://media-4.api-sports.io/football/teams/529.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 541,
         "name": "Real Madrid",
         "logo": "https://media-4.api-sports.io/football/teams/541.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 1,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -6938,13 +6938,13 @@
   {
     "fixture": {
       "id": 1038060,
-      "referee": null,
+      "referee": "Pablo Gonzales Fuertes, Spain",
       "timezone": "UTC",
       "date": "2023-10-28T16:30:00+00:00",
       "timestamp": 1698510600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698510600,
+        "second": 1698514200
       },
       "venue": {
         "id": 19940,
@@ -6952,9 +6952,9 @@
         "city": "Palma de Mallorca"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -6981,17 +6981,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 0,
+      "away": 0
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 0,
+        "away": 0
       },
       "extratime": {
         "home": null,
@@ -7006,13 +7006,13 @@
   {
     "fixture": {
       "id": 1038056,
-      "referee": null,
+      "referee": "Cesar Soto Grado, Spain",
       "timezone": "UTC",
       "date": "2023-10-28T19:00:00+00:00",
       "timestamp": 1698519600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698519600,
+        "second": 1698523200
       },
       "venue": {
         "id": 11915,
@@ -7020,9 +7020,9 @@
         "city": "Cádiz"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -7049,17 +7049,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -7074,13 +7074,13 @@
   {
     "fixture": {
       "id": 1038055,
-      "referee": null,
+      "referee": "Jose Maria Sanchez Martinez, Spain",
       "timezone": "UTC",
-      "date": "2023-10-29T12:00:00+00:00",
-      "timestamp": 1698580800,
+      "date": "2023-10-29T13:00:00+00:00",
+      "timestamp": 1698584400,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698584400,
+        "second": 1698588000
       },
       "venue": {
         "id": 1489,
@@ -7088,9 +7088,9 @@
         "city": "Sevilla"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -7107,27 +7107,27 @@
         "id": 543,
         "name": "Real Betis",
         "logo": "https://media-4.api-sports.io/football/teams/543.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 727,
         "name": "Osasuna",
         "logo": "https://media-4.api-sports.io/football/teams/727.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -7142,13 +7142,13 @@
   {
     "fixture": {
       "id": 1038057,
-      "referee": null,
+      "referee": "Mateo Busquets Ferrer, Spain",
       "timezone": "UTC",
-      "date": "2023-10-29T14:15:00+00:00",
-      "timestamp": 1698588900,
+      "date": "2023-10-29T15:15:00+00:00",
+      "timestamp": 1698592500,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698592500,
+        "second": 1698596100
       },
       "venue": {
         "id": 1488,
@@ -7156,9 +7156,9 @@
         "city": "Madrid"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -7185,17 +7185,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 1
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -7210,13 +7210,13 @@
   {
     "fixture": {
       "id": 1038053,
-      "referee": null,
+      "referee": "Jorge Figueroa Vazquez, Spain",
       "timezone": "UTC",
-      "date": "2023-10-29T16:30:00+00:00",
-      "timestamp": 1698597000,
+      "date": "2023-10-29T17:30:00+00:00",
+      "timestamp": 1698600600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698600600,
+        "second": 1698604200
       },
       "venue": {
         "id": 1460,
@@ -7224,9 +7224,9 @@
         "city": "Bilbao"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -7253,17 +7253,17 @@
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 2
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 1,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 2
       },
       "extratime": {
         "home": null,
@@ -7278,13 +7278,13 @@
   {
     "fixture": {
       "id": 1038061,
-      "referee": null,
+      "referee": "Alejandro Muniz Ruiz, Spain",
       "timezone": "UTC",
-      "date": "2023-10-29T19:00:00+00:00",
-      "timestamp": 1698606000,
+      "date": "2023-10-29T20:00:00+00:00",
+      "timestamp": 1698609600,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698609600,
+        "second": 1698613200
       },
       "venue": {
         "id": 19217,
@@ -7292,9 +7292,9 @@
         "city": "Madrid"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -7311,27 +7311,27 @@
         "id": 530,
         "name": "Atletico Madrid",
         "logo": "https://media-4.api-sports.io/football/teams/530.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 542,
         "name": "Alaves",
         "logo": "https://media-4.api-sports.io/football/teams/542.png",
-        "winner": null
+        "winner": false
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 1
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 0
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 1
       },
       "extratime": {
         "home": null,
@@ -7346,13 +7346,13 @@
   {
     "fixture": {
       "id": 1038058,
-      "referee": null,
+      "referee": "Javier Iglesias Villanueva, Spain",
       "timezone": "UTC",
       "date": "2023-10-30T20:00:00+00:00",
       "timestamp": 1698696000,
       "periods": {
-        "first": null,
-        "second": null
+        "first": 1698696000,
+        "second": 1698699600
       },
       "venue": {
         "id": 1479,
@@ -7360,9 +7360,9 @@
         "city": "Granada"
       },
       "status": {
-        "long": "Not Started",
-        "short": "NS",
-        "elapsed": null
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
       }
     },
     "league": {
@@ -7379,27 +7379,27 @@
         "id": 715,
         "name": "Granada CF",
         "logo": "https://media-4.api-sports.io/football/teams/715.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 533,
         "name": "Villarreal",
         "logo": "https://media-4.api-sports.io/football/teams/533.png",
-        "winner": null
+        "winner": true
       }
     },
     "goals": {
-      "home": null,
-      "away": null
+      "home": 2,
+      "away": 3
     },
     "score": {
       "halftime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 3
       },
       "fulltime": {
-        "home": null,
-        "away": null
+        "home": 2,
+        "away": 3
       },
       "extratime": {
         "home": null,
@@ -7688,8 +7688,8 @@
       "id": 1038067,
       "referee": null,
       "timezone": "UTC",
-      "date": "2023-11-05T00:00:00+00:00",
-      "timestamp": 1699142400,
+      "date": "2023-11-04T20:00:00+00:00",
+      "timestamp": 1699128000,
       "periods": {
         "first": null,
         "second": null
@@ -7700,8 +7700,8 @@
         "city": "Donostia-San Sebastián"
       },
       "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
+        "long": "Not Started",
+        "short": "NS",
         "elapsed": null
       }
     },
@@ -8036,7 +8036,7 @@
       },
       "venue": {
         "id": 1476,
-        "name": "Coliseum Alfonso Pérez",
+        "name": "Estadio Coliseum",
         "city": "Getafe"
       },
       "status": {
@@ -8773,283 +8773,11 @@
   },
   {
     "fixture": {
-      "id": 1038082,
-      "referee": null,
-      "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
-      "periods": {
-        "first": null,
-        "second": null
-      },
-      "venue": {
-        "id": 19217,
-        "name": "Estádio Cívitas Metropolitano",
-        "city": "Madrid"
-      },
-      "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
-        "elapsed": null
-      }
-    },
-    "league": {
-      "id": 140,
-      "name": "La Liga",
-      "country": "Spain",
-      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
-      "flag": "https://media-4.api-sports.io/flags/es.svg",
-      "season": 2023,
-      "round": "Regular Season - 14"
-    },
-    "teams": {
-      "home": {
-        "id": 530,
-        "name": "Atletico Madrid",
-        "logo": "https://media-4.api-sports.io/football/teams/530.png",
-        "winner": null
-      },
-      "away": {
-        "id": 798,
-        "name": "Mallorca",
-        "logo": "https://media-4.api-sports.io/football/teams/798.png",
-        "winner": null
-      }
-    },
-    "goals": {
-      "home": null,
-      "away": null
-    },
-    "score": {
-      "halftime": {
-        "home": null,
-        "away": null
-      },
-      "fulltime": {
-        "home": null,
-        "away": null
-      },
-      "extratime": {
-        "home": null,
-        "away": null
-      },
-      "penalty": {
-        "home": null,
-        "away": null
-      }
-    }
-  },
-  {
-    "fixture": {
-      "id": 1038083,
-      "referee": null,
-      "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
-      "periods": {
-        "first": null,
-        "second": null
-      },
-      "venue": {
-        "id": 1489,
-        "name": "Estadio Benito Villamarín",
-        "city": "Sevilla"
-      },
-      "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
-        "elapsed": null
-      }
-    },
-    "league": {
-      "id": 140,
-      "name": "La Liga",
-      "country": "Spain",
-      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
-      "flag": "https://media-4.api-sports.io/flags/es.svg",
-      "season": 2023,
-      "round": "Regular Season - 14"
-    },
-    "teams": {
-      "home": {
-        "id": 543,
-        "name": "Real Betis",
-        "logo": "https://media-4.api-sports.io/football/teams/543.png",
-        "winner": null
-      },
-      "away": {
-        "id": 534,
-        "name": "Las Palmas",
-        "logo": "https://media-4.api-sports.io/football/teams/534.png",
-        "winner": null
-      }
-    },
-    "goals": {
-      "home": null,
-      "away": null
-    },
-    "score": {
-      "halftime": {
-        "home": null,
-        "away": null
-      },
-      "fulltime": {
-        "home": null,
-        "away": null
-      },
-      "extratime": {
-        "home": null,
-        "away": null
-      },
-      "penalty": {
-        "home": null,
-        "away": null
-      }
-    }
-  },
-  {
-    "fixture": {
-      "id": 1038084,
-      "referee": null,
-      "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
-      "periods": {
-        "first": null,
-        "second": null
-      },
-      "venue": {
-        "id": 11915,
-        "name": "Estadio Nuevo Mirandilla",
-        "city": "Cádiz"
-      },
-      "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
-        "elapsed": null
-      }
-    },
-    "league": {
-      "id": 140,
-      "name": "La Liga",
-      "country": "Spain",
-      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
-      "flag": "https://media-4.api-sports.io/flags/es.svg",
-      "season": 2023,
-      "round": "Regular Season - 14"
-    },
-    "teams": {
-      "home": {
-        "id": 724,
-        "name": "Cadiz",
-        "logo": "https://media-4.api-sports.io/football/teams/724.png",
-        "winner": null
-      },
-      "away": {
-        "id": 541,
-        "name": "Real Madrid",
-        "logo": "https://media-4.api-sports.io/football/teams/541.png",
-        "winner": null
-      }
-    },
-    "goals": {
-      "home": null,
-      "away": null
-    },
-    "score": {
-      "halftime": {
-        "home": null,
-        "away": null
-      },
-      "fulltime": {
-        "home": null,
-        "away": null
-      },
-      "extratime": {
-        "home": null,
-        "away": null
-      },
-      "penalty": {
-        "home": null,
-        "away": null
-      }
-    }
-  },
-  {
-    "fixture": {
-      "id": 1038085,
-      "referee": null,
-      "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
-      "periods": {
-        "first": null,
-        "second": null
-      },
-      "venue": {
-        "id": 1491,
-        "name": "Reale Arena",
-        "city": "Donostia-San Sebastián"
-      },
-      "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
-        "elapsed": null
-      }
-    },
-    "league": {
-      "id": 140,
-      "name": "La Liga",
-      "country": "Spain",
-      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
-      "flag": "https://media-4.api-sports.io/flags/es.svg",
-      "season": 2023,
-      "round": "Regular Season - 14"
-    },
-    "teams": {
-      "home": {
-        "id": 548,
-        "name": "Real Sociedad",
-        "logo": "https://media-4.api-sports.io/football/teams/548.png",
-        "winner": null
-      },
-      "away": {
-        "id": 536,
-        "name": "Sevilla",
-        "logo": "https://media-4.api-sports.io/football/teams/536.png",
-        "winner": null
-      }
-    },
-    "goals": {
-      "home": null,
-      "away": null
-    },
-    "score": {
-      "halftime": {
-        "home": null,
-        "away": null
-      },
-      "fulltime": {
-        "home": null,
-        "away": null
-      },
-      "extratime": {
-        "home": null,
-        "away": null
-      },
-      "penalty": {
-        "home": null,
-        "away": null
-      }
-    }
-  },
-  {
-    "fixture": {
       "id": 1038086,
       "referee": null,
       "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
+      "date": "2023-11-24T20:00:00+00:00",
+      "timestamp": 1700856000,
       "periods": {
         "first": null,
         "second": null
@@ -9060,8 +8788,8 @@
         "city": "Vitoria-Gasteiz"
       },
       "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
+        "long": "Not Started",
+        "short": "NS",
         "elapsed": null
       }
     },
@@ -9113,147 +8841,11 @@
   },
   {
     "fixture": {
-      "id": 1038087,
-      "referee": null,
-      "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
-      "periods": {
-        "first": null,
-        "second": null
-      },
-      "venue": {
-        "id": 1476,
-        "name": "Coliseum Alfonso Pérez",
-        "city": "Getafe"
-      },
-      "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
-        "elapsed": null
-      }
-    },
-    "league": {
-      "id": 140,
-      "name": "La Liga",
-      "country": "Spain",
-      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
-      "flag": "https://media-4.api-sports.io/flags/es.svg",
-      "season": 2023,
-      "round": "Regular Season - 14"
-    },
-    "teams": {
-      "home": {
-        "id": 546,
-        "name": "Getafe",
-        "logo": "https://media-4.api-sports.io/football/teams/546.png",
-        "winner": null
-      },
-      "away": {
-        "id": 723,
-        "name": "Almeria",
-        "logo": "https://media-4.api-sports.io/football/teams/723.png",
-        "winner": null
-      }
-    },
-    "goals": {
-      "home": null,
-      "away": null
-    },
-    "score": {
-      "halftime": {
-        "home": null,
-        "away": null
-      },
-      "fulltime": {
-        "home": null,
-        "away": null
-      },
-      "extratime": {
-        "home": null,
-        "away": null
-      },
-      "penalty": {
-        "home": null,
-        "away": null
-      }
-    }
-  },
-  {
-    "fixture": {
-      "id": 1038088,
-      "referee": null,
-      "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
-      "periods": {
-        "first": null,
-        "second": null
-      },
-      "venue": {
-        "id": 1478,
-        "name": "Estadi Municipal de Montilivi",
-        "city": "Girona"
-      },
-      "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
-        "elapsed": null
-      }
-    },
-    "league": {
-      "id": 140,
-      "name": "La Liga",
-      "country": "Spain",
-      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
-      "flag": "https://media-4.api-sports.io/flags/es.svg",
-      "season": 2023,
-      "round": "Regular Season - 14"
-    },
-    "teams": {
-      "home": {
-        "id": 547,
-        "name": "Girona",
-        "logo": "https://media-4.api-sports.io/football/teams/547.png",
-        "winner": null
-      },
-      "away": {
-        "id": 531,
-        "name": "Athletic Club",
-        "logo": "https://media-4.api-sports.io/football/teams/531.png",
-        "winner": null
-      }
-    },
-    "goals": {
-      "home": null,
-      "away": null
-    },
-    "score": {
-      "halftime": {
-        "home": null,
-        "away": null
-      },
-      "fulltime": {
-        "home": null,
-        "away": null
-      },
-      "extratime": {
-        "home": null,
-        "away": null
-      },
-      "penalty": {
-        "home": null,
-        "away": null
-      }
-    }
-  },
-  {
-    "fixture": {
       "id": 1038089,
       "referee": null,
       "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
+      "date": "2023-11-25T13:00:00+00:00",
+      "timestamp": 1700917200,
       "periods": {
         "first": null,
         "second": null
@@ -9264,8 +8856,8 @@
         "city": "Madrid"
       },
       "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
+        "long": "Not Started",
+        "short": "NS",
         "elapsed": null
       }
     },
@@ -9320,8 +8912,8 @@
       "id": 1038090,
       "referee": null,
       "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
+      "date": "2023-11-25T15:15:00+00:00",
+      "timestamp": 1700925300,
       "periods": {
         "first": null,
         "second": null
@@ -9332,8 +8924,8 @@
         "city": "Valencia"
       },
       "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
+        "long": "Not Started",
+        "short": "NS",
         "elapsed": null
       }
     },
@@ -9385,11 +8977,147 @@
   },
   {
     "fixture": {
+      "id": 1038087,
+      "referee": null,
+      "timezone": "UTC",
+      "date": "2023-11-25T17:30:00+00:00",
+      "timestamp": 1700933400,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 1476,
+        "name": "Estadio Coliseum",
+        "city": "Getafe"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 140,
+      "name": "La Liga",
+      "country": "Spain",
+      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
+      "flag": "https://media-4.api-sports.io/flags/es.svg",
+      "season": 2023,
+      "round": "Regular Season - 14"
+    },
+    "teams": {
+      "home": {
+        "id": 546,
+        "name": "Getafe",
+        "logo": "https://media-4.api-sports.io/football/teams/546.png",
+        "winner": null
+      },
+      "away": {
+        "id": 723,
+        "name": "Almeria",
+        "logo": "https://media-4.api-sports.io/football/teams/723.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1038082,
+      "referee": null,
+      "timezone": "UTC",
+      "date": "2023-11-25T20:00:00+00:00",
+      "timestamp": 1700942400,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 19217,
+        "name": "Estádio Cívitas Metropolitano",
+        "city": "Madrid"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 140,
+      "name": "La Liga",
+      "country": "Spain",
+      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
+      "flag": "https://media-4.api-sports.io/flags/es.svg",
+      "season": 2023,
+      "round": "Regular Season - 14"
+    },
+    "teams": {
+      "home": {
+        "id": 530,
+        "name": "Atletico Madrid",
+        "logo": "https://media-4.api-sports.io/football/teams/530.png",
+        "winner": null
+      },
+      "away": {
+        "id": 798,
+        "name": "Mallorca",
+        "logo": "https://media-4.api-sports.io/football/teams/798.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
       "id": 1038091,
       "referee": null,
       "timezone": "UTC",
-      "date": "2023-11-26T00:00:00+00:00",
-      "timestamp": 1700956800,
+      "date": "2023-11-26T13:00:00+00:00",
+      "timestamp": 1701003600,
       "periods": {
         "first": null,
         "second": null
@@ -9400,8 +9128,8 @@
         "city": "Villarreal"
       },
       "status": {
-        "long": "Time to be defined",
-        "short": "TBD",
+        "long": "Not Started",
+        "short": "NS",
         "elapsed": null
       }
     },
@@ -9425,6 +9153,278 @@
         "id": 727,
         "name": "Osasuna",
         "logo": "https://media-4.api-sports.io/football/teams/727.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1038085,
+      "referee": null,
+      "timezone": "UTC",
+      "date": "2023-11-26T15:15:00+00:00",
+      "timestamp": 1701011700,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 1491,
+        "name": "Reale Arena",
+        "city": "Donostia-San Sebastián"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 140,
+      "name": "La Liga",
+      "country": "Spain",
+      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
+      "flag": "https://media-4.api-sports.io/flags/es.svg",
+      "season": 2023,
+      "round": "Regular Season - 14"
+    },
+    "teams": {
+      "home": {
+        "id": 548,
+        "name": "Real Sociedad",
+        "logo": "https://media-4.api-sports.io/football/teams/548.png",
+        "winner": null
+      },
+      "away": {
+        "id": 536,
+        "name": "Sevilla",
+        "logo": "https://media-4.api-sports.io/football/teams/536.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1038084,
+      "referee": null,
+      "timezone": "UTC",
+      "date": "2023-11-26T17:30:00+00:00",
+      "timestamp": 1701019800,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 11915,
+        "name": "Estadio Nuevo Mirandilla",
+        "city": "Cádiz"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 140,
+      "name": "La Liga",
+      "country": "Spain",
+      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
+      "flag": "https://media-4.api-sports.io/flags/es.svg",
+      "season": 2023,
+      "round": "Regular Season - 14"
+    },
+    "teams": {
+      "home": {
+        "id": 724,
+        "name": "Cadiz",
+        "logo": "https://media-4.api-sports.io/football/teams/724.png",
+        "winner": null
+      },
+      "away": {
+        "id": 541,
+        "name": "Real Madrid",
+        "logo": "https://media-4.api-sports.io/football/teams/541.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1038083,
+      "referee": null,
+      "timezone": "UTC",
+      "date": "2023-11-26T20:00:00+00:00",
+      "timestamp": 1701028800,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 1489,
+        "name": "Estadio Benito Villamarín",
+        "city": "Sevilla"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 140,
+      "name": "La Liga",
+      "country": "Spain",
+      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
+      "flag": "https://media-4.api-sports.io/flags/es.svg",
+      "season": 2023,
+      "round": "Regular Season - 14"
+    },
+    "teams": {
+      "home": {
+        "id": 543,
+        "name": "Real Betis",
+        "logo": "https://media-4.api-sports.io/football/teams/543.png",
+        "winner": null
+      },
+      "away": {
+        "id": 534,
+        "name": "Las Palmas",
+        "logo": "https://media-4.api-sports.io/football/teams/534.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1038088,
+      "referee": null,
+      "timezone": "UTC",
+      "date": "2023-11-27T20:00:00+00:00",
+      "timestamp": 1701115200,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 1478,
+        "name": "Estadi Municipal de Montilivi",
+        "city": "Girona"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 140,
+      "name": "La Liga",
+      "country": "Spain",
+      "logo": "https://media-4.api-sports.io/football/leagues/140.png",
+      "flag": "https://media-4.api-sports.io/flags/es.svg",
+      "season": 2023,
+      "round": "Regular Season - 14"
+    },
+    "teams": {
+      "home": {
+        "id": 547,
+        "name": "Girona",
+        "logo": "https://media-4.api-sports.io/football/teams/547.png",
+        "winner": null
+      },
+      "away": {
+        "id": 531,
+        "name": "Athletic Club",
+        "logo": "https://media-4.api-sports.io/football/teams/531.png",
         "winner": null
       }
     },

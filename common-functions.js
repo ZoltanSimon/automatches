@@ -3,19 +3,10 @@ let download = function () {
   link.download = "mysquad.png";
   link.href = document.getElementById("myCanvas").toDataURL();
   link.click();
-  /*var canvas = document.getElementById("myCanvas");
-  //var img =
-  var img = new Image();
-  img.crossOrigin = "anonymous";
-  img.setAttribute("crossorigin", "anonymous"); // works for me
-  console.log(img);
-  img.src = canvas.toDataURL("image/png");*/
-
-  //document.write('<img crossorigin="anonymous" src="' + img + '"/>');
 };
 
 function imagePath(teamName) {
-  return `../Logos//${teamName.replaceAll(" ", "_").toLowerCase()}.png`;
+  return `Logos//${teamName.replaceAll(" ", "_").toLowerCase()}.png`;
 }
 
 function removeNewlines(str) {
@@ -109,6 +100,23 @@ let clubs = [
   "VfL BOCHUM",
   "FSV Mainz 05",
   "FC Koln",
+  "Nice",
+  "Monaco",
+  "Reims",
+  "Lille",
+  "Stade Brestois 29",
+  "LE Havre",
+  "Nantes",
+  "Marseille",
+  "Lens",
+  "Rennes",
+  "Strasbourg",
+  "Montpellier",
+  "Toulouse",
+  "Lorient",
+  "Metz",
+  "Clermont Foot",
+  "Lyon",
 ];
 
 let allLeagues = [
@@ -117,4 +125,49 @@ let allLeagues = [
   "premier-league",
   "uefa-champions-league",
   "serie-a",
+  "ligue-1",
+  "pokal",
+];
+
+let players = [
+  {
+    id: 184, //Harry Kane,
+    club: 157, //Bayern
+  },
+  {
+    id: 278, //Mbappe
+    club: 85,
+  },
+  {
+    id: 1100,
+    club: 50, //Haaland
+  },
+  {
+    id: 129718,
+    club: 541, //Bellingham
+  },
+  {
+    id: 631,
+    club: 50, //Foden
+  },
+  {
+    id: 644,
+    club: 157, //Sane
+  },
+  {
+    id: 762,
+    club: 541, //Vini Jr
+  },
+  {
+    id: 6009,
+    club: 50, //Alvarez
+  },
+  {
+    id: 21393,
+    club: 172, //Guirassy
+  },
+  {
+    id: 217,
+    club: 505, //Lautaro
+  },
 ];

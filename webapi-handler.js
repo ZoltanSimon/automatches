@@ -78,16 +78,20 @@ export async function getResults(leagueID, round) {
 }
 
 export async function getResultsDate(leagueID, from, to) {
-  const response = await fetch(
-    `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${season}&from=${from}&to=${to}`,
-    {
-      method: "GET",
-      headers: {
-        "x-rapidapi-host": rapidApiHost,
-        "x-rapidapi-key": rapidApiKey,
-      },
-    }
-  );
+  console.log(isNaN(from));
+  let url = `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${season}&from=${from}&to=${to}`;
+
+  if (isNaN(parseInt(from))) {
+    url = `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${season}`;
+  }
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "x-rapidapi-host": rapidApiHost,
+      "x-rapidapi-key": rapidApiKey,
+    },
+  });
   const data = await response.json();
   console.log(data);
   return data;
