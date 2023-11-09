@@ -1,4 +1,6 @@
-export async function getLocalPlayerStats(playerId) {
+import { downloadResultFromApi } from "./webapi-handler.js";
+
+export async function getLocalPlayerStats(inputPlayer) {
   let playerFound;
   let stats;
   let goals = 0,
@@ -13,59 +15,73 @@ export async function getLocalPlayerStats(playerId) {
     keyPasses = 0,
     foulsDrawn = 0,
     duelsWon = 0,
-    duelsTotal = 0;
+    duelsTotal = 0,
+    playerName = "",
+    foundIndex = -1,
+    teamName = "";
   for (let i = 0; i < allLeagues.length; i++) {
     let response = await fetch(`Allmatches/${allLeagues[i]}.json`);
     let league = await response.json();
-    console.log(league);
+
     for (let i = 0; i < league.length; i++) {
-      if (league[i].fixture.status.short == "FT") {
-        let response2 = await fetch(
-          `Matches/${league[i].fixture.id}.json`
-        ).catch((err) => {
-          console.log("a");
-          handleError(err, league[i].fixture.id);
-        });
-        let match = await response2.json();
-        console.log(match);
-        /*.then((response2) => {
-            if (response2.ok) {
-                return response2.json();
-            }
-            throw new Error("Something went wrong");
-            })*/
-        //.then((matchJson) => {
-        //console.log(matchJson);
-        for (let { players } of match) {
-          playerFound = players[0].players.find((x) => x.player.id == playerId);
-          if (!playerFound)
-            playerFound = players[1].players.find(
-              (x) => x.player.id == playerId
+      if (
+        league[i].fixture.status.short == "FT" &&
+        (league[i].teams.home.id == inputPlayer.club ||
+          league[i].teams.away.id == inputPlayer.club)
+      ) {
+        let response2 = await fetch(`Matches/${league[i].fixture.id}.json`);
+
+        if (!response2.ok) {
+          await handleError(league[i].fixture.id);
+        } else {
+          foundIndex = -1;
+          let match = await response2.json();
+          for (let { players } of match) {
+            playerFound = players[0].players.find(
+              (x) => x.player.id == inputPlayer.id
             );
-          if (playerFound) {
-            stats = playerFound.statistics[0];
-            if (stats.goals.total) goals += stats.goals.total;
-            if (stats.goals.assists) assists += stats.goals.assists;
-            if (stats.shots.on) shotsOn += stats.shots.on;
-            if (stats.shots.total) shotsTotal += stats.shots.total;
-            if (stats.dribbles.attempts)
-              dribblesAttempts += stats.dribbles.attempts;
-            if (stats.dribbles.success) dribblesSucc += stats.dribbles.success;
-            if (stats.duels.won) duelsWon += stats.duels.won;
-            if (stats.duels.total) duelsTotal += stats.duels.total;
-            if (stats.passes.key) keyPasses += stats.passes.key;
-            if (stats.fouls.drawn) foulsDrawn += stats.fouls.drawn;
-            apps++;
-            minutes += stats.games.minutes;
+            if (!playerFound) {
+              playerFound = players[1].players.find(
+                (x) => x.player.id == inputPlayer.id
+              );
+            } else {
+              foundIndex = 0;
+            }
+            if (playerFound) {
+              if (foundIndex == -1) foundIndex = 1;
+              console.log(playerFound);
+              //console.log(match);
+              //console.log(league[i].fixture.id);
+              stats = playerFound.statistics[0];
+              if (stats.goals.total) goals += stats.goals.total;
+              if (stats.goals.assists) assists += stats.goals.assists;
+              if (stats.shots.on) shotsOn += stats.shots.on;
+              if (stats.shots.total) shotsTotal += stats.shots.total;
+              if (stats.dribbles.attempts)
+                dribblesAttempts += stats.dribbles.attempts;
+              if (stats.dribbles.success)
+                dribblesSucc += stats.dribbles.success;
+              if (stats.duels.won) duelsWon += stats.duels.won;
+              if (stats.duels.total) duelsTotal += stats.duels.total;
+              if (stats.passes.key) keyPasses += stats.passes.key;
+              if (stats.fouls.drawn) foulsDrawn += stats.fouls.drawn;
+              apps++;
+              minutes += stats.games.minutes;
+              if (!playerName) playerName = playerFound.player.name;
+              if (!teamName) teamName = players[foundIndex].team.name;
+            }
           }
+          gaper90 = (((goals + assists) * 90) / minutes).toFixed(2);
         }
-        gaper90 = (((goals + assists) * 90) / minutes).toFixed(2);
       }
     }
   }
 
   console.log(apps);
   return {
+    name: playerName,
+    id: inputPlayer.id,
+    team: teamName,
     apps: apps,
     goals: goals,
     assists: assists,
@@ -79,8 +95,9 @@ export async function getLocalPlayerStats(playerId) {
   };
 }
 
-function handleError(err) {
-  console.log(err);
-  console.log(json[i].fixture.id);
-  downloadResultFromApi(json[i].fixture.id);
+async function handleError(id) {
+  console.log(id);
+  document.getElementById("missing-matches").innerHTML += id + "<br/>";
+
+  //downloadResultFromApi(id);
 }

@@ -7,14 +7,21 @@ export class Stat {
   }
 
   getValues() {
+    console.log(this.homeTeam);
+    let firstValueHome = isNaN(this.homeTeam)
+      ? parseInt(this.homeTeam.split(" / ")[0])
+      : this.homeTeam;
+    let secondValueHome = isNaN(this.awayTeam)
+      ? parseInt(this.awayTeam.split(" / ")[0])
+      : this.awayTeam;
     let bold1, bold2;
-    if (this.homeTeam > this.awayTeam) {
+    if (firstValueHome > secondValueHome) {
       bold1 = `<b>${this.homeTeam}</b>`;
     } else {
       bold1 = this.homeTeam;
     }
 
-    if (this.homeTeam < this.awayTeam) {
+    if (firstValueHome < secondValueHome) {
       bold2 = `<b>${this.awayTeam}</b>`;
     } else {
       bold2 = this.awayTeam;

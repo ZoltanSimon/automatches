@@ -1,29 +1,29 @@
 export function leagueStandings(response) {
   let standings = response.response[0].league.standings;
   let addToPage = ``;
-  let tds = `<td style="padding: 5px; text-align: center;">`;
+  let tds = `<td style="padding:5px; text-align: center;">`;
+  let ths = `<th style="width:54px; padding: 5px; text-align: center;">`;
   standings.forEach((group) => {
-    addToPage += `<table style='border-collapse: collapse;' border='1' id="league-standings">
+    addToPage += `<table style='border-collapse: collapse; border-color: #1D3557;' border='1' id="league-standings">
         <thead>    
         <tr>
-        ${tds}#</td>
-        <td style="width:90px; text-align: center;"> </td>
-        <td style="width:450px;">Team</td>
-        ${tds}Played</td>
-        ${tds}Win</td>
-        ${tds}Draw</td>
-        ${tds}Lose</td>
-        <td style="width:160px; text-align: center;">Goals</td>
-        ${tds}Points</td>
+        ${ths}<b>#</b></th>
+        <th style="width:383px; padding:5px; text-align: center;" colspan="2"><b>Team</b></th>
+        ${ths}<b>P</b></th>
+        ${ths}<b>W</b></th>
+        ${ths}<b>D</b></th>
+        ${ths}<b>L</b></th>
+        <th style="width:92px; text-align: center;"><b>Goals</b></th>
+        ${ths}<b>Pts</b></th>
       </tr>
       </thead><tbody>`;
     group.forEach((a) => {
       addToPage += `
       <tr>
-      ${tds}${a.rank}</td>
-          <td><img src="${imagePath(a.team.name)}" alt="*${
+      ${tds}<b>${a.rank}</b></td>
+      <td style="width:54px; padding: 5px; text-align: center;"><img src="${imagePath(
         a.team.name
-      }*" width="30px" /></td>
+      )}" alt="*${a.team.name}*" width="40px" /> </td>
       <td style="padding: 5px;">${a.team.name}</td>
       ${tds}${a.all.played}</td>
       ${tds}${a.all.win}</td>

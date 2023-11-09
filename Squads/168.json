@@ -1,0 +1,235 @@
+[
+  {
+    "team": {
+      "id": 168,
+      "name": "Bayer Leverkusen",
+      "logo": "https://media-4.api-sports.io/football/teams/168.png"
+    },
+    "players": [
+      {
+        "id": 963,
+        "name": "L. Hrádecký",
+        "age": 34,
+        "number": 1,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/963.png"
+      },
+      {
+        "id": 138804,
+        "name": "M. Kovář",
+        "age": 23,
+        "number": 17,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/138804.png"
+      },
+      {
+        "id": 25168,
+        "name": "N. Lomb",
+        "age": 30,
+        "number": 36,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/25168.png"
+      },
+      {
+        "id": 125171,
+        "name": "J. Stanišić",
+        "age": 23,
+        "number": 2,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/125171.png"
+      },
+      {
+        "id": 127817,
+        "name": "P. Hincapié",
+        "age": 21,
+        "number": 3,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/127817.png"
+      },
+      {
+        "id": 972,
+        "name": "J. Tah",
+        "age": 27,
+        "number": 4,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/972.png"
+      },
+      {
+        "id": 48119,
+        "name": "O. Kossounou",
+        "age": 22,
+        "number": 6,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/48119.png"
+      },
+      {
+        "id": 41150,
+        "name": "E. Tapsoba",
+        "age": 24,
+        "number": 12,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/41150.png"
+      },
+      {
+        "id": 352375,
+        "name": "Arthur",
+        "age": 20,
+        "number": 13,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/352375.png"
+      },
+      {
+        "id": 563,
+        "name": "Álex Grimaldo",
+        "age": 28,
+        "number": 20,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/563.png"
+      },
+      {
+        "id": 19018,
+        "name": "T. Fosu-Mensah",
+        "age": 25,
+        "number": 24,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/19018.png"
+      },
+      {
+        "id": 152654,
+        "name": "J. Frimpong",
+        "age": 23,
+        "number": 30,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/152654.png"
+      },
+      {
+        "id": 340676,
+        "name": "M. Monamay",
+        "age": 17,
+        "number": 31,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/340676.png"
+      },
+      {
+        "id": 382329,
+        "name": "Reno Münz",
+        "age": 17,
+        "number": 48,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/382329.png"
+      },
+      {
+        "id": 25635,
+        "name": "J. Hofmann",
+        "age": 31,
+        "number": 7,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/25635.png"
+      },
+      {
+        "id": 24903,
+        "name": "R. Andrich",
+        "age": 29,
+        "number": 8,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/24903.png"
+      },
+      {
+        "id": 203224,
+        "name": "F. Wirtz",
+        "age": 20,
+        "number": 10,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/203224.png"
+      },
+      {
+        "id": 714,
+        "name": "N. Amiri",
+        "age": 27,
+        "number": 11,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/714.png"
+      },
+      {
+        "id": 298006,
+        "name": "N. Mbamba",
+        "age": 18,
+        "number": 18,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/298006.png"
+      },
+      {
+        "id": 231029,
+        "name": "N. Tella",
+        "age": 23,
+        "number": 19,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/231029.png"
+      },
+      {
+        "id": 6002,
+        "name": "E. Palacios",
+        "age": 25,
+        "number": 25,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/6002.png"
+      },
+      {
+        "id": 324034,
+        "name": "G. Puerta",
+        "age": 20,
+        "number": 32,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/324034.png"
+      },
+      {
+        "id": 1464,
+        "name": "G. Xhaka",
+        "age": 31,
+        "number": 34,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/1464.png"
+      },
+      {
+        "id": 330600,
+        "name": "A. Aourir",
+        "age": 19,
+        "number": 47,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/330600.png"
+      },
+      {
+        "id": 794,
+        "name": "P. Schick",
+        "age": 27,
+        "number": 14,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/794.png"
+      },
+      {
+        "id": 129682,
+        "name": "A. Adli",
+        "age": 23,
+        "number": 21,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/129682.png"
+      },
+      {
+        "id": 39071,
+        "name": "V. Boniface",
+        "age": 23,
+        "number": 22,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/39071.png"
+      },
+      {
+        "id": 66019,
+        "name": "A. Hložek",
+        "age": 21,
+        "number": 23,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/66019.png"
+      }
+    ]
+  }
+]
