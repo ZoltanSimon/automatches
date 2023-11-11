@@ -35,7 +35,6 @@ export async function downloadResultFromApi(matchID) {
     }
   );
   const data = await response.json();
-  //download(JSON.stringify(data), `${matchID}.json`, "text/plain");
   var dataStr =
     "data:text/json;charset=utf-8," +
     encodeURIComponent(JSON.stringify(data.response));
@@ -45,6 +44,7 @@ export async function downloadResultFromApi(matchID) {
   document.body.appendChild(downloadAnchorNode); // required for firefox
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
+  return data;
 }
 
 export async function getStandingsFromApi(leagueID) {

@@ -50,8 +50,6 @@ export async function getLocalPlayerStats(inputPlayer) {
             if (playerFound) {
               if (foundIndex == -1) foundIndex = 1;
               console.log(playerFound);
-              //console.log(match);
-              //console.log(league[i].fixture.id);
               stats = playerFound.statistics[0];
               if (stats.goals.total) goals += stats.goals.total;
               if (stats.goals.assists) assists += stats.goals.assists;
@@ -93,6 +91,16 @@ export async function getLocalPlayerStats(inputPlayer) {
     key_passes: keyPasses,
     fouls_drawn: foulsDrawn,
   };
+}
+
+export async function getResultFromLocal(fixtureID) {
+  let response = await fetch(`Matches/${fixtureID}.json`);
+  if (!response.ok) {
+    let downloadedResponse = await downloadResultFromApi(fixtureID);
+    console.log(downloadedResponse.response);
+    return downloadedResponse.response;
+  }
+  return await response.json();
 }
 
 async function handleError(id) {
