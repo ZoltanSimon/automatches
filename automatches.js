@@ -6,11 +6,9 @@ import {
   getStandingsFromApi,
   getResults,
   getCurrentRound,
-  getPlayerStats,
   getSquad,
-  downloadResultFromApi,
 } from "./webapi-handler.js";
-import { getLocalPlayerStats } from "./local-handler.js";
+import { getLocalPlayerStats, getResultFromLocal } from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
@@ -40,14 +38,8 @@ document.getElementById("getRound").onclick = function () {
 
 document.getElementById("getMatch").onclick = async function () {
   let fixtureID = document.getElementById("fixtureID").value;
-  matchFromApi = await getResultFromApi(fixtureID);
+  matchFromApi = await getResultFromLocal(fixtureID);
   oneFixture(matchFromApi);
-};
-
-document.getElementById("downloadMatch").onclick = async function () {
-  let fixtureID = document.getElementById("fixtureID").value;
-  matchFromApi = await downloadResultFromApi(fixtureID);
-  //oneFixture(matchFromApi);
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
@@ -73,7 +65,7 @@ async function submitRequest_matchList() {
   let startDate = document.getElementById("dateStart").value;
   let endDate = document.getElementById("dateEnd").value;
   getResultsDate(leagueID, startDate, endDate).then((response) =>
-    matchList(response)
+    matchList(response, true)
   );
 }
 
@@ -98,7 +90,7 @@ async function submitRequest_leagueInfo() {
       `Regular Season - ${roundNumber}`
     );
 
-    fixtureData(resultsFromApi);
+    matchList(resultsFromApi);
   }
 
   addText(resultsFromApi, standingsFromApi);
@@ -113,30 +105,6 @@ function setRound() {
         ""
       ))
   );
-}
-
-function fixtureData(response) {
-  let fixtures = response.response;
-  fixtures.sort(function (a, b) {
-    return new Date(a.fixture.date) - new Date(b.fixture.date);
-  });
-  addToPage = "<table>";
-  fixtures.forEach((a) => {
-    addToPage += `
-    <tr>
-        <td>${new Date(a.fixture.date).getDate()}.${
-      new Date(a.fixture.date).getMonth() + 1
-    }.${new Date(a.fixture.date).getFullYear()}</td>
-        <td><img src=${imagePath(a.teams.home.name)} width="30px"></td>
-        <td>${a.teams.home.name}</td>
-        <td>${a.goals.home}</td>
-        <td><img src=${imagePath(a.teams.away.name)} width="30px"></td>
-        <td>${a.teams.away.name}</td>
-        <td>${a.goals.away}</td>
-    </tr>`;
-  });
-  addToPage += `</table>`;
-  document.getElementById("results").innerHTML += addToPage;
 }
 
 function topScorers(response) {
@@ -225,7 +193,7 @@ const subs = (subs) => {
 };
 
 function oneFixture(response) {
-  let fixture = response.response[0];
+  let fixture = response[0];
   let players = [];
   let homeTeam = fixture.teams.home;
   let awayTeam = fixture.teams.away;

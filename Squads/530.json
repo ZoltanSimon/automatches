@@ -1,0 +1,291 @@
+[
+  {
+    "team": {
+      "id": 530,
+      "name": "Atletico Madrid",
+      "logo": "https://media-4.api-sports.io/football/teams/530.png"
+    },
+    "players": [
+      {
+        "id": 14382,
+        "name": "I. Grbić",
+        "age": 27,
+        "number": 1,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/14382.png"
+      },
+      {
+        "id": 29,
+        "name": "J. Oblak",
+        "age": 30,
+        "number": 13,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/29.png"
+      },
+      {
+        "id": 333379,
+        "name": "Antonio Gomis",
+        "age": 20,
+        "number": 31,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/333379.png"
+      },
+      {
+        "id": 315604,
+        "name": "Alejandro Iturbe",
+        "age": 20,
+        "number": null,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/315604.png"
+      },
+      {
+        "id": 386872,
+        "name": "Sergio Mestre",
+        "age": 18,
+        "number": null,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/386872.png"
+      },
+      {
+        "id": 31,
+        "name": "J. Giménez",
+        "age": 28,
+        "number": 2,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/31.png"
+      },
+      {
+        "id": 2280,
+        "name": "César Azpilicueta",
+        "age": 34,
+        "number": 3,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/2280.png"
+      },
+      {
+        "id": 18776,
+        "name": "Ç. Söyüncü",
+        "age": 27,
+        "number": 4,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/18776.png"
+      },
+      {
+        "id": 39,
+        "name": "S. Savić",
+        "age": 32,
+        "number": 15,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/39.png"
+      },
+      {
+        "id": 6503,
+        "name": "N. Molina",
+        "age": 25,
+        "number": 16,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/6503.png"
+      },
+      {
+        "id": 47566,
+        "name": "Javi Galán",
+        "age": 29,
+        "number": 17,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/47566.png"
+      },
+      {
+        "id": 2669,
+        "name": "Hermoso",
+        "age": 28,
+        "number": 22,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/2669.png"
+      },
+      {
+        "id": 22225,
+        "name": "Reinildo",
+        "age": 29,
+        "number": 23,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/22225.png"
+      },
+      {
+        "id": 338508,
+        "name": "I. Kostis",
+        "age": 20,
+        "number": 27,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/338508.png"
+      },
+      {
+        "id": 162138,
+        "name": "Marco Moreno",
+        "age": 22,
+        "number": 28,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/162138.png"
+      },
+      {
+        "id": 336685,
+        "name": "Javier Boñar",
+        "age": 18,
+        "number": null,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/336685.png"
+      },
+      {
+        "id": 2472,
+        "name": "R. De Paul",
+        "age": 29,
+        "number": 5,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/2472.png"
+      },
+      {
+        "id": 50,
+        "name": "Koke",
+        "age": 31,
+        "number": 6,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/50.png"
+      },
+      {
+        "id": 48,
+        "name": "Saúl",
+        "age": 29,
+        "number": 8,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/48.png"
+      },
+      {
+        "id": 45,
+        "name": "T. Lemar",
+        "age": 28,
+        "number": 11,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/45.png"
+      },
+      {
+        "id": 753,
+        "name": "Marcos Llorente",
+        "age": 28,
+        "number": 14,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/753.png"
+      },
+      {
+        "id": 20,
+        "name": "A. Witsel",
+        "age": 34,
+        "number": 20,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/20.png"
+      },
+      {
+        "id": 336594,
+        "name": "Pablo Barrios",
+        "age": 20,
+        "number": 24,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/336594.png"
+      },
+      {
+        "id": 136117,
+        "name": "Rodrigo Riquelme",
+        "age": 23,
+        "number": 25,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/136117.png"
+      },
+      {
+        "id": 336590,
+        "name": "Aitor Gismera",
+        "age": 19,
+        "number": 26,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/336590.png"
+      },
+      {
+        "id": 185308,
+        "name": "Mini",
+        "age": 24,
+        "number": null,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/185308.png"
+      },
+      {
+        "id": 56,
+        "name": "A. Griezmann",
+        "age": 32,
+        "number": 7,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/56.png"
+      },
+      {
+        "id": 667,
+        "name": "M. Depay",
+        "age": 29,
+        "number": 9,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/667.png"
+      },
+      {
+        "id": 53,
+        "name": "Á. Correa",
+        "age": 28,
+        "number": 10,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/53.png"
+      },
+      {
+        "id": 126936,
+        "name": "Samuel Lino",
+        "age": 24,
+        "number": 12,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/126936.png"
+      },
+      {
+        "id": 59,
+        "name": "Álvaro Morata",
+        "age": 31,
+        "number": 19,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/59.png"
+      },
+      {
+        "id": 336587,
+        "name": "S. El Jebari",
+        "age": 19,
+        "number": 30,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/336587.png"
+      },
+      {
+        "id": 386850,
+        "name": "AdriÃ¡n NiÃ±o",
+        "age": 19,
+        "number": 32,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/386850.png"
+      },
+      {
+        "id": 286038,
+        "name": "Álex Calatrava",
+        "age": 23,
+        "number": null,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/286038.png"
+      },
+      {
+        "id": 386849,
+        "name": "A. Raihani",
+        "age": 19,
+        "number": null,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/386849.png"
+      }
+    ]
+  }
+]

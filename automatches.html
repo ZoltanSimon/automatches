@@ -49,6 +49,7 @@
             <option value="135">Italy - Serie A</option>
             <option value="61">France - Ligue 1</option>
             <option value="2">UEFA Champions League</option>
+            <option value="3">UEFA Europa League</option>
             <option value="15">Club World Cup</option>
             <option value="81">Dfp Pokal</option>
           </select>
@@ -105,25 +106,25 @@
           <button id="submit-match-list">Get Match list</button>
           <input type="number" placeholder="Match ID" id="fixtureID" />
           <button id="getMatch">Get Match info</button>
-          <button id="downloadMatch">Download Match Info</button><br />
           <input type="number" placeholder="276" id="playerID" />
           <input type="number" placeholder="276" id="playerID2" />
           <button id="getPlayerStats">Get Player Stats</button><br />
           <input type="number" placeholder="541" id="teamID" />
           <button id="getSquad">Get Squad</button>
+          <button id="local-match-list">A</button>
         </div>
       </div>
       <div class="row">
         <textarea
           rows="5"
-          cols="40"
+          cols="44"
           placeholder="This is the default text"
           id="textOnPic"
         ></textarea>
         <textarea
           id="pasteArea"
           rows="5"
-          cols="14"
+          cols="10"
           placeholder="Paste Image Here"
         ></textarea>
       </div>
@@ -186,6 +187,7 @@
             </td>
           </tr>
         </table>
+        <input type="string" placeholder="OFFICIAL" id="breaking-official" />
       </fieldset>
       <div class="row">
         <button
@@ -205,39 +207,44 @@
       </div>
       <div class="row">
         <button type="button" class="btn btn-primary" id="copy-match-stats">
-          Copy match stats
+          Match stats
         </button>
-        <!--button type="button" class="btn btn-primary" onclick="addLogos()">
-          Add logos
-        </button-->
         <button type="button" class="btn btn-primary" id="copy-standings">
-          Copy standings
+          Standings
         </button>
         <button type="button" class="btn btn-primary" id="copy-player-stats">
-          Copy Player Stats
+          Player Stats
         </button>
         <button type="button" class="btn btn-primary" id="copy-matches">
-          Copy Matches
+          Matches
+        </button>
+        <button type="button" class="btn btn-primary" id="copy-selected">
+          Selected Matches
         </button>
       </div>
       <div class="row" id="missing-matches"></div>
     </div>
     <div class="col-md-6">
-      <div id="fixtures-info"></div>
-      <h2 id="league-name"></h2>
+      <h3 id="league-name"></h3>
+      <h3 id="round-no"></h3>
       <h3>Results</h3>
-      <div id="results"></div>
+      <div id="fixtures-info"></div>
       <div id="results_text"></div>
       <h3>Standings</h3>
       <div id="standings"></div>
       <div id="standings_text"></div>
-      <h3>Team of the Week</h3>
+      <!--h3>Team of the Week</h3>
       <h3>Top Scorers</h3>
       <div id="top-scorers"></div>
       <h3>Assists</h3>
-      <div id="top-assists"></div>
+      <div id="top-assists"></div-->
 
       <div id="one-fixture"></div>
+      <table
+        style="border-collapse: collapse; border-color: #1d3557"
+        border="1"
+        id="selected-matches"
+      ></table>
     </div>
   </body>
   <footer>

@@ -1,7 +1,9 @@
 import { matchesToCanvas } from "./components/match-list.js";
+import { playerStatsToCanvas } from "./components/player-stats.js";
+import { clubs } from "./data/clubs.js";
 
 let c = document.getElementById("myCanvas");
-let ctx = c.getContext("2d");
+export let ctx = c.getContext("2d");
 const font = "Source Sans Pro";
 const fontSize = "46px";
 const backgroundImageName = "insta_new_no_pic.png";
@@ -17,7 +19,7 @@ let inputTextValue,
   fontHeight,
   red_image,
   i;
-let imgs = {};
+export let imgs = {};
 
 //Preload images
 let border_image = new Image();
@@ -54,12 +56,17 @@ function make_base(text) {
       ctx.drawImage(border_image, 0, 0);
     }
     if (!["NONE", "ELEVEN", "ALLTEXT", "HALF", "TABLE"].includes(radioValue)) {
+      ctx.font = `bold 76px ${font}`;
       ctx.fillText(radioValue, 540, 860);
       red_image = new Image();
       red_image.src = sirens;
       red_image.onload = function () {
         ctx.drawImage(red_image, 294, 810);
       };
+    } else {
+      ctx.font = `bold 60px ${font}`;
+      let breakingText = document.getElementById("breaking-official").value;
+      ctx.fillText(breakingText, 540, 650);
     }
 
     ctx.font = `bold ${fontSize} ${font}`;
@@ -68,7 +75,7 @@ function make_base(text) {
     if (radioValue == "ALLTEXT") {
       fontHeight = 200;
     } else if (radioValue == "HALF") {
-      fontHeight = 650;
+      fontHeight = 700;
     } else if (radioValue == "NONE") {
       fontHeight = 908;
     } else {
@@ -234,32 +241,19 @@ document.getElementById("copy-standings").onclick = function (event) {
   );
 };
 
-document.getElementById("copy-player-stats").onclick = function (event) {
-  let imgToAdd = [];
-  let statsTable = document.getElementById("player-stats");
-  var tBody = statsTable.getElementsByTagName("tbody")[0];
-  let playerIDs = tBody.getAttribute("id").split("|");
-
-  imgToAdd.push({
-    img: imgs[playerIDs[0]],
-    imgHeight: 200,
-    startX: 550,
-    startY: 60,
-  });
-  imgToAdd.push({
-    img: imgs[playerIDs[1]],
-    imgHeight: 200,
-    startX: 1620,
-    startY: 60,
-  });
-  buildTableForTableType(removeNewlines(statsTable.outerHTML), imgToAdd, 260);
+document.getElementById("copy-player-stats").onclick = function () {
+  playerStatsToCanvas();
 };
 
-document.getElementById("copy-matches").onclick = function (event) {
-  matchesToCanvas();
+document.getElementById("copy-matches").onclick = function () {
+  matchesToCanvas("match-list");
 };
 
-function buildTableForTableType(lines, imgToAdd, yPos = 100) {
+document.getElementById("copy-selected").onclick = function () {
+  matchesToCanvas("selected-matches");
+};
+
+export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
   ctx.drawImage(border_image, 0, 0);
 
@@ -287,20 +281,6 @@ function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   img.src = buildSvgImageUrl(data);
   ctx.fillText(theText, 540, 160);
 }
-
-/*
-Should add logos when adding club names to text area
-function addLogos() {
-  inputTextValue = document.getElementById("textOnPic").value;
-  let texty = inputTextValue.split("\n");
-  for (let j = 0; j < texty.length; j++) {
-    for (let i = 0; i < clubs.length; i++) {
-      if (texty[j].indexOf(clubs[i]) > -1) {
-        drawResizedImage(imgs[clubs[i]], 60, 100 + j * 50, 200 + j * 50);
-      }
-    }
-  }
-}*/
 
 function drawResizedImage(image, imgHeight, startX, startY) {
   if (image.height > image.width) {
