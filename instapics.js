@@ -5,20 +5,18 @@ import { clubs } from "./data/clubs.js";
 let c = document.getElementById("myCanvas");
 export let ctx = c.getContext("2d");
 const font = "Source Sans Pro";
-const fontSize = "46px";
+const fontSize = 46;
 const backgroundImageName = "insta_new_no_pic.png";
 const borderImage = "border.png";
-const sirens = "officialbreakingetc.png";
 const lineheight = 50;
 let inputTextValue,
   newWidth,
   newHeight,
   base_image,
   imgHeight,
-  radioValue,
-  fontHeight,
-  red_image,
-  i;
+  fontY,
+  i,
+  breakingText;
 export let imgs = {};
 
 //Preload images
@@ -37,65 +35,46 @@ for (i = 0; i < players.length; i++) {
   imgs[players[i].id] = img;
 }
 
-make_base("");
+make_base("", "");
 
-function make_base(text) {
+function make_base(text, breakingText) {
+  let lines = text.split(/\r|\r\n|\n/);
+
   base_image = new Image();
   base_image.src = backgroundImageName;
   base_image.onload = function () {
     ctx.drawImage(base_image, 0, 0);
 
-    ctx.font = `bold 76px ${font}`;
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#e63946";
-    radioValue = document
-      .querySelector('input[name="bigred"]:checked')
-      .value.toUpperCase();
+    //ctx.font = `bold 76px ${font}`; //title
 
-    if (radioValue == "ALLTEXT") {
+    ctx.textAlign = "center";
+
+    if (lines.count > 10) {
       ctx.drawImage(border_image, 0, 0);
     }
-    if (!["NONE", "ELEVEN", "ALLTEXT", "HALF", "TABLE"].includes(radioValue)) {
-      ctx.font = `bold 76px ${font}`;
-      ctx.fillText(radioValue, 540, 860);
-      red_image = new Image();
-      red_image.src = sirens;
-      red_image.onload = function () {
-        ctx.drawImage(red_image, 294, 810);
-      };
-    } else {
-      ctx.font = `bold 60px ${font}`;
-      let breakingText = document.getElementById("breaking-official").value;
-      ctx.fillText(breakingText, 540, 650);
+
+    console.log(lines);
+    console.log(lines.length);
+    fontY = 1080 - 20 - lines.length * 50;
+
+    if (breakingText) {
+      ctx.font = `bold ${fontSize + 20}px ${font}`; //title
+      ctx.fillStyle = "#e63946"; //red
+      ctx.fillText(breakingText, 540, fontY - 50);
     }
-
-    ctx.font = `bold ${fontSize} ${font}`;
-    ctx.fillStyle = "#1d3557";
-
-    if (radioValue == "ALLTEXT") {
-      fontHeight = 200;
-    } else if (radioValue == "HALF") {
-      fontHeight = 700;
-    } else if (radioValue == "NONE") {
-      fontHeight = 908;
-    } else {
-      fontHeight = 920;
-    }
-
-    if (radioValue == "TABLE") {
-      buildTableForTableType(text);
-    } else {
-      let lines = text.split("\n");
-      for (let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], 540, fontHeight + i * lineheight);
-      }
+    ctx.fillStyle = "#1d3557"; //blue
+    ctx.font = `bold ${fontSize}px ${font}`;
+    console.log(fontY);
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], 540, fontY + i * lineheight);
     }
   };
 }
 
 document.getElementById("textOnPic").onkeyup = function () {
   inputTextValue = document.getElementById("textOnPic").value;
-  make_base(inputTextValue);
+  breakingText = document.getElementById("breaking-official").value;
+  make_base(inputTextValue, breakingText);
 };
 
 /*
@@ -144,29 +123,15 @@ document.getElementById("pasteArea").onpaste = function (event) {
   if (blob !== null) {
     var reader = new FileReader();
     reader.onload = function (event) {
-      radioValue = document
-        .querySelector('input[name="bigred"]:checked')
-        .value.toUpperCase();
+      console.log(fontY);
 
-      switch (radioValue) {
-        case "NONE":
-          imgHeight = 780;
-          break;
-        case "ELEVEN":
-          imgHeight = 934;
-          break;
-        case "HALF":
-          imgHeight = 520;
-          break;
-        default:
-          imgHeight = 696;
-          break;
-      }
+      imgHeight = fontY - 84 - lineheight;
+      if (breakingText) imgHeight -= 60;
 
       base_image = new Image();
       base_image.src = event.target.result;
       base_image.onload = function () {
-        drawResizedImage(base_image, imgHeight, 1080, 76);
+        drawResizedImage(base_image, imgHeight, 1080, 78);
         ctx.drawImage(border_image, 0, 0);
       };
     };
@@ -224,7 +189,7 @@ document.getElementById("copy-standings").onclick = function (event) {
           imgToAdd.push({
             img: imgs[thisClub],
             imgHeight: 40,
-            startX: 394,
+            startX: 178,
             startY: yPos + 44 + l * 42,
           });
           l++;
@@ -269,11 +234,12 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   img.onload = function () {
     ctx.drawImage(img, (1080 - img.width) / 2, yPos);
     for (let i = 0; i < imgToAdd.length; i++) {
-      drawResizedImage(
+      ctx.drawImage(
         imgToAdd[i].img,
-        imgToAdd[i].imgHeight,
         imgToAdd[i].startX,
-        imgToAdd[i].startY
+        imgToAdd[i].startY,
+        imgToAdd[i].imgHeight,
+        imgToAdd[i].imgHeight
       );
     }
   };
