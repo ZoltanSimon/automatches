@@ -1,6 +1,10 @@
 import { buildTableForTableType, imgs, ctx } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
 
+let imgToAdd = [];
+let yPos = 140;
+let notResultGap = 0;
+
 export function matchList(response, showID = false) {
   console.log(response);
   let addToPage;
@@ -53,18 +57,14 @@ export function matchList(response, showID = false) {
 }
 
 export function matchesToCanvas(sourceDiv) {
-  let yPos = 140;
-  let imgToAdd = [];
   let matchesTable = document.getElementById(sourceDiv);
   let leagueName = document.getElementById("league-name").innerHTML;
   let round = document.getElementById("round-no").innerHTML;
   var rowCount = matchesTable.rows.length;
-  let thisTr, thisTd, thisClub;
+  let thisTr;
   let index = 7;
   let isResult = true;
-  let notResultGap = 0;
-  let notResultGap2 = 0;
-  let date, logo1, team1, logo2, team2;
+  let logo1, logo2;
 
   if (matchesTable.rows.length < 11) yPos = 240;
 
@@ -83,7 +83,6 @@ export function matchesToCanvas(sourceDiv) {
     if (!isResult) {
       thisTr.deleteCell(6);
       notResultGap = 60;
-      notResultGap2 = 10;
       thisTr.children[3].innerHTML = "VS";
       thisTr.children[3].style.width = "63px";
     } else {
@@ -97,21 +96,21 @@ export function matchesToCanvas(sourceDiv) {
     thisTr.children[4].style.width = "40px";
     thisTr.children[5].style.width = "240px";
 
-    for (let j = 0; j < thisTr.children.length; j++) {
-      thisTd = thisTr.children[j];
-      for (let k = 0; k < clubs.length; k++) {
-        thisClub = clubs[k];
-        if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
-          imgToAdd.push({
-            img: imgs[thisClub],
-            imgHeight: 50,
-            startX: 235 + notResultGap + j * (260 + notResultGap2),
-            startY: yPos + 2 + i * 52,
-          });
-          thisTd.innerHTML = " ";
-        }
-      }
-    }
+    logo1 = clubs.find((element) =>
+      thisTr.children[1].innerHTML.includes(element)
+    );
+    logo2 = clubs.find((element) =>
+      thisTr.children[4].innerHTML.includes(element)
+    );
+    console.log(thisTr.children[1].innerHTML);
+    console.log(thisTr.children[4].innerHTML);
+    thisTr.children[1].innerHTML = "";
+    thisTr.children[4].innerHTML = "";
+    console.log(logo1);
+    console.log(logo2);
+
+    addImgToArray(251, logo1, i);
+    addImgToArray(618, logo2, i);
   }
 
   ctx.fillText("Round " + round.split(" - ")[1], 540, 880);
@@ -132,9 +131,17 @@ export function matchesToCanvas(sourceDiv) {
 }
 
 function clickHandler(event) {
-  // Here, `this` refers to the element the event was hooked on
   console.log(event.currentTarget);
   var table = document.getElementById("selected-matches");
   var newRow = table.insertRow(table.rows.length);
   newRow.innerHTML = event.currentTarget.innerHTML;
+}
+
+function addImgToArray(xPos, logo, i) {
+  imgToAdd.push({
+    img: imgs[logo],
+    imgHeight: 50,
+    startX: xPos + notResultGap,
+    startY: yPos + 2 + i * 52,
+  });
 }
