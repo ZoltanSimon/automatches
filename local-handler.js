@@ -20,7 +20,7 @@ export async function getLocalPlayerStats(inputPlayer) {
     foundIndex = -1,
     teamName = "";
   for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`Allmatches/${allLeagues[i]}.json`);
+    let response = await fetch(`leagues/${allLeagues[i]}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {

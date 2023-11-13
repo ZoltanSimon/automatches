@@ -6,7 +6,6 @@ let yPos = 140;
 let notResultGap = 0;
 
 export function matchList(response, showID = false) {
-  console.log(response);
   let addToPage;
   let fixtures = response.response;
   let leagueName = fixtures[0].league.name;
@@ -32,7 +31,10 @@ export function matchList(response, showID = false) {
     )} alt="*${element.teams.home.name
       .replace("ó", "o")
       .replace("ę", "e")}*" width="30px"></td>
-      <td style="text-align: left;">${element.teams.home.name}</td>
+      <td style="text-align: left;">${element.teams.home.name.replace(
+        "Borussia Monchengladbach",
+        "Gladbach"
+      )}</td>
     ${tds}${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
     <td style="text-align: center;"><img src=${imagePath(
       element.teams.away.name
@@ -71,7 +73,6 @@ export function matchesToCanvas(sourceDiv) {
   matchesTable.cellPadding = 10;
 
   for (var i = 0; i < rowCount; i++) {
-    console.log(matchesTable.rows[i].cells.length);
     if (matchesTable.rows[i].cells.length == index + 1)
       matchesTable.rows[i].deleteCell(index);
   }
@@ -84,17 +85,18 @@ export function matchesToCanvas(sourceDiv) {
       thisTr.deleteCell(6);
       notResultGap = 60;
       thisTr.children[3].innerHTML = "VS";
+      thisTr.children[0].style.width = "120px";
       thisTr.children[3].style.width = "63px";
     } else {
-      thisTr.children[3].style.width = "50px";
-      thisTr.children[6].style.width = "50px";
+      thisTr.children[0].style.width = "108px";
+      thisTr.children[3].style.width = "40px";
+      thisTr.children[6].style.width = "40px";
     }
 
-    thisTr.children[0].style.width = "130px";
     thisTr.children[1].style.width = "40px";
-    thisTr.children[2].style.width = "240px";
+    thisTr.children[2].style.width = "232px";
     thisTr.children[4].style.width = "40px";
-    thisTr.children[5].style.width = "240px";
+    thisTr.children[5].style.width = "232px";
 
     logo1 = clubs.find((element) =>
       thisTr.children[1].innerHTML.includes(element)
@@ -102,15 +104,11 @@ export function matchesToCanvas(sourceDiv) {
     logo2 = clubs.find((element) =>
       thisTr.children[4].innerHTML.includes(element)
     );
-    console.log(thisTr.children[1].innerHTML);
-    console.log(thisTr.children[4].innerHTML);
     thisTr.children[1].innerHTML = "";
     thisTr.children[4].innerHTML = "";
-    console.log(logo1);
-    console.log(logo2);
 
-    addImgToArray(251, logo1, i);
-    addImgToArray(618, logo2, i);
+    addImgToArray(234, logo1, i);
+    addImgToArray(609, logo2, i);
   }
 
   ctx.fillText("Round " + round.split(" - ")[1], 540, 880);
@@ -131,7 +129,6 @@ export function matchesToCanvas(sourceDiv) {
 }
 
 function clickHandler(event) {
-  console.log(event.currentTarget);
   var table = document.getElementById("selected-matches");
   var newRow = table.insertRow(table.rows.length);
   newRow.innerHTML = event.currentTarget.innerHTML;

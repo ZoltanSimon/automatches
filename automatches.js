@@ -269,26 +269,3 @@ function oneFixture(response) {
   document.getElementById("one-fixture").innerHTML += addToPage;
   addMatchStats(fixture);
 }
-
-function oneMatch(matchId) {
-  fetch(`Matches/${matchId}.json`)
-    .then((response) => response.json())
-    .then((data) => oneFixture(data))
-    .catch((error) => {
-      console.log("Calling from API");
-      getResultFromApi(matchId);
-    });
-}
-
-/*const fs = require("fs");
-const path = require("path");
-
-const jsonsInDir = fs
-  .readdirSync("./sw_lbi/categories")
-  .filter((file) => path.extname(file) === ".json");
-console.log(jsonsInDir);
-jsonsInDir.forEach((file) => {
-  const fileData = fs.readFileSync(path.join("./sw_lbi/categories", file));
-  const json = JSON.parse(fileData.toString());
-  console.log(json);
-});*/
