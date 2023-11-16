@@ -18,7 +18,9 @@ export async function getLocalPlayerStats(inputPlayer) {
     duelsTotal = 0,
     playerName = "",
     foundIndex = -1,
-    teamName = "";
+    teamName = "",
+    competitions = [],
+    thisComp = "";
   for (let i = 0; i < allLeagues.length; i++) {
     let response = await fetch(`leagues/${allLeagues[i]}.json`);
     let league = await response.json();
@@ -26,9 +28,14 @@ export async function getLocalPlayerStats(inputPlayer) {
     for (let i = 0; i < league.length; i++) {
       if (
         league[i].fixture.status.short == "FT" &&
-        (league[i].teams.home.id == inputPlayer.club ||
-          league[i].teams.away.id == inputPlayer.club)
+        //league[i].teams.home.id == inputPlayer.club ||
+        //league[i].teams.away.id == inputPlayer.club ||
+        (league[i].teams.home.id == inputPlayer.nation ||
+          league[i].teams.away.id == inputPlayer.nation)
       ) {
+        thisComp = league[i].league.name;
+        console.log(thisComp);
+        console.log(league[i].fixture.id);
         let response2 = await fetch(`Matches/${league[i].fixture.id}.json`);
 
         if (!response2.ok) {
@@ -67,6 +74,8 @@ export async function getLocalPlayerStats(inputPlayer) {
               minutes += stats.games.minutes;
               if (!playerName) playerName = playerFound.player.name;
               if (!teamName) teamName = players[foundIndex].team.name;
+              if (competitions.indexOf(thisComp) == -1)
+                competitions.push(thisComp);
             }
           }
           gaper90 = (((goals + assists) * 90) / minutes).toFixed(2);
@@ -90,6 +99,7 @@ export async function getLocalPlayerStats(inputPlayer) {
     duels: `${duelsWon} / ${duelsTotal}`,
     key_passes: keyPasses,
     fouls_drawn: foulsDrawn,
+    competitions: competitions.join(", "),
   };
 }
 

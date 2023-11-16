@@ -1,4 +1,5 @@
 import { matchesToCanvas } from "./components/match-list.js";
+import { matchStatsToCanvas } from "./components/match-statistics.js";
 import { playerStatsToCanvas } from "./components/player-stats.js";
 import { clubs } from "./data/clubs.js";
 
@@ -25,8 +26,8 @@ border_image.src = borderImage;
 for (i = 0; i < clubs.length; i++) {
   var img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = imagePath(clubs[i]);
-  imgs[clubs[i]] = img;
+  img.src = imagePath(clubs[i].id);
+  imgs[clubs[i].name] = img;
 }
 for (i = 0; i < players.length; i++) {
   var img = new Image();
@@ -53,8 +54,6 @@ function make_base(text, breakingText) {
       ctx.drawImage(border_image, 0, 0);
     }
 
-    console.log(lines);
-    console.log(lines.length);
     fontY = 1080 - 20 - lines.length * 50;
 
     if (breakingText) {
@@ -64,7 +63,6 @@ function make_base(text, breakingText) {
     }
     ctx.fillStyle = "#1d3557"; //blue
     ctx.font = `bold ${fontSize}px ${font}`;
-    console.log(fontY);
     for (let i = 0; i < lines.length; i++) {
       ctx.fillText(lines[i], 540, fontY + i * lineheight);
     }
@@ -140,32 +138,7 @@ document.getElementById("pasteArea").onpaste = function (event) {
 };
 
 document.getElementById("copy-match-stats").onclick = function (event) {
-  let imgToAdd = [];
-  let statisticsTable = document.getElementById("match-stats");
-  let teamLogos = statisticsTable.rows[0].children[1].innerHTML.split(" - ");
-  let leagueName = document.getElementById("league-match-stats").innerHTML;
-
-  for (let i = 0; i < teamLogos.length; i++) {
-    for (let j = 0; j < clubs.length; j++) {
-      if (teamLogos[i].indexOf(`*${clubs[j]}*`) > -1) {
-        imgToAdd.push({
-          img: imgs[clubs[j]],
-          imgHeight: 50,
-          startX: 920 + i * 320,
-          startY: 181,
-        });
-      }
-    }
-  }
-
-  statisticsTable.rows[0].children[1].innerHTML = "-";
-
-  buildTableForTableType(
-    removeNewlines(statisticsTable.outerHTML),
-    imgToAdd,
-    180
-  );
-  ctx.fillText(leagueName, 540, 960);
+  matchStatsToCanvas();
 };
 
 document.getElementById("copy-standings").onclick = function (event) {
@@ -184,7 +157,7 @@ document.getElementById("copy-standings").onclick = function (event) {
     for (let j = 0; j < thisTr.children.length; j++) {
       thisTd = thisTr.children[j];
       for (let k = 0; k < clubs.length; k++) {
-        thisClub = clubs[k];
+        thisClub = clubs[k].name;
         if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
           imgToAdd.push({
             img: imgs[thisClub],

@@ -3,9 +3,9 @@ import { clubs } from "./../data/clubs.js";
 
 let imgToAdd = [];
 let yPos = 140;
-let notResultGap = 0;
 
 export function matchList(response, showID = false) {
+  console.log(response);
   let addToPage;
   let fixtures = response.response;
   let leagueName = fixtures[0].league.name;
@@ -27,20 +27,16 @@ export function matchList(response, showID = false) {
       new Date(element.fixture.date).getMonth() + 1
     }.${new Date(element.fixture.date).getFullYear()}</td>
     <td style="text-align: center;"><img src=${imagePath(
-      element.teams.home.name
-    )} alt="*${element.teams.home.name
-      .replace("ó", "o")
-      .replace("ę", "e")}*" width="30px"></td>
+      element.teams.home.id
+    )} alt="*${element.teams.home.name}*" width="30px"></td>
       <td style="text-align: left;">${element.teams.home.name.replace(
         "Borussia Monchengladbach",
         "Gladbach"
       )}</td>
     ${tds}${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
     <td style="text-align: center;"><img src=${imagePath(
-      element.teams.away.name
-    )} alt="*${element.teams.away.name
-      .replace("ó", "o")
-      .replace("ę", "e")}*" width="30px"></td>
+      element.teams.away.id
+    )} alt="*${element.teams.away.name}*" width="30px"></td>
       <td style="text-align: left;">${element.teams.away.name}</td>
     ${tds}${
       !isNaN(parseInt(element.goals.away)) ? element.goals.away : ""
@@ -67,6 +63,8 @@ export function matchesToCanvas(sourceDiv) {
   let index = 7;
   let isResult = true;
   let logo1, logo2;
+  let notResultGap = 0;
+  let notResultGap2 = 0;
 
   if (matchesTable.rows.length < 11) yPos = 240;
 
@@ -83,10 +81,11 @@ export function matchesToCanvas(sourceDiv) {
 
     if (!isResult) {
       thisTr.deleteCell(6);
-      notResultGap = 60;
+      notResultGap = 24;
+      notResultGap2 = 62;
       thisTr.children[3].innerHTML = "VS";
-      thisTr.children[0].style.width = "120px";
-      thisTr.children[3].style.width = "63px";
+      thisTr.children[0].style.width = "131px";
+      thisTr.children[3].style.width = "78px";
     } else {
       thisTr.children[0].style.width = "108px";
       thisTr.children[3].style.width = "40px";
@@ -99,16 +98,17 @@ export function matchesToCanvas(sourceDiv) {
     thisTr.children[5].style.width = "232px";
 
     logo1 = clubs.find((element) =>
-      thisTr.children[1].innerHTML.includes(element)
+      htmlDecode(thisTr.children[1].innerHTML).includes(element.name)
     );
     logo2 = clubs.find((element) =>
-      thisTr.children[4].innerHTML.includes(element)
+      htmlDecode(thisTr.children[4].innerHTML).includes(element.name)
     );
+
     thisTr.children[1].innerHTML = "";
     thisTr.children[4].innerHTML = "";
 
-    addImgToArray(234, logo1, i);
-    addImgToArray(609, logo2, i);
+    addImgToArray(234 + notResultGap, logo1.name, i);
+    addImgToArray(609 + notResultGap2, logo2.name, i);
   }
 
   ctx.fillText("Round " + round.split(" - ")[1], 540, 880);
@@ -138,7 +138,7 @@ function addImgToArray(xPos, logo, i) {
   imgToAdd.push({
     img: imgs[logo],
     imgHeight: 50,
-    startX: xPos + notResultGap,
+    startX: xPos,
     startY: yPos + 2 + i * 52,
   });
 }

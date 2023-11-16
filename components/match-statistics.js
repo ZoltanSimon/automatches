@@ -1,4 +1,6 @@
+import { buildTableForTableType, imgs, ctx } from "./../instapics.js";
 import { Stat } from "../stat.js";
+import { clubs } from "./../data/clubs.js";
 
 const tds = `<td width='33%' style='text-align: center; border-color: #1D3557; padding: 10px;'>`;
 
@@ -65,4 +67,38 @@ export function addMatchStats(apiResponse) {
   //1035067
   //1035093
   //1038016
+  //1048908
+}
+
+export function matchStatsToCanvas() {
+  let imgToAdd = [];
+  let statisticsTable = document.getElementById("match-stats");
+  let teamLogos = statisticsTable.rows[0].children[1].innerHTML.split(" - ");
+  let leagueName = document.getElementById("league-match-stats").innerHTML;
+
+  statisticsTable.rows[0].style.backgroundColor = "#457B9D";
+  statisticsTable.rows[0].style.fontWeight = "bold";
+
+  for (let i = 0; i < teamLogos.length; i++) {
+    for (let j = 0; j < clubs.length; j++) {
+      if (teamLogos[i].indexOf(`*${clubs[j].name}*`) > -1) {
+        imgToAdd.push({
+          img: imgs[clubs[j].name],
+          imgHeight: 50,
+          startX: 430 + i * 172,
+          startY: 181,
+        });
+      }
+    }
+  }
+
+  statisticsTable.rows[0].children[1].innerHTML = "-";
+
+  buildTableForTableType(
+    removeNewlines(statisticsTable.outerHTML),
+    imgToAdd,
+    180
+  );
+  ctx.fillStyle = "#e63946";
+  ctx.fillText(leagueName, 540, 960);
 }

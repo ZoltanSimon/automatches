@@ -1,0 +1,267 @@
+[
+  {
+    "team": {
+      "id": 497,
+      "name": "AS Roma",
+      "logo": "https://media-4.api-sports.io/football/teams/497.png"
+    },
+    "players": [
+      {
+        "id": 2674,
+        "name": "Rui Patrício",
+        "age": 35,
+        "number": 1,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/2674.png"
+      },
+      {
+        "id": 277192,
+        "name": "P. Boer",
+        "age": 21,
+        "number": 63,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/277192.png"
+      },
+      {
+        "id": 556,
+        "name": "M. Svilar",
+        "age": 24,
+        "number": 99,
+        "position": "Goalkeeper",
+        "photo": "https://media-4.api-sports.io/football/players/556.png"
+      },
+      {
+        "id": 770,
+        "name": "R. Karsdorp",
+        "age": 28,
+        "number": 2,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/770.png"
+      },
+      {
+        "id": 1807,
+        "name": "E. Ndicka",
+        "age": 24,
+        "number": 5,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/1807.png"
+      },
+      {
+        "id": 892,
+        "name": "C. Smalling",
+        "age": 34,
+        "number": 6,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/892.png"
+      },
+      {
+        "id": 47302,
+        "name": "Diego Llorente",
+        "age": 30,
+        "number": 14,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/47302.png"
+      },
+      {
+        "id": 22222,
+        "name": "Z. Çelik",
+        "age": 26,
+        "number": 19,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/22222.png"
+      },
+      {
+        "id": 30425,
+        "name": "G. Mancini",
+        "age": 27,
+        "number": 23,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/30425.png"
+      },
+      {
+        "id": 30924,
+        "name": "M. Kumbulla",
+        "age": 23,
+        "number": 24,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/30924.png"
+      },
+      {
+        "id": 862,
+        "name": "L. Spinazzola",
+        "age": 30,
+        "number": 37,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/862.png"
+      },
+      {
+        "id": 533,
+        "name": "R. Kristensen",
+        "age": 26,
+        "number": 43,
+        "position": "Defender",
+        "photo": "https://media-4.api-sports.io/football/players/533.png"
+      },
+      {
+        "id": 778,
+        "name": "B. Cristante",
+        "age": 28,
+        "number": 4,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/778.png"
+      },
+      {
+        "id": 782,
+        "name": "L. Pellegrini",
+        "age": 27,
+        "number": 7,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/782.png"
+      },
+      {
+        "id": 271,
+        "name": "L. Paredes",
+        "age": 29,
+        "number": 16,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/271.png"
+      },
+      {
+        "id": 513,
+        "name": "Renato Sanches",
+        "age": 26,
+        "number": 20,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/513.png"
+      },
+      {
+        "id": 658,
+        "name": "H. Aouar",
+        "age": 25,
+        "number": 22,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/658.png"
+      },
+      {
+        "id": 286475,
+        "name": "E. Bove",
+        "age": 21,
+        "number": 52,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/286475.png"
+      },
+      {
+        "id": 203474,
+        "name": "N. Zalewski",
+        "age": 21,
+        "number": 59,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/203474.png"
+      },
+      {
+        "id": 343383,
+        "name": "R. Pagano",
+        "age": 19,
+        "number": 60,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/343383.png"
+      },
+      {
+        "id": 356888,
+        "name": "N. Pisilli",
+        "age": 19,
+        "number": 61,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/356888.png"
+      },
+      {
+        "id": 342042,
+        "name": "L. Cherubini",
+        "age": 19,
+        "number": 64,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/342042.png"
+      },
+      {
+        "id": 342037,
+        "name": "F. D'Alessio",
+        "age": 19,
+        "number": 68,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/342037.png"
+      },
+      {
+        "id": 392506,
+        "name": "Mattia Mannini",
+        "age": 16,
+        "number": null,
+        "position": "Midfielder",
+        "photo": "https://media-4.api-sports.io/football/players/392506.png"
+      },
+      {
+        "id": 19194,
+        "name": "T. Abraham",
+        "age": 26,
+        "number": 9,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/19194.png"
+      },
+      {
+        "id": 30509,
+        "name": "A. Belotti",
+        "age": 30,
+        "number": 11,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/30509.png"
+      },
+      {
+        "id": 1221,
+        "name": "S. Azmoun",
+        "age": 28,
+        "number": 17,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/1221.png"
+      },
+      {
+        "id": 875,
+        "name": "P. Dybala",
+        "age": 30,
+        "number": 21,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/875.png"
+      },
+      {
+        "id": 348468,
+        "name": "Filippo Alessio",
+        "age": 19,
+        "number": 62,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/348468.png"
+      },
+      {
+        "id": 368096,
+        "name": "João Gabriel e Costa Cesco",
+        "age": 17,
+        "number": 67,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/368096.png"
+      },
+      {
+        "id": 907,
+        "name": "R. Lukaku",
+        "age": 30,
+        "number": 90,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/907.png"
+      },
+      {
+        "id": 791,
+        "name": "S. El Shaarawy",
+        "age": 31,
+        "number": 92,
+        "position": "Attacker",
+        "photo": "https://media-4.api-sports.io/football/players/791.png"
+      }
+    ]
+  }
+]

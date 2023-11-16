@@ -36,6 +36,38 @@ document.getElementById("getRound").onclick = function () {
   setRound();
 };
 
+document.getElementById("a").onclick = async function () {
+  let teamsNew = [];
+  let homeTeam, awayTeam;
+  for (let i = 0; i < allLeagues.length; i++) {
+    console.log(allLeagues[i]);
+    let response = await fetch(`leagues/${allLeagues[i]}.json`);
+    let league = await response.json();
+    //console.log(league);
+    for (let j = 0; j < 45; j++) {
+      console.log(league[j].teams);
+
+      homeTeam = {
+        id: league[j].teams.home.id,
+        name: league[j].teams.home.name,
+      };
+      awayTeam = {
+        id: league[j].teams.away.id,
+        name: league[j].teams.away.name,
+      };
+
+      if (!teamsNew.find((e) => e.id == homeTeam.id)) {
+        teamsNew.push(homeTeam);
+      }
+
+      if (!teamsNew.find((e) => e.id == awayTeam.id)) {
+        teamsNew.push(awayTeam);
+      }
+    }
+  }
+  console.log(teamsNew);
+};
+
 document.getElementById("getMatch").onclick = async function () {
   let fixtureID = document.getElementById("fixtureID").value;
   matchFromApi = await getResultFromLocal(fixtureID);
@@ -129,7 +161,7 @@ function topScorers(response) {
         <td>${it}</td>
         <td><img src="${a.player.photo}" width="50px"</td>
         <td>${a.player.name}</td>
-        <td><img src=${imagePath(a.statistics[0].team.name)} width="30px"/></td>
+        <td><img src=${imagePath(a.statistics[0].team.id)} width="30px"/></td>
         <td>${a.statistics[0].goals.total}</td>
         <td>${(
           (a.statistics[0].goals.total * 90) /
@@ -163,7 +195,7 @@ function topAssists(response) {
         <td>${it}</td>
         <td><img src="${a.player.photo}" width="50px"</td>
         <td>${a.player.name}</td>
-        <td><img src=${imagePath(a.statistics[0].team.name)} width="30px"/></td>
+        <td><img src=${imagePath(a.statistics[0].team.id)} width="30px"/></td>
         <td>${a.statistics[0].goals.assists}</td>
     </tr>`;
     it++;
@@ -239,10 +271,10 @@ function oneFixture(response) {
   addToPage = `
   <table>
     <tr>
-      <td><img src=${imagePath(fixture.teams.home.name)} width="30px"></td>
+      <td><img src=${imagePath(homeTeam.id)} width="30px"></td>
       <td><a href="${teamLink(homeTeam.name)}/">${homeTeam.name}</a></td>
       <td width="30px">${fixture.goals.home || 0}</td>
-      <td><img src=${imagePath(awayTeam.name)} width="30px"</td>
+      <td><img src=${imagePath(awayTeam.id)} width="30px"</td>
       <td><a href="${teamLink(awayTeam.name)}/">${awayTeam.name}</a></td>
       <td width="30px">${fixture.goals.away || 0}</td>
     </tr>

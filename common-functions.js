@@ -5,9 +5,9 @@ let download = function () {
   link.click();
 };
 
-function imagePath(teamName) {
-  teamName = teamName.replace("ó", "o").replace("ę", "e");
-  return `Logos//${teamName.replaceAll(" ", "_").toLowerCase()}.png`;
+function imagePath(teamID) {
+  console.log(teamID);
+  return `logos//${teamID}.png`;
 }
 
 function removeNewlines(str) {
@@ -25,19 +25,23 @@ let allLeagues = [
   "la-liga",
   "premier-league",
   "uefa-champions-league",
+  "uefa-europa-league",
   "serie-a",
   "ligue-1",
   "pokal",
+  "euro-quali",
 ];
 
 let players = [
   {
     id: 184, //Harry Kane,
     club: 157, //Bayern
+    nation: 10, //England
   },
   {
     id: 278, //Mbappe
-    club: 85,
+    club: 85, //PSG
+    nation: 2, //France
   },
   {
     id: 1100,
@@ -46,10 +50,12 @@ let players = [
   {
     id: 129718,
     club: 541, //Bellingham
+    nation: 10, //England
   },
   {
     id: 631,
     club: 50, //Foden
+    nation: 10, //England
   },
   {
     id: 644,
@@ -71,6 +77,15 @@ let players = [
     id: 217,
     club: 505, //Lautaro
   },
-  { id: 56, club: 530 }, //Griezzmann
+  { id: 56, club: 530, nation: 2 }, //Griezzmann
   { id: 521, club: 529 }, //Lewa
+  { id: 306, club: 40 }, //Salah
+  { id: 907, club: 497, nation: 1 }, //Lukaku
+  { id: 874, club: 0, nation: 27 }, //Ronaldo
 ];
+
+function htmlDecode(input) {
+  var txt = document.createElement("textarea");
+  txt.innerHTML = input;
+  return txt.value;
+}
