@@ -6,7 +6,6 @@ let download = function () {
 };
 
 function imagePath(teamID) {
-  console.log(teamID);
   return `logos//${teamID}.png`;
 }
 
@@ -30,6 +29,8 @@ let allLeagues = [
   "ligue-1",
   "pokal",
   "euro-quali",
+  "world-cup-qualifiers-south-america",
+  "world-cup-2022",
 ];
 
 let players = [
@@ -82,6 +83,7 @@ let players = [
   { id: 306, club: 40 }, //Salah
   { id: 907, club: 497, nation: 1 }, //Lukaku
   { id: 874, club: 0, nation: 27 }, //Ronaldo
+  { id: 59, name: "Álvaro Morata", club: 530, nation: 9 },
 ];
 
 function htmlDecode(input) {

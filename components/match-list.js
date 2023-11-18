@@ -5,7 +5,6 @@ let imgToAdd = [];
 let yPos = 140;
 
 export function matchList(response, showID = false) {
-  console.log(response);
   let addToPage;
   let fixtures = response.response;
   let leagueName = fixtures[0].league.name;
@@ -81,8 +80,8 @@ export function matchesToCanvas(sourceDiv) {
 
     if (!isResult) {
       thisTr.deleteCell(6);
-      notResultGap = 24;
-      notResultGap2 = 62;
+      notResultGap = 23;
+      notResultGap2 = 61;
       thisTr.children[3].innerHTML = "VS";
       thisTr.children[0].style.width = "131px";
       thisTr.children[3].style.width = "78px";
@@ -107,8 +106,8 @@ export function matchesToCanvas(sourceDiv) {
     thisTr.children[1].innerHTML = "";
     thisTr.children[4].innerHTML = "";
 
-    addImgToArray(234 + notResultGap, logo1.name, i);
-    addImgToArray(609 + notResultGap2, logo2.name, i);
+    addImgToArray(235 + notResultGap, logo1.name, i);
+    addImgToArray(610 + notResultGap2, logo2.name, i);
   }
 
   ctx.fillText("Round " + round.split(" - ")[1], 540, 880);

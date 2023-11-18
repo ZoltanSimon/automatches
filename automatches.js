@@ -8,13 +8,18 @@ import {
   getCurrentRound,
   getSquad,
 } from "./webapi-handler.js";
-import { getLocalPlayerStats, getResultFromLocal } from "./local-handler.js";
+import {
+  getLocalPlayerStats,
+  getResultFromLocal,
+  getPlayerGoalList,
+} from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
 import { addSquad } from "./components/team-squad.js";
 import { leagueStandings } from "./components/league-standings.js";
 import { matchList } from "./components/match-list.js";
+import { playerGoalList } from "./components/player-list.js";
 
 let addToPage;
 let standingsFromApi,
@@ -36,6 +41,21 @@ document.getElementById("getRound").onclick = function () {
   setRound();
 };
 
+document.getElementById("get-player-goal-list").onclick = async function () {
+  let thisPlayer;
+  let top10 = [];
+  let playerList = await getPlayerGoalList();
+  for (let i = 0; i < 10; i++) {
+    console.log(playerList[i]);
+    let player = players.find((x) => x.id == playerList[i].id);
+
+    thisPlayer = await getLocalPlayerStats(player);
+    top10.push(thisPlayer);
+  }
+  console.log(top10);
+  playerGoalList(top10);
+};
+
 document.getElementById("a").onclick = async function () {
   let teamsNew = [];
   let homeTeam, awayTeam;
@@ -43,8 +63,9 @@ document.getElementById("a").onclick = async function () {
     console.log(allLeagues[i]);
     let response = await fetch(`leagues/${allLeagues[i]}.json`);
     let league = await response.json();
-    //console.log(league);
-    for (let j = 0; j < 45; j++) {
+    console.log(allLeagues[i]);
+    console.log(league);
+    for (let j = 0; j < league.length; j++) {
       console.log(league[j].teams);
 
       homeTeam = {

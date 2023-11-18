@@ -2,6 +2,7 @@ import { matchesToCanvas } from "./components/match-list.js";
 import { matchStatsToCanvas } from "./components/match-statistics.js";
 import { playerStatsToCanvas } from "./components/player-stats.js";
 import { clubs } from "./data/clubs.js";
+import { playerListToCanvas } from "./components/player-list.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c.getContext("2d");
@@ -189,6 +190,10 @@ document.getElementById("copy-matches").onclick = function () {
 
 document.getElementById("copy-selected").onclick = function () {
   matchesToCanvas("selected-matches");
+};
+
+document.getElementById("copy-player-list").onclick = function () {
+  playerListToCanvas();
 };
 
 export function buildTableForTableType(lines, imgToAdd, yPos = 100) {

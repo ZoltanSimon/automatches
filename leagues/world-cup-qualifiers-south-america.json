@@ -1,0 +1,2042 @@
+[
+  {
+    "fixture": {
+      "id": 1100235,
+      "referee": "Andres Matonte, Uruguay",
+      "timezone": "UTC",
+      "date": "2023-09-07T22:30:00+00:00",
+      "timestamp": 1694125800,
+      "periods": {
+        "first": 1694125800,
+        "second": 1694129400
+      },
+      "venue": {
+        "id": 1213,
+        "name": "Estadio Antonio Aranda",
+        "city": "Ciudad del Este"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 1"
+    },
+    "teams": {
+      "home": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media-4.api-sports.io/football/teams/2380.png",
+        "winner": null
+      },
+      "away": {
+        "id": 30,
+        "name": "Peru",
+        "logo": "https://media-4.api-sports.io/football/teams/30.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100236,
+      "referee": "Anderson Daronco, Brazil",
+      "timezone": "UTC",
+      "date": "2023-09-07T23:00:00+00:00",
+      "timestamp": 1694127600,
+      "periods": {
+        "first": 1694127600,
+        "second": 1694131200
+      },
+      "venue": {
+        "id": 366,
+        "name": "Estadio Metropolitano Roberto Meléndez",
+        "city": "Barranquilla"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 1"
+    },
+    "teams": {
+      "home": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media-4.api-sports.io/football/teams/8.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2379,
+        "name": "Venezuela",
+        "logo": "https://media-4.api-sports.io/football/teams/2379.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 1,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 1,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100237,
+      "referee": "W. Roldán",
+      "timezone": "UTC",
+      "date": "2023-09-08T00:00:00+00:00",
+      "timestamp": 1694131200,
+      "periods": {
+        "first": 1694131200,
+        "second": 1694134800
+      },
+      "venue": {
+        "id": 19570,
+        "name": "Estadio Mâs Monumental",
+        "city": "Capital Federal, Ciudad de Buenos Aires"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 1"
+    },
+    "teams": {
+      "home": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media-4.api-sports.io/football/teams/26.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media-4.api-sports.io/football/teams/2382.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 1,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 1,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100233,
+      "referee": "Dario Herrera, Argentina",
+      "timezone": "UTC",
+      "date": "2023-09-08T23:00:00+00:00",
+      "timestamp": 1694214000,
+      "periods": {
+        "first": 1694214000,
+        "second": 1694217600
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "city": "Montevideo"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 1"
+    },
+    "teams": {
+      "home": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media-4.api-sports.io/football/teams/7.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2383,
+        "name": "Chile",
+        "logo": "https://media-4.api-sports.io/football/teams/2383.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 3,
+      "away": 1
+    },
+    "score": {
+      "halftime": {
+        "home": 2,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 3,
+        "away": 1
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100234,
+      "referee": "Juan Gabriel Benitez, Paraguay",
+      "timezone": "UTC",
+      "date": "2023-09-09T00:45:00+00:00",
+      "timestamp": 1694220300,
+      "periods": {
+        "first": 1694220300,
+        "second": 1694223900
+      },
+      "venue": {
+        "id": 262,
+        "name": "Estádio Estadual Jornalista Edgar Augusto Proença",
+        "city": "Belém, Pará"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 1"
+    },
+    "teams": {
+      "home": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media-4.api-sports.io/football/teams/6.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2381,
+        "name": "Bolivia",
+        "logo": "https://media-4.api-sports.io/football/teams/2381.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 5,
+      "away": 1
+    },
+    "score": {
+      "halftime": {
+        "home": 1,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 5,
+        "away": 1
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100238,
+      "referee": "Esteban Ostojich, Uruguay",
+      "timezone": "UTC",
+      "date": "2023-09-12T20:00:00+00:00",
+      "timestamp": 1694548800,
+      "periods": {
+        "first": 1694548800,
+        "second": 1694552400
+      },
+      "venue": {
+        "id": 198,
+        "name": "Estadio Hernando Siles",
+        "city": "La Paz"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 2"
+    },
+    "teams": {
+      "home": {
+        "id": 2381,
+        "name": "Bolivia",
+        "logo": "https://media-4.api-sports.io/football/teams/2381.png",
+        "winner": false
+      },
+      "away": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media-4.api-sports.io/football/teams/26.png",
+        "winner": true
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 3
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 2
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 3
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100240,
+      "referee": "Wilton Pereira Sampaio, Brazil",
+      "timezone": "UTC",
+      "date": "2023-09-12T21:00:00+00:00",
+      "timestamp": 1694552400,
+      "periods": {
+        "first": 1694552400,
+        "second": 1694556000
+      },
+      "venue": {
+        "id": 471,
+        "name": "Estadio Rodrigo Paz Delgado",
+        "city": "Quito"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 2"
+    },
+    "teams": {
+      "home": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media-4.api-sports.io/football/teams/2382.png",
+        "winner": true
+      },
+      "away": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media-4.api-sports.io/football/teams/7.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 2,
+      "away": 1
+    },
+    "score": {
+      "halftime": {
+        "home": 1,
+        "away": 1
+      },
+      "fulltime": {
+        "home": 2,
+        "away": 1
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100241,
+      "referee": "Andres Rojas, Colombia",
+      "timezone": "UTC",
+      "date": "2023-09-12T22:00:00+00:00",
+      "timestamp": 1694556000,
+      "periods": {
+        "first": 1694556000,
+        "second": 1694559600
+      },
+      "venue": {
+        "id": 1660,
+        "name": "Estadio Monumental de Maturín",
+        "city": "Maturín"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 2"
+    },
+    "teams": {
+      "home": {
+        "id": 2379,
+        "name": "Venezuela",
+        "logo": "https://media-4.api-sports.io/football/teams/2379.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media-4.api-sports.io/football/teams/2380.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 1,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 1,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100239,
+      "referee": "Jesus Valenzuela, Venezuela",
+      "timezone": "UTC",
+      "date": "2023-09-13T00:30:00+00:00",
+      "timestamp": 1694565000,
+      "periods": {
+        "first": 1694565000,
+        "second": 1694568600
+      },
+      "venue": {
+        "id": 319,
+        "name": "Estadio Monumental David Arellano",
+        "city": "Santiago de Chile"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 2"
+    },
+    "teams": {
+      "home": {
+        "id": 2383,
+        "name": "Chile",
+        "logo": "https://media-4.api-sports.io/football/teams/2383.png",
+        "winner": null
+      },
+      "away": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media-4.api-sports.io/football/teams/8.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100242,
+      "referee": "Fernando Rapallini, Argentina",
+      "timezone": "UTC",
+      "date": "2023-09-13T02:00:00+00:00",
+      "timestamp": 1694570400,
+      "periods": {
+        "first": 1694570400,
+        "second": 1694574000
+      },
+      "venue": {
+        "id": 1228,
+        "name": "Estadio Nacional de Lima",
+        "city": "Lima"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 2"
+    },
+    "teams": {
+      "home": {
+        "id": 30,
+        "name": "Peru",
+        "logo": "https://media-4.api-sports.io/football/teams/30.png",
+        "winner": false
+      },
+      "away": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media-4.api-sports.io/football/teams/6.png",
+        "winner": true
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 1
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 1
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100245,
+      "referee": "Piero Maza, Chile",
+      "timezone": "UTC",
+      "date": "2023-10-12T20:30:00+00:00",
+      "timestamp": 1697142600,
+      "periods": {
+        "first": 1697142600,
+        "second": 1697146200
+      },
+      "venue": {
+        "id": 366,
+        "name": "Estadio Metropolitano Roberto Meléndez",
+        "city": "Barranquilla"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 3"
+    },
+    "teams": {
+      "home": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media-4.api-sports.io/football/teams/8.png",
+        "winner": null
+      },
+      "away": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media-4.api-sports.io/football/teams/7.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": 2,
+      "away": 2
+    },
+    "score": {
+      "halftime": {
+        "home": 1,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 2,
+        "away": 2
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100243,
+      "referee": "Cristian Garay, Chile",
+      "timezone": "UTC",
+      "date": "2023-10-12T23:00:00+00:00",
+      "timestamp": 1697151600,
+      "periods": {
+        "first": 1697151600,
+        "second": 1697155200
+      },
+      "venue": {
+        "id": 198,
+        "name": "Estadio Hernando Siles",
+        "city": "La Paz"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 3"
+    },
+    "teams": {
+      "home": {
+        "id": 2381,
+        "name": "Bolivia",
+        "logo": "https://media-4.api-sports.io/football/teams/2381.png",
+        "winner": false
+      },
+      "away": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media-4.api-sports.io/football/teams/2382.png",
+        "winner": true
+      }
+    },
+    "goals": {
+      "home": 1,
+      "away": 2
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 1
+      },
+      "fulltime": {
+        "home": 1,
+        "away": 2
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100244,
+      "referee": "Raphael Claus, Brazil",
+      "timezone": "UTC",
+      "date": "2023-10-12T23:00:00+00:00",
+      "timestamp": 1697151600,
+      "periods": {
+        "first": 1697151600,
+        "second": 1697155200
+      },
+      "venue": {
+        "id": 19570,
+        "name": "Estadio Mâs Monumental",
+        "city": "Capital Federal, Ciudad de Buenos Aires"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 3"
+    },
+    "teams": {
+      "home": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media-4.api-sports.io/football/teams/26.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media-4.api-sports.io/football/teams/2380.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 1,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 1,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 1,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100246,
+      "referee": "Wilmar Roldan, Colombia",
+      "timezone": "UTC",
+      "date": "2023-10-13T00:00:00+00:00",
+      "timestamp": 1697155200,
+      "periods": {
+        "first": 1697155200,
+        "second": 1697158800
+      },
+      "venue": {
+        "id": 319,
+        "name": "Estadio Monumental David Arellano",
+        "city": "Santiago de Chile"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 3"
+    },
+    "teams": {
+      "home": {
+        "id": 2383,
+        "name": "Chile",
+        "logo": "https://media-4.api-sports.io/football/teams/2383.png",
+        "winner": true
+      },
+      "away": {
+        "id": 30,
+        "name": "Peru",
+        "logo": "https://media-4.api-sports.io/football/teams/30.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 2,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 2,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100247,
+      "referee": "Carlos Ortega, Colombia",
+      "timezone": "UTC",
+      "date": "2023-10-13T00:30:00+00:00",
+      "timestamp": 1697157000,
+      "periods": {
+        "first": 1697157000,
+        "second": 1697160600
+      },
+      "venue": {
+        "id": 235,
+        "name": "Arena Pantanal",
+        "city": "Cuiabá, Mato Grosso"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 3"
+    },
+    "teams": {
+      "home": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media-4.api-sports.io/football/teams/6.png",
+        "winner": null
+      },
+      "away": {
+        "id": 2379,
+        "name": "Venezuela",
+        "logo": "https://media-4.api-sports.io/football/teams/2379.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": 1,
+      "away": 1
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 1,
+        "away": 1
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100249,
+      "referee": "Flavio Rodrigues De Souza, Brazil",
+      "timezone": "UTC",
+      "date": "2023-10-17T21:00:00+00:00",
+      "timestamp": 1697576400,
+      "periods": {
+        "first": 1697576400,
+        "second": 1697580000
+      },
+      "venue": {
+        "id": 1660,
+        "name": "Estadio Monumental de Maturín",
+        "city": "Maturín"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 4"
+    },
+    "teams": {
+      "home": {
+        "id": 2379,
+        "name": "Venezuela",
+        "logo": "https://media-4.api-sports.io/football/teams/2379.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2383,
+        "name": "Chile",
+        "logo": "https://media-4.api-sports.io/football/teams/2383.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 3,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 1,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 3,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100250,
+      "referee": "Gustavo Tejera, Uruguay",
+      "timezone": "UTC",
+      "date": "2023-10-17T22:30:00+00:00",
+      "timestamp": 1697581800,
+      "periods": {
+        "first": 1697581800,
+        "second": 1697585400
+      },
+      "venue": {
+        "id": 11622,
+        "name": "Estadio Defensores del Chaco",
+        "city": "Asunción"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 4"
+    },
+    "teams": {
+      "home": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media-4.api-sports.io/football/teams/2380.png",
+        "winner": true
+      },
+      "away": {
+        "id": 2381,
+        "name": "Bolivia",
+        "logo": "https://media-4.api-sports.io/football/teams/2381.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 1,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 1,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100248,
+      "referee": "Facundo Tello, Argentina",
+      "timezone": "UTC",
+      "date": "2023-10-17T23:30:00+00:00",
+      "timestamp": 1697585400,
+      "periods": {
+        "first": 1697585400,
+        "second": 1697589000
+      },
+      "venue": {
+        "id": 471,
+        "name": "Estadio Rodrigo Paz Delgado",
+        "city": "Quito"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 4"
+    },
+    "teams": {
+      "home": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media-4.api-sports.io/football/teams/2382.png",
+        "winner": null
+      },
+      "away": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media-4.api-sports.io/football/teams/8.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100251,
+      "referee": "Alexis Herrera, Venezuela",
+      "timezone": "UTC",
+      "date": "2023-10-18T00:00:00+00:00",
+      "timestamp": 1697587200,
+      "periods": {
+        "first": 1697587200,
+        "second": 1697590800
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "city": "Montevideo"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 4"
+    },
+    "teams": {
+      "home": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media-4.api-sports.io/football/teams/7.png",
+        "winner": true
+      },
+      "away": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media-4.api-sports.io/football/teams/6.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 2,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 1,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 2,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100252,
+      "referee": "Jesus Valenzuela, Venezuela",
+      "timezone": "UTC",
+      "date": "2023-10-18T02:00:00+00:00",
+      "timestamp": 1697594400,
+      "periods": {
+        "first": 1697594400,
+        "second": 1697598000
+      },
+      "venue": {
+        "id": 1228,
+        "name": "Estadio Nacional de Lima",
+        "city": "Lima"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 4"
+    },
+    "teams": {
+      "home": {
+        "id": 30,
+        "name": "Peru",
+        "logo": "https://media-4.api-sports.io/football/teams/30.png",
+        "winner": false
+      },
+      "away": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media-4.api-sports.io/football/teams/26.png",
+        "winner": true
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 2
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 2
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 2
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100253,
+      "referee": "Guillermo Enrique Guerrero Alcivar, Ecuador",
+      "timezone": "UTC",
+      "date": "2023-11-16T20:00:00+00:00",
+      "timestamp": 1700164800,
+      "periods": {
+        "first": 1700164800,
+        "second": 1700168400
+      },
+      "venue": {
+        "id": 198,
+        "name": "Estadio Hernando Siles",
+        "city": "La Paz"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 5"
+    },
+    "teams": {
+      "home": {
+        "id": 2381,
+        "name": "Bolivia",
+        "logo": "https://media-4.api-sports.io/football/teams/2381.png",
+        "winner": true
+      },
+      "away": {
+        "id": 30,
+        "name": "Peru",
+        "logo": "https://media-4.api-sports.io/football/teams/30.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 2,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 1,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 2,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100254,
+      "referee": "Juan Gabriel Benitez, Paraguay",
+      "timezone": "UTC",
+      "date": "2023-11-16T22:00:00+00:00",
+      "timestamp": 1700172000,
+      "periods": {
+        "first": 1700172000,
+        "second": 1700175600
+      },
+      "venue": {
+        "id": 1660,
+        "name": "Estadio Monumental de Maturín",
+        "city": "Maturín"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 5"
+    },
+    "teams": {
+      "home": {
+        "id": 2379,
+        "name": "Venezuela",
+        "logo": "https://media-4.api-sports.io/football/teams/2379.png",
+        "winner": null
+      },
+      "away": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media-4.api-sports.io/football/teams/2382.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100255,
+      "referee": "Andres Matonte, Uruguay",
+      "timezone": "UTC",
+      "date": "2023-11-17T00:00:00+00:00",
+      "timestamp": 1700179200,
+      "periods": {
+        "first": 1700179200,
+        "second": 1700182800
+      },
+      "venue": {
+        "id": 366,
+        "name": "Estadio Metropolitano Roberto Meléndez",
+        "city": "Barranquilla"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 5"
+    },
+    "teams": {
+      "home": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media-4.api-sports.io/football/teams/8.png",
+        "winner": true
+      },
+      "away": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media-4.api-sports.io/football/teams/6.png",
+        "winner": false
+      }
+    },
+    "goals": {
+      "home": 2,
+      "away": 1
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 1
+      },
+      "fulltime": {
+        "home": 2,
+        "away": 1
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100256,
+      "referee": "Wilmar Roldan, Colombia",
+      "timezone": "UTC",
+      "date": "2023-11-17T00:00:00+00:00",
+      "timestamp": 1700179200,
+      "periods": {
+        "first": 1700179200,
+        "second": 1700182800
+      },
+      "venue": {
+        "id": 46,
+        "name": "Estadio Alberto José Armando",
+        "city": "Ciudad de Buenos Aires"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 5"
+    },
+    "teams": {
+      "home": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media-4.api-sports.io/football/teams/26.png",
+        "winner": false
+      },
+      "away": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media-4.api-sports.io/football/teams/7.png",
+        "winner": true
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 2
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 1
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 2
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100257,
+      "referee": "Fernando Rapallini, Argentina",
+      "timezone": "UTC",
+      "date": "2023-11-17T00:30:00+00:00",
+      "timestamp": 1700181000,
+      "periods": {
+        "first": 1700181000,
+        "second": 1700184600
+      },
+      "venue": {
+        "id": 319,
+        "name": "Estadio Monumental David Arellano",
+        "city": "Santiago de Chile"
+      },
+      "status": {
+        "long": "Match Finished",
+        "short": "FT",
+        "elapsed": 90
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 5"
+    },
+    "teams": {
+      "home": {
+        "id": 2383,
+        "name": "Chile",
+        "logo": "https://media-4.api-sports.io/football/teams/2383.png",
+        "winner": null
+      },
+      "away": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media-4.api-sports.io/football/teams/2380.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": 0,
+      "away": 0
+    },
+    "score": {
+      "halftime": {
+        "home": 0,
+        "away": 0
+      },
+      "fulltime": {
+        "home": 0,
+        "away": 0
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100260,
+      "referee": "J. Valenzuela",
+      "timezone": "UTC",
+      "date": "2023-11-21T23:00:00+00:00",
+      "timestamp": 1700607600,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 11622,
+        "name": "Estadio Defensores del Chaco",
+        "city": "Asunción"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 6"
+    },
+    "teams": {
+      "home": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media-4.api-sports.io/football/teams/2380.png",
+        "winner": null
+      },
+      "away": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media-4.api-sports.io/football/teams/8.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100259,
+      "referee": "Anderson Daronco",
+      "timezone": "UTC",
+      "date": "2023-11-21T23:30:00+00:00",
+      "timestamp": 1700609400,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 471,
+        "name": "Estadio Rodrigo Paz Delgado",
+        "city": "Quito"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 6"
+    },
+    "teams": {
+      "home": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media-4.api-sports.io/football/teams/2382.png",
+        "winner": null
+      },
+      "away": {
+        "id": 2383,
+        "name": "Chile",
+        "logo": "https://media-4.api-sports.io/football/teams/2383.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100261,
+      "referee": "K. Ortega",
+      "timezone": "UTC",
+      "date": "2023-11-21T23:30:00+00:00",
+      "timestamp": 1700609400,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "city": "Montevideo"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 6"
+    },
+    "teams": {
+      "home": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media-4.api-sports.io/football/teams/7.png",
+        "winner": null
+      },
+      "away": {
+        "id": 2381,
+        "name": "Bolivia",
+        "logo": "https://media-4.api-sports.io/football/teams/2381.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100258,
+      "referee": "P. Maza",
+      "timezone": "UTC",
+      "date": "2023-11-22T00:30:00+00:00",
+      "timestamp": 1700613000,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": null,
+        "name": "Estadio Jornalista Mário Filho",
+        "city": "Rio de Janeiro, Rio de Janeiro"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 6"
+    },
+    "teams": {
+      "home": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media-4.api-sports.io/football/teams/6.png",
+        "winner": null
+      },
+      "away": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media-4.api-sports.io/football/teams/26.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  },
+  {
+    "fixture": {
+      "id": 1100262,
+      "referee": "D. Herrera",
+      "timezone": "UTC",
+      "date": "2023-11-22T02:00:00+00:00",
+      "timestamp": 1700618400,
+      "periods": {
+        "first": null,
+        "second": null
+      },
+      "venue": {
+        "id": 1228,
+        "name": "Estadio Nacional de Lima",
+        "city": "Lima"
+      },
+      "status": {
+        "long": "Not Started",
+        "short": "NS",
+        "elapsed": null
+      }
+    },
+    "league": {
+      "id": 34,
+      "name": "World Cup - Qualification South America",
+      "country": "World",
+      "logo": "https://media-4.api-sports.io/football/leagues/34.png",
+      "flag": null,
+      "season": 2026,
+      "round": "Group Stage - 6"
+    },
+    "teams": {
+      "home": {
+        "id": 30,
+        "name": "Peru",
+        "logo": "https://media-4.api-sports.io/football/teams/30.png",
+        "winner": null
+      },
+      "away": {
+        "id": 2379,
+        "name": "Venezuela",
+        "logo": "https://media-4.api-sports.io/football/teams/2379.png",
+        "winner": null
+      }
+    },
+    "goals": {
+      "home": null,
+      "away": null
+    },
+    "score": {
+      "halftime": {
+        "home": null,
+        "away": null
+      },
+      "fulltime": {
+        "home": null,
+        "away": null
+      },
+      "extratime": {
+        "home": null,
+        "away": null
+      },
+      "penalty": {
+        "home": null,
+        "away": null
+      }
+    }
+  }
+]

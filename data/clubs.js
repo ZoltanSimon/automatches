@@ -911,4 +911,108 @@ export let clubs = [
     id: 1092,
     name: "Latvia",
   },
+  {
+    id: 2380,
+    name: "Paraguay",
+  },
+  {
+    id: 30,
+    name: "Peru",
+  },
+  {
+    id: 8,
+    name: "Colombia",
+  },
+  {
+    id: 2379,
+    name: "Venezuela",
+  },
+  {
+    id: 26,
+    name: "Argentina",
+  },
+  {
+    id: 2382,
+    name: "Ecuador",
+  },
+  {
+    id: 7,
+    name: "Uruguay",
+  },
+  {
+    id: 2383,
+    name: "Chile",
+  },
+  {
+    id: 6,
+    name: "Brazil",
+  },
+  {
+    id: 2381,
+    name: "Bolivia",
+  },
+  {
+    id: 1569,
+    name: "Qatar",
+  },
+  {
+    id: 22,
+    name: "Iran",
+  },
+  {
+    id: 13,
+    name: "Senegal",
+  },
+  {
+    id: 2384,
+    name: "USA",
+  },
+  {
+    id: 23,
+    name: "Saudi Arabia",
+  },
+  {
+    id: 28,
+    name: "Tunisia",
+  },
+  {
+    id: 16,
+    name: "Mexico",
+  },
+  {
+    id: 20,
+    name: "Australia",
+  },
+  {
+    id: 31,
+    name: "Morocco",
+  },
+  {
+    id: 25,
+    name: "Germany",
+  },
+  {
+    id: 12,
+    name: "Japan",
+  },
+  {
+    id: 29,
+    name: "Costa Rica",
+  },
+  {
+    id: 5529,
+    name: "Canada",
+  },
+  {
+    id: 1530,
+    name: "Cameroon",
+  },
+  {
+    id: 17,
+    name: "South Korea",
+  },
+  {
+    id: 1504,
+    name: "Ghana",
+  },
 ];
