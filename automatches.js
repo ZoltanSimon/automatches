@@ -12,6 +12,7 @@ import {
   getLocalPlayerStats,
   getResultFromLocal,
   getPlayerGoalList,
+  getAllPlayers,
 } from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
@@ -20,6 +21,8 @@ import { addSquad } from "./components/team-squad.js";
 import { leagueStandings } from "./components/league-standings.js";
 import { matchList } from "./components/match-list.js";
 import { playerGoalList } from "./components/player-list.js";
+import { players } from "./data/players.js";
+import { imgs } from "./instapics.js";
 
 let addToPage;
 let standingsFromApi,
@@ -45,7 +48,13 @@ document.getElementById("get-player-goal-list").onclick = async function () {
   let thisPlayer;
   let top10 = [];
   let playerList = await getPlayerGoalList();
+
   for (let i = 0; i < 10; i++) {
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = `Players-pictures/${playerList[i].id}.png`;
+    imgs[playerList[i].id] = img;
+
     console.log(playerList[i]);
     let player = players.find((x) => x.id == playerList[i].id);
 
@@ -87,6 +96,10 @@ document.getElementById("a").onclick = async function () {
     }
   }
   console.log(teamsNew);
+};
+
+document.getElementById("c").onclick = async function () {
+  getAllPlayers();
 };
 
 document.getElementById("getMatch").onclick = async function () {

@@ -3,6 +3,7 @@ import { matchStatsToCanvas } from "./components/match-statistics.js";
 import { playerStatsToCanvas } from "./components/player-stats.js";
 import { clubs } from "./data/clubs.js";
 import { playerListToCanvas } from "./components/player-list.js";
+import { players } from "./data/players.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c.getContext("2d");
@@ -29,12 +30,6 @@ for (i = 0; i < clubs.length; i++) {
   img.crossOrigin = "anonymous";
   img.src = imagePath(clubs[i].id);
   imgs[clubs[i].name] = img;
-}
-for (i = 0; i < players.length; i++) {
-  var img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = `Players-pictures/${players[i].id}.png`;
-  imgs[players[i].id] = img;
 }
 
 make_base("", "");

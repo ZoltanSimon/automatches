@@ -1,4 +1,23 @@
 import { downloadResultFromApi } from "./webapi-handler.js";
+import { players } from "./data/players.js";
+
+let allLeagues = [
+  "bundesliga",
+  "la-liga",
+  "premier-league",
+  "uefa-champions-league",
+  "uefa-europa-league",
+  "serie-a",
+  "ligue-1",
+];
+
+let allNationalComps = [
+  "world-cup-2022",
+  "world-cup-qualifiers-south-america",
+  "euro-quali",
+];
+
+let allPlayers = [];
 
 export async function getLocalPlayerStats(inputPlayer) {
   console.log(inputPlayer);
@@ -37,9 +56,6 @@ export async function getLocalPlayerStats(inputPlayer) {
         thisComp = league[i].league.name;
         foundIndex = -1;
 
-        //console.log(thisComp);
-        //console.log(league[i].fixture.id);
-
         let match = await getResultFromLocal(league[i].fixture.id);
         for (let { players } of match) {
           playerFound = players[0].players.find(
@@ -54,8 +70,9 @@ export async function getLocalPlayerStats(inputPlayer) {
           }
           if (playerFound) {
             if (foundIndex == -1) foundIndex = 1;
-            console.log(playerFound);
+            //console.log(playerFound);
             stats = playerFound.statistics[0];
+            console.log(stats.games.minutes);
             if (stats.goals.total) goals += stats.goals.total;
             if (stats.goals.assists) assists += stats.goals.assists;
             if (stats.shots.on) shotsOn += stats.shots.on;
@@ -67,7 +84,7 @@ export async function getLocalPlayerStats(inputPlayer) {
             if (stats.duels.total) duelsTotal += stats.duels.total;
             if (stats.passes.key) keyPasses += stats.passes.key;
             if (stats.fouls.drawn) foulsDrawn += stats.fouls.drawn;
-            apps++;
+            if (stats.games.minutes) apps++;
             minutes += stats.games.minutes;
             if (!playerName) playerName = playerFound.player.name;
             if (!teamName) teamName = players[foundIndex].team.name;
@@ -104,8 +121,8 @@ export async function getResultFromLocal(fixtureID) {
   if (!response.ok) {
     handleError(fixtureID);
     let downloadedResponse = await downloadResultFromApi(fixtureID);
-    //return downloadedResponse.response;
-    return [];
+    return downloadedResponse.response;
+    //return [];
   }
   return await response.json();
 }
@@ -117,16 +134,8 @@ async function handleError(id) {
 
 export async function getPlayerGoalList() {
   let scorerList = [];
-  let allLeagues = [
-    "bundesliga",
-    "la-liga",
-    "premier-league",
-    "uefa-champions-league",
-    "uefa-europa-league",
-    "serie-a",
-    "ligue-1",
-  ];
-  let scorer, assister;
+  let scorer;
+
   for (let i = 0; i < allLeagues.length; i++) {
     let response = await fetch(`leagues/${allLeagues[i]}.json`);
     let league = await response.json();
@@ -135,13 +144,9 @@ export async function getPlayerGoalList() {
       if (league[i].fixture.status.short == "FT") {
         let match = await getResultFromLocal(league[i].fixture.id);
         if (match[0]) {
-          console.log(match[0].players);
           for (let j = 0; j < match[0].events.length; j++) {
             if (match[0].events[j].type == "Goal") {
               scorer = match[0].events[j].player;
-              assister = match[0].events[j].assist;
-              console.log(assister);
-              console.log(scorer);
               if (!scorerList.find((e) => e.id == scorer.id)) {
                 scorer.goals = 1;
                 scorerList.push(scorer);
@@ -160,4 +165,42 @@ export async function getPlayerGoalList() {
 
   console.log(scorerList);
   return scorerList;
+}
+
+export async function getAllPlayers() {
+  await getPlayerList("club", allLeagues);
+  await getPlayerList("nation", allNationalComps);
+  console.log(allPlayers);
+}
+
+async function getPlayerList(compType, compList) {
+  let player, thisClub;
+  for (let i = 0; i < compList.length; i++) {
+    let response = await fetch(`leagues/${compList[i]}.json`);
+    let league = await response.json();
+
+    for (let i = 0; i < league.length; i++) {
+      if (league[i].fixture.status.short == "FT") {
+        let match = await getResultFromLocal(league[i].fixture.id);
+        if (match[0]) {
+          for (let j = 0; j < match[0].players.length; j++) {
+            thisClub = match[0].players[j].team.id;
+
+            for (let k = 0; k < match[0].players[j].players.length; k++) {
+              player = {
+                id: match[0].players[j].players[k].player.id,
+                name: match[0].players[j].players[k].player.name,
+              };
+              player[compType] = thisClub;
+              if (!allPlayers.find((e) => e.id == player.id)) {
+                allPlayers.push(player);
+              } else {
+                allPlayers.find((e) => e.id == player.id)[compType] = thisClub;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
