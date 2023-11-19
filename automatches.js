@@ -8,13 +8,21 @@ import {
   getCurrentRound,
   getSquad,
 } from "./webapi-handler.js";
-import { getLocalPlayerStats, getResultFromLocal } from "./local-handler.js";
+import {
+  getLocalPlayerStats,
+  getResultFromLocal,
+  getPlayerGoalList,
+  getAllPlayers,
+} from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
 import { addSquad } from "./components/team-squad.js";
 import { leagueStandings } from "./components/league-standings.js";
 import { matchList } from "./components/match-list.js";
+import { playerGoalList } from "./components/player-list.js";
+import { players } from "./data/players.js";
+import { imgs } from "./instapics.js";
 
 let addToPage;
 let standingsFromApi,
@@ -34,6 +42,64 @@ document.getElementById("submit-match-list").onclick = async function () {
 
 document.getElementById("getRound").onclick = function () {
   setRound();
+};
+
+document.getElementById("get-player-goal-list").onclick = async function () {
+  let thisPlayer;
+  let top10 = [];
+  let playerList = await getPlayerGoalList();
+
+  for (let i = 0; i < 10; i++) {
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = `Players-pictures/${playerList[i].id}.png`;
+    imgs[playerList[i].id] = img;
+
+    console.log(playerList[i]);
+    let player = players.find((x) => x.id == playerList[i].id);
+
+    thisPlayer = await getLocalPlayerStats(player);
+    top10.push(thisPlayer);
+  }
+  console.log(top10);
+  playerGoalList(top10);
+};
+
+document.getElementById("a").onclick = async function () {
+  let teamsNew = [];
+  let homeTeam, awayTeam;
+  for (let i = 0; i < allLeagues.length; i++) {
+    console.log(allLeagues[i]);
+    let response = await fetch(`leagues/${allLeagues[i]}.json`);
+    let league = await response.json();
+    console.log(allLeagues[i]);
+    console.log(league);
+    for (let j = 0; j < league.length; j++) {
+      console.log(league[j].teams);
+
+      homeTeam = {
+        id: league[j].teams.home.id,
+        name: league[j].teams.home.name,
+      };
+      awayTeam = {
+        id: league[j].teams.away.id,
+        name: league[j].teams.away.name,
+      };
+
+      if (!teamsNew.find((e) => e.id == homeTeam.id)) {
+        teamsNew.push(homeTeam);
+      }
+
+      if (!teamsNew.find((e) => e.id == awayTeam.id)) {
+        teamsNew.push(awayTeam);
+      }
+    }
+  }
+  console.log(teamsNew);
+};
+
+document.getElementById("c").onclick = async function () {
+  getAllPlayers();
 };
 
 document.getElementById("getMatch").onclick = async function () {
@@ -129,7 +195,7 @@ function topScorers(response) {
         <td>${it}</td>
         <td><img src="${a.player.photo}" width="50px"</td>
         <td>${a.player.name}</td>
-        <td><img src=${imagePath(a.statistics[0].team.name)} width="30px"/></td>
+        <td><img src=${imagePath(a.statistics[0].team.id)} width="30px"/></td>
         <td>${a.statistics[0].goals.total}</td>
         <td>${(
           (a.statistics[0].goals.total * 90) /
@@ -163,7 +229,7 @@ function topAssists(response) {
         <td>${it}</td>
         <td><img src="${a.player.photo}" width="50px"</td>
         <td>${a.player.name}</td>
-        <td><img src=${imagePath(a.statistics[0].team.name)} width="30px"/></td>
+        <td><img src=${imagePath(a.statistics[0].team.id)} width="30px"/></td>
         <td>${a.statistics[0].goals.assists}</td>
     </tr>`;
     it++;
@@ -239,10 +305,10 @@ function oneFixture(response) {
   addToPage = `
   <table>
     <tr>
-      <td><img src=${imagePath(fixture.teams.home.name)} width="30px"></td>
+      <td><img src=${imagePath(homeTeam.id)} width="30px"></td>
       <td><a href="${teamLink(homeTeam.name)}/">${homeTeam.name}</a></td>
       <td width="30px">${fixture.goals.home || 0}</td>
-      <td><img src=${imagePath(awayTeam.name)} width="30px"</td>
+      <td><img src=${imagePath(awayTeam.id)} width="30px"</td>
       <td><a href="${teamLink(awayTeam.name)}/">${awayTeam.name}</a></td>
       <td width="30px">${fixture.goals.away || 0}</td>
     </tr>

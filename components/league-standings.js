@@ -22,7 +22,7 @@ export function leagueStandings(response) {
       <tr>
       ${tds}<b>${a.rank}</b></td>
       <td style="width:54px; padding: 5px; text-align: center;"><img src="${imagePath(
-        a.team.name
+        a.team.id
       )}" alt="*${a.team.name}*" width="40px" /> </td>
       <td style="padding: 5px;">${a.team.name}</td>
       ${tds}${a.all.played}</td>

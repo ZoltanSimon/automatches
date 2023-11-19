@@ -36,7 +36,7 @@
 
     <div class="floating-buttons">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-8">
           <select
             name="leagues"
             class="form-select form-select-lg mb-3"
@@ -52,12 +52,16 @@
             <option value="3">UEFA Europa League</option>
             <option value="15">Club World Cup</option>
             <option value="81">Dfp Pokal</option>
+            <option value="1">World Cup</option>
+            <option value="960">Euro Quali</option>
+            <option value="34">World Cup Qualification - South America</option>
+            <option value="587">U17 World Cup</option>
           </select>
 
           <input type="text" placeholder="Round Number" id="roundnr" />
           <button id="getRound">Get Round #</button>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <fieldset>
             <div>
               <input
@@ -111,10 +115,12 @@
           <button id="getPlayerStats">Get Player Stats</button><br />
           <input type="number" placeholder="541" id="teamID" />
           <button id="getSquad">Get Squad</button>
-          <button id="local-match-list">A</button>
+          <button id="a">A</button>
+          <button id="get-player-goal-list">B</button>
+          <button id="c">C</button>
         </div>
       </div>
-      <div class="row">
+      <div class="row" style="margin-top: 5px">
         <textarea
           rows="5"
           cols="44"
@@ -128,69 +134,9 @@
           placeholder="Paste Image Here"
         ></textarea>
       </div>
-      <!--fieldset>
-        <table>
-          <tr>
-            <td>
-              <input
-                type="radio"
-                id="official"
-                name="bigred"
-                value="official"
-              />
-              <label for="official">Official</label>
-            </td>
-            <td>
-              <input
-                type="radio"
-                id="breaking"
-                name="bigred"
-                value="breaking"
-              />
-              <label for="breaking">Breaking</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input type="radio" id="rumour" name="bigred" value="rumour" />
-              <label for="rumour">Rumour</label>
-            </td>
-            <td>
-              <input type="radio" id="eleven" name="bigred" value="eleven" />
-              <label for="eleven">Eleven</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input
-                type="radio"
-                id="none"
-                name="bigred"
-                value="none"
-                checked
-              />
-              <label for="none">None</label>
-            </td>
-            <td>
-              <input type="radio" id="half" name="bigred" value="half" />
-              <label for="half">Half</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input type="radio" id="alltext" name="bigred" value="alltext" />
-              <label for="alltext">Alltext</label>
-            </td>
-            <td>
-              <input type="radio" id="table" name="bigred" value="table" />
-              <label for="table">Table</label>
-            </td>
-          </tr>
-        </table>
-        </fieldset-->
       <input type="string" placeholder="OFFICIAL" id="breaking-official" />
 
-      <div class="row">
+      <div class="row" style="margin-top: 5px">
         <button
           type="button"
           class="btn btn-primary btn-block"
@@ -206,21 +152,56 @@
           onkeyup="keyPresszer()"
         ></textarea-->
       </div>
-      <div class="row">
-        <button type="button" class="btn btn-primary" id="copy-match-stats">
+      <div class="row" style="margin-top: 5px">
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-match-stats"
+        >
           Match stats
         </button>
-        <button type="button" class="btn btn-primary" id="copy-standings">
+        <button
+          type="button"
+          style="width: 32%"
+          class="btn btn-secondary"
+          id="copy-standings"
+        >
           Standings
         </button>
-        <button type="button" class="btn btn-primary" id="copy-player-stats">
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-player-stats"
+        >
           Player Stats
         </button>
-        <button type="button" class="btn btn-primary" id="copy-matches">
+      </div>
+      <div class="row" style="margin-top: 5px">
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-matches"
+        >
           Matches
         </button>
-        <button type="button" class="btn btn-primary" id="copy-selected">
+        <button
+          type="button"
+          style="width: 32%"
+          class="btn btn-secondary"
+          id="copy-selected"
+        >
           Selected Matches
+        </button>
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-player-list"
+        >
+          Player List
         </button>
       </div>
       <div class="row" id="missing-matches"></div>
@@ -234,6 +215,7 @@
       <h3>Standings</h3>
       <div id="standings"></div>
       <div id="standings_text"></div>
+      <div id="player-list"></div>
       <!--h3>Team of the Week</h3>
       <h3>Top Scorers</h3>
       <div id="top-scorers"></div>

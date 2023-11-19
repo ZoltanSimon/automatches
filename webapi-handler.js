@@ -13,11 +13,6 @@ export async function getResultFromApi(matchID) {
       },
     }
   );
-  /*.then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      download(JSON.stringify(data), `${matchID}.json`, "text/plain");
-    });*/
   const data = await response.json();
   console.log(data);
   return data;
@@ -78,13 +73,13 @@ export async function getResults(leagueID, round) {
 }
 
 export async function getResultsDate(leagueID, from, to) {
-  console.log(isNaN(from));
   let url = `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${season}&from=${from}&to=${to}`;
 
   if (isNaN(parseInt(from))) {
     url = `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${season}`;
   }
 
+  console.log(url);
   const response = await fetch(url, {
     method: "GET",
     headers: {

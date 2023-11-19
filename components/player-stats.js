@@ -5,8 +5,6 @@ let width = 50;
 let values;
 
 export function addPlayerStats(statsAPI, statsAPI2 = null) {
-  console.log(statsAPI);
-  console.log(statsAPI2);
   if (statsAPI) width = 33;
   let tds = `<td width='${width}%' style='text-align: center; border-color: #1D3557; padding: 12px;'>`;
 
@@ -19,13 +17,13 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
   stats.push(new Stat("assists", "Assists"));
   stats.push(new Stat("gap90", "GA per 90"));
   stats.push(new Stat("shots", "Shots on Target / Total"));
-  stats.push(new Stat("dribbles", "Dribbles Succeeded / Attempted"));
+  stats.push(new Stat("dribbles", "Dribbles"));
   stats.push(new Stat("duels", "Duels Won / Total"));
   stats.push(new Stat("key_passes", "Key Passes"));
   stats.push(new Stat("fouls_drawn", "Fouls Drawn"));
+  stats.push(new Stat("competitions", "Competitions"));
 
   for (let i in statsAPI) {
-    //console.log(i);
     let thatStat = stats.find((x) => x.tag === i);
 
     if (thatStat) {
@@ -41,7 +39,7 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
       }
     }
   }
-  console.log(stats);
+
   let addToPage = `
   <table id='player-stats' style='border-collapse: collapse;' border='1'><tbody id=${statsAPI.id}|${statsAPI2.id}>`;
 
@@ -60,17 +58,23 @@ export function playerStatsToCanvas() {
   var tBody = statsTable.getElementsByTagName("tbody")[0];
   let playerIDs = tBody.getAttribute("id").split("|");
 
+  statsTable.rows[0].style.backgroundColor = "#457B9D";
+  statsTable.rows[0].style.fontWeight = "bold";
+  statsTable.rows[statsTable.rows.length - 1].style.backgroundColor = "#457B9D";
+  statsTable.rows[0].children[0].style.width = "250px";
+  statsTable.rows[0].children[1].style.width = "300px";
+  statsTable.rows[0].children[2].style.width = "250px";
   imgToAdd.push({
     img: imgs[playerIDs[0]],
-    imgHeight: 200,
-    startX: 500,
+    imgHeight: 180,
+    startX: 160,
     startY: 60,
   });
   imgToAdd.push({
     img: imgs[playerIDs[1]],
-    imgHeight: 200,
-    startX: 1670,
+    imgHeight: 180,
+    startX: 746,
     startY: 60,
   });
-  buildTableForTableType(removeNewlines(statsTable.outerHTML), imgToAdd, 260);
+  buildTableForTableType(removeNewlines(statsTable.outerHTML), imgToAdd, 240);
 }
