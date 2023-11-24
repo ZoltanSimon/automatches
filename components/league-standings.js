@@ -1,3 +1,5 @@
+import { buildTableForTableType, imgs } from "./../instapics.js";
+
 export function leagueStandings(response) {
   let standings = response.response[0].league.standings;
   let addToPage = ``;
@@ -37,4 +39,42 @@ export function leagueStandings(response) {
   });
   console.log(addToPage);
   document.getElementById("standings").innerHTML += addToPage;
+}
+
+export function standingsToCanvas() {
+  let yPos = 100;
+  let imgToAdd = [];
+  let thisTr,
+    thisTd,
+    thisClub,
+    l = 0;
+  let standingsTable = document.getElementById("league-standings");
+
+  if (standingsTable.rows.length < 20) yPos = 150;
+
+  for (let i = 0; i < standingsTable.rows.length; i++) {
+    thisTr = standingsTable.rows[i];
+    for (let j = 0; j < thisTr.children.length; j++) {
+      thisTd = thisTr.children[j];
+      for (let k = 0; k < clubs.length; k++) {
+        thisClub = clubs[k].name;
+        if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
+          imgToAdd.push({
+            img: imgs[thisClub],
+            imgHeight: 40,
+            startX: 178,
+            startY: yPos + 44 + l * 42,
+          });
+          l++;
+          thisTd.innerHTML = " ";
+        }
+      }
+    }
+  }
+
+  buildTableForTableType(
+    removeNewlines(standingsTable.outerHTML),
+    imgToAdd,
+    yPos
+  );
 }

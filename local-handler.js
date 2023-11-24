@@ -1,5 +1,4 @@
 import { downloadResultFromApi } from "./webapi-handler.js";
-import { players } from "./data/players.js";
 
 let allLeagues = [
   //"bundesliga",

@@ -85,8 +85,6 @@ export function matchesToCanvas(sourceDiv) {
   let notResultGap = 0;
   let notResultGap2 = 0;
 
-  //if (matchesTable.rows.length < 11) yPos = 140;
-
   matchesTable.cellPadding = 10;
 
   for (var i = 0; i < rowCount; i++) {

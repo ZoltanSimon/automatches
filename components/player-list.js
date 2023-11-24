@@ -1,5 +1,4 @@
 import { buildTableForTableType, imgs, ctx } from "./../instapics.js";
-import { players } from "./../data/players.js";
 
 export function playerGoalList(response) {
   console.log(response);
@@ -29,11 +28,6 @@ export function playerListToCanvas() {
 
   playerListTable.rows[0].style.backgroundColor = "#457B9D";
   playerListTable.rows[0].style.fontWeight = "bold";
-
-  /*for (var i = 0; i < playerListTable.rows.length; i++) {
-    if (matchesTable.rows[i].cells.length == index + 1)
-      matchesTable.rows[i].deleteCell(index);
-  }*/
 
   for (let i = 1; i < playerListTable.rows.length; i++) {
     thisTr = playerListTable.rows[i];

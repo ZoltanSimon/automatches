@@ -1,9 +1,8 @@
 import { matchList, matchesToCanvas } from "./components/match-list.js";
 import { matchStatsToCanvas } from "./components/match-statistics.js";
 import { playerStatsToCanvas } from "./components/player-stats.js";
-import { clubs } from "./data/clubs.js";
+import { standingsToCanvas } from "./components/league-standings.js";
 import { playerListToCanvas } from "./components/player-list.js";
-import { players } from "./data/players.js";
 import { allLeagues } from "./data/leagues.js";
 
 let c = document.getElementById("myCanvas");
@@ -78,37 +77,6 @@ document.getElementById("textOnPic").onkeyup = function () {
   make_base(inputTextValue, breakingText);
 };
 
-/*
-Should convert transfermarkt transfers to tables we can use
-function keyPresszer() {
-  inputTextValue = document.getElementById("cleanTmarks").value;
-  var lines = inputTextValue.split("\n");
-  lines.splice(0, 1);
-
-  let players = [];
-  let player = {};
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i] == " \t") {
-      //lines.splice(i, 1);
-    }
-    console.log(i % 6);
-    if (i % 7 == 0) {
-      player.name = lines[i];
-      console.log(player.name);
-    }
-    if (i % 7 == 1) {
-      player.pos = lines[i];
-      console.log(player.pos);
-    }
-    if (i % 7 == 5) {
-      player.price = lines[i];
-      console.log(player.price);
-      players.push(player);
-      player = {};
-    }
-  }
-}*/
-
 document.getElementById("pasteArea").onpaste = function (event) {
   // use event.originalEvent.clipboard for newer chrome versions
   var items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -123,8 +91,6 @@ document.getElementById("pasteArea").onpaste = function (event) {
   if (blob !== null) {
     var reader = new FileReader();
     reader.onload = function (event) {
-      console.log(fontY);
-
       imgHeight = fontY - 84 - lineheight;
       if (breakingText) imgHeight -= 60;
 
@@ -139,46 +105,12 @@ document.getElementById("pasteArea").onpaste = function (event) {
   }
 };
 
-document.getElementById("copy-match-stats").onclick = function (event) {
+document.getElementById("copy-match-stats").onclick = function () {
   matchStatsToCanvas();
 };
 
 document.getElementById("copy-standings").onclick = function (event) {
-  let yPos = 100;
-  let imgToAdd = [];
-  let thisTr,
-    thisTd,
-    thisClub,
-    l = 0;
-  let standingsTable = document.getElementById("league-standings");
-
-  if (standingsTable.rows.length < 20) yPos = 150;
-
-  for (let i = 0; i < standingsTable.rows.length; i++) {
-    thisTr = standingsTable.rows[i];
-    for (let j = 0; j < thisTr.children.length; j++) {
-      thisTd = thisTr.children[j];
-      for (let k = 0; k < clubs.length; k++) {
-        thisClub = clubs[k].name;
-        if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
-          imgToAdd.push({
-            img: imgs[thisClub],
-            imgHeight: 40,
-            startX: 178,
-            startY: yPos + 44 + l * 42,
-          });
-          l++;
-          thisTd.innerHTML = " ";
-        }
-      }
-    }
-  }
-
-  buildTableForTableType(
-    removeNewlines(standingsTable.outerHTML),
-    imgToAdd,
-    yPos
-  );
+  standingsToCanvas();
 };
 
 document.getElementById("copy-player-stats").onclick = function () {
