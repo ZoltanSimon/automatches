@@ -20,7 +20,6 @@ let allNationalComps = [
 let allPlayers = [];
 
 export async function getLocalPlayerStats(inputPlayer) {
-  console.log(inputPlayer);
   let playerFound;
   let stats;
   let goals = 0,
@@ -70,7 +69,6 @@ export async function getLocalPlayerStats(inputPlayer) {
           }
           if (playerFound) {
             if (foundIndex == -1) foundIndex = 1;
-            //console.log(playerFound);
             stats = playerFound.statistics[0];
             console.log(stats.games.minutes);
             if (stats.goals.total) goals += stats.goals.total;
@@ -117,7 +115,7 @@ export async function getLocalPlayerStats(inputPlayer) {
 }
 
 export async function getResultFromLocal(fixtureID) {
-  let response = await fetch(`Matches/${fixtureID}.json`);
+  let response = await fetch(`matches/${fixtureID}.json`);
   if (!response.ok) {
     handleError(fixtureID);
     let downloadedResponse = await downloadResultFromApi(fixtureID);
@@ -204,4 +202,10 @@ async function getPlayerList(compType, compList) {
       }
     }
   }
+}
+
+export async function getResultsByRoundLocal(leagueID, roundNo) {
+  await getPlayerList("club", allLeagues);
+  await getPlayerList("nation", allNationalComps);
+  console.log(allPlayers);
 }

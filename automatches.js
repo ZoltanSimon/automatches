@@ -52,16 +52,14 @@ document.getElementById("get-player-goal-list").onclick = async function () {
   for (let i = 0; i < 10; i++) {
     var img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = `Players-pictures/${playerList[i].id}.png`;
+    img.src = `player-pictures/${playerList[i].id}.png`;
     imgs[playerList[i].id] = img;
 
-    console.log(playerList[i]);
     let player = players.find((x) => x.id == playerList[i].id);
 
     thisPlayer = await getLocalPlayerStats(player);
     top10.push(thisPlayer);
   }
-  console.log(top10);
   playerGoalList(top10);
 };
 

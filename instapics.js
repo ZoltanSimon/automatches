@@ -26,20 +26,15 @@ let inputTextValue,
 export let imgs = {};
 
 const date = new Date();
-console.log(date);
 for (let i = 0; i < allLeagues.length; i++) {
   let response = await fetch(`leagues/${allLeagues[i].id}.json`);
   let league = await response.json();
-  console.log(league);
   for (let j = 0; j < league.length; j++) {
     fixtureDate = new Date(league[j].fixture.date);
-    console.log(fixtureDate);
     if (fixtureDate.toDateString() == date.toDateString()) {
-      console.log(fixtureDate);
       matches.push(league[j]);
     }
   }
-  console.log(matches);
 }
 if (matches.length > 0) matchList(matches);
 
@@ -56,9 +51,6 @@ function make_base(text, breakingText) {
   base_image.src = backgroundImageName;
   base_image.onload = function () {
     ctx.drawImage(base_image, 0, 0);
-
-    //ctx.font = `bold 76px ${font}`; //title
-
     ctx.textAlign = "center";
 
     if (lines.count > 10) {
@@ -115,7 +107,6 @@ function keyPresszer() {
       player = {};
     }
   }
-  console.log(players);
 }*/
 
 document.getElementById("pasteArea").onpaste = function (event) {
