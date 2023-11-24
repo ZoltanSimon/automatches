@@ -1,16 +1,22 @@
-import { buildTableForTableType, imgs, ctx } from "./../instapics.js";
+import {
+  buildTableForTableType,
+  imgs,
+  ctx,
+  loadClubLogos,
+} from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
 
 let imgToAdd = [];
-let yPos = 140;
+let yPos = 120;
 
-export function matchList(response, showID = false) {
-  let addToPage;
-  let fixtures = response.response;
+export function matchList(fixtures, showID = false) {
+  console.log(fixtures);
+  let addToPage, date;
   let leagueName = fixtures[0].league.name;
   let round = fixtures[0].league.round;
   let thisID = ``;
   let tds = `<td style="text-align: center;">`;
+  let logosToLoad = [];
 
   fixtures.sort(function (a, b) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);
@@ -20,23 +26,35 @@ export function matchList(response, showID = false) {
 
   fixtures.forEach((element) => {
     if (showID) thisID = `${tds}${element.fixture.id}</td>`;
+    date = new Date(element.fixture.date);
+
+    logosToLoad.push({
+      id: element.teams.home.id,
+      name: element.teams.home.name,
+    });
+    logosToLoad.push({
+      id: element.teams.away.id,
+      name: element.teams.away.name,
+    });
 
     addToPage += `<tr">
-    ${tds}${new Date(element.fixture.date).getDate()}.${
-      new Date(element.fixture.date).getMonth() + 1
-    }.${new Date(element.fixture.date).getFullYear()}</td>
+    ${tds}${date.getDate()}.${
+      date.getMonth() + 1
+    }.${date.getFullYear()} ${date.getHours()}:${
+      (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
+    }</td>
     <td style="text-align: center;"><img src=${imagePath(
       element.teams.home.id
     )} alt="*${element.teams.home.name}*" width="30px"></td>
-      <td style="text-align: left;">${element.teams.home.name.replace(
-        "Borussia Monchengladbach",
-        "Gladbach"
-      )}</td>
+      <td style="text-align: left;">${element.teams.home.name}</td>
     ${tds}${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
     <td style="text-align: center;"><img src=${imagePath(
       element.teams.away.id
     )} alt="*${element.teams.away.name}*" width="30px"></td>
-      <td style="text-align: left;">${element.teams.away.name}</td>
+      <td style="text-align: left;">${truncate(
+        element.teams.away.name,
+        19
+      )}</td>
     ${tds}${
       !isNaN(parseInt(element.goals.away)) ? element.goals.away : ""
     }</td>${thisID}
@@ -51,6 +69,8 @@ export function matchList(response, showID = false) {
   document
     .querySelectorAll("#match-list tr")
     .forEach((e) => e.addEventListener("click", clickHandler));
+
+  loadClubLogos(logosToLoad);
 }
 
 export function matchesToCanvas(sourceDiv) {
@@ -65,7 +85,7 @@ export function matchesToCanvas(sourceDiv) {
   let notResultGap = 0;
   let notResultGap2 = 0;
 
-  if (matchesTable.rows.length < 11) yPos = 240;
+  //if (matchesTable.rows.length < 11) yPos = 140;
 
   matchesTable.cellPadding = 10;
 
@@ -84,6 +104,7 @@ export function matchesToCanvas(sourceDiv) {
       notResultGap2 = 61;
       thisTr.children[3].innerHTML = "VS";
       thisTr.children[0].style.width = "131px";
+
       thisTr.children[3].style.width = "78px";
     } else {
       thisTr.children[0].style.width = "108px";
@@ -91,6 +112,7 @@ export function matchesToCanvas(sourceDiv) {
       thisTr.children[6].style.width = "40px";
     }
 
+    thisTr.children[0].style.fontSize = "22px";
     thisTr.children[1].style.width = "40px";
     thisTr.children[2].style.width = "232px";
     thisTr.children[4].style.width = "40px";
@@ -110,13 +132,15 @@ export function matchesToCanvas(sourceDiv) {
     addImgToArray(610 + notResultGap2, logo2.name, i);
   }
 
-  ctx.fillText("Round " + round.split(" - ")[1], 540, 880);
-  ctx.fillStyle = "#e63946";
-  ctx.fillText(leagueName, 540, 820);
-
-  /*ctx.fillText("Season 2023/24, Week 12", 540, 880);
-  ctx.fillStyle = "#e63946";
-  ctx.fillText("Games to Watch over the Weekend", 540, 820);*/
+  if (sourceDiv == "match-list") {
+    ctx.fillText("Round " + round.split(" - ")[1], 540, 990);
+    ctx.fillStyle = "#e63946";
+    ctx.fillText(leagueName, 540, 940);
+  } else {
+    ctx.fillText("Season 2023/24, Week 13", 540, 880);
+    ctx.fillStyle = "#e63946";
+    ctx.fillText("Games to Watch over the Weekend", 540, 820);
+  }
 
   console.log(removeNewlines(matchesTable.outerHTML));
 
@@ -138,6 +162,6 @@ function addImgToArray(xPos, logo, i) {
     img: imgs[logo],
     imgHeight: 50,
     startX: xPos,
-    startY: yPos + 2 + i * 52,
+    startY: yPos + 14 + i * 77,
   });
 }

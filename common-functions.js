@@ -19,22 +19,12 @@ function removeNewlines(str) {
   return str;
 }
 
-let allLeagues = [
-  "bundesliga",
-  "la-liga",
-  "premier-league",
-  "uefa-champions-league",
-  "uefa-europa-league",
-  "serie-a",
-  "ligue-1",
-  "pokal",
-  "euro-quali",
-  "world-cup-qualifiers-south-america",
-  "world-cup-2022",
-];
-
 function htmlDecode(input) {
   var txt = document.createElement("textarea");
   txt.innerHTML = input;
   return txt.value;
+}
+
+function truncate(str, n) {
+  return str.length > n ? str.slice(0, n - 1) + "&hellip;" : str;
 }
