@@ -2,12 +2,12 @@ import { downloadResultFromApi } from "./webapi-handler.js";
 import { players } from "./data/players.js";
 
 let allLeagues = [
-  "bundesliga",
-  "la-liga",
-  "premier-league",
-  "uefa-champions-league",
-  "uefa-europa-league",
-  "serie-a",
+  //"bundesliga",
+  //"la-liga",
+  //"premier-league",
+  //"uefa-champions-league",
+  //"uefa-europa-league",
+  //"serie-a",
   "ligue-1",
 ];
 
@@ -145,6 +145,7 @@ export async function getPlayerGoalList() {
         let match = await getResultFromLocal(league[i].fixture.id);
         if (match[0]) {
           for (let j = 0; j < match[0].events.length; j++) {
+            console.log(match[0].events[j]);
             if (match[0].events[j].type == "Goal") {
               scorer = match[0].events[j].player;
               if (!scorerList.find((e) => e.id == scorer.id)) {

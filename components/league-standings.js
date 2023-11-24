@@ -34,7 +34,6 @@ export function leagueStandings(response) {
       </tr>`;
     });
     addToPage += `</tbody></table>`;
-    //console.log(removeNewlines(addToPage));
   });
   console.log(addToPage);
   document.getElementById("standings").innerHTML += addToPage;

@@ -41,9 +41,9 @@ export function playerListToCanvas() {
 
     imgToAdd.push({
       img: playerFace,
-      imgHeight: 84,
-      startX: 100,
-      startY: 78 + i * 80,
+      imgHeight: 80,
+      startX: 102,
+      startY: 82 + i * 80,
     });
 
     thisTr.style.height = "80px";

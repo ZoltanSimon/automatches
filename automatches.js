@@ -68,15 +68,12 @@ document.getElementById("get-player-goal-list").onclick = async function () {
 document.getElementById("a").onclick = async function () {
   let teamsNew = [];
   let homeTeam, awayTeam;
-  for (let i = 0; i < allLeagues.length; i++) {
-    console.log(allLeagues[i]);
-    let response = await fetch(`leagues/${allLeagues[i]}.json`);
-    let league = await response.json();
-    console.log(allLeagues[i]);
-    console.log(league);
-    for (let j = 0; j < league.length; j++) {
-      console.log(league[j].teams);
 
+  for (let i = 0; i < allLeagues.length; i++) {
+    let response = await fetch(`leagues/${allLeagues[i].id}.json`);
+    let league = await response.json();
+
+    for (let j = 0; j < league.length; j++) {
       homeTeam = {
         id: league[j].teams.home.id,
         name: league[j].teams.home.name,
@@ -95,7 +92,6 @@ document.getElementById("a").onclick = async function () {
       }
     }
   }
-  console.log(teamsNew);
 };
 
 document.getElementById("c").onclick = async function () {
@@ -126,12 +122,16 @@ document.getElementById("getSquad").onclick = async function () {
   addSquad(squadFromApi.response);
 };
 
+document.getElementById("clear-results").onclick = async function () {
+  document.getElementById("fixtures-info").innerHTML = "";
+};
+
 async function submitRequest_matchList() {
   let leagueID = document.getElementById("leagues").value;
   let startDate = document.getElementById("dateStart").value;
   let endDate = document.getElementById("dateEnd").value;
   getResultsDate(leagueID, startDate, endDate).then((response) =>
-    matchList(response, true)
+    matchList(response.response, true)
   );
 }
 
@@ -156,7 +156,7 @@ async function submitRequest_leagueInfo() {
       `Regular Season - ${roundNumber}`
     );
 
-    matchList(resultsFromApi);
+    matchList(resultsFromApi.response);
   }
 
   addText(resultsFromApi, standingsFromApi);

@@ -1,9 +1,10 @@
-import { matchesToCanvas } from "./components/match-list.js";
+import { matchList, matchesToCanvas } from "./components/match-list.js";
 import { matchStatsToCanvas } from "./components/match-statistics.js";
 import { playerStatsToCanvas } from "./components/player-stats.js";
 import { clubs } from "./data/clubs.js";
 import { playerListToCanvas } from "./components/player-list.js";
 import { players } from "./data/players.js";
+import { allLeagues } from "./data/leagues.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c.getContext("2d");
@@ -19,18 +20,32 @@ let inputTextValue,
   imgHeight,
   fontY,
   i,
-  breakingText;
+  breakingText,
+  fixtureDate,
+  matches = [];
 export let imgs = {};
+
+const date = new Date();
+console.log(date);
+for (let i = 0; i < allLeagues.length; i++) {
+  let response = await fetch(`leagues/${allLeagues[i].id}.json`);
+  let league = await response.json();
+  console.log(league);
+  for (let j = 0; j < league.length; j++) {
+    fixtureDate = new Date(league[j].fixture.date);
+    console.log(fixtureDate);
+    if (fixtureDate.toDateString() == date.toDateString()) {
+      console.log(fixtureDate);
+      matches.push(league[j]);
+    }
+  }
+  console.log(matches);
+}
+if (matches.length > 0) matchList(matches);
 
 //Preload images
 let border_image = new Image();
 border_image.src = borderImage;
-for (i = 0; i < clubs.length; i++) {
-  var img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = imagePath(clubs[i].id);
-  imgs[clubs[i].name] = img;
-}
 
 make_base("", "");
 
@@ -235,4 +250,14 @@ function drawResizedImage(image, imgHeight, startX, startY) {
 function buildSvgImageUrl(svg) {
   let b64 = window.btoa(unescape(encodeURIComponent(svg)));
   return "data:image/svg+xml;base64," + b64;
+}
+
+export function loadClubLogos(clubsToLoad) {
+  console.log(clubsToLoad);
+  for (i = 0; i < clubsToLoad.length; i++) {
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imagePath(clubsToLoad[i].id);
+    imgs[clubsToLoad[i].name] = img;
+  }
 }
