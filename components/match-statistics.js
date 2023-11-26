@@ -83,7 +83,7 @@ export function matchStatsToCanvas() {
     for (let j = 0; j < clubs.length; j++) {
       if (teamLogos[i].indexOf(`*${clubs[j].name}*`) > -1) {
         imgToAdd.push({
-          img: imgs[clubs[j].name],
+          img: imgs.clubs[clubs[j].id],
           imgHeight: 50,
           startX: 430 + i * 172,
           startY: 181,

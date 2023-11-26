@@ -13,6 +13,7 @@ import {
   getResultFromLocal,
   getPlayerGoalList,
   getAllPlayers,
+  getResultsByRoundLocal,
 } from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
@@ -53,7 +54,7 @@ document.getElementById("get-player-goal-list").onclick = async function () {
     var img = new Image();
     img.crossOrigin = "anonymous";
     img.src = `player-pictures/${playerList[i].id}.png`;
-    imgs[playerList[i].id] = img;
+    imgs.players[playerList[i].id] = img;
 
     let player = players.find((x) => x.id == playerList[i].id);
 
@@ -94,6 +95,14 @@ document.getElementById("a").onclick = async function () {
 
 document.getElementById("c").onclick = async function () {
   getAllPlayers();
+};
+
+document.getElementById("d").onclick = async function () {
+  let leagueID = document.getElementById("leagues").value;
+  let roundNumber = `Regular Season - ${
+    document.getElementById("roundnr").value
+  }`;
+  getResultsByRoundLocal(leagueID, roundNumber);
 };
 
 document.getElementById("getMatch").onclick = async function () {

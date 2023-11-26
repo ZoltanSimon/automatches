@@ -18,7 +18,6 @@ let inputTextValue,
   base_image,
   imgHeight,
   fontY,
-  i,
   breakingText,
   fixtureDate,
   matches = [];
@@ -35,7 +34,7 @@ for (let i = 0; i < allLeagues.length; i++) {
     }
   }
 }
-if (matches.length > 0) matchList(matches);
+if (matches.length > 0) matchList(matches, true);
 
 //Preload images
 let border_image = new Image();
@@ -56,7 +55,7 @@ function make_base(text, breakingText) {
       ctx.drawImage(border_image, 0, 0);
     }
 
-    fontY = 1080 - 20 - lines.length * 50;
+    fontY = 1080 - 30 - lines.length * 50;
 
     if (breakingText) {
       ctx.font = `bold ${fontSize + 20}px ${font}`; //title
@@ -91,13 +90,13 @@ document.getElementById("pasteArea").onpaste = function (event) {
   if (blob !== null) {
     var reader = new FileReader();
     reader.onload = function (event) {
-      imgHeight = fontY - 84 - lineheight;
+      imgHeight = fontY - 34 - lineheight;
       if (breakingText) imgHeight -= 60;
 
       base_image = new Image();
       base_image.src = event.target.result;
       base_image.onload = function () {
-        drawResizedImage(base_image, imgHeight, 1080, 78);
+        drawResizedImage(base_image, imgHeight, 1080, 25);
         ctx.drawImage(border_image, 0, 0);
       };
     };
@@ -175,12 +174,10 @@ function buildSvgImageUrl(svg) {
   return "data:image/svg+xml;base64," + b64;
 }
 
-export function loadClubLogos(clubsToLoad) {
-  console.log(clubsToLoad);
-  for (i = 0; i < clubsToLoad.length; i++) {
-    var img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = imagePath(clubsToLoad[i].id);
-    imgs[clubsToLoad[i].name] = img;
-  }
+export function loadClubLogo(clubToLoad) {
+  var img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = imagePath(clubToLoad);
+  if (!imgs.clubs) imgs.clubs = [];
+  imgs.clubs[clubToLoad] = img;
 }
