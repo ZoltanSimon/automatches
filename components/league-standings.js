@@ -1,4 +1,6 @@
 import { buildTableForTableType, imgs } from "./../instapics.js";
+import { clubs } from "./../data/clubs.js";
+import { loadClubLogo } from "./../instapics.js";
 
 export function leagueStandings(response) {
   let standings = response.response[0].league.standings;
@@ -20,6 +22,7 @@ export function leagueStandings(response) {
       </tr>
       </thead><tbody>`;
     group.forEach((a) => {
+      loadClubLogo(a.team.id);
       addToPage += `
       <tr>
       ${tds}<b>${a.rank}</b></td>
@@ -60,7 +63,7 @@ export function standingsToCanvas() {
         thisClub = clubs[k].name;
         if (thisTd.innerHTML.indexOf(`*${thisClub}*`) > -1) {
           imgToAdd.push({
-            img: imgs[thisClub],
+            img: imgs.clubs[clubs[k].id],
             imgHeight: 40,
             startX: 178,
             startY: yPos + 44 + l * 42,

@@ -65,13 +65,13 @@ export function playerStatsToCanvas() {
   statsTable.rows[0].children[1].style.width = "300px";
   statsTable.rows[0].children[2].style.width = "250px";
   imgToAdd.push({
-    img: imgs[playerIDs[0]],
+    img: imgs.players[playerIDs[0]],
     imgHeight: 180,
     startX: 160,
     startY: 60,
   });
   imgToAdd.push({
-    img: imgs[playerIDs[1]],
+    img: imgs.players[playerIDs[1]],
     imgHeight: 180,
     startX: 746,
     startY: 60,

@@ -31,7 +31,7 @@ export function playerListToCanvas() {
 
   for (let i = 1; i < playerListTable.rows.length; i++) {
     thisTr = playerListTable.rows[i];
-    playerFace = imgs[thisTr.children[0].innerHTML];
+    playerFace = imgs.players[thisTr.children[0].innerHTML];
 
     imgToAdd.push({
       img: playerFace,

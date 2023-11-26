@@ -2,12 +2,13 @@ import {
   buildTableForTableType,
   imgs,
   ctx,
-  loadClubLogos,
+  loadClubLogo,
 } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
+import { getResultFromLocal } from "../local-handler.js";
 
 let imgToAdd = [];
-let yPos = 120;
+let yPos = 154;
 
 export function matchList(fixtures, showID = false) {
   console.log(fixtures);
@@ -16,26 +17,19 @@ export function matchList(fixtures, showID = false) {
   let round = fixtures[0].league.round;
   let thisID = ``;
   let tds = `<td style="text-align: center;">`;
-  let logosToLoad = [];
 
   fixtures.sort(function (a, b) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);
   });
 
-  addToPage = `<table style='border-collapse: collapse; border-color: #1D3557;' border='1' id="match-list">`;
+  addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="match-list">`;
 
   fixtures.forEach((element) => {
-    if (showID) thisID = `${tds}${element.fixture.id}</td>`;
+    if (showID) thisID = `<td class="match-id">${element.fixture.id}</td>`;
     date = new Date(element.fixture.date);
 
-    logosToLoad.push({
-      id: element.teams.home.id,
-      name: element.teams.home.name,
-    });
-    logosToLoad.push({
-      id: element.teams.away.id,
-      name: element.teams.away.name,
-    });
+    loadClubLogo(element.teams.home.id);
+    loadClubLogo(element.teams.away.id);
 
     addToPage += `<tr">
     ${tds}${date.getDate()}.${
@@ -70,7 +64,9 @@ export function matchList(fixtures, showID = false) {
     .querySelectorAll("#match-list tr")
     .forEach((e) => e.addEventListener("click", clickHandler));
 
-  loadClubLogos(logosToLoad);
+  document
+    .querySelectorAll(".match-id")
+    .forEach((e) => e.addEventListener("click", getResultFromLocal));
 }
 
 export function matchesToCanvas(sourceDiv) {
@@ -91,8 +87,9 @@ export function matchesToCanvas(sourceDiv) {
     if (matchesTable.rows[i].cells.length == index + 1)
       matchesTable.rows[i].deleteCell(index);
   }
+  yPos += (10 - rowCount) * 30;
 
-  for (let i = 0; i < matchesTable.rows.length; i++) {
+  for (let i = 0; i < rowCount; i++) {
     thisTr = matchesTable.rows[i];
     if (thisTr.children[3].innerHTML == "") isResult = false;
 
@@ -126,19 +123,20 @@ export function matchesToCanvas(sourceDiv) {
     thisTr.children[1].innerHTML = "";
     thisTr.children[4].innerHTML = "";
 
-    addImgToArray(235 + notResultGap, logo1.name, i);
-    addImgToArray(610 + notResultGap2, logo2.name, i);
+    addImgToArray(235 + notResultGap, logo1.id, i);
+    addImgToArray(610 + notResultGap2, logo2.id, i);
   }
 
-  if (sourceDiv == "match-list") {
-    ctx.fillText("Round " + round.split(" - ")[1], 540, 990);
-    ctx.fillStyle = "#e63946";
-    ctx.fillText(leagueName, 540, 940);
-  } else {
-    ctx.fillText("Season 2023/24, Week 13", 540, 880);
-    ctx.fillStyle = "#e63946";
-    ctx.fillText("Games to Watch over the Weekend", 540, 820);
-  }
+  if (rowCount <= 11)
+    if (sourceDiv == "match-list") {
+      ctx.fillText("Round " + round.split(" - ")[1], 540, 990);
+      ctx.fillStyle = "#e63946";
+      ctx.fillText(leagueName, 540, 130);
+    } else {
+      ctx.fillText("Season 2023/24, Week 13", 540, yPos + 58 + rowCount * 77);
+      ctx.fillStyle = "#e63946";
+      ctx.fillText("Games to Watch on Sunday", 540, yPos - 22);
+    }
 
   console.log(removeNewlines(matchesTable.outerHTML));
 
@@ -157,7 +155,7 @@ function clickHandler(event) {
 
 function addImgToArray(xPos, logo, i) {
   imgToAdd.push({
-    img: imgs[logo],
+    img: imgs.clubs[logo],
     imgHeight: 50,
     startX: xPos,
     startY: yPos + 14 + i * 77,

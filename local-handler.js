@@ -1,3 +1,4 @@
+import { matchList } from "./components/match-list.js";
 import { downloadResultFromApi } from "./webapi-handler.js";
 
 let allLeagues = [
@@ -114,6 +115,9 @@ export async function getLocalPlayerStats(inputPlayer) {
 }
 
 export async function getResultFromLocal(fixtureID) {
+  if (fixtureID instanceof PointerEvent) {
+    fixtureID = fixtureID.target.innerHTML;
+  }
   let response = await fetch(`matches/${fixtureID}.json`);
   if (!response.ok) {
     handleError(fixtureID);
@@ -204,7 +208,18 @@ async function getPlayerList(compType, compList) {
 }
 
 export async function getResultsByRoundLocal(leagueID, roundNo) {
-  await getPlayerList("club", allLeagues);
-  await getPlayerList("nation", allNationalComps);
-  console.log(allPlayers);
+  console.log(leagueID);
+  console.log(roundNo);
+  let allGames = [];
+  let response = await fetch(`leagues/${leagueID}.json`);
+  let league = await response.json();
+  console.log(league);
+  for (let i = 0; i < league.length; i++) {
+    console.log(league[i].league.round);
+    if (league[i].league.round == roundNo) {
+      allGames.push(league[i]);
+    }
+  }
+  console.log(allGames);
+  matchList(allGames);
 }
