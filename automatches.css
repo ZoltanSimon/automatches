@@ -46,3 +46,11 @@ td a {
 .canvas-div {
   width: 1100px;
 }
+
+#league-list {
+  cursor: pointer;
+}
+
+.selected-league {
+  border: 2px solid red;
+}

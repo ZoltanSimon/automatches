@@ -36,32 +36,11 @@
 
     <div class="floating-buttons">
       <div class="row">
-        <div class="col-md-8">
-          <select
-            name="leagues"
-            class="form-select form-select-lg mb-3"
-            aria-label=".form-select-lg example"
-            id="leagues"
-          >
-            <option value="39">England - Premier League</option>
-            <option value="140">Spain - La Liga</option>
-            <option value="78">Germany - Bundesliga</option>
-            <option value="135">Italy - Serie A</option>
-            <option value="61">France - Ligue 1</option>
-            <option value="2">UEFA Champions League</option>
-            <option value="3">UEFA Europa League</option>
-            <option value="15">Club World Cup</option>
-            <option value="81">Dfp Pokal</option>
-            <option value="1">World Cup</option>
-            <option value="960">Euro Quali</option>
-            <option value="34">World Cup Qualification - South America</option>
-            <option value="587">U17 World Cup</option>
-          </select>
+        <div id="league-list"></div>
 
-          <input type="text" placeholder="Round Number" id="roundnr" />
-          <button id="getRound">Get Round #</button>
-        </div>
-        <div class="col-md-4">
+        <input type="text" placeholder="Round Number" id="roundnr" />
+        <button id="getRound">Get Round #</button>
+        <!--div class="col-md-4">
           <fieldset>
             <div>
               <input
@@ -99,7 +78,7 @@
               <label for="get-top-assists">Top Assists</label>
             </div>
           </fieldset>
-        </div>
+        </div-->
         <button id="submit-league-info" class="btn btn-primary btn-block">
           Get league info
         </button>
@@ -118,7 +97,6 @@
           <button id="a">Get all clubs</button>
           <button id="get-player-goal-list">Get Player List</button>
           <button id="c">Get all players</button>
-          <button id="d">Get results by round local</button>
         </div>
       </div>
       <div class="row" style="margin-top: 5px">

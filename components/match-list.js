@@ -95,7 +95,7 @@ export function matchesToCanvas(sourceDiv) {
 
     if (!isResult) {
       thisTr.deleteCell(6);
-      notResultGap = 23;
+      notResultGap = 21;
       notResultGap2 = 61;
       thisTr.children[3].innerHTML = "VS";
       thisTr.children[0].style.width = "131px";
@@ -123,15 +123,19 @@ export function matchesToCanvas(sourceDiv) {
     thisTr.children[1].innerHTML = "";
     thisTr.children[4].innerHTML = "";
 
-    addImgToArray(235 + notResultGap, logo1.id, i);
+    addImgToArray(237 + notResultGap, logo1.id, i);
     addImgToArray(610 + notResultGap2, logo2.id, i);
   }
 
   if (rowCount <= 11)
     if (sourceDiv == "match-list") {
-      ctx.fillText("Round " + round.split(" - ")[1], 540, 990);
+      ctx.fillText(
+        "Round " + round.split(" - ")[1],
+        540,
+        yPos + 58 + rowCount * 77
+      );
       ctx.fillStyle = "#e63946";
-      ctx.fillText(leagueName, 540, 130);
+      ctx.fillText(leagueName, 540, yPos - 22);
     } else {
       ctx.fillText("Season 2023/24, Week 13", 540, yPos + 58 + rowCount * 77);
       ctx.fillStyle = "#e63946";
@@ -158,6 +162,6 @@ function addImgToArray(xPos, logo, i) {
     img: imgs.clubs[logo],
     imgHeight: 50,
     startX: xPos,
-    startY: yPos + 14 + i * 77,
+    startY: yPos + 15 + i * 77,
   });
 }

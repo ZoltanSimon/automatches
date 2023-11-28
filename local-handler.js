@@ -1,15 +1,16 @@
 import { matchList } from "./components/match-list.js";
 import { downloadResultFromApi } from "./webapi-handler.js";
+import { selectedLeagues } from "./automatches.js";
 
-let allLeagues = [
-  //"bundesliga",
-  //"la-liga",
-  //"premier-league",
+/*let allLeagues = [
+  "78", //bundesliga
+  "140", //"la-liga",
+  "39", //"premier-league",
   //"uefa-champions-league",
   //"uefa-europa-league",
-  //"serie-a",
-  "ligue-1",
-];
+  "135", //"serie-a",
+  "61", //"ligue-1",
+];*/
 
 let allNationalComps = [
   "world-cup-2022",
@@ -40,8 +41,8 @@ export async function getLocalPlayerStats(inputPlayer) {
     teamName = "",
     competitions = [],
     thisComp = "";
-  for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`leagues/${allLeagues[i]}.json`);
+  for (let i = 0; i < selectedLeagues.length; i++) {
+    let response = await fetch(`leagues/${selectedLeagues[i]}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {
@@ -137,8 +138,8 @@ export async function getPlayerGoalList() {
   let scorerList = [];
   let scorer;
 
-  for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`leagues/${allLeagues[i]}.json`);
+  for (let i = 0; i < selectedLeagues.length; i++) {
+    let response = await fetch(`leagues/${selectedLeagues[i]}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {
@@ -170,7 +171,7 @@ export async function getPlayerGoalList() {
 }
 
 export async function getAllPlayers() {
-  await getPlayerList("club", allLeagues);
+  await getPlayerList("club", selectedLeagues);
   await getPlayerList("nation", allNationalComps);
   console.log(allPlayers);
 }
@@ -220,6 +221,6 @@ export async function getResultsByRoundLocal(leagueID, roundNo) {
       allGames.push(league[i]);
     }
   }
-  console.log(allGames);
-  matchList(allGames);
+  return allGames;
+  //matchList(allGames);
 }
