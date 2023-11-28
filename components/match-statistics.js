@@ -45,7 +45,7 @@ export function addMatchStats(apiResponse) {
   }
 
   addToPage = `
-  <table id='match-stats' style='border-collapse: collapse;' border='1'><thead>
+  <table id='match-stats' style='border-collapse: collapse; border: 3px solid #1D3557;' border='1'><thead>
   <tr>
   <td style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${homeTeamName}</td>
   <td style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>*${homeTeamName}* - *${awayTeamName}*</td>
@@ -86,7 +86,7 @@ export function matchStatsToCanvas() {
           img: imgs.clubs[clubs[j].id],
           imgHeight: 50,
           startX: 430 + i * 172,
-          startY: 181,
+          startY: 184,
         });
       }
     }
@@ -99,6 +99,11 @@ export function matchStatsToCanvas() {
     imgToAdd,
     180
   );
+  //ctx.fillStyle = "#e63946";
+  //ctx.fillText(leagueName, 540, 960);
+  let rounNo = leagueName.split(" - ")[0];
+  let league = leagueName.split(" - ")[1];
+  ctx.fillText(rounNo, 540, 922);
   ctx.fillStyle = "#e63946";
-  ctx.fillText(leagueName, 540, 960);
+  ctx.fillText(league, 540, 130);
 }

@@ -23,6 +23,7 @@ import { leagueStandings } from "./components/league-standings.js";
 import { matchList } from "./components/match-list.js";
 import { playerGoalList } from "./components/player-list.js";
 import { players } from "./data/players.js";
+import { allLeagues } from "./data/leagues.js";
 import { imgs } from "./instapics.js";
 
 let addToPage;
@@ -32,6 +33,8 @@ let standingsFromApi,
   playerFromApi,
   squadFromApi,
   playerFromApi2;
+
+export let selectedLeagues = [];
 
 document.getElementById("submit-league-info").onclick = async function () {
   await submitRequest_leagueInfo();
@@ -54,6 +57,7 @@ document.getElementById("get-player-goal-list").onclick = async function () {
     var img = new Image();
     img.crossOrigin = "anonymous";
     img.src = `player-pictures/${playerList[i].id}.png`;
+    if (!imgs.players) imgs.players = [];
     imgs.players[playerList[i].id] = img;
 
     let player = players.find((x) => x.id == playerList[i].id);
@@ -97,14 +101,6 @@ document.getElementById("c").onclick = async function () {
   getAllPlayers();
 };
 
-document.getElementById("d").onclick = async function () {
-  let leagueID = document.getElementById("leagues").value;
-  let roundNumber = `Regular Season - ${
-    document.getElementById("roundnr").value
-  }`;
-  getResultsByRoundLocal(leagueID, roundNumber);
-};
-
 document.getElementById("getMatch").onclick = async function () {
   let fixtureID = document.getElementById("fixtureID").value;
   matchFromApi = await getResultFromLocal(fixtureID);
@@ -134,7 +130,7 @@ document.getElementById("clear-results").onclick = async function () {
 };
 
 async function submitRequest_matchList() {
-  let leagueID = document.getElementById("leagues").value;
+  let leagueID = selectedLeagues[0];
   let startDate = document.getElementById("dateStart").value;
   let endDate = document.getElementById("dateEnd").value;
   getResultsDate(leagueID, startDate, endDate).then((response) =>
@@ -143,34 +139,35 @@ async function submitRequest_matchList() {
 }
 
 async function submitRequest_leagueInfo() {
-  let leagueID = document.getElementById("leagues").value;
+  let leagueID = selectedLeagues[0];
   let roundNumber = document.getElementById("roundnr").value;
 
-  if (document.querySelector("#get-top-scorers").checked)
+  /*if (document.querySelector("#get-top-scorers").checked)
     getTopScorer(leagueID).then((response) => topScorers(response)); //Not updated regularly from API
 
   if (document.querySelector("#get-top-assists").checked)
-    getTopAssists(leagueID).then((response) => topAssists(response)); //Not updated regularly from API
+    getTopAssists(leagueID).then((response) => topAssists(response)); //Not updated regularly from API*/
 
-  if (document.querySelector("#get-standings").checked) {
-    standingsFromApi = await getStandingsFromApi(leagueID);
-    leagueStandings(standingsFromApi);
-  }
+  //if (document.querySelector("#get-standings").checked) {
+  standingsFromApi = await getStandingsFromApi(leagueID);
+  leagueStandings(standingsFromApi);
+  //}
 
-  if (document.querySelector("#get-results").checked) {
-    resultsFromApi = await getResults(
-      leagueID,
-      `Regular Season - ${roundNumber}`
-    );
+  //if (document.querySelector("#get-results").checked) {
+  resultsFromApi = await getResultsByRoundLocal(
+    leagueID,
+    `Regular Season - ${roundNumber}`
+  );
 
-    matchList(resultsFromApi.response);
-  }
+  console.log(resultsFromApi);
+  matchList(resultsFromApi);
+  //}
 
   addText(resultsFromApi, standingsFromApi);
 }
 
 function setRound() {
-  let leagueID = document.getElementById("leagues").value;
+  let leagueID = selectedLeagues[0];
   getCurrentRound(leagueID).then(
     (response) =>
       (document.getElementById("roundnr").value = response.response[0].replace(
@@ -341,4 +338,24 @@ function oneFixture(response) {
 
   document.getElementById("one-fixture").innerHTML += addToPage;
   addMatchStats(fixture);
+}
+
+for (const element of allLeagues) {
+  console.log(element);
+  let dasID;
+  document.getElementById(
+    "league-list"
+  ).innerHTML += `<img width=30px id="img-${element.id}" class="league-to-select" src=images/competitions/${element.id}.png />`;
+  document.querySelectorAll(".league-to-select").forEach((e) =>
+    e.addEventListener("click", function () {
+      this.classList.toggle("selected-league");
+      dasID = this.id.replace("img-", "");
+      if (!selectedLeagues.includes(dasID)) {
+        selectedLeagues.push(dasID);
+      } else {
+        selectedLeagues.splice(selectedLeagues.indexOf(dasID), 1);
+      }
+      console.log(selectedLeagues);
+    })
+  );
 }

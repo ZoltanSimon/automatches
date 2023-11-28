@@ -124,7 +124,7 @@ let lasts = [
 
 let Napolis = [`Napoli `];
 
-export function addText(resultsObj, standingsObj) {
+export function addText(fixtures, standingsObj) {
   let textToPage = ``;
   let matchEnding, leader, firstPart, finalPart;
 
@@ -132,8 +132,6 @@ export function addText(resultsObj, standingsObj) {
   let lastMatch = lastMatches[Math.floor(Math.random() * lastMatches.length)];
   let first = firsts[Math.floor(Math.random() * firsts.length)];
   let last = lasts[Math.floor(Math.random() * lasts.length)];
-
-  let fixtures = resultsObj.response;
 
   fixtures.sort(function (a, b) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);

@@ -6,7 +6,7 @@ export function playerGoalList(response) {
   let tds = `<td style="text-align: center;">`;
   let thisPlayer;
 
-  addToPage = `<table style='border-collapse: collapse; border-color: #1D3557;' border='1' id="player-list-table">
+  addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="player-list-table">
   <thead><tr><td colspan=2>Player</td><td>Team</td>${tds}Apps</td>${tds}Goals</td>${tds}Assists</td></tr></thead>
   <tbody>`;
 
@@ -36,8 +36,8 @@ export function playerListToCanvas() {
     imgToAdd.push({
       img: playerFace,
       imgHeight: 80,
-      startX: 102,
-      startY: 82 + i * 80,
+      startX: 103,
+      startY: 84 + i * 80,
     });
 
     thisTr.style.height = "80px";

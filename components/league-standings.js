@@ -8,7 +8,7 @@ export function leagueStandings(response) {
   let tds = `<td style="padding:5px; text-align: center;">`;
   let ths = `<th style="width:54px; padding: 5px; text-align: center;">`;
   standings.forEach((group) => {
-    addToPage += `<table style='border-collapse: collapse; border-color: #1D3557;' border='1' id="league-standings">
+    addToPage += `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="league-standings">
         <thead>    
         <tr>
         ${ths}<b>#</b></th>
@@ -66,7 +66,7 @@ export function standingsToCanvas() {
             img: imgs.clubs[clubs[k].id],
             imgHeight: 40,
             startX: 178,
-            startY: yPos + 44 + l * 42,
+            startY: yPos + 45 + l * 42,
           });
           l++;
           thisTd.innerHTML = " ";
