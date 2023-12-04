@@ -24,7 +24,7 @@ import { matchList } from "./components/match-list.js";
 import { playerGoalList } from "./components/player-list.js";
 import { players } from "./data/players.js";
 import { allLeagues } from "./data/leagues.js";
-import { imgs } from "./instapics.js";
+import { loadPlayerFace } from "./instapics.js";
 
 let addToPage;
 let standingsFromApi,
@@ -40,13 +40,17 @@ document.getElementById("submit-league-info").onclick = async function () {
   await submitRequest_leagueInfo();
 };
 
+document.getElementById("get-matches-by-round").onclick = async function () {
+  await matchesByRound();
+};
+
 document.getElementById("submit-match-list").onclick = async function () {
   await submitRequest_matchList();
 };
 
-document.getElementById("getRound").onclick = function () {
+/*document.getElementById("getRound").onclick = function () {
   setRound();
-};
+};*/
 
 document.getElementById("get-player-goal-list").onclick = async function () {
   let thisPlayer;
@@ -54,11 +58,7 @@ document.getElementById("get-player-goal-list").onclick = async function () {
   let playerList = await getPlayerGoalList();
 
   for (let i = 0; i < 10; i++) {
-    var img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = `player-pictures/${playerList[i].id}.png`;
-    if (!imgs.players) imgs.players = [];
-    imgs.players[playerList[i].id] = img;
+    loadPlayerFace(playerList[i].id);
 
     let player = players.find((x) => x.id == playerList[i].id);
 
@@ -140,30 +140,22 @@ async function submitRequest_matchList() {
 
 async function submitRequest_leagueInfo() {
   let leagueID = selectedLeagues[0];
-  let roundNumber = document.getElementById("roundnr").value;
 
-  /*if (document.querySelector("#get-top-scorers").checked)
-    getTopScorer(leagueID).then((response) => topScorers(response)); //Not updated regularly from API
-
-  if (document.querySelector("#get-top-assists").checked)
-    getTopAssists(leagueID).then((response) => topAssists(response)); //Not updated regularly from API*/
-
-  //if (document.querySelector("#get-standings").checked) {
   standingsFromApi = await getStandingsFromApi(leagueID);
   leagueStandings(standingsFromApi);
-  //}
 
-  //if (document.querySelector("#get-results").checked) {
+  //addText(resultsFromApi, standingsFromApi);
+}
+
+async function matchesByRound() {
+  let leagueID = selectedLeagues[0];
+  let roundNumber = document.getElementById("roundnr").value;
   resultsFromApi = await getResultsByRoundLocal(
     leagueID,
     `Regular Season - ${roundNumber}`
   );
 
-  console.log(resultsFromApi);
   matchList(resultsFromApi);
-  //}
-
-  addText(resultsFromApi, standingsFromApi);
 }
 
 function setRound() {

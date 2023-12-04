@@ -1,4 +1,9 @@
-import { buildTableForTableType, imgs, ctx } from "./../instapics.js";
+import {
+  buildTableForTableType,
+  imgs,
+  ctx,
+  loadClubLogo,
+} from "./../instapics.js";
 import { Stat } from "../stat.js";
 import { clubs } from "./../data/clubs.js";
 
@@ -10,6 +15,9 @@ export function addMatchStats(apiResponse) {
   let awayTeamName = statsAPI[1].team.name;
   let addToPage = ``;
   let values;
+
+  loadClubLogo(statsAPI[0].team.id);
+  loadClubLogo(statsAPI[1].team.id);
 
   let stats = [];
   stats.push(new Stat("goals", "Score"));
@@ -101,8 +109,9 @@ export function matchStatsToCanvas() {
   );
   //ctx.fillStyle = "#e63946";
   //ctx.fillText(leagueName, 540, 960);
+  console.log(leagueName);
   let rounNo = leagueName.split(" - ")[0];
-  let league = leagueName.split(" - ")[1];
+  let league = leagueName.split(" - ")[leagueName.split(" - ").length - 1];
   ctx.fillText(rounNo, 540, 922);
   ctx.fillStyle = "#e63946";
   ctx.fillText(league, 540, 130);

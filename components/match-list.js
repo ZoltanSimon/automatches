@@ -95,8 +95,8 @@ export function matchesToCanvas(sourceDiv) {
 
     if (!isResult) {
       thisTr.deleteCell(6);
-      notResultGap = 21;
-      notResultGap2 = 61;
+      notResultGap = 22;
+      notResultGap2 = 60;
       thisTr.children[3].innerHTML = "VS";
       thisTr.children[0].style.width = "131px";
 
@@ -139,7 +139,7 @@ export function matchesToCanvas(sourceDiv) {
     } else {
       ctx.fillText("Season 2023/24, Week 13", 540, yPos + 58 + rowCount * 77);
       ctx.fillStyle = "#e63946";
-      ctx.fillText("Games to Watch on Sunday", 540, yPos - 22);
+      ctx.fillText("Games to Watch on the Weekend", 540, yPos - 22);
     }
 
   console.log(removeNewlines(matchesTable.outerHTML));
