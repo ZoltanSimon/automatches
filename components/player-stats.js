@@ -1,5 +1,9 @@
 import { Stat } from "../stat.js";
-import { buildTableForTableType, imgs } from "./../instapics.js";
+import {
+  buildTableForTableType,
+  imgs,
+  loadPlayerFace,
+} from "./../instapics.js";
 
 let width = 50;
 let values;
@@ -39,9 +43,10 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
       }
     }
   }
-
+  loadPlayerFace(statsAPI.id);
+  loadPlayerFace(statsAPI2.id);
   let addToPage = `
-  <table id='player-stats' style='border-collapse: collapse;' border='1'><tbody id=${statsAPI.id}|${statsAPI2.id}>`;
+  <table id='player-stats' style='border-collapse: collapse; border: 3px solid #1D3557;' border='1'><tbody id=${statsAPI.id}|${statsAPI2.id}>`;
 
   for (let i = 0; i < stats.length; i++) {
     values = stats[i].getValues();
@@ -57,6 +62,7 @@ export function playerStatsToCanvas() {
   let statsTable = document.getElementById("player-stats");
   var tBody = statsTable.getElementsByTagName("tbody")[0];
   let playerIDs = tBody.getAttribute("id").split("|");
+  console.log(playerIDs);
 
   statsTable.rows[0].style.backgroundColor = "#457B9D";
   statsTable.rows[0].style.fontWeight = "bold";
@@ -64,6 +70,7 @@ export function playerStatsToCanvas() {
   statsTable.rows[0].children[0].style.width = "250px";
   statsTable.rows[0].children[1].style.width = "300px";
   statsTable.rows[0].children[2].style.width = "250px";
+  console.log(imgs);
   imgToAdd.push({
     img: imgs.players[playerIDs[0]],
     imgHeight: 180,

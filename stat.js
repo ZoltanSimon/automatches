@@ -7,7 +7,6 @@ export class Stat {
   }
 
   getValues() {
-    console.log(this.homeTeam);
     let firstValueHome = isNaN(this.homeTeam)
       ? parseInt(this.homeTeam.split(" / ")[0])
       : this.homeTeam;

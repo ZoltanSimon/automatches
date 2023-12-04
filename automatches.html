@@ -1,5 +1,10 @@
 <html>
   <head>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+      integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8="
+      crossorigin="anonymous"
+    ></script>
     <!-- Latest compiled and minified CSS -->
     <link
       rel="stylesheet"
@@ -15,13 +20,6 @@
       integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
       crossorigin="anonymous"
     />
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
-      integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-      crossorigin="anonymous"
-    ></script>
     <link rel="stylesheet" href="automatches.css" />
   </head>
   <body>
@@ -38,65 +36,40 @@
       <div class="row">
         <div id="league-list"></div>
 
-        <input type="text" placeholder="Round Number" id="roundnr" />
-        <button id="getRound">Get Round #</button>
-        <!--div class="col-md-4">
-          <fieldset>
-            <div>
-              <input
-                type="checkbox"
-                id="get-results"
-                name="get-results"
-                checked
-              />
-              <label for="get-results">Results</label>
-            </div>
-
-            <div>
-              <input
-                type="checkbox"
-                id="get-standings"
-                name="get-standings"
-                checked
-              />
-              <label for="get-standings">Standings</label>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                id="get-top-scorers"
-                name="get-top-scorers"
-              />
-              <label for="get-top-scorers">Top Scorers</label>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                id="get-top-assists"
-                name="get-top-assists"
-              />
-              <label for="get-top-assists">Top Assists</label>
-            </div>
-          </fieldset>
-        </div-->
         <button id="submit-league-info" class="btn btn-primary btn-block">
-          Get league info
+          League standings
         </button>
         <br />
         <div class="roundandmatch">
+          <input type="text" placeholder="Round Number" id="roundnr" />
+          <button class="btn btn-info" id="get-matches-by-round">
+            Matches in round
+          </button>
           <input type="string" placeholder="2023-08-23" id="dateStart" />
           <input type="string" placeholder="2023-08-26" id="dateEnd" />
-          <button id="submit-match-list">Get Match list</button>
+          <button class="btn btn-light" id="submit-match-list">
+            Get Match list
+          </button>
           <input type="number" placeholder="Match ID" id="fixtureID" />
-          <button id="getMatch">Get Match info</button>
+          <button class="btn btn-outline-primary" id="getMatch">
+            Get Match info
+          </button>
           <input type="number" placeholder="276" id="playerID" />
           <input type="number" placeholder="276" id="playerID2" />
-          <button id="getPlayerStats">Get Player Stats</button><br />
+          <button class="btn btn-outline-primary" id="getPlayerStats">
+            Get Player Stats</button
+          ><br />
           <input type="number" placeholder="541" id="teamID" />
-          <button id="getSquad">Get Squad</button>
-          <button id="a">Get all clubs</button>
-          <button id="get-player-goal-list">Get Player List</button>
-          <button id="c">Get all players</button>
+          <button class="btn btn-outline-primary" id="getSquad">
+            Get Squad
+          </button>
+          <button class="btn btn-outline-primary" id="a">Get all clubs</button>
+          <button class="btn btn-outline-primary" id="get-player-goal-list">
+            Get Player List
+          </button>
+          <button class="btn btn-outline-primary" id="c">
+            Get all players
+          </button>
         </div>
       </div>
       <div class="row" style="margin-top: 5px">
@@ -202,5 +175,11 @@
     <script src="common-functions.js"></script>
     <script src="automatches.js" type="module"></script>
     <script src="instapics.js" type="module"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+      integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+      crossorigin="anonymous"
+    ></script>
   </footer>
 </html>

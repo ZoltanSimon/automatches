@@ -181,3 +181,11 @@ export function loadClubLogo(clubToLoad) {
   if (!imgs.clubs) imgs.clubs = [];
   imgs.clubs[clubToLoad] = img;
 }
+
+export function loadPlayerFace(playerToLoad) {
+  var img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = `player-pictures/${playerToLoad}.png`;
+  if (!imgs.players) imgs.players = [];
+  imgs.players[playerToLoad] = img;
+}

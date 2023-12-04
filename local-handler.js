@@ -69,9 +69,10 @@ export async function getLocalPlayerStats(inputPlayer) {
             foundIndex = 0;
           }
           if (playerFound) {
+            console.log(match[0].teams);
             if (foundIndex == -1) foundIndex = 1;
             stats = playerFound.statistics[0];
-            console.log(stats.games.minutes);
+            console.log(stats);
             if (stats.goals.total) goals += stats.goals.total;
             if (stats.goals.assists) assists += stats.goals.assists;
             if (stats.shots.on) shotsOn += stats.shots.on;
