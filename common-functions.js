@@ -28,3 +28,15 @@ function htmlDecode(input) {
 function truncate(str, n) {
   return str.length > n ? str.slice(0, n - 1) + "&hellip;" : str;
 }
+
+function downloadResult(matchID, response) {
+  let dataStr =
+    "data:text/json;charset=utf-8," +
+    encodeURIComponent(JSON.stringify(response));
+  let downloadAnchorNode = document.createElement("a");
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", matchID + ".json");
+  document.body.appendChild(downloadAnchorNode); // required for firefox
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+}

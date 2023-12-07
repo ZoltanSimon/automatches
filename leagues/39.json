@@ -6106,13 +6106,13 @@
   {
     "fixture": {
       "id": 1035314,
-      "referee": "J. Brooks",
+      "referee": "John Brooks, England",
       "timezone": "UTC",
       "date": "2023-12-06T20:15:00+00:00",
       "timestamp": 1701893700,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701893700, "second": 1701897300 },
       "venue": { "id": 495, "name": "Villa Park", "city": "Birmingham" },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6128,19 +6128,19 @@
         "id": 66,
         "name": "Aston Villa",
         "logo": "https://media-4.api-sports.io/football/teams/66.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 50,
         "name": "Manchester City",
         "logo": "https://media-4.api-sports.io/football/teams/50.png",
-        "winner": null
+        "winner": false
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 1, "away": 0 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 0, "away": 0 },
+      "fulltime": { "home": 1, "away": 0 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6148,17 +6148,17 @@
   {
     "fixture": {
       "id": 1035315,
-      "referee": "P. Bankes",
+      "referee": "Peter Bankes, England",
       "timezone": "UTC",
       "date": "2023-12-06T19:30:00+00:00",
       "timestamp": 1701891000,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701891000, "second": 1701894600 },
       "venue": {
         "id": 508,
         "name": "The American Express Community Stadium",
         "city": "Falmer, East Sussex"
       },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6174,19 +6174,19 @@
         "id": 51,
         "name": "Brighton",
         "logo": "https://media-4.api-sports.io/football/teams/51.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 55,
         "name": "Brentford",
         "logo": "https://media-4.api-sports.io/football/teams/55.png",
-        "winner": null
+        "winner": false
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 2, "away": 1 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 1, "away": 1 },
+      "fulltime": { "home": 2, "away": 1 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6236,13 +6236,13 @@
   {
     "fixture": {
       "id": 1035317,
-      "referee": "J. Smith",
+      "referee": "Josh Smith, England",
       "timezone": "UTC",
       "date": "2023-12-06T19:30:00+00:00",
       "timestamp": 1701891000,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701891000, "second": 1701894600 },
       "venue": { "id": 535, "name": "Craven Cottage", "city": "London" },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6258,19 +6258,19 @@
         "id": 36,
         "name": "Fulham",
         "logo": "https://media-4.api-sports.io/football/teams/36.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 65,
         "name": "Nottingham Forest",
         "logo": "https://media-4.api-sports.io/football/teams/65.png",
-        "winner": null
+        "winner": false
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 5, "away": 0 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 2, "away": 0 },
+      "fulltime": { "home": 5, "away": 0 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6278,17 +6278,17 @@
   {
     "fixture": {
       "id": 1035318,
-      "referee": "S. Barrott",
+      "referee": "Samuel Barrott, England",
       "timezone": "UTC",
       "date": "2023-12-05T20:15:00+00:00",
       "timestamp": 1701807300,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701807300, "second": 1701810900 },
       "venue": {
         "id": 551,
         "name": "Kenilworth Road",
         "city": "Luton, Bedfordshire"
       },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6304,19 +6304,19 @@
         "id": 1359,
         "name": "Luton",
         "logo": "https://media-4.api-sports.io/football/teams/1359.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 42,
         "name": "Arsenal",
         "logo": "https://media-4.api-sports.io/football/teams/42.png",
-        "winner": null
+        "winner": true
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 3, "away": 4 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 1, "away": 2 },
+      "fulltime": { "home": 3, "away": 4 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6324,13 +6324,13 @@
   {
     "fixture": {
       "id": 1035319,
-      "referee": "S. Hooper",
+      "referee": "Simon Hooper, England",
       "timezone": "UTC",
       "date": "2023-12-06T19:30:00+00:00",
       "timestamp": 1701891000,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701891000, "second": 1701894600 },
       "venue": { "id": 581, "name": "Bramall Lane", "city": "Sheffield" },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6346,19 +6346,19 @@
         "id": 62,
         "name": "Sheffield Utd",
         "logo": "https://media-4.api-sports.io/football/teams/62.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 40,
         "name": "Liverpool",
         "logo": "https://media-4.api-sports.io/football/teams/40.png",
-        "winner": null
+        "winner": true
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 0, "away": 2 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 0, "away": 1 },
+      "fulltime": { "home": 0, "away": 2 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6412,17 +6412,17 @@
   {
     "fixture": {
       "id": 1035321,
-      "referee": "J. Gillett",
+      "referee": "Jarred Gillett, Australia",
       "timezone": "UTC",
       "date": "2023-12-05T19:30:00+00:00",
       "timestamp": 1701804600,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701804600, "second": 1701808200 },
       "venue": {
         "id": 600,
         "name": "Molineux Stadium",
         "city": "Wolverhampton, West Midlands"
       },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6438,19 +6438,19 @@
         "id": 39,
         "name": "Wolves",
         "logo": "https://media-4.api-sports.io/football/teams/39.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 44,
         "name": "Burnley",
         "logo": "https://media-4.api-sports.io/football/teams/44.png",
-        "winner": null
+        "winner": false
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 1, "away": 0 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 1, "away": 0 },
+      "fulltime": { "home": 1, "away": 0 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6458,13 +6458,13 @@
   {
     "fixture": {
       "id": 1035322,
-      "referee": "C. Pawson",
+      "referee": "Craig Pawson, England",
       "timezone": "UTC",
       "date": "2023-12-06T19:30:00+00:00",
       "timestamp": 1701891000,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701891000, "second": 1701894600 },
       "venue": { "id": 525, "name": "Selhurst Park", "city": "London" },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6480,19 +6480,19 @@
         "id": 52,
         "name": "Crystal Palace",
         "logo": "https://media-4.api-sports.io/football/teams/52.png",
-        "winner": null
+        "winner": false
       },
       "away": {
         "id": 35,
         "name": "Bournemouth",
         "logo": "https://media-4.api-sports.io/football/teams/35.png",
-        "winner": null
+        "winner": true
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 0, "away": 2 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 0, "away": 1 },
+      "fulltime": { "home": 0, "away": 2 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6500,13 +6500,13 @@
   {
     "fixture": {
       "id": 1035323,
-      "referee": "C. Kavanagh",
+      "referee": "Chris Kavanagh, England",
       "timezone": "UTC",
       "date": "2023-12-06T20:15:00+00:00",
       "timestamp": 1701893700,
-      "periods": { "first": null, "second": null },
+      "periods": { "first": 1701893700, "second": 1701897300 },
       "venue": { "id": 556, "name": "Old Trafford", "city": "Manchester" },
-      "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      "status": { "long": "Match Finished", "short": "FT", "elapsed": 90 }
     },
     "league": {
       "id": 39,
@@ -6522,19 +6522,19 @@
         "id": 33,
         "name": "Manchester United",
         "logo": "https://media-4.api-sports.io/football/teams/33.png",
-        "winner": null
+        "winner": true
       },
       "away": {
         "id": 49,
         "name": "Chelsea",
         "logo": "https://media-4.api-sports.io/football/teams/49.png",
-        "winner": null
+        "winner": false
       }
     },
-    "goals": { "home": null, "away": null },
+    "goals": { "home": 2, "away": 1 },
     "score": {
-      "halftime": { "home": null, "away": null },
-      "fulltime": { "home": null, "away": null },
+      "halftime": { "home": 1, "away": 1 },
+      "fulltime": { "home": 2, "away": 1 },
       "extratime": { "home": null, "away": null },
       "penalty": { "home": null, "away": null }
     }
@@ -6542,7 +6542,7 @@
   {
     "fixture": {
       "id": 1035324,
-      "referee": null,
+      "referee": "J. Gillett",
       "timezone": "UTC",
       "date": "2023-12-09T17:30:00+00:00",
       "timestamp": 1702143000,
@@ -6584,7 +6584,7 @@
   {
     "fixture": {
       "id": 1035325,
-      "referee": null,
+      "referee": "S. Hooper",
       "timezone": "UTC",
       "date": "2023-12-09T15:00:00+00:00",
       "timestamp": 1702134000,
@@ -6630,7 +6630,7 @@
   {
     "fixture": {
       "id": 1035326,
-      "referee": null,
+      "referee": "A. Madley",
       "timezone": "UTC",
       "date": "2023-12-09T12:30:00+00:00",
       "timestamp": 1702125000,
@@ -6672,7 +6672,7 @@
   {
     "fixture": {
       "id": 1035327,
-      "referee": null,
+      "referee": "M. Oliver",
       "timezone": "UTC",
       "date": "2023-12-10T14:00:00+00:00",
       "timestamp": 1702216800,
@@ -6714,7 +6714,7 @@
   {
     "fixture": {
       "id": 1035328,
-      "referee": null,
+      "referee": "P. Tierney",
       "timezone": "UTC",
       "date": "2023-12-10T14:00:00+00:00",
       "timestamp": 1702216800,
@@ -6756,7 +6756,7 @@
   {
     "fixture": {
       "id": 1035329,
-      "referee": null,
+      "referee": "T. Robinson",
       "timezone": "UTC",
       "date": "2023-12-10T14:00:00+00:00",
       "timestamp": 1702216800,
@@ -6802,7 +6802,7 @@
   {
     "fixture": {
       "id": 1035330,
-      "referee": null,
+      "referee": "P. Bankes",
       "timezone": "UTC",
       "date": "2023-12-09T15:00:00+00:00",
       "timestamp": 1702134000,
@@ -6844,7 +6844,7 @@
   {
     "fixture": {
       "id": 1035331,
-      "referee": null,
+      "referee": "S. Attwell",
       "timezone": "UTC",
       "date": "2023-12-09T15:00:00+00:00",
       "timestamp": 1702134000,
@@ -6886,7 +6886,7 @@
   {
     "fixture": {
       "id": 1035332,
-      "referee": null,
+      "referee": "C. Kavanagh",
       "timezone": "UTC",
       "date": "2023-12-10T16:30:00+00:00",
       "timestamp": 1702225800,
@@ -6932,7 +6932,7 @@
   {
     "fixture": {
       "id": 1035333,
-      "referee": null,
+      "referee": "S. Barrott",
       "timezone": "UTC",
       "date": "2023-12-09T15:00:00+00:00",
       "timestamp": 1702134000,

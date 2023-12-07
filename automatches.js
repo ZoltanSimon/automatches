@@ -48,9 +48,29 @@ document.getElementById("submit-match-list").onclick = async function () {
   await submitRequest_matchList();
 };
 
-/*document.getElementById("getRound").onclick = function () {
-  setRound();
-};*/
+document.getElementById("update-leagues").onclick = async function () {
+  let leagueID = selectedLeagues[0];
+  const response = await fetch(
+    `http://localhost:3000/update-leagues?leagueID=${leagueID}`,
+    {
+      method: "GET",
+    }
+  );
+  const data = await response.json();
+  console.log(data);
+};
+
+document.getElementById("missing-matches").onclick = async function () {
+  let leagueID = selectedLeagues[0];
+  const response = await fetch(
+    `http://localhost:3000/missing-matches?leagueID=${leagueID}`,
+    {
+      method: "GET",
+    }
+  );
+  const data = await response.json();
+  console.log(data);
+};
 
 document.getElementById("get-player-goal-list").onclick = async function () {
   let thisPlayer;

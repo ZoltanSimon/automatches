@@ -1,39 +1,105 @@
 import { readFile } from "fs/promises";
 import * as fs from "fs";
+import express from "express";
+import { PORT } from "./config.js";
+import { getResultsDate, getResultFromApi } from "./../webapi-handler.js";
+import { createRequire } from "module";
 
-let data = JSON.parse(await readFile("../leagues/1.json", "utf8"));
-console.log(data[0].fixture.timezone);
-//change the value in the in-memory object
-data[0].fixture.timezone = "UTC";
-//Serialize as JSON and Write it to a file
-fs.writeFileSync("../leagues/1.json", JSON.stringify(data));
-let dataToWrite = await getResultsDate(39);
+const app = express();
+app.use(express.json());
+app.listen(PORT, () => {
+  console.log("Server Listening on PORT:", PORT);
+});
 
-fs.writeFile(
-  "../leagues/39.json",
-  JSON.stringify(dataToWrite.response),
-  function (err) {
-    if (err) {
-      return console.log(err);
+const require = createRequire(import.meta.url);
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions)); // Use this after the variable declaration
+
+app.get("/status", (request, response) => {
+  const status = {
+    Status: "Running",
+  };
+
+  response.send(status);
+});
+
+//updates the given league's json file
+app.get("/update-leagues", async (request, response) => {
+  let leagueID = request.query.leagueID;
+  let dataToWrite = await getResultsDate(leagueID);
+
+  fs.writeFile(
+    `../leagues/${leagueID}.json`,
+    JSON.stringify(dataToWrite.response),
+    function (err) {
+      if (err) {
+        return console.log(err);
+      }
+      response.send("The file was saved!");
     }
-    console.log("The file was saved!");
+  );
+});
+
+//returns missing matches from given league
+app.get("/missing-matches", async (request, response) => {
+  let leagueID = request.query.leagueID;
+  let matchArr = [];
+  let data = JSON.parse(await readFile(`../leagues/${leagueID}.json`, "utf8"));
+  console.log(data[0]);
+
+  for (const element of data) {
+    if (element.fixture.status.short == "FT")
+      if (!fs.existsSync(`../matches/${element.fixture.id}.json`)) {
+        matchArr.push(`${element.fixture.id}`);
+      }
   }
-);
+  response.json(matchArr);
+});
 
-export async function getResultsDate(leagueID) {
-  const rapidApiHost = "v3.football.api-sports.io";
-  const rapidApiKey = "aba57b743572275dac2835162c201c56";
-  const season = 2023;
-  let url = `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${season}`;
+//change the value in the in-memory object
+//data[0].fixture.timezone = "UTC";
+//Serialize as JSON and Write it to a file
+//fs.writeFileSync("../leagues/1.json", JSON.stringify(data));
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "x-rapidapi-host": rapidApiHost,
-      "x-rapidapi-key": rapidApiKey,
-    },
-  });
-  const data = await response.json();
-  console.log(data.response);
-  return data;
+app.get("/get-all-matches", async (request, response) => {
+  let bigArr = [];
+  const dirname = "../matches";
+  await readFiles(dirname);
+  response.json(bigArr);
+});
+
+async function readFiles(dirname) {
+  console.log(dirname);
+  console.log(await fs.readdir(dirname));
+  /*await fs.readdir(dirname, function (err, filenames) {
+    console.log(filenames);
+    console.log("a");
+    if (err) {
+      console.log(err);
+      return;
+    }
+    filenames.forEach(async function (filename) {
+      await fs.readFile(dirname + filename, "utf-8", function (err, content) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        let newEl = {
+          fileName: filename,
+          leagueName: JSON.parse(content)[0].league.name,
+        };
+        bigArr.push(newEl);
+        console.log(filename);
+        console.log(JSON.parse(content)[0].league.name);
+      });
+    });
+  });*/
 }
+
+function onFileContent(filename, content) {}
