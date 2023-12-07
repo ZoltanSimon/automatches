@@ -1,16 +1,6 @@
 import { matchList } from "./components/match-list.js";
-import { downloadResultFromApi } from "./webapi-handler.js";
+import { getResultFromApi } from "./webapi-handler.js";
 import { selectedLeagues } from "./automatches.js";
-
-/*let allLeagues = [
-  "78", //bundesliga
-  "140", //"la-liga",
-  "39", //"premier-league",
-  //"uefa-champions-league",
-  //"uefa-europa-league",
-  "135", //"serie-a",
-  "61", //"ligue-1",
-];*/
 
 let allNationalComps = [
   "world-cup-2022",
@@ -72,8 +62,9 @@ export async function getLocalPlayerStats(inputPlayer) {
             console.log(match[0].teams);
             if (foundIndex == -1) foundIndex = 1;
             stats = playerFound.statistics[0];
-            console.log(stats);
+
             if (stats.goals.total) goals += stats.goals.total;
+            console.log(goals);
             if (stats.goals.assists) assists += stats.goals.assists;
             if (stats.shots.on) shotsOn += stats.shots.on;
             if (stats.shots.total) shotsTotal += stats.shots.total;
@@ -123,8 +114,9 @@ export async function getResultFromLocal(fixtureID) {
   let response = await fetch(`matches/${fixtureID}.json`);
   if (!response.ok) {
     handleError(fixtureID);
-    let downloadedResponse = await downloadResultFromApi(fixtureID);
-    return downloadedResponse.response;
+    //let downloadedResponse = await downloadResultFromApi(fixtureID);
+    let response = downloadResult(await getResultFromApi(fixtureID), fixtureID);
+    return response;
     //return [];
   }
   return await response.json();

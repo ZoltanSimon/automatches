@@ -18,30 +18,6 @@ export async function getResultFromApi(matchID) {
   return data;
 }
 
-export async function downloadResultFromApi(matchID) {
-  const response = await fetch(
-    `https://v3.football.api-sports.io/fixtures?id=${matchID}`,
-    {
-      method: "GET",
-      headers: {
-        "x-rapidapi-host": rapidApiHost,
-        "x-rapidapi-key": rapidApiKey,
-      },
-    }
-  );
-  const data = await response.json();
-  var dataStr =
-    "data:text/json;charset=utf-8," +
-    encodeURIComponent(JSON.stringify(data.response));
-  var downloadAnchorNode = document.createElement("a");
-  downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", matchID + ".json");
-  document.body.appendChild(downloadAnchorNode); // required for firefox
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
-  return data;
-}
-
 export async function getStandingsFromApi(leagueID) {
   const response = await fetch(
     `https://v3.football.api-sports.io/standings?league=${leagueID}&season=${season}`,
