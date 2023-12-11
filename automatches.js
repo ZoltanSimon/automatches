@@ -60,6 +60,19 @@ document.getElementById("update-leagues").onclick = async function () {
   console.log(data);
 };
 
+document.getElementById("get-match-auto").onclick = async function () {
+  let fixtureID = document.getElementById("fixtureID").value;
+  const response = await fetch(
+    `http://localhost:3000/save-match?matchID=${fixtureID}`,
+    {
+      method: "GET",
+    }
+  );
+  const data = await response.json();
+  oneFixture(data);
+  console.log(data);
+};
+
 document.getElementById("missing-matches").onclick = async function () {
   let leagueID = selectedLeagues[0];
   const response = await fetch(
@@ -119,12 +132,6 @@ document.getElementById("a").onclick = async function () {
 
 document.getElementById("c").onclick = async function () {
   getAllPlayers();
-};
-
-document.getElementById("getMatch").onclick = async function () {
-  let fixtureID = document.getElementById("fixtureID").value;
-  matchFromApi = await getResultFromLocal(fixtureID);
-  oneFixture(matchFromApi);
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {

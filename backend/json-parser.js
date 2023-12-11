@@ -4,6 +4,7 @@ import express from "express";
 import { PORT } from "./config.js";
 import { getResultsDate, getResultFromApi } from "./../webapi-handler.js";
 import { createRequire } from "module";
+import { match } from "assert";
 
 const app = express();
 app.use(express.json());
@@ -42,6 +43,23 @@ app.get("/update-leagues", async (request, response) => {
         return console.log(err);
       }
       response.send("The file was saved!");
+    }
+  );
+});
+
+//saves match
+app.get("/save-match", async (request, response) => {
+  let matchID = request.query.matchID;
+  let dataToWrite = await getResultFromApi(matchID);
+  console.log(matchID);
+
+  fs.writeFile(
+    `../matches/${matchID}.json`,
+    JSON.stringify(dataToWrite.response),
+    { flag: "wx" },
+    function (err) {
+      if (err) throw err;
+      response.json(dataToWrite.response);
     }
   );
 });

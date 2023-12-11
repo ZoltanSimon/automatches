@@ -52,6 +52,7 @@ export function standingsToCanvas() {
     thisClub,
     l = 0;
   let standingsTable = document.getElementById("league-standings");
+  standingsTable.rows[0].style.backgroundColor = "#457B9D";
 
   if (standingsTable.rows.length < 20) yPos = 150;
 
