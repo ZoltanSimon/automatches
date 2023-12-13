@@ -10,8 +10,8 @@ let c = document.getElementById("myCanvas");
 export let ctx = c.getContext("2d");
 const font = "Source Sans Pro";
 const fontSize = 46;
-const backgroundImageName = "insta_new_no_pic.png";
-const borderImage = "border.png";
+const backgroundImageName = "images/insta_new_no_pic.png";
+const borderImage = "images/border.png";
 const lineheight = 50;
 let inputTextValue,
   newWidth,
@@ -26,8 +26,7 @@ export let imgs = {};
 
 const date = new Date();
 for (let i = 0; i < allLeagues.length; i++) {
-  console.log("ide");
-  let response = await fetch(`leagues/${allLeagues[i].id}.json`);
+  let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
   let league = await response.json();
   for (let j = 0; j < league.length; j++) {
     fixtureDate = new Date(league[j].fixture.date);
@@ -191,7 +190,7 @@ export function loadClubLogo(clubToLoad) {
 export function loadPlayerFace(playerToLoad) {
   var img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = `player-pictures/${playerToLoad}.png`;
+  img.src = `images/player-pictures/${playerToLoad}.png`;
   if (!imgs.players) imgs.players = [];
   imgs.players[playerToLoad] = img;
 }
