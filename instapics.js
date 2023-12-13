@@ -4,6 +4,7 @@ import { playerStatsToCanvas } from "./components/player-stats.js";
 import { standingsToCanvas } from "./components/league-standings.js";
 import { playerListToCanvas } from "./components/player-list.js";
 import { allLeagues } from "./data/leagues.js";
+import { imagePath, download } from "./common-functions.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c.getContext("2d");
@@ -25,6 +26,7 @@ export let imgs = {};
 
 const date = new Date();
 for (let i = 0; i < allLeagues.length; i++) {
+  console.log("ide");
   let response = await fetch(`leagues/${allLeagues[i].id}.json`);
   let league = await response.json();
   for (let j = 0; j < league.length; j++) {
@@ -126,6 +128,10 @@ document.getElementById("copy-selected").onclick = function () {
 
 document.getElementById("copy-player-list").onclick = function () {
   playerListToCanvas();
+};
+
+document.getElementById("download-image").onclick = function () {
+  download();
 };
 
 export function buildTableForTableType(lines, imgToAdd, yPos = 100) {

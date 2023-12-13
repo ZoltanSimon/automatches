@@ -74,7 +74,7 @@ app.get("/missing-matches", async (request, response) => {
   for (const element of data) {
     if (element.fixture.status.short == "FT")
       if (!fs.existsSync(`../matches/${element.fixture.id}.json`)) {
-        matchArr.push(`${element.fixture.id}`);
+        matchArr.push(element);
       }
   }
   response.json(matchArr);

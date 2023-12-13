@@ -14,6 +14,7 @@ import {
   getPlayerGoalList,
   getAllPlayers,
   getResultsByRoundLocal,
+  getMatch,
 } from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
@@ -62,15 +63,8 @@ document.getElementById("update-leagues").onclick = async function () {
 
 document.getElementById("get-match-auto").onclick = async function () {
   let fixtureID = document.getElementById("fixtureID").value;
-  const response = await fetch(
-    `http://localhost:3000/save-match?matchID=${fixtureID}`,
-    {
-      method: "GET",
-    }
-  );
-  const data = await response.json();
-  oneFixture(data);
-  console.log(data);
+  let match = await getMatch(fixtureID);
+  oneFixture(match);
 };
 
 document.getElementById("missing-matches").onclick = async function () {
@@ -82,6 +76,7 @@ document.getElementById("missing-matches").onclick = async function () {
     }
   );
   const data = await response.json();
+  matchList(data, true);
   console.log(data);
 };
 
@@ -108,7 +103,6 @@ document.getElementById("a").onclick = async function () {
   for (let i = 0; i < allLeagues.length; i++) {
     let response = await fetch(`leagues/${allLeagues[i].id}.json`);
     let league = await response.json();
-
     for (let j = 0; j < league.length; j++) {
       homeTeam = {
         id: league[j].teams.home.id,
@@ -128,6 +122,7 @@ document.getElementById("a").onclick = async function () {
       }
     }
   }
+  console.log(teamsNew);
 };
 
 document.getElementById("c").onclick = async function () {

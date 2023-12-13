@@ -4,6 +4,7 @@ import {
   imgs,
   loadPlayerFace,
 } from "./../instapics.js";
+import { removeNewlines } from "../common-functions.js";
 
 let width = 50;
 let values;
@@ -54,7 +55,6 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
   }
   addToPage += `</tbody></table>`;
   document.getElementById("one-fixture").innerHTML += addToPage;
-  console.log(removeNewlines(addToPage));
 }
 
 export function playerStatsToCanvas() {

@@ -1,6 +1,8 @@
 import { matchList } from "./components/match-list.js";
 import { getResultFromApi } from "./webapi-handler.js";
 import { selectedLeagues } from "./automatches.js";
+import { downloadResult } from "./common-functions.js";
+import { Player } from "./player.js";
 
 let allNationalComps = [
   "world-cup-2022",
@@ -12,25 +14,10 @@ let allPlayers = [];
 
 export async function getLocalPlayerStats(inputPlayer) {
   let playerFound;
-  let stats;
-  let goals = 0,
-    apps = 0,
-    minutes = 0,
-    assists = 0,
-    gaper90 = 0,
-    shotsTotal = 0,
-    shotsOn = 0,
-    dribblesSucc = 0,
-    dribblesAttempts = 0,
-    keyPasses = 0,
-    foulsDrawn = 0,
-    duelsWon = 0,
-    duelsTotal = 0,
-    playerName = "",
-    foundIndex = -1,
-    teamName = "",
-    competitions = [],
-    thisComp = "";
+  let foundIndex = -1;
+  let thisComp = "";
+
+  let player = new Player(inputPlayer);
   for (let i = 0; i < selectedLeagues.length; i++) {
     let response = await fetch(`leagues/${selectedLeagues[i]}.json`);
     let league = await response.json();
@@ -59,52 +46,20 @@ export async function getLocalPlayerStats(inputPlayer) {
             foundIndex = 0;
           }
           if (playerFound) {
-            console.log(match[0].teams);
             if (foundIndex == -1) foundIndex = 1;
-            stats = playerFound.statistics[0];
-
-            if (stats.goals.total) goals += stats.goals.total;
-            console.log(goals);
-            if (stats.goals.assists) assists += stats.goals.assists;
-            if (stats.shots.on) shotsOn += stats.shots.on;
-            if (stats.shots.total) shotsTotal += stats.shots.total;
-            if (stats.dribbles.attempts)
-              dribblesAttempts += stats.dribbles.attempts;
-            if (stats.dribbles.success) dribblesSucc += stats.dribbles.success;
-            if (stats.duels.won) duelsWon += stats.duels.won;
-            if (stats.duels.total) duelsTotal += stats.duels.total;
-            if (stats.passes.key) keyPasses += stats.passes.key;
-            if (stats.fouls.drawn) foulsDrawn += stats.fouls.drawn;
-            if (stats.games.minutes) apps++;
-            minutes += stats.games.minutes;
-            if (!playerName) playerName = playerFound.player.name;
-            if (!teamName) teamName = players[foundIndex].team.name;
-            if (competitions.indexOf(thisComp) == -1)
-              competitions.push(thisComp);
+            player.getPlayerStats(playerFound);
+            if (!player.team) player.team = players[foundIndex].team.name;
+            if (player.competitions.indexOf(thisComp) == -1)
+              player.competitionsList.push(thisComp);
           }
         }
-        gaper90 = (((goals + assists) * 90) / minutes).toFixed(2);
+        player.getGAper90();
       }
     }
   }
 
-  console.log(apps);
-  return {
-    name: playerName,
-    id: inputPlayer.id,
-    team: teamName,
-    apps: apps,
-    goals: goals,
-    assists: assists,
-    minutes: minutes,
-    gap90: gaper90,
-    shots: `${shotsOn} / ${shotsTotal}`,
-    dribbles: `${dribblesSucc} / ${dribblesAttempts}`,
-    duels: `${duelsWon} / ${duelsTotal}`,
-    key_passes: keyPasses,
-    fouls_drawn: foulsDrawn,
-    competitions: competitions.join(", "),
-  };
+  console.log(player);
+  return player;
 }
 
 export async function getResultFromLocal(fixtureID) {
@@ -216,4 +171,19 @@ export async function getResultsByRoundLocal(leagueID, roundNo) {
   }
   return allGames;
   //matchList(allGames);
+}
+
+export async function getMatch(fixtureID) {
+  if (fixtureID instanceof PointerEvent) {
+    fixtureID = fixtureID.target.innerHTML;
+  }
+  const response = await fetch(
+    `http://localhost:3000/save-match?matchID=${fixtureID}`,
+    {
+      method: "GET",
+    }
+  );
+  const data = await response.json();
+  console.log(data);
+  return data;
 }
