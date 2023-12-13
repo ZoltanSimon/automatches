@@ -1,16 +1,10 @@
 import {
   getResultsDate,
-  getTopScorer,
-  getTopAssists,
-  getResultFromApi,
   getStandingsFromApi,
-  getResults,
-  getCurrentRound,
   getSquad,
 } from "./webapi-handler.js";
 import {
   getLocalPlayerStats,
-  getResultFromLocal,
   getPlayerGoalList,
   getAllPlayers,
   getResultsByRoundLocal,
@@ -30,7 +24,6 @@ import { loadPlayerFace } from "./instapics.js";
 let addToPage;
 let standingsFromApi,
   resultsFromApi,
-  matchFromApi,
   playerFromApi,
   squadFromApi,
   playerFromApi2;
@@ -178,86 +171,6 @@ async function matchesByRound() {
   );
 
   matchList(resultsFromApi);
-}
-
-function setRound() {
-  let leagueID = selectedLeagues[0];
-  getCurrentRound(leagueID).then(
-    (response) =>
-      (document.getElementById("roundnr").value = response.response[0].replace(
-        "Regular Season - ",
-        ""
-      ))
-  );
-}
-
-function topScorers(response) {
-  let topScorerAr = response.response;
-  let it = 1;
-
-  addToPage = `<table>
-  <thead>    
-  <tr>
-  <th>#</th>
-  <th></th>
-  <th>Name</th>
-  <th>Team</th>
-  <th>Goals</th>
-  <th>G/90</th>
-  </tr>
-  </thead>`;
-
-  topScorerAr.forEach((a) => {
-    addToPage += `
-    <tr>
-        <td>${it}</td>
-        <td><img src="${a.player.photo}" width="50px"</td>
-        <td>${a.player.name}</td>
-        <td><img src=${imagePath(a.statistics[0].team.id)} width="30px"/></td>
-        <td>${a.statistics[0].goals.total}</td>
-        <td>${(
-          (a.statistics[0].goals.total * 90) /
-          a.statistics[0].games.minutes
-        ).toFixed(2)}</td>
-    </tr>`;
-    it++;
-  });
-  addToPage += `</table>`;
-  document.getElementById("top-scorers").innerHTML += addToPage;
-}
-
-function topAssists(response) {
-  let topScorerAr = response.response;
-  let it = 1;
-
-  addToPage = `<table>
-  <thead>    
-  <tr>
-  <th>#</th>
-  <th></th>
-  <th>Name</th>
-  <th>Team</th>
-  <th>Assists</th>
-  </tr>
-  </thead>`;
-
-  topScorerAr.forEach((a) => {
-    addToPage += `
-    <tr>
-        <td>${it}</td>
-        <td><img src="${a.player.photo}" width="50px"</td>
-        <td>${a.player.name}</td>
-        <td><img src=${imagePath(a.statistics[0].team.id)} width="30px"/></td>
-        <td>${a.statistics[0].goals.assists}</td>
-    </tr>`;
-    it++;
-  });
-  addToPage += `</table>`;
-  document.getElementById("top-scorers").innerHTML += addToPage;
-}
-
-function teamLink(name) {
-  return `https://generationfootball.net/world-cup-2022-qatar/world-cup-2022-teams/${name}`;
 }
 
 function addGoals(goals) {

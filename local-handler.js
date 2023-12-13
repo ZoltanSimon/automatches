@@ -19,7 +19,7 @@ export async function getLocalPlayerStats(inputPlayer) {
 
   let player = new Player(inputPlayer);
   for (let i = 0; i < selectedLeagues.length; i++) {
-    let response = await fetch(`leagues/${selectedLeagues[i]}.json`);
+    let response = await fetch(`data/leagues/${selectedLeagues[i]}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {
@@ -66,7 +66,7 @@ export async function getResultFromLocal(fixtureID) {
   if (fixtureID instanceof PointerEvent) {
     fixtureID = fixtureID.target.innerHTML;
   }
-  let response = await fetch(`matches/${fixtureID}.json`);
+  let response = await fetch(`data/matches/${fixtureID}.json`);
   if (!response.ok) {
     handleError(fixtureID);
     //let downloadedResponse = await downloadResultFromApi(fixtureID);
@@ -87,7 +87,7 @@ export async function getPlayerGoalList() {
   let scorer;
 
   for (let i = 0; i < selectedLeagues.length; i++) {
-    let response = await fetch(`leagues/${selectedLeagues[i]}.json`);
+    let response = await fetch(`data/leagues/${selectedLeagues[i]}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {

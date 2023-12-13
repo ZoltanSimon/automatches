@@ -4,7 +4,6 @@ import express from "express";
 import { PORT } from "./config.js";
 import { getResultsDate, getResultFromApi } from "./../webapi-handler.js";
 import { createRequire } from "module";
-import { match } from "assert";
 
 const app = express();
 app.use(express.json());
@@ -36,7 +35,7 @@ app.get("/update-leagues", async (request, response) => {
   let dataToWrite = await getResultsDate(leagueID);
 
   fs.writeFile(
-    `../leagues/${leagueID}.json`,
+    `../data/leagues/${leagueID}.json`,
     JSON.stringify(dataToWrite.response),
     function (err) {
       if (err) {
@@ -54,7 +53,7 @@ app.get("/save-match", async (request, response) => {
   console.log(matchID);
 
   fs.writeFile(
-    `../matches/${matchID}.json`,
+    `../data/matches/${matchID}.json`,
     JSON.stringify(dataToWrite.response),
     { flag: "wx" },
     function (err) {
@@ -68,12 +67,14 @@ app.get("/save-match", async (request, response) => {
 app.get("/missing-matches", async (request, response) => {
   let leagueID = request.query.leagueID;
   let matchArr = [];
-  let data = JSON.parse(await readFile(`../leagues/${leagueID}.json`, "utf8"));
+  let data = JSON.parse(
+    await readFile(`../data/leagues/${leagueID}.json`, "utf8")
+  );
   console.log(data[0]);
 
   for (const element of data) {
     if (element.fixture.status.short == "FT")
-      if (!fs.existsSync(`../matches/${element.fixture.id}.json`)) {
+      if (!fs.existsSync(`../data/matches/${element.fixture.id}.json`)) {
         matchArr.push(element);
       }
   }
@@ -87,7 +88,7 @@ app.get("/missing-matches", async (request, response) => {
 
 app.get("/get-all-matches", async (request, response) => {
   let bigArr = [];
-  const dirname = "../matches";
+  const dirname = "../data/matches";
   await readFiles(dirname);
   response.json(bigArr);
 });

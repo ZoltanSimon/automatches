@@ -6,7 +6,7 @@ export let download = function () {
 };
 
 export function imagePath(teamID) {
-  return `logos//${teamID}.png`;
+  return `images/logos/${teamID}.png`;
 }
 
 export function removeNewlines(str) {
