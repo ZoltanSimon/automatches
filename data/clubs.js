@@ -1,157 +1,5 @@
 export let clubs = [
   {
-    id: 162,
-    name: "Werder Bremen",
-  },
-  {
-    id: 157,
-    name: "Bayern Munich",
-  },
-  {
-    id: 168,
-    name: "Bayer Leverkusen",
-  },
-  {
-    id: 173,
-    name: "RB Leipzig",
-  },
-  {
-    id: 161,
-    name: "VfL Wolfsburg",
-  },
-  {
-    id: 180,
-    name: "FC Heidenheim",
-  },
-  {
-    id: 167,
-    name: "1899 Hoffenheim",
-  },
-  {
-    id: 160,
-    name: "SC Freiburg",
-  },
-  {
-    id: 170,
-    name: "FC Augsburg",
-  },
-  {
-    id: 163,
-    name: "Borussia Monchengladbach",
-  },
-  {
-    id: 172,
-    name: "VfB Stuttgart",
-  },
-  {
-    id: 176,
-    name: "VfL BOCHUM",
-  },
-  {
-    id: 165,
-    name: "Borussia Dortmund",
-  },
-  {
-    id: 192,
-    name: "FC Koln",
-  },
-  {
-    id: 182,
-    name: "Union Berlin",
-  },
-  {
-    id: 164,
-    name: "FSV Mainz 05",
-  },
-  {
-    id: 169,
-    name: "Eintracht Frankfurt",
-  },
-  {
-    id: 181,
-    name: "SV Darmstadt 98",
-  },
-  {
-    id: 723,
-    name: "Almeria",
-  },
-  {
-    id: 728,
-    name: "Rayo Vallecano",
-  },
-  {
-    id: 536,
-    name: "Sevilla",
-  },
-  {
-    id: 532,
-    name: "Valencia",
-  },
-  {
-    id: 548,
-    name: "Real Sociedad",
-  },
-  {
-    id: 547,
-    name: "Girona",
-  },
-  {
-    id: 534,
-    name: "Las Palmas",
-  },
-  {
-    id: 798,
-    name: "Mallorca",
-  },
-  {
-    id: 531,
-    name: "Athletic Club",
-  },
-  {
-    id: 541,
-    name: "Real Madrid",
-  },
-  {
-    id: 538,
-    name: "Celta Vigo",
-  },
-  {
-    id: 727,
-    name: "Osasuna",
-  },
-  {
-    id: 533,
-    name: "Villarreal",
-  },
-  {
-    id: 543,
-    name: "Real Betis",
-  },
-  {
-    id: 546,
-    name: "Getafe",
-  },
-  {
-    id: 529,
-    name: "Barcelona",
-  },
-  {
-    id: 724,
-    name: "Cadiz",
-  },
-  {
-    id: 542,
-    name: "Alaves",
-  },
-  {
-    id: 530,
-    name: "Atletico Madrid",
-  },
-  {
-    id: 715,
-    name: "Granada CF",
-  },
-  {
     id: 44,
     name: "Burnley",
   },
@@ -232,180 +80,92 @@ export let clubs = [
     name: "Wolves",
   },
   {
+    id: 723,
+    name: "Almeria",
+  },
+  {
+    id: 728,
+    name: "Rayo Vallecano",
+  },
+  {
+    id: 531,
+    name: "Athletic Club",
+  },
+  {
+    id: 541,
+    name: "Real Madrid",
+  },
+  {
+    id: 530,
+    name: "Atletico Madrid",
+  },
+  {
+    id: 715,
+    name: "Granada CF",
+  },
+  {
+    id: 538,
+    name: "Celta Vigo",
+  },
+  {
+    id: 727,
+    name: "Osasuna",
+  },
+  {
+    id: 536,
+    name: "Sevilla",
+  },
+  {
+    id: 532,
+    name: "Valencia",
+  },
+  {
+    id: 534,
+    name: "Las Palmas",
+  },
+  {
+    id: 798,
+    name: "Mallorca",
+  },
+  {
+    id: 546,
+    name: "Getafe",
+  },
+  {
+    id: 529,
+    name: "Barcelona",
+  },
+  {
+    id: 533,
+    name: "Villarreal",
+  },
+  {
+    id: 543,
+    name: "Real Betis",
+  },
+  {
+    id: 548,
+    name: "Real Sociedad",
+  },
+  {
+    id: 547,
+    name: "Girona",
+  },
+  {
+    id: 724,
+    name: "Cadiz",
+  },
+  {
+    id: 542,
+    name: "Alaves",
+  },
+  {
+    id: 500,
+    name: "Bologna",
+  },
+  {
     id: 489,
     name: "AC Milan",
-  },
-  {
-    id: 565,
-    name: "BSC Young Boys",
-  },
-  {
-    id: 209,
-    name: "Feyenoord",
-  },
-  {
-    id: 247,
-    name: "Celtic",
-  },
-  {
-    id: 487,
-    name: "Lazio",
-  },
-  {
-    id: 85,
-    name: "Paris Saint Germain",
-  },
-  {
-    id: 598,
-    name: "FK Crvena Zvezda",
-  },
-  {
-    id: 740,
-    name: "Antwerp",
-  },
-  {
-    id: 550,
-    name: "Shakhtar Donetsk",
-  },
-  {
-    id: 212,
-    name: "FC Porto",
-  },
-  {
-    id: 645,
-    name: "Galatasaray",
-  },
-  {
-    id: 400,
-    name: "FC Copenhagen",
-  },
-  {
-    id: 116,
-    name: "Lens",
-  },
-  {
-    id: 197,
-    name: "PSV Eindhoven",
-  },
-  {
-    id: 217,
-    name: "SC Braga",
-  },
-  {
-    id: 492,
-    name: "Napoli",
-  },
-  {
-    id: 211,
-    name: "Benfica",
-  },
-  {
-    id: 571,
-    name: "Red Bull Salzburg",
-  },
-  {
-    id: 505,
-    name: "Inter",
-  },
-  {
-    id: 1393,
-    name: "Union St. Gilloise",
-  },
-  {
-    id: 96,
-    name: "Toulouse",
-  },
-  {
-    id: 1026,
-    name: "Lask Linz",
-  },
-  {
-    id: 617,
-    name: "Panathinaikos",
-  },
-  {
-    id: 94,
-    name: "Rennes",
-  },
-  {
-    id: 4195,
-    name: "Maccabi Haifa",
-  },
-  {
-    id: 2184,
-    name: "Servette FC",
-  },
-  {
-    id: 560,
-    name: "Slavia Praha",
-  },
-  {
-    id: 568,
-    name: "Sheriff Tiraspol",
-  },
-  {
-    id: 497,
-    name: "AS Roma",
-  },
-  {
-    id: 367,
-    name: "BK Hacken",
-  },
-  {
-    id: 556,
-    name: "Qarabag",
-  },
-  {
-    id: 329,
-    name: "Molde",
-  },
-  {
-    id: 2646,
-    name: "TSC Backa Topola",
-  },
-  {
-    id: 553,
-    name: "Olympiakos Piraeus",
-  },
-  {
-    id: 194,
-    name: "Ajax",
-  },
-  {
-    id: 81,
-    name: "Marseille",
-  },
-  {
-    id: 575,
-    name: "AEK Athens FC",
-  },
-  {
-    id: 628,
-    name: "Sparta Praha",
-  },
-  {
-    id: 3408,
-    name: "Aris",
-  },
-  {
-    id: 257,
-    name: "Rangers",
-  },
-  {
-    id: 499,
-    name: "Atalanta",
-  },
-  {
-    id: 3491,
-    name: "Raków Częstochowa",
-  },
-  {
-    id: 637,
-    name: "Sturm Graz",
-  },
-  {
-    id: 228,
-    name: "Sporting CP",
   },
   {
     id: 511,
@@ -420,6 +180,10 @@ export let clubs = [
     name: "Frosinone",
   },
   {
+    id: 492,
+    name: "Napoli",
+  },
+  {
     id: 495,
     name: "Genoa",
   },
@@ -428,8 +192,24 @@ export let clubs = [
     name: "Fiorentina",
   },
   {
+    id: 505,
+    name: "Inter",
+  },
+  {
     id: 1579,
     name: "Monza",
+  },
+  {
+    id: 867,
+    name: "Lecce",
+  },
+  {
+    id: 487,
+    name: "Lazio",
+  },
+  {
+    id: 497,
+    name: "AS Roma",
   },
   {
     id: 514,
@@ -440,16 +220,8 @@ export let clubs = [
     name: "Sassuolo",
   },
   {
-    id: 867,
-    name: "Lecce",
-  },
-  {
-    id: 494,
-    name: "Udinese",
-  },
-  {
-    id: 496,
-    name: "Juventus",
+    id: 499,
+    name: "Atalanta",
   },
   {
     id: 503,
@@ -460,8 +232,116 @@ export let clubs = [
     name: "Cagliari",
   },
   {
-    id: 500,
-    name: "Bologna",
+    id: 494,
+    name: "Udinese",
+  },
+  {
+    id: 496,
+    name: "Juventus",
+  },
+  {
+    id: 162,
+    name: "Werder Bremen",
+  },
+  {
+    id: 157,
+    name: "Bayern Munich",
+  },
+  {
+    id: 165,
+    name: "Borussia Dortmund",
+  },
+  {
+    id: 192,
+    name: "FC Koln",
+  },
+  {
+    id: 182,
+    name: "Union Berlin",
+  },
+  {
+    id: 164,
+    name: "FSV Mainz 05",
+  },
+  {
+    id: 168,
+    name: "Bayer Leverkusen",
+  },
+  {
+    id: 173,
+    name: "RB Leipzig",
+  },
+  {
+    id: 169,
+    name: "Eintracht Frankfurt",
+  },
+  {
+    id: 181,
+    name: "SV Darmstadt 98",
+  },
+  {
+    id: 161,
+    name: "VfL Wolfsburg",
+  },
+  {
+    id: 180,
+    name: "FC Heidenheim",
+  },
+  {
+    id: 167,
+    name: "1899 Hoffenheim",
+  },
+  {
+    id: 160,
+    name: "SC Freiburg",
+  },
+  {
+    id: 170,
+    name: "FC Augsburg",
+  },
+  {
+    id: 163,
+    name: "Borussia Monchengladbach",
+  },
+  {
+    id: 172,
+    name: "VfB Stuttgart",
+  },
+  {
+    id: 176,
+    name: "VfL BOCHUM",
+  },
+  {
+    id: 85,
+    name: "Paris Saint Germain",
+  },
+  {
+    id: 97,
+    name: "Lorient",
+  },
+  {
+    id: 95,
+    name: "Strasbourg",
+  },
+  {
+    id: 80,
+    name: "Lyon",
+  },
+  {
+    id: 94,
+    name: "Rennes",
+  },
+  {
+    id: 112,
+    name: "Metz",
+  },
+  {
+    id: 81,
+    name: "Marseille",
+  },
+  {
+    id: 93,
+    name: "Reims",
   },
   {
     id: 84,
@@ -470,18 +350,6 @@ export let clubs = [
   {
     id: 79,
     name: "Lille",
-  },
-  {
-    id: 93,
-    name: "Reims",
-  },
-  {
-    id: 97,
-    name: "Lorient",
-  },
-  {
-    id: 106,
-    name: "Stade Brestois 29",
   },
   {
     id: 99,
@@ -496,6 +364,10 @@ export let clubs = [
     name: "Nantes",
   },
   {
+    id: 96,
+    name: "Toulouse",
+  },
+  {
     id: 82,
     name: "Montpellier",
   },
@@ -504,16 +376,284 @@ export let clubs = [
     name: "LE Havre",
   },
   {
-    id: 112,
-    name: "Metz",
+    id: 106,
+    name: "Stade Brestois 29",
   },
   {
-    id: 95,
-    name: "Strasbourg",
+    id: 116,
+    name: "Lens",
   },
   {
-    id: 80,
-    name: "Lyon",
+    id: 3345,
+    name: "Atlètic Club d'Escaldes",
+  },
+  {
+    id: 579,
+    name: "Buducnost Podgorica",
+  },
+  {
+    id: 700,
+    name: "Tre Penne",
+  },
+  {
+    id: 276,
+    name: "Breidablik",
+  },
+  {
+    id: 367,
+    name: "BK Hacken",
+  },
+  {
+    id: 354,
+    name: "The New Saints",
+  },
+  {
+    id: 12733,
+    name: "Ballkani",
+  },
+  {
+    id: 566,
+    name: "Ludogorets",
+  },
+  {
+    id: 586,
+    name: "FK Zalgiris Vilnius",
+  },
+  {
+    id: 4346,
+    name: "Struga",
+  },
+  {
+    id: 701,
+    name: "KI Klaksvik",
+  },
+  {
+    id: 651,
+    name: "Ferencvarosi TC",
+  },
+  {
+    id: 677,
+    name: "Olimpija Ljubljana",
+  },
+  {
+    id: 4153,
+    name: "Valmiera / BSS",
+  },
+  {
+    id: 649,
+    name: "HJK helsinki",
+  },
+  {
+    id: 5354,
+    name: "Larne",
+  },
+  {
+    id: 667,
+    name: "Lincoln Red Imps FC",
+  },
+  {
+    id: 556,
+    name: "Qarabag",
+  },
+  {
+    id: 3491,
+    name: "Raków Częstochowa",
+  },
+  {
+    id: 687,
+    name: "Flora Tallinn",
+  },
+  {
+    id: 656,
+    name: "Slovan Bratislava",
+  },
+  {
+    id: 11907,
+    name: "Swift Hesperange",
+  },
+  {
+    id: 2596,
+    name: "Farul Constanta",
+  },
+  {
+    id: 568,
+    name: "Sheriff Tiraspol",
+  },
+  {
+    id: 4626,
+    name: "Hamrun Spartans",
+  },
+  {
+    id: 4195,
+    name: "Maccabi Haifa",
+  },
+  {
+    id: 2276,
+    name: "FC Urartu",
+  },
+  {
+    id: 588,
+    name: "Zrinjski",
+  },
+  {
+    id: 708,
+    name: "Partizani",
+  },
+  {
+    id: 388,
+    name: "Bate Borisov",
+  },
+  {
+    id: 562,
+    name: "FC Astana",
+  },
+  {
+    id: 2262,
+    name: "Dinamo Tbilisi",
+  },
+  {
+    id: 3623,
+    name: "Dnipro-1",
+  },
+  {
+    id: 617,
+    name: "Panathinaikos",
+  },
+  {
+    id: 2184,
+    name: "Servette FC",
+  },
+  {
+    id: 742,
+    name: "Genk",
+  },
+  {
+    id: 652,
+    name: "Shamrock Rovers",
+  },
+  {
+    id: 645,
+    name: "Galatasaray",
+  },
+  {
+    id: 620,
+    name: "Dinamo Zagreb",
+  },
+  {
+    id: 400,
+    name: "FC Copenhagen",
+  },
+  {
+    id: 329,
+    name: "Molde",
+  },
+  {
+    id: 3408,
+    name: "Aris",
+  },
+  {
+    id: 217,
+    name: "SC Braga",
+  },
+  {
+    id: 2646,
+    name: "TSC Backa Topola",
+  },
+  {
+    id: 197,
+    name: "PSV Eindhoven",
+  },
+  {
+    id: 637,
+    name: "Sturm Graz",
+  },
+  {
+    id: 575,
+    name: "AEK Athens FC",
+  },
+  {
+    id: 628,
+    name: "Sparta Praha",
+  },
+  {
+    id: 257,
+    name: "Rangers",
+  },
+  {
+    id: 565,
+    name: "BSC Young Boys",
+  },
+  {
+    id: 740,
+    name: "Antwerp",
+  },
+  {
+    id: 209,
+    name: "Feyenoord",
+  },
+  {
+    id: 247,
+    name: "Celtic",
+  },
+  {
+    id: 598,
+    name: "FK Crvena Zvezda",
+  },
+  {
+    id: 550,
+    name: "Shakhtar Donetsk",
+  },
+  {
+    id: 212,
+    name: "FC Porto",
+  },
+  {
+    id: 211,
+    name: "Benfica",
+  },
+  {
+    id: 571,
+    name: "Red Bull Salzburg",
+  },
+  {
+    id: 560,
+    name: "Slavia Praha",
+  },
+  {
+    id: 553,
+    name: "Olympiakos Piraeus",
+  },
+  {
+    id: 1393,
+    name: "Union St. Gilloise",
+  },
+  {
+    id: 606,
+    name: "FC Lugano",
+  },
+  {
+    id: 599,
+    name: "Zorya Luhansk",
+  },
+  {
+    id: 2656,
+    name: "Cukaricki",
+  },
+  {
+    id: 194,
+    name: "Ajax",
+  },
+  {
+    id: 1026,
+    name: "Lask Linz",
+  },
+  {
+    id: 252,
+    name: "Aberdeen",
+  },
+  {
+    id: 228,
+    name: "Sporting CP",
   },
   {
     id: 189,

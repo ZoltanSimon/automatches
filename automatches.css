@@ -39,7 +39,9 @@ td a {
 #dateEnd,
 #fixtureID,
 #playerID,
-#playerID2 {
+#playerID2,
+#roundNr,
+#teamID {
   width: 150px;
 }
 
@@ -53,4 +55,22 @@ td a {
 
 .selected-league {
   border: 2px solid red;
+}
+
+.automatches-row {
+  margin-bottom: 3px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.automatches-row * {
+  flex: 1 1 0px;
+}
+
+.thirtythree {
+  width: 33%;
+}
+
+#submit-league-info {
+  margin-bottom: 3px;
 }

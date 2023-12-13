@@ -5,7 +5,8 @@ import {
   loadClubLogo,
 } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
-import { getResultFromLocal } from "../local-handler.js";
+import { getResultFromLocal, getMatch } from "../local-handler.js";
+import { imagePath, truncate } from "../common-functions.js";
 
 let imgToAdd = [];
 let yPos = 154;
@@ -66,7 +67,7 @@ export function matchList(fixtures, showID = false) {
 
   document
     .querySelectorAll(".match-id")
-    .forEach((e) => e.addEventListener("click", getResultFromLocal));
+    .forEach((e) => e.addEventListener("click", getMatch));
 }
 
 export function matchesToCanvas(sourceDiv) {
