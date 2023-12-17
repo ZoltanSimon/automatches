@@ -77,6 +77,12 @@ document.getElementById("textOnPic").onkeyup = function () {
   make_base(inputTextValue, breakingText);
 };
 
+document.getElementById("add-breaking").onclick = function () {
+  console.log(document.getElementById("add-breaking").innerHTML);
+  document.getElementById("breaking-official").value =
+    document.getElementById("add-breaking").innerHTML;
+};
+
 document.getElementById("pasteArea").onpaste = function (event) {
   // use event.originalEvent.clipboard for newer chrome versions
   var items = (event.clipboardData || event.originalEvent.clipboardData).items;

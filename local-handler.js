@@ -50,7 +50,7 @@ export async function getLocalPlayerStats(inputPlayer) {
             player.getPlayerStats(playerFound);
             if (!player.team) player.team = players[foundIndex].team.name;
             if (player.competitions.indexOf(thisComp) == -1)
-              player.competitionsList.push(thisComp);
+              player.competitionList.push(thisComp);
           }
         }
         player.getGAper90();
@@ -127,7 +127,7 @@ export async function getAllPlayers() {
 async function getPlayerList(compType, compList) {
   let player, thisClub;
   for (let i = 0; i < compList.length; i++) {
-    let response = await fetch(`leagues/${compList[i]}.json`);
+    let response = await fetch(`data/leagues/${compList[i]}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {
@@ -160,7 +160,7 @@ export async function getResultsByRoundLocal(leagueID, roundNo) {
   console.log(leagueID);
   console.log(roundNo);
   let allGames = [];
-  let response = await fetch(`leagues/${leagueID}.json`);
+  let response = await fetch(`data/leagues/${leagueID}.json`);
   let league = await response.json();
   console.log(league);
   for (let i = 0; i < league.length; i++) {
@@ -183,6 +183,7 @@ export async function getMatch(fixtureID) {
       method: "GET",
     }
   );
+  console.log("ide");
   const data = await response.json();
   console.log(data);
   return data;

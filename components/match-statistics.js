@@ -6,6 +6,7 @@ import {
 } from "./../instapics.js";
 import { Stat } from "../stat.js";
 import { clubs } from "./../data/clubs.js";
+import { removeNewlines } from "../common-functions.js";
 
 const tds = `<td width='33%' style='text-align: center; border-color: #1D3557; padding: 10px;'>`;
 

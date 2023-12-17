@@ -5,8 +5,13 @@ import {
   loadClubLogo,
 } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
-import { getResultFromLocal, getMatch } from "../local-handler.js";
-import { imagePath, truncate } from "../common-functions.js";
+import { getMatch } from "../local-handler.js";
+import {
+  imagePath,
+  truncate,
+  htmlDecode,
+  removeNewlines,
+} from "../common-functions.js";
 
 let imgToAdd = [];
 let yPos = 154;
@@ -140,7 +145,7 @@ export function matchesToCanvas(sourceDiv) {
     } else {
       ctx.fillText("Season 2023/24", 540, yPos + 58 + rowCount * 77);
       ctx.fillStyle = "#e63946";
-      ctx.fillText("Games to watch today, 9th of December", 540, yPos - 22);
+      ctx.fillText("Games to watch over the weekend", 540, yPos - 22);
     }
 
   console.log(removeNewlines(matchesTable.outerHTML));
