@@ -20,6 +20,7 @@ import { playerGoalList } from "./components/player-list.js";
 import { players } from "./data/players.js";
 import { allLeagues } from "./data/leagues.js";
 import { loadPlayerFace } from "./instapics.js";
+import { imagePath } from "./common-functions.js";
 
 let addToPage;
 let standingsFromApi,
@@ -237,10 +238,10 @@ function oneFixture(response) {
   <table>
     <tr>
       <td><img src=${imagePath(homeTeam.id)} width="30px"></td>
-      <td><a href="${teamLink(homeTeam.name)}/">${homeTeam.name}</a></td>
+      <td><a href="${homeTeam.name}/">${homeTeam.name}</a></td>
       <td width="30px">${fixture.goals.home || 0}</td>
       <td><img src=${imagePath(awayTeam.id)} width="30px"</td>
-      <td><a href="${teamLink(awayTeam.name)}/">${awayTeam.name}</a></td>
+      <td><a href="${awayTeam.name}/">${awayTeam.name}</a></td>
       <td width="30px">${fixture.goals.away || 0}</td>
     </tr>
   </table>

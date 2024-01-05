@@ -1,6 +1,6 @@
-import { buildTableForTableType, imgs } from "./../instapics.js";
+import { buildTableForTableType, imgs, loadClubLogo } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
-import { loadClubLogo } from "./../instapics.js";
+import { imagePath, removeNewlines } from "./../common-functions.js";
 
 export function leagueStandings(response) {
   let standings = response.response[0].league.standings;

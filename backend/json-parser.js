@@ -57,7 +57,10 @@ app.get("/save-match", async (request, response) => {
     JSON.stringify(dataToWrite.response),
     { flag: "wx" },
     function (err) {
-      if (err) throw err;
+      if (err) {
+        console.log("Already exists");
+        //throw err;
+      }
       response.json(dataToWrite.response);
     }
   );
