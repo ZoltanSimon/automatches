@@ -15,4 +15,5 @@ export let allLeagues = [
     type: "quali",
   },
   { id: 1, name: "world-cup-2022", teams: "nt", type: "tournament" },
+  { id: 45, name: "fa-cup", teams: "club", type: "tournament" },
 ];

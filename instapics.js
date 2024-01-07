@@ -19,7 +19,6 @@ let inputTextValue,
   base_image,
   imgHeight,
   fontY,
-  breakingText,
   fixtureDate,
   matches = [];
 export let imgs = {};
@@ -59,21 +58,22 @@ function make_base(text, breakingText) {
     fontY = 1080 - 30 - lines.length * 50;
 
     if (breakingText) {
-      ctx.font = `bold ${fontSize + 20}px ${font}`; //title
-      ctx.fillStyle = "#e63946"; //red
-      ctx.fillText(breakingText, 540, fontY - 50);
+      writeStrokedText({
+        text: [breakingText],
+        fontSize: fontSize + 20,
+        strokeStyle: "#1d3557",
+        fillStyle: "#e63946",
+        lineWidth: 4,
+        y: fontY - 56,
+      });
     }
-    ctx.fillStyle = "#1d3557"; //blue
-    ctx.font = `bold ${fontSize}px ${font}`;
-    for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], 540, fontY + i * lineheight);
-    }
+    writeStrokedText({ text: lines, fontSize: fontSize, y: fontY });
   };
 }
 
 document.getElementById("textOnPic").onkeyup = function () {
   inputTextValue = document.getElementById("textOnPic").value;
-  breakingText = document.getElementById("breaking-official").value;
+  let breakingText = document.getElementById("breaking-official").value;
   make_base(inputTextValue, breakingText);
 };
 
@@ -84,6 +84,7 @@ document.getElementById("add-breaking").onclick = function () {
 };
 
 document.getElementById("pasteArea").onpaste = function (event) {
+  let breakingText = document.getElementById("breaking-official").value;
   // use event.originalEvent.clipboard for newer chrome versions
   var items = (event.clipboardData || event.originalEvent.clipboardData).items;
   // find pasted image among pasted items
@@ -98,7 +99,7 @@ document.getElementById("pasteArea").onpaste = function (event) {
     var reader = new FileReader();
     reader.onload = function (event) {
       imgHeight = fontY - 34 - lineheight;
-      if (breakingText) imgHeight -= 60;
+      if (breakingText) imgHeight -= 66;
 
       base_image = new Image();
       base_image.src = event.target.result;
@@ -143,15 +144,13 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
   ctx.drawImage(border_image, 0, 0);
 
-  let theTable = "<table" + lines.split("<table")[1];
-  let theText = lines.split("<table")[0];
-  var data = `<svg xmlns='http://www.w3.org/2000/svg' width='880'>
+  let data = `<svg xmlns='http://www.w3.org/2000/svg' width='880'>
     <foreignObject width='100%' height='100%'>
     <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>
-    ${theTable}
+    ${lines}
     </div></foreignObject></svg>`;
 
-  var img = new Image();
+  let img = new Image();
   img.onload = function () {
     ctx.drawImage(img, (1080 - img.width) / 2, yPos);
     for (let i = 0; i < imgToAdd.length; i++) {
@@ -166,7 +165,6 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   };
 
   img.src = buildSvgImageUrl(data);
-  ctx.fillText(theText, 540, 160);
 }
 
 function drawResizedImage(image, imgHeight, startX, startY) {
@@ -199,4 +197,23 @@ export function loadPlayerFace(playerToLoad) {
   img.src = `images/player-pictures/${playerToLoad}.png`;
   if (!imgs.players) imgs.players = [];
   imgs.players[playerToLoad] = img;
+}
+
+export function writeStrokedText({
+  text,
+  fontSize = 46,
+  strokeStyle = "black",
+  fillStyle = "#1d3557",
+  lineWidth = 2,
+  x = 540,
+  y,
+} = {}) {
+  ctx.font = `bold ${fontSize}px ${font}`; //title
+  ctx.strokeStyle = strokeStyle;
+  ctx.lineWidth = lineWidth;
+  ctx.fillStyle = fillStyle;
+  for (let i = 0; i < text.length; i++) {
+    ctx.strokeText(text[i], x, y + i * lineheight);
+    ctx.fillText(text[i], x, y + i * lineheight);
+  }
 }

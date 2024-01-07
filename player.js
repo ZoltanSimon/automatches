@@ -28,7 +28,6 @@ export class Player {
     let stats = playerFound.statistics[0];
 
     console.log(stats);
-    console.log(stats.goals.total);
     if (stats.goals.total) this.goals += stats.goals.total;
     if (stats.goals.assists) this.assists += stats.goals.assists;
     if (stats.shots.on) this.shotsOn += stats.shots.on;
@@ -43,7 +42,6 @@ export class Player {
     if (stats.games.minutes) this.apps++;
     this.minutes += stats.games.minutes;
     if (!this.name) this.name = playerFound.player.name;
-    console.log(this.goals);
   }
 
   getGAper90() {

@@ -3,6 +3,7 @@ import {
   imgs,
   ctx,
   loadClubLogo,
+  writeStrokedText,
 } from "./../instapics.js";
 import { Stat } from "../stat.js";
 import { clubs } from "./../data/clubs.js";
@@ -108,12 +109,14 @@ export function matchStatsToCanvas() {
     imgToAdd,
     180
   );
-  //ctx.fillStyle = "#e63946";
-  //ctx.fillText(leagueName, 540, 960);
-  console.log(leagueName);
+
   let rounNo = leagueName.split(" - ")[0];
   let league = leagueName.split(" - ")[leagueName.split(" - ").length - 1];
   ctx.fillText(rounNo, 540, 922);
-  ctx.fillStyle = "#e63946";
-  ctx.fillText(league, 540, 130);
+  writeStrokedText({
+    text: [league],
+    strokeStyle: "#1d3557",
+    fillStyle: "#e63946",
+    y: 130,
+  });
 }

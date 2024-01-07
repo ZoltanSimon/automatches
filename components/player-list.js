@@ -1,4 +1,5 @@
 import { buildTableForTableType, imgs, ctx } from "./../instapics.js";
+import { removeNewlines } from "../common-functions.js";
 
 export function playerGoalList(response) {
   console.log(response);
