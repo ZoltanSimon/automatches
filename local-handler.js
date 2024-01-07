@@ -183,7 +183,6 @@ export async function getMatch(fixtureID) {
       method: "GET",
     }
   );
-  console.log("ide");
   const data = await response.json();
   console.log(data);
   return data;

@@ -143,9 +143,10 @@ export function matchesToCanvas(sourceDiv) {
       ctx.fillStyle = "#e63946";
       ctx.fillText(leagueName, 540, yPos - 22);
     } else {
+      let bottomText = document.getElementById("breaking-official").value;
       ctx.fillText("Season 2023/24", 540, yPos + 58 + rowCount * 77);
       ctx.fillStyle = "#e63946";
-      ctx.fillText("Games to watch over the weekend", 540, yPos - 22);
+      ctx.fillText(bottomText, 540, yPos - 22);
     }
 
   console.log(removeNewlines(matchesTable.outerHTML));
