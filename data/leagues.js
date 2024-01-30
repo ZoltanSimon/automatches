@@ -16,4 +16,6 @@ export let allLeagues = [
   },
   { id: 1, name: "world-cup-2022", teams: "nt", type: "tournament" },
   { id: 45, name: "fa-cup", teams: "club", type: "tournament" },
+  { id: 556, name: "spanish-super-cup", teams: "club", type: "tournament" },
+  { id: 6, name: "afcon", teams: "nt", type: "tournament" },
 ];

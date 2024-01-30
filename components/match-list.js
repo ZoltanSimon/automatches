@@ -3,6 +3,7 @@ import {
   imgs,
   ctx,
   loadClubLogo,
+  writeStrokedText,
 } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
 import { getMatch } from "../local-handler.js";
@@ -126,6 +127,9 @@ export function matchesToCanvas(sourceDiv) {
       htmlDecode(thisTr.children[4].innerHTML).includes(element.name)
     );
 
+    console.log(thisTr.children[1].innerHTML);
+    console.log(logo1);
+
     thisTr.children[1].innerHTML = "";
     thisTr.children[4].innerHTML = "";
 
@@ -135,13 +139,17 @@ export function matchesToCanvas(sourceDiv) {
 
   if (rowCount <= 11)
     if (sourceDiv == "match-list") {
-      ctx.fillText(
-        "Round " + round.split(" - ")[1],
-        540,
-        yPos + 58 + rowCount * 77
-      );
-      ctx.fillStyle = "#e63946";
-      ctx.fillText(leagueName, 540, yPos - 22);
+      writeStrokedText({
+        text: ["Round " + round.split(" - ")[1]],
+        y: yPos + 58 + rowCount * 77,
+      });
+      writeStrokedText({
+        text: [leagueName],
+        strokeStyle: "#1d3557",
+        fillStyle: "#e63946",
+        lineWidth: 2,
+        y: yPos - 22,
+      });
     } else {
       let bottomText = document.getElementById("breaking-official").value;
       ctx.fillText("Season 2023/24", 540, yPos + 58 + rowCount * 77);

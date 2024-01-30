@@ -124,7 +124,7 @@ let lasts = [
 
 let Napolis = [`Napoli `];
 
-export function addText(fixtures, standingsObj) {
+export function addText(fixtures) {
   let textToPage = ``;
   let matchEnding, leader, firstPart, finalPart;
 
@@ -137,7 +137,7 @@ export function addText(fixtures, standingsObj) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);
   });
 
-  let standings = standingsObj.response[0].league.standings;
+  /*let standings = standingsObj.response[0].league.standings;
   standings.forEach((group) => {
     group.forEach((a, index) => {
       if (index == 0) {
@@ -150,7 +150,7 @@ export function addText(fixtures, standingsObj) {
     });
     document.getElementById("standings_text").innerHTML += textToPage;
   });
-  textToPage = "";
+  textToPage = "";*/
 
   fixtures.forEach((a, index) => {
     matchEnding = matchEndings[Math.floor(Math.random() * matchEndings.length)];
@@ -183,7 +183,7 @@ export function addText(fixtures, standingsObj) {
     );
   });
 
-  document.getElementById("results_text").innerHTML += textToPage;
+  document.getElementById("generated-text").value += textToPage;
 }
 
 function buildMatch(homeTeam, awayTeam, firstPart, finalPart) {

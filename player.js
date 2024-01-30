@@ -27,7 +27,6 @@ export class Player {
   getPlayerStats(playerFound) {
     let stats = playerFound.statistics[0];
 
-    console.log(stats);
     if (stats.goals.total) this.goals += stats.goals.total;
     if (stats.goals.assists) this.assists += stats.goals.assists;
     if (stats.shots.on) this.shotsOn += stats.shots.on;

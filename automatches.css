@@ -30,8 +30,15 @@ td a {
 .floating-buttons {
   width: 400px;
   position: absolute;
-  left: 80%;
-  top: 45%;
+  left: 83%;
+  top: 50%;
+  z-index: 99999;
+}
+
+.floating-text {
+  position: absolute;
+  left: 72%;
+  top: 51%;
   z-index: 99999;
 }
 
