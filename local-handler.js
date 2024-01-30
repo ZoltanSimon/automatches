@@ -3,12 +3,7 @@ import { getResultFromApi } from "./webapi-handler.js";
 import { selectedLeagues } from "./automatches.js";
 import { downloadResult } from "./common-functions.js";
 import { Player } from "./player.js";
-
-let allNationalComps = [
-  "world-cup-2022",
-  "world-cup-qualifiers-south-america",
-  "euro-quali",
-];
+import { allLeagues } from "./data/leagues.js";
 
 let allPlayers = [];
 
@@ -95,7 +90,6 @@ export async function getPlayerGoalList() {
         let match = await getResultFromLocal(league[i].fixture.id);
         if (match[0]) {
           for (let j = 0; j < match[0].events.length; j++) {
-            console.log(match[0].events[j]);
             if (match[0].events[j].type == "Goal") {
               scorer = match[0].events[j].player;
               if (!scorerList.find((e) => e.id == scorer.id)) {
@@ -119,15 +113,112 @@ export async function getPlayerGoalList() {
 }
 
 export async function getAllPlayers() {
-  await getPlayerList("club", selectedLeagues);
-  await getPlayerList("nation", allNationalComps);
+  await getPlayerList("club", allLeagues);
+  //await getPlayerList("nation", allNationalComps);
   console.log(allPlayers);
+}
+
+export async function getAllMatches() {
+  let teams = [];
+  let t1, t2;
+  let it = 0;
+  const response = await fetch(`http://localhost:3000/get-league-matches`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  console.log(data);
+  for (let match of data) {
+    /*for (let team of match[0].statistics) {
+      //console.log(team);
+      const found = teams.find((element) => element.name == team.team.name);
+      //console.log(found);
+      //if (teams.some((e) => e.name === team.team.name)) {
+      if (found) {
+        found.xg += parseFloat(team.statistics[16].value);
+        found.matches += 1;
+      } else {
+        teams.push({
+          name: team.team.name,
+          id: team.team.id,
+          matches: 1,
+          xg: parseFloat(team.statistics[16].value),
+        });
+      }
+    }*/
+    let team1 = match[0].statistics[0].team;
+    let team2 = match[0].statistics[1].team;
+
+    let found1 = teams.find((element) => element.name == team1.name);
+    let found2 = teams.find((element) => element.name == team2.name);
+
+    console.log(found1);
+    console.log(found2);
+
+    if (found1 !== undefined) {
+      team1 = found1;
+    } else {
+      team1.stats = [];
+      team1.xg = 0;
+      team1.xg_against = 0;
+      team1.goals = 0;
+      team1.goals_against = 0;
+      teams.push(team1);
+    }
+    if (found2 !== undefined) {
+      team2 = found2;
+    } else {
+      team2.stats = [];
+      team2.xg = 0;
+      team2.xg_against = 0;
+      team2.goals = 0;
+      team2.goals_against = 0;
+      teams.push(team2);
+    }
+
+    console.log(team1);
+    console.log(team2);
+
+    t1 = {};
+    t2 = {};
+    t1.goalsFor = match[0].score.fulltime.home;
+    t1.goalsAgainst = match[0].score.fulltime.away;
+    t2.goalsFor = match[0].score.fulltime.away;
+    t2.goalsAgainst = match[0].score.fulltime.home;
+    t1.xg = parseFloat(match[0].statistics[0].statistics[16].value);
+    t2.xg = parseFloat(match[0].statistics[1].statistics[16].value);
+    t1.xg_against = parseFloat(match[0].statistics[1].statistics[16].value);
+    t2.xg_against = parseFloat(match[0].statistics[0].statistics[16].value);
+    team1.stats.push(t1);
+    team2.stats.push(t2);
+    console.log(team1);
+    console.log(team2);
+  }
+
+  console.log(teams);
+
+  for (let team of teams) {
+    for (let stat of team.stats) {
+      console.log(stat);
+      team.xg += stat.xg;
+      team.xg_against += stat.xg_against;
+      team.goals += stat.goalsFor;
+      team.goals_against += stat.goalsAgainst;
+    }
+  }
+
+  teams.sort((a, b) => b.xg - a.xg); // b - a for reverse sort
+
+  console.log(teams);
+
+  teams.sort((a, b) => a.xg_against - b.xg_against); // b - a for reverse sort
+
+  console.log(teams);
 }
 
 async function getPlayerList(compType, compList) {
   let player, thisClub;
   for (let i = 0; i < compList.length; i++) {
-    let response = await fetch(`data/leagues/${compList[i]}.json`);
+    let response = await fetch(`data/leagues/${compList[i].id}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {
@@ -157,14 +248,12 @@ async function getPlayerList(compType, compList) {
 }
 
 export async function getResultsByRoundLocal(leagueID, roundNo) {
-  console.log(leagueID);
-  console.log(roundNo);
+  console.log(`${leagueID} ${roundNo}`);
   let allGames = [];
   let response = await fetch(`data/leagues/${leagueID}.json`);
   let league = await response.json();
   console.log(league);
   for (let i = 0; i < league.length; i++) {
-    console.log(league[i].league.round);
     if (league[i].league.round == roundNo) {
       allGames.push(league[i]);
     }

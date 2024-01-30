@@ -78,9 +78,13 @@ document.getElementById("textOnPic").onkeyup = function () {
 };
 
 document.getElementById("add-breaking").onclick = function () {
-  console.log(document.getElementById("add-breaking").innerHTML);
   document.getElementById("breaking-official").value =
     document.getElementById("add-breaking").innerHTML;
+};
+
+document.getElementById("happy-bday").onclick = function () {
+  document.getElementById("breaking-official").value =
+    document.getElementById("happy-bday").innerHTML;
 };
 
 document.getElementById("pasteArea").onpaste = function (event) {
@@ -204,7 +208,7 @@ export function writeStrokedText({
   fontSize = 46,
   strokeStyle = "black",
   fillStyle = "#1d3557",
-  lineWidth = 2,
+  lineWidth = 1,
   x = 540,
   y,
 } = {}) {

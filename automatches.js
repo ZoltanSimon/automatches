@@ -9,6 +9,7 @@ import {
   getAllPlayers,
   getResultsByRoundLocal,
   getMatch,
+  getAllMatches,
 } from "./local-handler.js";
 import { addText } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
@@ -51,7 +52,7 @@ document.getElementById("update-leagues").onclick = async function () {
       method: "GET",
     }
   );
-  const data = await response.json();
+  const data = await response.text();
   console.log(data);
 };
 
@@ -62,7 +63,7 @@ document.getElementById("get-match-auto").onclick = async function () {
 };
 
 document.getElementById("missing-matches").onclick = async function () {
-  let leagueID = selectedLeagues[0];
+  let leagueID = selectedLeagues.join(",");
   const response = await fetch(
     `http://localhost:3000/missing-matches?leagueID=${leagueID}`,
     {
@@ -95,7 +96,7 @@ document.getElementById("a").onclick = async function () {
   let homeTeam, awayTeam;
 
   for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`leagues/${allLeagues[i].id}.json`);
+    let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
     let league = await response.json();
     for (let j = 0; j < league.length; j++) {
       homeTeam = {
@@ -119,8 +120,12 @@ document.getElementById("a").onclick = async function () {
   console.log(teamsNew);
 };
 
-document.getElementById("c").onclick = async function () {
+document.getElementById("get-all-players").onclick = async function () {
   getAllPlayers();
+};
+
+document.getElementById("get-all-matches").onclick = async function () {
+  getAllMatches();
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
@@ -145,6 +150,21 @@ document.getElementById("clear-results").onclick = async function () {
   document.getElementById("fixtures-info").innerHTML = "";
 };
 
+document.getElementById("copy-text").onclick = async function () {
+  // Get the text field
+  var copyText = document.getElementById("generated-text");
+
+  // Select the text field
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); // For mobile devices
+
+  // Copy the text inside the text field
+  navigator.clipboard.writeText(copyText.value);
+
+  // Alert the copied text
+  alert("Copied the text: " + copyText.value);
+};
+
 async function submitRequest_matchList() {
   let leagueID = selectedLeagues[0];
   let startDate = document.getElementById("dateStart").value;
@@ -159,8 +179,6 @@ async function submitRequest_leagueInfo() {
 
   standingsFromApi = await getStandingsFromApi(leagueID);
   leagueStandings(standingsFromApi);
-
-  //addText(resultsFromApi, standingsFromApi);
 }
 
 async function matchesByRound() {
@@ -170,8 +188,8 @@ async function matchesByRound() {
     leagueID,
     `Regular Season - ${roundNumber}`
   );
-
   matchList(resultsFromApi);
+  addText(resultsFromApi);
 }
 
 function addGoals(goals) {
@@ -269,11 +287,10 @@ function oneFixture(response) {
 }
 
 for (const element of allLeagues) {
-  console.log(element);
   let dasID;
   document.getElementById(
     "league-list"
-  ).innerHTML += `<img width=30px id="img-${element.id}" class="league-to-select" src=images/competitions/${element.id}.png />`;
+  ).innerHTML += `<img width=30px id="img-${element.id}" class="league-to-select" src="images/competitions/${element.id}.png" alt="${element.name}" title="${element.name}"/>`;
   document.querySelectorAll(".league-to-select").forEach((e) =>
     e.addEventListener("click", function () {
       this.classList.toggle("selected-league");
@@ -283,7 +300,6 @@ for (const element of allLeagues) {
       } else {
         selectedLeagues.splice(selectedLeagues.indexOf(dasID), 1);
       }
-      console.log(selectedLeagues);
     })
   );
 }

@@ -31,7 +31,24 @@
         style="border: 1px solid #d3d3d3"
       ></canvas>
     </div>
-
+    <div class="floating-text">
+      <textarea
+        id="generated-text"
+        rows="22"
+        cols="33"
+        placeholder="This is text"
+      ></textarea>
+      <button
+        type="button"
+        id="generate-text"
+        class="btn btn-primary btn-block"
+      >
+        Generate
+      </button>
+      <button type="button" id="copy-text" class="btn btn-primary btn-block">
+        Copy
+      </button>
+    </div>
     <div class="floating-buttons">
       <div class="row">
         <div id="league-list"></div>
@@ -67,7 +84,8 @@
           </div>
           <button id="a">Get all clubs</button>
 
-          <button id="c">Get all players</button>
+          <button id="get-all-players">Get all players</button>
+          <button id="get-all-matches">Get all matches</button>
         </div>
       </div>
       <div class="row" style="margin-top: 5px">
@@ -84,8 +102,11 @@
           placeholder="Paste Image Here"
         ></textarea>
       </div>
-      <input type="string" placeholder="OFFICIAL" id="breaking-official" />
-      <button id="add-breaking">🚨BREAKING🚨</button>
+      <div class="row">
+        <input type="string" placeholder="OFFICIAL" id="breaking-official" />
+        <button id="add-breaking">🚨BREAKING🚨</button>
+        <button id="happy-bday">🎉HAPPY BIRTHDAY🎂</button>
+      </div>
 
       <div class="row" style="margin-top: 5px">
         <button

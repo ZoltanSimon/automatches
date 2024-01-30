@@ -56,7 +56,7 @@ export function addMatchStats(apiResponse) {
 
   addToPage = `
   <table id='match-stats' style='border-collapse: collapse; border: 3px solid #1D3557;' border='1'><thead>
-  <tr>
+  <tr style='font-size:30;'>
   <td style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${homeTeamName}</td>
   <td style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>*${homeTeamName}* - *${awayTeamName}*</td>
   <td style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${awayTeamName}</td>
@@ -94,8 +94,8 @@ export function matchStatsToCanvas() {
       if (teamLogos[i].indexOf(`*${clubs[j].name}*`) > -1) {
         imgToAdd.push({
           img: imgs.clubs[clubs[j].id],
-          imgHeight: 50,
-          startX: 430 + i * 172,
+          imgHeight: 56,
+          startX: 430 + i * 164,
           startY: 184,
         });
       }
@@ -112,11 +112,17 @@ export function matchStatsToCanvas() {
 
   let rounNo = leagueName.split(" - ")[0];
   let league = leagueName.split(" - ")[leagueName.split(" - ").length - 1];
-  ctx.fillText(rounNo, 540, 922);
   writeStrokedText({
     text: [league],
+    fontSize: 56,
     strokeStyle: "#1d3557",
     fillStyle: "#e63946",
-    y: 130,
+    y: 140,
+  });
+  writeStrokedText({
+    text: [rounNo],
+    strokeStyle: "#1d3557",
+    fillStyle: "#1d3557",
+    y: 930,
   });
 }

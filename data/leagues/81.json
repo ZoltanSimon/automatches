@@ -991,7 +991,7 @@
       },
       "away": {
         "id": 176,
-        "name": "VfL BOCHUM",
+        "name": "Vfl Bochum",
         "logo": "https://media-4.api-sports.io/football/teams/176.png",
         "winner": false
       }
@@ -2011,7 +2011,7 @@
       },
       "away": {
         "id": 192,
-        "name": "FC Koln",
+        "name": "1.FC Köln",
         "logo": "https://media-4.api-sports.io/football/teams/192.png",
         "winner": true
       }
@@ -2691,7 +2691,7 @@
       },
       "away": {
         "id": 192,
-        "name": "FC Koln",
+        "name": "1.FC Köln",
         "logo": "https://media-4.api-sports.io/football/teams/192.png",
         "winner": false
       }
