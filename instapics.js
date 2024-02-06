@@ -83,8 +83,7 @@ document.getElementById("add-breaking").onclick = function () {
 };
 
 document.getElementById("happy-bday").onclick = function () {
-  document.getElementById("breaking-official").value =
-    document.getElementById("happy-bday").innerHTML;
+  document.getElementById("breaking-official").value = "🎉HAPPY BIRTHDAY🎂";
 };
 
 document.getElementById("pasteArea").onpaste = function (event) {

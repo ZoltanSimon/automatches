@@ -18,6 +18,7 @@ import { addSquad } from "./components/team-squad.js";
 import { leagueStandings } from "./components/league-standings.js";
 import { matchList } from "./components/match-list.js";
 import { playerGoalList } from "./components/player-list.js";
+import { teamList } from "./components/team-list.js";
 import { players } from "./data/players.js";
 import { allLeagues } from "./data/leagues.js";
 import { loadPlayerFace } from "./instapics.js";
@@ -125,7 +126,7 @@ document.getElementById("get-all-players").onclick = async function () {
 };
 
 document.getElementById("get-all-matches").onclick = async function () {
-  getAllMatches();
+  teamList(await getAllMatches());
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
