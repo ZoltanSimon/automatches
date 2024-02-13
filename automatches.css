@@ -26,7 +26,7 @@ tr td {
 
 tr:nth-child(even) td:nth-child(odd),
 tr:nth-child(odd) td:nth-child(even) {
-  background-color: #ccc;
+  background-color: #f1faee;
 }
 
 #headertext {
@@ -67,6 +67,7 @@ tr:nth-child(odd) td:nth-child(even) {
 
 #league-list {
   cursor: pointer;
+  width: 300px;
 }
 
 .selected-league {

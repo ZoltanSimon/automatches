@@ -31,19 +31,22 @@ app.get("/status", (request, response) => {
 
 //updates the given league's json file
 app.get("/update-leagues", async (request, response) => {
-  let leagueID = request.query.leagueID;
-  let dataToWrite = await getResultsDate(leagueID);
+  let leagueIDs = request.query.leagueID.split(",");
 
-  fs.writeFile(
-    `../data/leagues/${leagueID}.json`,
-    JSON.stringify(dataToWrite.response),
-    function (err) {
-      if (err) {
-        return console.log(err);
+  for (const leagueID of leagueIDs) {
+    let dataToWrite = await getResultsDate(leagueID);
+
+    fs.writeFile(
+      `../data/leagues/${leagueID}.json`,
+      JSON.stringify(dataToWrite.response),
+      function (err) {
+        if (err) {
+          return console.log(err);
+        }
+        response.send(`${leagueID} was saved!`);
       }
-      response.send("The file was saved!");
-    }
-  );
+    );
+  }
 });
 
 //saves match
@@ -89,7 +92,7 @@ app.get("/missing-matches", async (request, response) => {
 
 app.get("/get-league-matches", async (request, response) => {
   let allMatches = [];
-  let leagues = [39, 140, 135, 78, 61];
+  let leagues = [39, 140, 135, 78, 61, 88, 94, 144, 203, 283];
   let matchID;
 
   for (let i = 0; i < leagues.length; i++) {

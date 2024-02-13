@@ -672,6 +672,70 @@ export let clubs = [
     name: "İstanbulspor",
   },
   {
+    id: 6886,
+    name: "Oţelul",
+  },
+  {
+    id: 2589,
+    name: "Uta Arad",
+  },
+  {
+    id: 2246,
+    name: "CFR 1907 Cluj",
+  },
+  {
+    id: 2583,
+    name: "Politehnica Iasi",
+  },
+  {
+    id: 2579,
+    name: "AFC Hermannstadt",
+  },
+  {
+    id: 2596,
+    name: "Farul Constanta",
+  },
+  {
+    id: 6231,
+    name: "Rapid",
+  },
+  {
+    id: 2585,
+    name: "Sepsi OSK Sfantu Gheorghe",
+  },
+  {
+    id: 2598,
+    name: "Petrolul Ploiesti",
+  },
+  {
+    id: 2599,
+    name: "Universitatea Cluj",
+  },
+  {
+    id: 6910,
+    name: "U Craiova 1948",
+  },
+  {
+    id: 559,
+    name: "FCSB",
+  },
+  {
+    id: 2578,
+    name: "FC Voluntari",
+  },
+  {
+    id: 2581,
+    name: "FC Botosani",
+  },
+  {
+    id: 635,
+    name: "Dinamo Bucuresti",
+  },
+  {
+    id: 632,
+    name: "Universitatea Craiova",
+  },
+  {
     id: 3345,
     name: "Atlètic Club d'Escaldes",
   },
@@ -758,10 +822,6 @@ export let clubs = [
   {
     id: 11907,
     name: "Swift Hesperange",
-  },
-  {
-    id: 2596,
-    name: "Farul Constanta",
   },
   {
     id: 568,

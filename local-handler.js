@@ -145,8 +145,9 @@ export async function getAllMatches() {
         });
       }
     }*/
-    let team1 = match[0].statistics[0].team;
-    let team2 = match[0].statistics[1].team;
+    console.log(match[0]);
+    let team1 = match[0].teams.home;
+    let team2 = match[0].teams.away;
 
     //console.log(team1);
 
@@ -171,26 +172,28 @@ export async function getAllMatches() {
 
     //console.log(teams);
 
-    t1 = {};
-    t2 = {};
-    t1.goalsFor = match[0].score.fulltime.home;
-    t1.goalsAgainst = match[0].score.fulltime.away;
-    t2.goalsFor = match[0].score.fulltime.away;
-    t2.goalsAgainst = match[0].score.fulltime.home;
-    t1.corners = match[0].statistics[0].statistics[7].value;
-    t2.corners = match[0].statistics[1].statistics[7].value;
-    t1.cornersAgainst = match[0].statistics[1].statistics[7].value;
-    t2.cornersAgainst = match[0].statistics[0].statistics[7].value;
-    t1.shotsOnGoal = match[0].statistics[0].statistics[0].value;
-    t2.shotsOnGoal = match[0].statistics[1].statistics[0].value;
-    t1.shotsOnGoalAgainst = match[0].statistics[1].statistics[0].value;
-    t2.shotsOnGoalAgainst = match[0].statistics[0].statistics[0].value;
-    t1.xG = parseFloat(match[0].statistics[0].statistics[16].value);
-    t2.xG = parseFloat(match[0].statistics[1].statistics[16].value);
-    t1.xGA = parseFloat(match[0].statistics[1].statistics[16].value);
-    t2.xGA = parseFloat(match[0].statistics[0].statistics[16].value);
-    team1.stats.push(t1);
-    team2.stats.push(t2);
+    if (match[0].statistics[0]) {
+      t1 = {};
+      t2 = {};
+      t1.goalsFor = match[0].score.fulltime.home;
+      t1.goalsAgainst = match[0].score.fulltime.away;
+      t2.goalsFor = match[0].score.fulltime.away;
+      t2.goalsAgainst = match[0].score.fulltime.home;
+      t1.corners = match[0].statistics[0].statistics[7].value;
+      t2.corners = match[0].statistics[1].statistics[7].value;
+      t1.cornersAgainst = match[0].statistics[1].statistics[7].value;
+      t2.cornersAgainst = match[0].statistics[0].statistics[7].value;
+      t1.shotsOnGoal = match[0].statistics[0].statistics[0].value;
+      t2.shotsOnGoal = match[0].statistics[1].statistics[0].value;
+      t1.shotsOnGoalAgainst = match[0].statistics[1].statistics[0].value;
+      t2.shotsOnGoalAgainst = match[0].statistics[0].statistics[0].value;
+      t1.xG = parseFloat(match[0].statistics[0].statistics[16].value);
+      t2.xG = parseFloat(match[0].statistics[1].statistics[16].value);
+      t1.xGA = parseFloat(match[0].statistics[1].statistics[16].value);
+      t2.xGA = parseFloat(match[0].statistics[0].statistics[16].value);
+      team1.stats.push(t1);
+      team2.stats.push(t2);
+    }
   }
 
   for (let team of teams) {
@@ -216,6 +219,13 @@ export async function getAllMatches() {
         team.last5.shotsOnGoalAgainst += stat.shotsOnGoalAgainst;
         team.last5.goals += stat.goalsFor;
         team.last5.goalsAgainst += stat.goalsAgainst;
+        if (stat.goalsFor > stat.goalsAgainst) {
+          team.form = "W" + team.form;
+        } else if (stat.goalsFor == stat.goalsAgainst) {
+          team.form = "D" + team.form;
+        } else {
+          team.form = "L" + team.form;
+        }
       }
     }
 

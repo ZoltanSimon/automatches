@@ -8,6 +8,7 @@ export let allLeagues = [
   { id: 94, name: "primeira-liga", teams: "clubs", type: "league" },
   { id: 144, name: "Pro League", teams: "clubs", type: "league" },
   { id: 203, name: "turkey-league", teams: "clubs", type: "league" },
+  { id: 283, name: "Romania Liga 1", teams: "clubs", type: "league" },
   { id: 2, name: "uefa-champions-league", teams: "club", type: "continental" },
   { id: 3, name: "uefa-europa-league", teams: "club", type: "continental" },
   { id: 81, name: "pokal", teams: "club", type: "cup" },

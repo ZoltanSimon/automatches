@@ -11,7 +11,7 @@ import {
   getMatch,
   getAllMatches,
 } from "./local-handler.js";
-import { addText } from "./autotext.js";
+import { addText, buildResults } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
 import { addSquad } from "./components/team-squad.js";
@@ -22,7 +22,7 @@ import { teamList } from "./components/team-list.js";
 import { players } from "./data/players.js";
 import { allLeagues } from "./data/leagues.js";
 import { loadPlayerFace } from "./instapics.js";
-import { imagePath } from "./common-functions.js";
+import { copyText, copyToClipboard, imagePath } from "./common-functions.js";
 
 let addToPage;
 let standingsFromApi,
@@ -46,7 +46,8 @@ document.getElementById("submit-match-list").onclick = async function () {
 };
 
 document.getElementById("update-leagues").onclick = async function () {
-  let leagueID = selectedLeagues[0];
+  let leagueID = selectedLeagues.join(",");
+  console.log(leagueID);
   const response = await fetch(
     `http://localhost:3000/update-leagues?leagueID=${leagueID}`,
     {
@@ -72,7 +73,7 @@ document.getElementById("missing-matches").onclick = async function () {
     }
   );
   const data = await response.json();
-  matchList(data, true);
+  if (data.length > 0) matchList(data, true);
   console.log(data);
 };
 
@@ -151,19 +152,14 @@ document.getElementById("clear-results").onclick = async function () {
   document.getElementById("fixtures-info").innerHTML = "";
 };
 
+document.getElementById("copy-for-blog").onclick = function () {
+  copyToClipboard("league-stuff");
+};
+
+document.getElementById("generate-text").onclick = async function () {};
+
 document.getElementById("copy-text").onclick = async function () {
-  // Get the text field
-  var copyText = document.getElementById("generated-text");
-
-  // Select the text field
-  copyText.select();
-  copyText.setSelectionRange(0, 99999); // For mobile devices
-
-  // Copy the text inside the text field
-  navigator.clipboard.writeText(copyText.value);
-
-  // Alert the copied text
-  alert("Copied the text: " + copyText.value);
+  copyText("generated-text");
 };
 
 async function submitRequest_matchList() {
@@ -191,6 +187,7 @@ async function matchesByRound() {
   );
   matchList(resultsFromApi);
   addText(resultsFromApi);
+  buildResults(resultsFromApi);
 }
 
 function addGoals(goals) {
