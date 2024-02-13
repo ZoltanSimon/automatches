@@ -40,3 +40,37 @@ export function downloadResult(matchID, response) {
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
 }
+
+export function copyText(field) {
+  // Get the text field
+  var copyText = document.getElementById(field);
+
+  // Select the text field
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); // For mobile devices
+
+  // Copy the text inside the text field
+  navigator.clipboard.writeText(copyText.value);
+}
+
+export function copyToClipboard(element) {
+  var doc = document,
+    text = doc.getElementById(element),
+    range,
+    selection;
+
+  if (doc.body.createTextRange) {
+    range = doc.body.createTextRange();
+    range.moveToElementText(text);
+    range.select();
+  } else if (window.getSelection) {
+    selection = window.getSelection();
+    range = doc.createRange();
+    range.selectNodeContents(text);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+  document.execCommand("copy");
+  window.getSelection().removeAllRanges();
+  document.getElementById("btn").value = "Copied";
+}

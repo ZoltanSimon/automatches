@@ -124,6 +124,14 @@ let lasts = [
 
 let Napolis = [`Napoli `];
 
+export function buildResults(fixtures) {
+  console.log(fixtures);
+  let league = fixtures[0].league.name;
+  let round = fixtures[0].league.round.replace("Regular Season - ", "");
+  let textToPage = `${league} results for Round ${round}`;
+  document.getElementById("generated-text").value += textToPage;
+}
+
 export function addText(fixtures) {
   let textToPage = ``;
   let matchEnding, leader, firstPart, finalPart;
@@ -182,8 +190,8 @@ export function addText(fixtures) {
       finalPart
     );
   });
-
-  document.getElementById("generated-text").value += textToPage;
+  console.log(textToPage);
+  document.getElementById("results-text").innerHTML += textToPage;
 }
 
 function buildMatch(homeTeam, awayTeam, firstPart, finalPart) {

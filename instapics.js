@@ -83,8 +83,7 @@ document.getElementById("add-breaking").onclick = function () {
 };
 
 document.getElementById("happy-bday").onclick = function () {
-  document.getElementById("breaking-official").value =
-    document.getElementById("happy-bday").innerHTML;
+  document.getElementById("breaking-official").value = "🎉HAPPY BIRTHDAY🎂";
 };
 
 document.getElementById("pasteArea").onpaste = function (event) {
@@ -147,7 +146,7 @@ document.getElementById("download-image").onclick = function () {
 export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
   ctx.drawImage(border_image, 0, 0);
-
+  console.log(lines);
   let data = `<svg xmlns='http://www.w3.org/2000/svg' width='880'>
     <foreignObject width='100%' height='100%'>
     <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>

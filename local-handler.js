@@ -145,74 +145,117 @@ export async function getAllMatches() {
         });
       }
     }*/
-    let team1 = match[0].statistics[0].team;
-    let team2 = match[0].statistics[1].team;
+    console.log(match[0]);
+    let team1 = match[0].teams.home;
+    let team2 = match[0].teams.away;
+
+    //console.log(team1);
 
     let found1 = teams.find((element) => element.name == team1.name);
     let found2 = teams.find((element) => element.name == team2.name);
 
-    console.log(found1);
-    console.log(found2);
+    //console.log(found1);
+    //console.log(found2);
 
     if (found1 !== undefined) {
       team1 = found1;
     } else {
-      team1.stats = [];
-      team1.xg = 0;
-      team1.xg_against = 0;
-      team1.goals = 0;
-      team1.goals_against = 0;
+      team1 = new Team(team1);
       teams.push(team1);
     }
     if (found2 !== undefined) {
       team2 = found2;
     } else {
-      team2.stats = [];
-      team2.xg = 0;
-      team2.xg_against = 0;
-      team2.goals = 0;
-      team2.goals_against = 0;
+      team2 = new Team(team2);
       teams.push(team2);
     }
 
-    console.log(team1);
-    console.log(team2);
+    //console.log(teams);
 
-    t1 = {};
-    t2 = {};
-    t1.goalsFor = match[0].score.fulltime.home;
-    t1.goalsAgainst = match[0].score.fulltime.away;
-    t2.goalsFor = match[0].score.fulltime.away;
-    t2.goalsAgainst = match[0].score.fulltime.home;
-    t1.xg = parseFloat(match[0].statistics[0].statistics[16].value);
-    t2.xg = parseFloat(match[0].statistics[1].statistics[16].value);
-    t1.xg_against = parseFloat(match[0].statistics[1].statistics[16].value);
-    t2.xg_against = parseFloat(match[0].statistics[0].statistics[16].value);
-    team1.stats.push(t1);
-    team2.stats.push(t2);
-    console.log(team1);
-    console.log(team2);
-  }
-
-  console.log(teams);
-
-  for (let team of teams) {
-    for (let stat of team.stats) {
-      console.log(stat);
-      team.xg += stat.xg;
-      team.xg_against += stat.xg_against;
-      team.goals += stat.goalsFor;
-      team.goals_against += stat.goalsAgainst;
+    if (match[0].statistics[0]) {
+      t1 = {};
+      t2 = {};
+      t1.goalsFor = match[0].score.fulltime.home;
+      t1.goalsAgainst = match[0].score.fulltime.away;
+      t2.goalsFor = match[0].score.fulltime.away;
+      t2.goalsAgainst = match[0].score.fulltime.home;
+      t1.corners = match[0].statistics[0].statistics[7].value;
+      t2.corners = match[0].statistics[1].statistics[7].value;
+      t1.cornersAgainst = match[0].statistics[1].statistics[7].value;
+      t2.cornersAgainst = match[0].statistics[0].statistics[7].value;
+      t1.shotsOnGoal = match[0].statistics[0].statistics[0].value;
+      t2.shotsOnGoal = match[0].statistics[1].statistics[0].value;
+      t1.shotsOnGoalAgainst = match[0].statistics[1].statistics[0].value;
+      t2.shotsOnGoalAgainst = match[0].statistics[0].statistics[0].value;
+      t1.xG = parseFloat(match[0].statistics[0].statistics[16].value);
+      t2.xG = parseFloat(match[0].statistics[1].statistics[16].value);
+      t1.xGA = parseFloat(match[0].statistics[1].statistics[16].value);
+      t2.xGA = parseFloat(match[0].statistics[0].statistics[16].value);
+      team1.stats.push(t1);
+      team2.stats.push(t2);
     }
   }
 
-  teams.sort((a, b) => b.xg - a.xg); // b - a for reverse sort
+  for (let team of teams) {
+    for (let i = team.stats.length - 1; i >= 0; i--) {
+      let stat = team.stats[i];
+      team.matches = team.stats.length;
+
+      team.total.xG += stat.xG;
+      team.total.xGA += stat.xGA;
+      team.total.corners += stat.corners;
+      team.total.cornersAgainst += stat.cornersAgainst;
+      team.total.shotsOnGoal += stat.shotsOnGoal;
+      team.total.shotsOnGoalAgainst += stat.shotsOnGoalAgainst;
+      team.total.goals += stat.goalsFor;
+      team.total.goalsAgainst += stat.goalsAgainst;
+
+      if (i > team.stats.length - 6) {
+        team.last5.xG += stat.xG;
+        team.last5.xGA += stat.xGA;
+        team.last5.corners += stat.corners;
+        team.last5.cornersAgainst += stat.cornersAgainst;
+        team.last5.shotsOnGoal += stat.shotsOnGoal;
+        team.last5.shotsOnGoalAgainst += stat.shotsOnGoalAgainst;
+        team.last5.goals += stat.goalsFor;
+        team.last5.goalsAgainst += stat.goalsAgainst;
+        if (stat.goalsFor > stat.goalsAgainst) {
+          team.form = "W" + team.form;
+        } else if (stat.goalsFor == stat.goalsAgainst) {
+          team.form = "D" + team.form;
+        } else {
+          team.form = "L" + team.form;
+        }
+      }
+    }
+
+    team.perGame.xG = team.total.xG / team.matches;
+    team.perGame.xGA = team.total.xGA / team.matches;
+    team.perGame.corners = team.total.corners / team.matches;
+    team.perGame.cornersAgainst = team.total.cornersAgainst / team.matches;
+    team.perGame.shotsOnGoal = team.total.shotsOnGoal / team.matches;
+    team.perGame.shotsOnGoalAgainst =
+      team.total.shotsOnGoalAgainst / team.matches;
+    team.perGame.goals = team.total.goals / team.matches;
+    team.perGame.goalsAgainst = team.total.goalsAgainst / team.matches;
+
+    team.last5PerGame.xG = team.last5.xG / 5;
+    team.last5PerGame.xGA = team.last5.xGA / 5;
+    team.last5PerGame.corners = team.last5.corners / 5;
+    team.last5PerGame.cornersAgainst = team.last5.cornersAgainst / 5;
+    team.last5PerGame.goals = team.last5.goals / 5;
+    team.last5PerGame.goalsAgainst = team.last5.goalsAgainst / 5;
+    team.last5PerGame.shotsOnGoal = team.last5.shotsOnGoal / 5;
+    team.last5PerGame.shotsOnGoalAgainst = team.last5.shotsOnGoalAgainst / 5;
+  }
+
+  //teams.sort((a, b) => b.xG - a.xG); // b - a for reverse sort
 
   console.log(teams);
 
-  teams.sort((a, b) => a.xg_against - b.xg_against); // b - a for reverse sort
+  //teams.sort((a, b) => a.xGA - b.xGA); // b - a for reverse sort
 
-  console.log(teams);
+  return teams;
 }
 
 async function getPlayerList(compType, compList) {
@@ -275,4 +318,32 @@ export async function getMatch(fixtureID) {
   const data = await response.json();
   console.log(data);
   return data;
+}
+
+class Team {
+  constructor(team) {
+    this.id = team.id;
+    this.name = team.name;
+    this.logo = team.logo;
+    this.stats = [];
+    this.matches = 0;
+    this.total = new Stats();
+    this.perGame = new Stats();
+    this.last5 = new Stats();
+    this.last5PerGame = new Stats();
+    this.form = "";
+  }
+}
+
+class Stats {
+  constructor() {
+    this.goals = 0;
+    this.goalsAgainst = 0;
+    this.xG = 0;
+    this.xGA = 0;
+    this.corners = 0;
+    this.cornersAgainst = 0;
+    this.shotsOnGoal = 0;
+    this.shotsOnGoalAgainst = 0;
+  }
 }

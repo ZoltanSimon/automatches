@@ -41,21 +41,23 @@ export function matchList(fixtures, showID = false) {
     addToPage += `<tr">
     ${tds}${date.getDate()}.${
       date.getMonth() + 1
-    }.${date.getFullYear()} ${date.getHours()}:${
+    }.${date.getFullYear()} ${date.getUTCHours()}:${
       (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
     }</td>
     <td style="text-align: center;"><img src=${imagePath(
       element.teams.home.id
     )} alt="*${element.teams.home.name}*" width="30px"></td>
-      <td style="text-align: left;">${element.teams.home.name}</td>
+      <td style="text-align: left;" id="${element.teams.home.id}">${
+      element.teams.home.name
+    }</td>
     ${tds}${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
     <td style="text-align: center;"><img src=${imagePath(
       element.teams.away.id
     )} alt="*${element.teams.away.name}*" width="30px"></td>
-      <td style="text-align: left;">${truncate(
-        element.teams.away.name,
-        19
-      )}</td>
+      <td style="text-align: left;" id="${element.teams.away.id}">${truncate(
+      element.teams.away.name,
+      19
+    )}</td>
     ${tds}${
       !isNaN(parseInt(element.goals.away)) ? element.goals.away : ""
     }</td>${thisID}
