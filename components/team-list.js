@@ -28,14 +28,14 @@ function findTeamById(response, thisId) {
 function createTeamsTable(response) {
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
     <thead>
+    <tr>
     <th rowspan=2>Team</th>
     <th style="text-align: center; padding:2px;" colspan=2>Total</th>
     <th style="text-align: center; padding:2px;" colspan=8>Last 5</th>
     <th style="text-align: center; padding:2px;" colspan=8>Last 5 Per Game</th>
     <th style="text-align: center; padding:2px;" colspan=4>Expected</th>
-    </thead>
-    <tbody><tr>
-    <td></td>
+    </tr>
+    <tr>
     ${tds}Form</td>
     ${tds}Matches</td>
     ${tds}Goals</td>
@@ -58,7 +58,9 @@ function createTeamsTable(response) {
     ${tds}xG</td>
     ${tds}Corners</td>
     ${tds}ShotsG</td>
-    </tr>`;
+    </tr>
+    </thead>
+    <tbody>`;
 
   for (let i = 0; i < response.length; i++) {
     thisTeam = response[i];

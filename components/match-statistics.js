@@ -5,7 +5,7 @@ import {
   loadClubLogo,
   writeStrokedText,
 } from "./../instapics.js";
-import { Stat } from "../stat.js";
+import { Stat } from "../classes/stat.js";
 import { clubs } from "./../data/clubs.js";
 import { removeNewlines } from "../common-functions.js";
 

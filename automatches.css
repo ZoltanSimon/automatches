@@ -29,6 +29,10 @@ tr:nth-child(odd) td:nth-child(even) {
   background-color: #f1faee;
 }
 
+table tr:nth-of-type(2n) td {
+  border-bottom: 3px solid #1d3557;
+}
+
 #headertext {
   text-align: center;
 }

@@ -157,11 +157,17 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   img.onload = function () {
     ctx.drawImage(img, (1080 - img.width) / 2, yPos);
     for (let i = 0; i < imgToAdd.length; i++) {
-      ctx.drawImage(
+      /*ctx.drawImage(
         imgToAdd[i].img,
         imgToAdd[i].startX,
         imgToAdd[i].startY,
         imgToAdd[i].imgHeight,
+        imgToAdd[i].imgHeight
+      );*/
+      drawCentre(
+        imgToAdd[i].img,
+        imgToAdd[i].startX,
+        imgToAdd[i].startY,
         imgToAdd[i].imgHeight
       );
     }
@@ -179,6 +185,10 @@ function drawResizedImage(image, imgHeight, startX, startY) {
     newWidth = imgHeight * (image.width / image.height);
   }
   ctx.drawImage(image, (startX - newWidth) / 2, startY, newWidth, newHeight);
+}
+
+function drawCentre(img, x, y, height) {
+  ctx.drawImage(img, x - height / 2, y, height, height);
 }
 
 function buildSvgImageUrl(svg) {
@@ -202,9 +212,18 @@ export function loadPlayerFace(playerToLoad) {
   imgs.players[playerToLoad] = img;
 }
 
+export function loadCompLogo(compToLoad) {
+  var img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = `images/competitions/${compToLoad}.png`;
+  if (!imgs.leagues) imgs.leagues = [];
+  imgs.leagues[compToLoad] = img;
+}
+
 export function writeStrokedText({
   text,
   fontSize = 46,
+  textAlign = "center",
   strokeStyle = "black",
   fillStyle = "#1d3557",
   lineWidth = 1,
@@ -215,6 +234,7 @@ export function writeStrokedText({
   ctx.strokeStyle = strokeStyle;
   ctx.lineWidth = lineWidth;
   ctx.fillStyle = fillStyle;
+  ctx.textAlign = textAlign;
   for (let i = 0; i < text.length; i++) {
     ctx.strokeText(text[i], x, y + i * lineheight);
     ctx.fillText(text[i], x, y + i * lineheight);

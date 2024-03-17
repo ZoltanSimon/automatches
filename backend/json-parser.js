@@ -32,8 +32,11 @@ app.get("/status", (request, response) => {
 //updates the given league's json file
 app.get("/update-leagues", async (request, response) => {
   let leagueIDs = request.query.leagueID.split(",");
+  let responseToSend = "";
 
   for (const leagueID of leagueIDs) {
+    console.log("Delayed for 1 second.");
+
     let dataToWrite = await getResultsDate(leagueID);
 
     fs.writeFile(
@@ -43,10 +46,11 @@ app.get("/update-leagues", async (request, response) => {
         if (err) {
           return console.log(err);
         }
-        response.send(`${leagueID} was saved!`);
+        responseToSend += `${leagueID} was saved!<br/>`;
       }
     );
   }
+  response.send(responseToSend);
 });
 
 //saves match

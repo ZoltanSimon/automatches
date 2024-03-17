@@ -1,4 +1,4 @@
-import { Stat } from "../stat.js";
+import { Stat } from "../classes/stat.js";
 import {
   buildTableForTableType,
   imgs,

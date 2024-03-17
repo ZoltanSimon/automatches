@@ -11,6 +11,7 @@ export let allLeagues = [
   { id: 283, name: "Romania Liga 1", teams: "clubs", type: "league" },
   { id: 2, name: "uefa-champions-league", teams: "club", type: "continental" },
   { id: 3, name: "uefa-europa-league", teams: "club", type: "continental" },
+  { id: 848, name: "Conference League", teams: "club", type: "continental" },
   { id: 81, name: "pokal", teams: "club", type: "cup" },
   { id: 960, name: "euro-quali", teams: "nt", type: "quali" },
   {
