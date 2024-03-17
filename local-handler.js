@@ -2,8 +2,9 @@ import { matchList } from "./components/match-list.js";
 import { getResultFromApi } from "./webapi-handler.js";
 import { selectedLeagues } from "./automatches.js";
 import { downloadResult } from "./common-functions.js";
-import { Player } from "./player.js";
+import { Player } from "./classes/player.js";
 import { allLeagues } from "./data/leagues.js";
+import { Team } from "./classes/team.js";
 
 let allPlayers = [];
 
@@ -128,34 +129,12 @@ export async function getAllMatches() {
   const data = await response.json();
   console.log(data);
   for (let match of data) {
-    /*for (let team of match[0].statistics) {
-      //console.log(team);
-      const found = teams.find((element) => element.name == team.team.name);
-      //console.log(found);
-      //if (teams.some((e) => e.name === team.team.name)) {
-      if (found) {
-        found.xg += parseFloat(team.statistics[16].value);
-        found.matches += 1;
-      } else {
-        teams.push({
-          name: team.team.name,
-          id: team.team.id,
-          matches: 1,
-          xg: parseFloat(team.statistics[16].value),
-        });
-      }
-    }*/
     console.log(match[0]);
     let team1 = match[0].teams.home;
     let team2 = match[0].teams.away;
 
-    //console.log(team1);
-
     let found1 = teams.find((element) => element.name == team1.name);
     let found2 = teams.find((element) => element.name == team2.name);
-
-    //console.log(found1);
-    //console.log(found2);
 
     if (found1 !== undefined) {
       team1 = found1;
@@ -169,8 +148,6 @@ export async function getAllMatches() {
       team2 = new Team(team2);
       teams.push(team2);
     }
-
-    //console.log(teams);
 
     if (match[0].statistics[0]) {
       t1 = {};
@@ -197,10 +174,9 @@ export async function getAllMatches() {
   }
 
   for (let team of teams) {
+    team.matches = team.stats.length;
     for (let i = team.stats.length - 1; i >= 0; i--) {
       let stat = team.stats[i];
-      team.matches = team.stats.length;
-
       team.total.xG += stat.xG;
       team.total.xGA += stat.xGA;
       team.total.corners += stat.corners;
@@ -209,6 +185,14 @@ export async function getAllMatches() {
       team.total.shotsOnGoalAgainst += stat.shotsOnGoalAgainst;
       team.total.goals += stat.goalsFor;
       team.total.goalsAgainst += stat.goalsAgainst;
+
+      if (stat.goalsFor > stat.goalsAgainst) {
+        team.wins++;
+      } else if (stat.goalsAgainst > stat.goalsFor) {
+        team.losses++;
+      } else {
+        team.draws++;
+      }
 
       if (i > team.stats.length - 6) {
         team.last5.xG += stat.xG;
@@ -249,11 +233,7 @@ export async function getAllMatches() {
     team.last5PerGame.shotsOnGoalAgainst = team.last5.shotsOnGoalAgainst / 5;
   }
 
-  //teams.sort((a, b) => b.xG - a.xG); // b - a for reverse sort
-
   console.log(teams);
-
-  //teams.sort((a, b) => a.xGA - b.xGA); // b - a for reverse sort
 
   return teams;
 }
@@ -318,32 +298,4 @@ export async function getMatch(fixtureID) {
   const data = await response.json();
   console.log(data);
   return data;
-}
-
-class Team {
-  constructor(team) {
-    this.id = team.id;
-    this.name = team.name;
-    this.logo = team.logo;
-    this.stats = [];
-    this.matches = 0;
-    this.total = new Stats();
-    this.perGame = new Stats();
-    this.last5 = new Stats();
-    this.last5PerGame = new Stats();
-    this.form = "";
-  }
-}
-
-class Stats {
-  constructor() {
-    this.goals = 0;
-    this.goalsAgainst = 0;
-    this.xG = 0;
-    this.xGA = 0;
-    this.corners = 0;
-    this.cornersAgainst = 0;
-    this.shotsOnGoal = 0;
-    this.shotsOnGoalAgainst = 0;
-  }
 }

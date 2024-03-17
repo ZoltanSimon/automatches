@@ -51,9 +51,13 @@
         </button>
       </div>
       <div class="floating-buttons">
-        <div class="row">
+        <div class="row" style="display: flex">
           <div id="league-list"></div>
-
+          <button id="select-all-leagues" style="height: 30px">
+            Select all
+          </button>
+        </div>
+        <div class="row">
           <button id="submit-league-info" class="btn btn-primary btn-block">
             League standings
           </button>
@@ -175,6 +179,7 @@
       <div class="col-md-6">
         <div id="league-stuff">
           <h3 id="league-name"></h3>
+          <span id="league-id"></span>
           <h3 id="round-no"></h3>
           <button id="clear-results">Clear</button>
           <button id="copy-for-blog">Copy</button>

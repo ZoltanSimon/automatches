@@ -3,6 +3,7 @@ import {
   imgs,
   ctx,
   loadClubLogo,
+  loadCompLogo,
   writeStrokedText,
 } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
@@ -15,15 +16,18 @@ import {
 } from "../common-functions.js";
 
 let imgToAdd = [];
-let yPos = 154;
+let yPos = 100;
 
 export function matchList(fixtures, showID = false) {
   console.log(fixtures);
   let addToPage, date;
   let leagueName = fixtures[0].league.name;
+  let leagueID = fixtures[0].league.id;
   let round = fixtures[0].league.round;
   let thisID = ``;
   let tds = `<td style="text-align: center;">`;
+
+  loadCompLogo(leagueID);
 
   fixtures.sort(function (a, b) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);
@@ -66,6 +70,7 @@ export function matchList(fixtures, showID = false) {
 
   addToPage += `</table>`;
   document.getElementById("league-name").innerHTML = leagueName;
+  document.getElementById("league-id").innerHTML = leagueID;
   document.getElementById("round-no").innerHTML = round;
   document.getElementById("fixtures-info").innerHTML += addToPage;
 
@@ -81,6 +86,7 @@ export function matchList(fixtures, showID = false) {
 export function matchesToCanvas(sourceDiv) {
   let matchesTable = document.getElementById(sourceDiv);
   let leagueName = document.getElementById("league-name").innerHTML;
+  let leagueID = document.getElementById("league-id").innerHTML;
   let round = document.getElementById("round-no").innerHTML;
   var rowCount = matchesTable.rows.length;
   let thisTr;
@@ -135,22 +141,29 @@ export function matchesToCanvas(sourceDiv) {
     thisTr.children[1].innerHTML = "";
     thisTr.children[4].innerHTML = "";
 
-    addImgToArray(237 + notResultGap, logo1.id, i);
-    addImgToArray(610 + notResultGap2, logo2.id, i);
+    addImgToArray(262 + notResultGap, logo1.id, i);
+    addImgToArray(634 + notResultGap2, logo2.id, i);
   }
 
+  //text: ["Round " + round.split(" - ")[1]],
   if (rowCount <= 11)
     if (sourceDiv == "match-list") {
       writeStrokedText({
-        text: ["Round " + round.split(" - ")[1]],
-        y: yPos + 58 + rowCount * 77,
-      });
-      writeStrokedText({
         text: [leagueName],
+        fontSize: 60,
+        textAlign: "center",
         strokeStyle: "#1d3557",
         fillStyle: "#e63946",
         lineWidth: 2,
-        y: yPos - 22,
+        x: 256,
+        y: yPos + 90 + rowCount * 77,
+      });
+      writeStrokedText({
+        text: [round.replace(`Regular Season -`, "Round")],
+        fontSize: 60,
+        textAlign: "center",
+        x: 815,
+        y: yPos + 90 + rowCount * 77,
       });
     } else {
       let bottomText = document.getElementById("breaking-official").value;
@@ -159,7 +172,12 @@ export function matchesToCanvas(sourceDiv) {
       ctx.fillText(bottomText, 540, yPos - 22);
     }
 
-  console.log(removeNewlines(matchesTable.outerHTML));
+  imgToAdd.push({
+    img: imgs.leagues[leagueID],
+    imgHeight: 140,
+    startX: 540,
+    startY: yPos + rowCount * 77,
+  });
 
   buildTableForTableType(
     removeNewlines(matchesTable.outerHTML),

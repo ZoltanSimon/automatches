@@ -33,6 +33,18 @@ let standingsFromApi,
 
 export let selectedLeagues = [];
 
+document.getElementById("select-all-leagues").onclick = function () {
+  //selectedLeagues
+  const allTheLeagues = document
+    .getElementById("league-list")
+    .querySelectorAll("img");
+  for (let i = 0; i < allTheLeagues.length / 2; i++) {
+    let league = allTheLeagues[i];
+    league.classList.add("selected-league");
+    selectedLeagues.push(league.id.split("img-")[1]);
+  }
+};
+
 document.getElementById("submit-league-info").onclick = async function () {
   await submitRequest_leagueInfo();
 };
@@ -166,9 +178,10 @@ async function submitRequest_matchList() {
   let leagueID = selectedLeagues[0];
   let startDate = document.getElementById("dateStart").value;
   let endDate = document.getElementById("dateEnd").value;
-  getResultsDate(leagueID, startDate, endDate).then((response) =>
-    matchList(response.response, true)
-  );
+  getResultsDate(leagueID, startDate, endDate).then((response) => {
+    matchList(response.response, true);
+    addText(response.response);
+  });
 }
 
 async function submitRequest_leagueInfo() {

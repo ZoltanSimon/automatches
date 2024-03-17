@@ -960,6 +960,478 @@ export let clubs = [
     name: "Aberdeen",
   },
   {
+    id: 2191,
+    name: "Penybont",
+  },
+  {
+    id: 591,
+    name: "FC Santa Coloma",
+  },
+  {
+    id: 3861,
+    name: "Hegelmann Litauen",
+  },
+  {
+    id: 2265,
+    name: "Shkupi 1927",
+  },
+  {
+    id: 578,
+    name: "F91 Dudelange",
+  },
+  {
+    id: 3843,
+    name: "St Patrick's Athl.",
+  },
+  {
+    id: 678,
+    name: "B36 Torshavn",
+  },
+  {
+    id: 3528,
+    name: "Paide",
+  },
+  {
+    id: 2264,
+    name: "Gzira United",
+  },
+  {
+    id: 5352,
+    name: "Glentoran",
+  },
+  {
+    id: 673,
+    name: "Sutjeska",
+  },
+  {
+    id: 5298,
+    name: "Cosmos",
+  },
+  {
+    id: 696,
+    name: "Balzan FC",
+  },
+  {
+    id: 615,
+    name: "NK Domzale",
+  },
+  {
+    id: 660,
+    name: "FC Vaduz",
+  },
+  {
+    id: 387,
+    name: "Neman",
+  },
+  {
+    id: 3683,
+    name: "Ararat-Armenia",
+  },
+  {
+    id: 3327,
+    name: "Egnatia Rrogozhinë",
+  },
+  {
+    id: 685,
+    name: "Torpedo Kutaisi",
+  },
+  {
+    id: 679,
+    name: "FK Sarajevo",
+  },
+  {
+    id: 582,
+    name: "Alashkert",
+  },
+  {
+    id: 3742,
+    name: "Arsenal Tivat",
+  },
+  {
+    id: 654,
+    name: "Zeljeznicar Sarajevo",
+  },
+  {
+    id: 394,
+    name: "Dinamo Minsk",
+  },
+  {
+    id: 2249,
+    name: "La Fiorita",
+  },
+  {
+    id: 4633,
+    name: "Zimbru",
+  },
+  {
+    id: 552,
+    name: "Maribor",
+  },
+  {
+    id: 2277,
+    name: "Birkirkara",
+  },
+  {
+    id: 694,
+    name: "Tirana",
+  },
+  {
+    id: 705,
+    name: "Dinamo Batumi",
+  },
+  {
+    id: 584,
+    name: "Dundalk",
+  },
+  {
+    id: 16135,
+    name: "Magpies",
+  },
+  {
+    id: 580,
+    name: "Vikingur Gota",
+  },
+  {
+    id: 3342,
+    name: "Inter Club d'Escaldes",
+  },
+  {
+    id: 658,
+    name: "Progres Niederkorn",
+  },
+  {
+    id: 12772,
+    name: "Gjilani",
+  },
+  {
+    id: 583,
+    name: "Linfield",
+  },
+  {
+    id: 3339,
+    name: "Vllaznia Shkodër",
+  },
+  {
+    id: 272,
+    name: "KA Akureyri",
+  },
+  {
+    id: 357,
+    name: "GAP Connah S Quay FC",
+  },
+  {
+    id: 609,
+    name: "Shkendija",
+  },
+  {
+    id: 2194,
+    name: "Haverfordwest County AFC",
+  },
+  {
+    id: 2080,
+    name: "haka",
+  },
+  {
+    id: 697,
+    name: "Crusaders FC",
+  },
+  {
+    id: 4133,
+    name: "HB",
+  },
+  {
+    id: 670,
+    name: "Derry City",
+  },
+  {
+    id: 10124,
+    name: "Riga",
+  },
+  {
+    id: 278,
+    name: "Vikingur Reykjavik",
+  },
+  {
+    id: 3554,
+    name: "Žilina",
+  },
+  {
+    id: 2273,
+    name: "FC Levadia Tallinn",
+  },
+  {
+    id: 709,
+    name: "Pyunik Yerevan",
+  },
+  {
+    id: 2274,
+    name: "Trans Narva",
+  },
+  {
+    id: 3874,
+    name: "Panevėžys",
+  },
+  {
+    id: 691,
+    name: "Milsami Orhei",
+  },
+  {
+    id: 2259,
+    name: "FK Tobol Kostanay",
+  },
+  {
+    id: 1169,
+    name: "Honka",
+  },
+  {
+    id: 2257,
+    name: "Dunajska Streda",
+  },
+  {
+    id: 3499,
+    name: "Dila",
+  },
+  {
+    id: 4196,
+    name: "Makedonija GjP",
+  },
+  {
+    id: 4160,
+    name: "Rīgas FS",
+  },
+  {
+    id: 14393,
+    name: "Dukagjini",
+  },
+  {
+    id: 10125,
+    name: "Europa",
+  },
+  {
+    id: 364,
+    name: "Djurgardens IF",
+  },
+  {
+    id: 644,
+    name: "FC Luzern",
+  },
+  {
+    id: 4360,
+    name: "Celje",
+  },
+  {
+    id: 692,
+    name: "Ordabasy",
+  },
+  {
+    id: 339,
+    name: "Legia Warszawa",
+  },
+  {
+    id: 2247,
+    name: "Apoel Nicosia",
+  },
+  {
+    id: 702,
+    name: "Vojvodina",
+  },
+  {
+    id: 1426,
+    name: "CSKA 1948",
+  },
+  {
+    id: 347,
+    name: "Lech Poznan",
+  },
+  {
+    id: 3872,
+    name: "Kauno Žalgiris",
+  },
+  {
+    id: 327,
+    name: "Bodo/Glimt",
+  },
+  {
+    id: 3714,
+    name: "Bohemians 1905",
+  },
+  {
+    id: 4135,
+    name: "Auda",
+  },
+  {
+    id: 1120,
+    name: "Spartak Trnava",
+  },
+  {
+    id: 616,
+    name: "NK Osijek",
+  },
+  {
+    id: 2414,
+    name: "Zalaegerszegi TE",
+  },
+  {
+    id: 363,
+    name: "Hammarby FF",
+  },
+  {
+    id: 406,
+    name: "Aarhus",
+  },
+  {
+    id: 567,
+    name: "Plzen",
+  },
+  {
+    id: 14281,
+    name: "Drita",
+  },
+  {
+    id: 601,
+    name: "Austria Vienna",
+  },
+  {
+    id: 3364,
+    name: "Borac Banja Luka",
+  },
+  {
+    id: 853,
+    name: "CSKA Sofia",
+  },
+  {
+    id: 604,
+    name: "Maccabi Tel Aviv",
+  },
+  {
+    id: 2271,
+    name: "Petrocub",
+  },
+  {
+    id: 385,
+    name: "Torpedo Zhodino",
+  },
+  {
+    id: 614,
+    name: "AEK Larnaca",
+  },
+  {
+    id: 619,
+    name: "PAOK",
+  },
+  {
+    id: 657,
+    name: "Beitar Jerusalem",
+  },
+  {
+    id: 627,
+    name: "Qabala",
+  },
+  {
+    id: 3402,
+    name: "Omonia Nicosia",
+  },
+  {
+    id: 397,
+    name: "Midtjylland",
+  },
+  {
+    id: 561,
+    name: "HNK Rijeka",
+  },
+  {
+    id: 2392,
+    name: "Debreceni VSC",
+  },
+  {
+    id: 249,
+    name: "Hibernian",
+  },
+  {
+    id: 13976,
+    name: "Sabah FA",
+  },
+  {
+    id: 1165,
+    name: "KuPS",
+  },
+  {
+    id: 348,
+    name: "Pogon Szczecin",
+  },
+  {
+    id: 2270,
+    name: "Neftchi Baku",
+  },
+  {
+    id: 331,
+    name: "Rosenborg",
+  },
+  {
+    id: 4563,
+    name: "Aktobe",
+  },
+  {
+    id: 646,
+    name: "Levski Sofia",
+  },
+  {
+    id: 1123,
+    name: "Aris Thessalonikis",
+  },
+  {
+    id: 563,
+    name: "Hapoel Beer Sheva",
+  },
+  {
+    id: 374,
+    name: "kalmar FF",
+  },
+  {
+    id: 5111,
+    name: "Kecskeméti TE",
+  },
+  {
+    id: 1121,
+    name: "Vorskla Poltava",
+  },
+  {
+    id: 551,
+    name: "FC Basel 1893",
+  },
+  {
+    id: 684,
+    name: "FC Differdange 03",
+  },
+  {
+    id: 319,
+    name: "Brann",
+  },
+  {
+    id: 573,
+    name: "FK Partizan",
+  },
+  {
+    id: 781,
+    name: "Rapid Vienna",
+  },
+  {
+    id: 398,
+    name: "FC Nordsjaelland",
+  },
+  {
+    id: 254,
+    name: "Heart OF Midlothian",
+  },
+  {
+    id: 572,
+    name: "Dynamo Kyiv",
+  },
+  {
+    id: 608,
+    name: "HNK Hajduk Split",
+  },
+  {
     id: 189,
     name: "SV Sandhausen",
   },
