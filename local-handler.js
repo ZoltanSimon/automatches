@@ -23,8 +23,6 @@ export async function getLocalPlayerStats(inputPlayer) {
         league[i].fixture.status.short == "FT" &&
         (league[i].teams.home.id == inputPlayer.club ||
           league[i].teams.away.id == inputPlayer.club)
-        //(league[i].teams.home.id == inputPlayer.nation ||
-        //  league[i].teams.away.id == inputPlayer.nation)
       ) {
         thisComp = league[i].league.name;
         foundIndex = -1;
@@ -65,10 +63,8 @@ export async function getResultFromLocal(fixtureID) {
   let response = await fetch(`data/matches/${fixtureID}.json`);
   if (!response.ok) {
     handleError(fixtureID);
-    //let downloadedResponse = await downloadResultFromApi(fixtureID);
     let response = downloadResult(await getResultFromApi(fixtureID), fixtureID);
     return response;
-    //return [];
   }
   return await response.json();
 }
@@ -119,17 +115,19 @@ export async function getAllPlayers() {
   console.log(allPlayers);
 }
 
-export async function getAllMatches() {
+export async function getAllMatches(leagues) {
+  console.log(leagues);
   let teams = [];
   let t1, t2;
-  let it = 0;
-  const response = await fetch(`http://localhost:3000/get-league-matches`, {
-    method: "GET",
-  });
+  const response = await fetch(
+    `http://localhost:3000/get-league-matches?leagueID=${leagues.join(",")}`,
+    {
+      method: "GET",
+    }
+  );
   const data = await response.json();
   console.log(data);
   for (let match of data) {
-    console.log(match[0]);
     let team1 = match[0].teams.home;
     let team2 = match[0].teams.away;
 
@@ -175,6 +173,7 @@ export async function getAllMatches() {
 
   for (let team of teams) {
     team.matches = team.stats.length;
+
     for (let i = team.stats.length - 1; i >= 0; i--) {
       let stat = team.stats[i];
       team.total.xG += stat.xG;
@@ -193,6 +192,8 @@ export async function getAllMatches() {
       } else {
         team.draws++;
       }
+
+      team.getPoints();
 
       if (i > team.stats.length - 6) {
         team.last5.xG += stat.xG;
@@ -271,14 +272,12 @@ async function getPlayerList(compType, compList) {
 }
 
 export async function getResultsByRoundLocal(leagueID, roundNo) {
-  console.log(`${leagueID} ${roundNo}`);
   let allGames = [];
   let response = await fetch(`data/leagues/${leagueID}.json`);
   let league = await response.json();
-  console.log(league);
   for (let i = 0; i < league.length; i++) {
     if (league[i].league.round == roundNo) {
-      allGames.push(league[i]);
+      allGames.push((await getResultFromLocal(league[i].fixture.id))[0]);
     }
   }
   return allGames;

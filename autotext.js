@@ -132,6 +132,15 @@ export function buildResults(fixtures) {
   document.getElementById("generated-text").value += textToPage;
 }
 
+export function buildStandings(standings) {
+  let league = document.getElementById("league-name").innerHTML;
+  //let round = fixtures[0].league.round.replace("Regular Season - ", "");
+  let textToPage = `Current ${league} standings 👇
+
+  ${standings[0].name} are first with ${standings[0].points} points, followed by ${standings[1].name} on ${standings[1].points}. ${standings[2].name} completes the top 3 with ${standings[2].points}.`;
+  document.getElementById("generated-text").value += textToPage;
+}
+
 export function addText(fixtures) {
   let textToPage = ``;
   let matchEnding, leader, firstPart, finalPart;

@@ -11,7 +11,7 @@ import {
   getMatch,
   getAllMatches,
 } from "./local-handler.js";
-import { addText, buildResults } from "./autotext.js";
+import { addText, buildResults, buildStandings } from "./autotext.js";
 import { addMatchStats } from "./components/match-statistics.js";
 import { addPlayerStats } from "./components/player-stats.js";
 import { addSquad } from "./components/team-squad.js";
@@ -21,7 +21,7 @@ import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
 import { players } from "./data/players.js";
 import { allLeagues } from "./data/leagues.js";
-import { loadPlayerFace } from "./instapics.js";
+import { loadPlayerFace, loadCompLogo } from "./instapics.js";
 import { copyText, copyToClipboard, imagePath } from "./common-functions.js";
 
 let addToPage;
@@ -34,7 +34,6 @@ let standingsFromApi,
 export let selectedLeagues = [];
 
 document.getElementById("select-all-leagues").onclick = function () {
-  //selectedLeagues
   const allTheLeagues = document
     .getElementById("league-list")
     .querySelectorAll("img");
@@ -139,7 +138,7 @@ document.getElementById("get-all-players").onclick = async function () {
 };
 
 document.getElementById("get-all-matches").onclick = async function () {
-  teamList(await getAllMatches());
+  teamList(await getAllMatches([39, 140, 135, 78, 61, 88, 94, 144, 203, 283]));
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
@@ -185,10 +184,14 @@ async function submitRequest_matchList() {
 }
 
 async function submitRequest_leagueInfo() {
-  let leagueID = selectedLeagues[0];
-
-  standingsFromApi = await getStandingsFromApi(leagueID);
+  const found = allLeagues.find((element) => element.id == selectedLeagues[0]);
+  document.getElementById("league-name").innerHTML = found.name;
+  document.getElementById("league-id").innerHTML = found.id;
+  standingsFromApi = await getAllMatches(selectedLeagues);
+  standingsFromApi.sort((a, b) => b.points - a.points); // b - a for reverse sort
+  loadCompLogo(found.id);
   leagueStandings(standingsFromApi);
+  buildStandings(standingsFromApi);
 }
 
 async function matchesByRound() {

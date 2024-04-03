@@ -4,7 +4,7 @@ import {
   ctx,
   loadClubLogo,
   loadCompLogo,
-  writeStrokedText,
+  leagueBannerBig,
 } from "./../instapics.js";
 import { clubs } from "./../data/clubs.js";
 import { getMatch } from "../local-handler.js";
@@ -16,7 +16,7 @@ import {
 } from "../common-functions.js";
 
 let imgToAdd = [];
-let yPos = 100;
+let yPos = 200;
 
 export function matchList(fixtures, showID = false) {
   console.log(fixtures);
@@ -25,7 +25,6 @@ export function matchList(fixtures, showID = false) {
   let leagueID = fixtures[0].league.id;
   let round = fixtures[0].league.round;
   let thisID = ``;
-  let tds = `<td style="text-align: center;">`;
 
   loadCompLogo(leagueID);
 
@@ -38,34 +37,48 @@ export function matchList(fixtures, showID = false) {
   fixtures.forEach((element) => {
     if (showID) thisID = `<td class="match-id">${element.fixture.id}</td>`;
     date = new Date(element.fixture.date);
+    let dateToAdd = `${date.getDate()}.${
+      (date.getMonth() + 1 < 10 ? "0" : "") + date.getMonth()
+    }.${date.getFullYear()}`;
 
     loadClubLogo(element.teams.home.id);
     loadClubLogo(element.teams.away.id);
 
-    addToPage += `<tr">
-    ${tds}${date.getDate()}.${
-      date.getMonth() + 1
-    }.${date.getFullYear()} ${date.getUTCHours()}:${
-      (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
-    }</td>
-    <td style="text-align: center;"><img src=${imagePath(
-      element.teams.home.id
-    )} alt="*${element.teams.home.name}*" width="30px"></td>
-      <td style="text-align: left;" id="${element.teams.home.id}">${
+    addToPage += `
+    <tr>
+      <td style="text-align: center;">${dateToAdd}</td>
+      <td style="text-align: left;" rowspan=2 id="${element.teams.home.id}">${
       element.teams.home.name
     }</td>
-    ${tds}${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
-    <td style="text-align: center;"><img src=${imagePath(
-      element.teams.away.id
-    )} alt="*${element.teams.away.name}*" width="30px"></td>
-      <td style="text-align: left;" id="${element.teams.away.id}">${truncate(
-      element.teams.away.name,
-      19
-    )}</td>
-    ${tds}${
-      !isNaN(parseInt(element.goals.away)) ? element.goals.away : ""
-    }</td>${thisID}
-      </tr>`;
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(
+        element.teams.home.id
+      )} alt="*${element.teams.home.name}*" width="30px"></td>
+      <td style="text-align: center; font-weight: bold">${
+        !isNaN(parseInt(element.goals.home)) ? element.goals.home : ""
+      }</td>
+      <td style="text-align: center;" rowspan=2> - </td>
+      <td style="text-align: center; font-weight: bold">${
+        !isNaN(parseInt(element.goals.away)) ? element.goals.away : ""
+      }</td>
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(
+        element.teams.away.id
+      )} alt="*${element.teams.away.name}*" width="30px">
+      <td style="text-align: left;" rowspan=2 id="${
+        element.teams.away.id
+      }">${truncate(element.teams.away.name, 19)}</td>
+      ${thisID}
+    </tr>
+    <tr>
+      <td style="text-align: center;">${date.getUTCHours()} : ${
+      (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
+    }</td>
+      <td style="text-align: center;">(${
+        element.statistics ? element.statistics[0].statistics[16].value : ""
+      })</td>
+      <td style="text-align: center;">(${
+        element.statistics ? element.statistics[1].statistics[16].value : ""
+      })</td>
+    </tr>`;
   });
 
   addToPage += `</table>`;
@@ -85,99 +98,88 @@ export function matchList(fixtures, showID = false) {
 
 export function matchesToCanvas(sourceDiv) {
   let matchesTable = document.getElementById(sourceDiv);
-  let leagueName = document.getElementById("league-name").innerHTML;
-  let leagueID = document.getElementById("league-id").innerHTML;
-  let round = document.getElementById("round-no").innerHTML;
   var rowCount = matchesTable.rows.length;
   let thisTr;
-  let index = 7;
   let isResult = true;
   let logo1, logo2;
   let notResultGap = 0;
   let notResultGap2 = 0;
 
-  matchesTable.cellPadding = 10;
+  matchesTable.cellPadding = 4;
 
-  for (var i = 0; i < rowCount; i++) {
+  /*for (var i = 0; i < rowCount; i++) {
     if (matchesTable.rows[i].cells.length == index + 1)
       matchesTable.rows[i].deleteCell(index);
-  }
-  yPos += (10 - rowCount) * 30;
+  }*/
+  yPos += (10 - rowCount / 2) * 30;
 
   for (let i = 0; i < rowCount; i++) {
     thisTr = matchesTable.rows[i];
-    if (thisTr.children[3].innerHTML == "") isResult = false;
+    thisTr.children[0].style.backgroundColor = "F1FAEE";
+    if (i % 2 == 0) {
+      if (thisTr.children[3].innerHTML == "") isResult = false;
 
-    if (!isResult) {
-      thisTr.deleteCell(6);
-      notResultGap = 22;
-      notResultGap2 = 60;
-      thisTr.children[3].innerHTML = "VS";
-      thisTr.children[0].style.width = "131px";
+      if (!isResult) {
+        thisTr.deleteCell(6);
+        notResultGap = 22;
+        notResultGap2 = 60;
+        thisTr.children[3].innerHTML = "VS";
+        thisTr.children[0].style.width = "131px";
+        thisTr.children[3].style.width = "78px";
+      } else {
+        thisTr.children[0].style.width = "120px";
+        thisTr.children[1].style.width = "238px";
+        thisTr.children[2].style.width = "50px"; //logo
+        thisTr.children[3].style.width = "50px"; //score
+        thisTr.children[4].style.width = "30px"; //-
+        thisTr.children[5].style.width = "50px"; //score
+        thisTr.children[6].style.width = "50px"; //logo
+        thisTr.children[7].style.width = "238px";
 
-      thisTr.children[3].style.width = "78px";
+        thisTr.children[0].style.fontSize = "22px";
+        thisTr.children[6].style.fontSize = "22px";
+
+        thisTr.children[0].style.borderBottomStyle = "hidden";
+        thisTr.children[1].style.borderRightStyle = "hidden";
+        thisTr.children[7].style.borderLeftStyle = "hidden";
+
+        thisTr.children[1].style.borderLeftColor = "#457B9D";
+        thisTr.children[1].style.borderLeftWidth = "2px";
+
+        thisTr.children[1].style.textAlign = "right";
+
+        thisTr.children[0].cellPadding = 2;
+      }
+
+      logo1 = clubs.find((element) =>
+        htmlDecode(thisTr.children[2].innerHTML).includes(element.name)
+      );
+      logo2 = clubs.find((element) =>
+        htmlDecode(thisTr.children[6].innerHTML).includes(element.name)
+      );
+
+      thisTr.children[2].innerHTML = "";
+      thisTr.children[6].innerHTML = "";
+
+      addImgToArray(494 + notResultGap, logo1.id, i / 2);
+      addImgToArray(714 + notResultGap2, logo2.id, i / 2);
     } else {
-      thisTr.children[0].style.width = "108px";
-      thisTr.children[3].style.width = "40px";
-      thisTr.children[6].style.width = "40px";
+      thisTr.children[0].style.fontSize = "22px";
+      thisTr.children[1].style.fontSize = "18px";
+      thisTr.children[2].style.fontSize = "18px";
+      thisTr.children[0].cellPadding = 2;
     }
-
-    thisTr.children[0].style.fontSize = "22px";
-    thisTr.children[1].style.width = "40px";
-    thisTr.children[2].style.width = "232px";
-    thisTr.children[4].style.width = "40px";
-    thisTr.children[5].style.width = "232px";
-
-    logo1 = clubs.find((element) =>
-      htmlDecode(thisTr.children[1].innerHTML).includes(element.name)
-    );
-    logo2 = clubs.find((element) =>
-      htmlDecode(thisTr.children[4].innerHTML).includes(element.name)
-    );
-
-    console.log(thisTr.children[1].innerHTML);
-    console.log(logo1);
-
-    thisTr.children[1].innerHTML = "";
-    thisTr.children[4].innerHTML = "";
-
-    addImgToArray(262 + notResultGap, logo1.id, i);
-    addImgToArray(634 + notResultGap2, logo2.id, i);
   }
 
-  //text: ["Round " + round.split(" - ")[1]],
-  if (rowCount <= 11)
+  if (rowCount <= 22)
     if (sourceDiv == "match-list") {
-      writeStrokedText({
-        text: [leagueName],
-        fontSize: 60,
-        textAlign: "center",
-        strokeStyle: "#1d3557",
-        fillStyle: "#e63946",
-        lineWidth: 2,
-        x: 256,
-        y: yPos + 90 + rowCount * 77,
-      });
-      writeStrokedText({
-        text: [round.replace(`Regular Season -`, "Round")],
-        fontSize: 60,
-        textAlign: "center",
-        x: 815,
-        y: yPos + 90 + rowCount * 77,
-      });
+      leagueBannerBig(yPos);
     } else {
       let bottomText = document.getElementById("breaking-official").value;
       ctx.fillText("Season 2023/24", 540, yPos + 58 + rowCount * 77);
       ctx.fillStyle = "#e63946";
       ctx.fillText(bottomText, 540, yPos - 22);
     }
-
-  imgToAdd.push({
-    img: imgs.leagues[leagueID],
-    imgHeight: 140,
-    startX: 540,
-    startY: yPos + rowCount * 77,
-  });
 
   buildTableForTableType(
     removeNewlines(matchesTable.outerHTML),
@@ -197,6 +199,6 @@ function addImgToArray(xPos, logo, i) {
     img: imgs.clubs[logo],
     imgHeight: 50,
     startX: xPos,
-    startY: yPos + 15 + i * 77,
+    startY: yPos + 16 + i * 77,
   });
 }
