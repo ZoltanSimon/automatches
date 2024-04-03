@@ -13,6 +13,11 @@ export class Team {
     this.last5 = new Stats();
     this.last5PerGame = new Stats();
     this.form = "";
+    this.points = 0;
+  }
+
+  getPoints() {
+    this.points = 3 * this.wins + this.draws;
   }
 }
 

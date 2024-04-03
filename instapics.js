@@ -107,7 +107,7 @@ document.getElementById("pasteArea").onpaste = function (event) {
       base_image = new Image();
       base_image.src = event.target.result;
       base_image.onload = function () {
-        drawResizedImage(base_image, imgHeight, 1080, 25);
+        drawResizedImage(base_image, imgHeight, 1080, 30);
         ctx.drawImage(border_image, 0, 0);
       };
     };
@@ -147,7 +147,7 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
   ctx.drawImage(border_image, 0, 0);
   console.log(lines);
-  let data = `<svg xmlns='http://www.w3.org/2000/svg' width='880'>
+  let data = `<svg xmlns='http://www.w3.org/2000/svg' width='900'>
     <foreignObject width='100%' height='100%'>
     <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>
     ${lines}
@@ -176,7 +176,7 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   img.src = buildSvgImageUrl(data);
 }
 
-function drawResizedImage(image, imgHeight, startX, startY) {
+export function drawResizedImage(image, imgHeight, startX, startY) {
   if (image.height > image.width) {
     newHeight = imgHeight;
     newWidth = imgHeight / (image.height / image.width);
@@ -239,4 +239,29 @@ export function writeStrokedText({
     ctx.strokeText(text[i], x, y + i * lineheight);
     ctx.fillText(text[i], x, y + i * lineheight);
   }
+}
+
+export function leagueBannerBig(yPos) {
+  let leagueName = document.getElementById("league-name").innerHTML;
+  let leagueID = document.getElementById("league-id").innerHTML;
+  let round = document.getElementById("round-no").innerHTML;
+  writeStrokedText({
+    text: [leagueName],
+    fontSize: 60,
+    textAlign: "right",
+    strokeStyle: "#1d3557",
+    fillStyle: "#e63946",
+    lineWidth: 2,
+    x: 990,
+    y: yPos - 80,
+  });
+  writeStrokedText({
+    text: [round.replace(`Regular Season -`, "Round")],
+    fontSize: 60,
+    textAlign: "right",
+    x: 990,
+    y: yPos - 20,
+  });
+
+  ctx.drawImage(imgs.leagues[leagueID], 90, yPos - 160, 150, 150);
 }
