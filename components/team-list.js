@@ -4,17 +4,20 @@ let thisTeam, thisTr, thisId;
 
 export function teamList(response) {
   console.log(response);
-  createTeamsTable(response);
+  //createTeamsTable(response);
 
   let matchesTable = document.getElementById("match-list");
   let allPlayingTeams = [];
 
   if (matchesTable) {
     for (let i = 0; i < matchesTable.rows.length; i++) {
-      thisTr = matchesTable.rows[i];
-
-      allPlayingTeams.push(findTeamById(response, thisTr.children[2].id));
-      allPlayingTeams.push(findTeamById(response, thisTr.children[5].id));
+      if (i % 2 == 0) {
+        thisTr = matchesTable.rows[i];
+        console.log(thisTr.children[1].id);
+        console.log(thisTr.children[7].id);
+        allPlayingTeams.push(findTeamById(response, thisTr.children[1].id));
+        allPlayingTeams.push(findTeamById(response, thisTr.children[7].id));
+      }
     }
     console.log(allPlayingTeams);
     createTeamsTable(allPlayingTeams);

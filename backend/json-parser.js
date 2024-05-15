@@ -118,44 +118,9 @@ app.get("/get-league-matches", async (request, response) => {
   return response.json(allMatches);
 });
 
-//change the value in the in-memory object
-//data[0].fixture.timezone = "UTC";
-//Serialize as JSON and Write it to a file
-//fs.writeFileSync("../leagues/1.json", JSON.stringify(data));
-
 app.get("/get-all-matches", async (request, response) => {
   let bigArr = [];
   const dirname = "../data/matches";
   await readFiles(dirname);
   response.json(bigArr);
 });
-
-async function readFiles(dirname) {
-  console.log(dirname);
-  console.log(await fs.readdir(dirname));
-  /*await fs.readdir(dirname, function (err, filenames) {
-    console.log(filenames);
-    console.log("a");
-    if (err) {
-      console.log(err);
-      return;
-    }
-    filenames.forEach(async function (filename) {
-      await fs.readFile(dirname + filename, "utf-8", function (err, content) {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        let newEl = {
-          fileName: filename,
-          leagueName: JSON.parse(content)[0].league.name,
-        };
-        bigArr.push(newEl);
-        console.log(filename);
-        console.log(JSON.parse(content)[0].league.name);
-      });
-    });
-  });*/
-}
-
-function onFileContent(filename, content) {}
