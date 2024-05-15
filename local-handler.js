@@ -101,6 +101,7 @@ export async function getPlayerGoalList() {
       }
     }
   }
+  console.log(scorerList);
   scorerList.sort((a, b) =>
     a.goals < b.goals ? 1 : b.goals < a.goals ? -1 : 0
   );

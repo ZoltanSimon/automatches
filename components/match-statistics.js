@@ -1,9 +1,8 @@
 import {
   buildTableForTableType,
   imgs,
-  ctx,
   loadClubLogo,
-  writeStrokedText,
+  leagueBannerBig,
 } from "./../instapics.js";
 import { Stat } from "../classes/stat.js";
 import { clubs } from "./../data/clubs.js";
@@ -67,6 +66,11 @@ export function addMatchStats(apiResponse) {
     addToPage += `<tr>${tds}${values[0]}</td>${tds}${stats[i].title}</td>${tds}${values[1]}</td></tr>`;
   }
   addToPage += `</tbody></table>`;
+
+  document.getElementById("league-name").innerHTML = apiResponse.league.name;
+  document.getElementById("league-id").innerHTML = apiResponse.league.id;
+  document.getElementById("round-no").innerHTML = apiResponse.league.round;
+
   document.getElementById("one-fixture").innerHTML += addToPage;
   document.getElementById(
     "one-fixture"
@@ -84,7 +88,7 @@ export function matchStatsToCanvas() {
   let imgToAdd = [];
   let statisticsTable = document.getElementById("match-stats");
   let teamLogos = statisticsTable.rows[0].children[1].innerHTML.split(" - ");
-  let leagueName = document.getElementById("league-match-stats").innerHTML;
+  let yPos = 190;
 
   statisticsTable.rows[0].style.backgroundColor = "#457B9D";
   statisticsTable.rows[0].style.fontWeight = "bold";
@@ -96,7 +100,7 @@ export function matchStatsToCanvas() {
           img: imgs.clubs[clubs[j].id],
           imgHeight: 56,
           startX: 430 + i * 164,
-          startY: 184,
+          startY: yPos,
         });
       }
     }
@@ -107,22 +111,8 @@ export function matchStatsToCanvas() {
   buildTableForTableType(
     removeNewlines(statisticsTable.outerHTML),
     imgToAdd,
-    180
+    yPos
   );
 
-  let rounNo = leagueName.split(" - ")[0];
-  let league = leagueName.split(" - ")[leagueName.split(" - ").length - 1];
-  writeStrokedText({
-    text: [league],
-    fontSize: 56,
-    strokeStyle: "#1d3557",
-    fillStyle: "#e63946",
-    y: 140,
-  });
-  writeStrokedText({
-    text: [rounNo],
-    strokeStyle: "#1d3557",
-    fillStyle: "#1d3557",
-    y: 930,
-  });
+  leagueBannerBig(yPos);
 }

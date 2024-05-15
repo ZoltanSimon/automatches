@@ -38,7 +38,7 @@ export function matchList(fixtures, showID = false) {
     if (showID) thisID = `<td class="match-id">${element.fixture.id}</td>`;
     date = new Date(element.fixture.date);
     let dateToAdd = `${date.getDate()}.${
-      (date.getMonth() + 1 < 10 ? "0" : "") + date.getMonth()
+      (date.getMonth() + 1 < 10 ? "0" : "") + (parseInt(date.getMonth()) + 1)
     }.${date.getFullYear()}`;
 
     loadClubLogo(element.teams.home.id);
