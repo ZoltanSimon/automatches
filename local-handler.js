@@ -248,6 +248,7 @@ async function getPlayerList(compType, compList) {
 
     for (let i = 0; i < league.length; i++) {
       if (league[i].fixture.status.short == "FT") {
+        console.log(league[i].fixture.id);
         let match = await getResultFromLocal(league[i].fixture.id);
         if (match[0]) {
           for (let j = 0; j < match[0].players.length; j++) {
@@ -278,7 +279,11 @@ export async function getResultsByRoundLocal(leagueID, roundNo) {
   let league = await response.json();
   for (let i = 0; i < league.length; i++) {
     if (league[i].league.round == roundNo) {
-      allGames.push((await getResultFromLocal(league[i].fixture.id))[0]);
+      if (league[i].fixture.status.short == "FT") {
+        allGames.push((await getResultFromLocal(league[i].fixture.id))[0]);
+      } else {
+        allGames.push(league[i]);
+      }
     }
   }
   return allGames;
