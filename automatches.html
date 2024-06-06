@@ -21,6 +21,10 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="automatches.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/js-datepicker/dist/datepicker.min.css"
+    />
   </head>
   <body>
     <div style="height: 1100px">
@@ -49,6 +53,7 @@
         <button type="button" id="copy-text" class="btn btn-primary btn-block">
           Copy
         </button>
+        <div type="text" id="calendar"></div>
       </div>
       <div class="floating-buttons">
         <div class="row" style="display: flex">
@@ -87,7 +92,7 @@
               <button id="getSquad">Get Squad</button>
               <button id="get-player-goal-list">Get Player List</button>
             </div>
-            <button id="a">Get all clubs</button>
+            <button id="get-all-clubs">Get all clubs</button>
 
             <button id="get-all-players">Get all players</button>
             <button id="get-all-matches">Get all matches</button>
@@ -209,5 +214,6 @@
       integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
       crossorigin="anonymous"
     ></script>
+    <script src="https://unpkg.com/js-datepicker"></script>
   </footer>
 </html>

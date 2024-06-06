@@ -20,6 +20,7 @@ import { matchList } from "./components/match-list.js";
 import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
 import { players } from "./data/players.js";
+import { clubs } from "./data/clubs.js";
 import { allLeagues } from "./data/leagues.js";
 import { loadPlayerFace, loadCompLogo } from "./instapics.js";
 import { copyText, copyToClipboard, imagePath } from "./common-functions.js";
@@ -104,7 +105,7 @@ document.getElementById("get-player-goal-list").onclick = async function () {
   playerGoalList(top10);
 };
 
-document.getElementById("a").onclick = async function () {
+document.getElementById("get-all-clubs").onclick = async function () {
   let teamsNew = [];
   let homeTeam, awayTeam;
 
@@ -130,6 +131,10 @@ document.getElementById("a").onclick = async function () {
       }
     }
   }
+
+  teamsNew = teamsNew.filter(function (obj) {
+    return !clubs.some((el) => el.id === obj.id);
+  });
   console.log(teamsNew);
 };
 
@@ -317,3 +322,9 @@ for (const element of allLeagues) {
     })
   );
 }
+
+const leftJoin = (objArr1, objArr2, key1, key2) =>
+  objArr1.map((anObj1) => ({
+    ...objArr2.find((anObj2) => anObj1[key1] === anObj2[key2]),
+    ...anObj1,
+  }));

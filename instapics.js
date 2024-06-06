@@ -19,22 +19,21 @@ let inputTextValue,
   base_image,
   imgHeight,
   fontY,
-  fixtureDate,
-  matches = [];
+  fixtureDate;
 export let imgs = {};
 
+const picker = datepicker(document.querySelector("#calendar"), {
+  position: "bl",
+  alwaysShow: true,
+  onSelect: (instance, date) => {
+    document.getElementById("fixtures-info").innerHTML = "";
+    showMatchesOnDate(date);
+  },
+});
+
 const date = new Date();
-for (let i = 0; i < allLeagues.length; i++) {
-  let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
-  let league = await response.json();
-  for (let j = 0; j < league.length; j++) {
-    fixtureDate = new Date(league[j].fixture.date);
-    if (fixtureDate.toDateString() == date.toDateString()) {
-      matches.push(league[j]);
-    }
-  }
-}
-if (matches.length > 0) matchList(matches, true);
+
+showMatchesOnDate(date);
 
 //Preload images
 let border_image = new Image();
@@ -264,4 +263,19 @@ export function leagueBannerBig(yPos) {
   });
 
   ctx.drawImage(imgs.leagues[leagueID], 90, yPos - 160, 150, 150);
+}
+
+async function showMatchesOnDate(date) {
+  let matches = [];
+  for (let i = 0; i < allLeagues.length; i++) {
+    let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
+    let league = await response.json();
+    for (let j = 0; j < league.length; j++) {
+      fixtureDate = new Date(league[j].fixture.date);
+      if (fixtureDate.toDateString() == date.toDateString()) {
+        matches.push(league[j]);
+      }
+    }
+  }
+  if (matches.length > 0) matchList(matches, true);
 }
