@@ -4812,4 +4812,72 @@ export let clubs = [
     id: 1063,
     name: "Saint Etienne",
   },
+  {
+    id: 25,
+    name: "Germany",
+  },
+  {
+    id: 30,
+    name: "Peru",
+  },
+  {
+    id: 2383,
+    name: "Chile",
+  },
+  {
+    id: 2382,
+    name: "Ecuador",
+  },
+  {
+    id: 2379,
+    name: "Venezuela",
+  },
+  {
+    id: 16,
+    name: "Mexico",
+  },
+  {
+    id: 2385,
+    name: "Jamaica",
+  },
+  {
+    id: 2384,
+    name: "USA",
+  },
+  {
+    id: 2381,
+    name: "Bolivia",
+  },
+  {
+    id: 7,
+    name: "Uruguay",
+  },
+  {
+    id: 11,
+    name: "Panama",
+  },
+  {
+    id: 8,
+    name: "Colombia",
+  },
+  {
+    id: 2380,
+    name: "Paraguay",
+  },
+  {
+    id: 26,
+    name: "Argentina",
+  },
+  {
+    id: 6,
+    name: "Brazil",
+  },
+  {
+    id: 5529,
+    name: "Canada",
+  },
+  {
+    id: 29,
+    name: "Costa Rica",
+  },
 ];

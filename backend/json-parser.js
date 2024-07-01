@@ -4,9 +4,23 @@ import express from "express";
 import { PORT } from "./config.js";
 import { getResultsDate, getResultFromApi } from "./../webapi-handler.js";
 import { createRequire } from "module";
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
 const app = express();
 app.use(express.json());
+
+app.get("/about", (req, res) => {
+  res.send("Welcome to about us page");
+});
+
+console.log(__dirname);
+app.get("/starting11", (req, res) => {
+  res.sendFile(path.resolve(__dirname + "/../pitch/palya.html"));
+});
+
 app.listen(PORT, () => {
   console.log("Server Listening on PORT:", PORT);
 });
