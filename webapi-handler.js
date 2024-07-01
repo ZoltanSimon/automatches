@@ -1,6 +1,6 @@
 const rapidApiHost = "v3.football.api-sports.io";
 const rapidApiKey = "aba57b743572275dac2835162c201c56";
-const season = 2023;
+const season = 2024;
 
 export async function getResultFromApi(matchID) {
   const response = await fetch(

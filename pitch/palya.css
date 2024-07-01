@@ -1,0 +1,100 @@
+.smallInput {
+  width: 17%;
+}
+.bigInput {
+  width: 62%;
+  margin-left: 9px;
+}
+
+.row {
+  margin-bottom: 5px;
+}
+.page-id-655 #sidebar-primary {
+  display: none;
+}
+.page-id-655 #sidebar-secondary {
+  display: none;
+}
+.page-id-655 #primary {
+  width: 100%;
+}
+.container {
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 1200px;
+  margin: 10px auto;
+}
+.right {
+  float: right;
+}
+.row {
+  display: flex;
+}
+.col-sm {
+  width: 50%;
+}
+fieldset {
+  margin: 0px;
+  margin-right: 6px;
+  width: 100%;
+  padding-bottom: 6px;
+}
+
+.bigDiv {
+  float: right;
+  width: 400px;
+}
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+}
+
+.active,
+.accordion:hover {
+  background-color: #ccc;
+}
+
+.accordion:after {
+  content: "\002B";
+  color: #777;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2212";
+}
+
+.panel {
+  margin-top: 10px;
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+@media only screen and (max-width: 600px) {
+  .col-sm {
+    width: 100%;
+  }
+  .bigDiv {
+    width: 100%;
+  }
+  .right {
+    clear: both;
+  }
+  .row {
+    display: block;
+    width: 100%;
+  }
+}

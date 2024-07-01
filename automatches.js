@@ -38,7 +38,7 @@ document.getElementById("select-all-leagues").onclick = function () {
   const allTheLeagues = document
     .getElementById("league-list")
     .querySelectorAll("img");
-  for (let i = 0; i < allTheLeagues.length / 2; i++) {
+  for (let i = 0; i < 10; i++) {
     let league = allTheLeagues[i];
     league.classList.add("selected-league");
     selectedLeagues.push(league.id.split("img-")[1]);
@@ -143,7 +143,7 @@ document.getElementById("get-all-players").onclick = async function () {
 };
 
 document.getElementById("get-all-matches").onclick = async function () {
-  teamList(await getAllMatches([39, 140, 135, 78, 61, 88, 94, 144, 203, 283]));
+  teamList(await getAllMatches(selectedLeagues));
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {

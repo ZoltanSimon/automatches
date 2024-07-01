@@ -12,6 +12,8 @@ export let allLeagues = [
   { id: 2, name: "uefa-champions-league", teams: "club", type: "continental" },
   { id: 3, name: "uefa-europa-league", teams: "club", type: "continental" },
   { id: 848, name: "Conference League", teams: "club", type: "continental" },
+  { id: 4, name: "EURO 2024", teams: "nt", type: "continental" },
+  { id: 9, name: "Copa America", teams: "nt", type: "continental" },
   { id: 81, name: "pokal", teams: "club", type: "cup" },
   { id: 960, name: "euro-quali", teams: "nt", type: "quali" },
   {
