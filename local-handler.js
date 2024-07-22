@@ -1,4 +1,3 @@
-import { matchList } from "./components/match-list.js";
 import { getResultFromApi } from "./webapi-handler.js";
 import { selectedLeagues } from "./automatches.js";
 import { downloadResult } from "./common-functions.js";

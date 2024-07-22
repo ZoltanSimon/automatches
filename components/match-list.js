@@ -5,7 +5,7 @@ import {
   loadClubLogo,
   loadCompLogo,
   leagueBannerBig,
-} from "./../instapics.js";
+} from "../instapics.js";
 import { clubs } from "./../data/clubs.js";
 import { getMatch } from "../local-handler.js";
 import {
@@ -107,10 +107,6 @@ export function matchesToCanvas(sourceDiv) {
 
   matchesTable.cellPadding = 4;
 
-  /*for (var i = 0; i < rowCount; i++) {
-    if (matchesTable.rows[i].cells.length == index + 1)
-      matchesTable.rows[i].deleteCell(index);
-  }*/
   yPos += (10 - rowCount / 2) * 30;
 
   for (let i = 0; i < rowCount; i++) {

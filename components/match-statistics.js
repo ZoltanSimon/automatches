@@ -3,7 +3,7 @@ import {
   imgs,
   loadClubLogo,
   leagueBannerBig,
-} from "./../instapics.js";
+} from "../instapics.js";
 import { Stat } from "../classes/stat.js";
 import { clubs } from "./../data/clubs.js";
 import { removeNewlines } from "../common-functions.js";
