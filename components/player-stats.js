@@ -1,9 +1,5 @@
 import { Stat } from "../classes/stat.js";
-import {
-  buildTableForTableType,
-  imgs,
-  loadPlayerFace,
-} from "./../instapics.js";
+import { buildTableForTableType, imgs, loadPlayerFace } from "../instapics.js";
 import { removeNewlines } from "../common-functions.js";
 
 let width = 50;

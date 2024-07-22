@@ -1,8 +1,9 @@
 import { readFile } from "fs/promises";
 import * as fs from "fs";
 import express from "express";
-import { PORT } from "./config.js";
-import { getResultsDate, getResultFromApi } from "./../webapi-handler.js";
+import { engine } from "express-handlebars";
+import { PORT } from "./backend/config.js";
+import { getResultsDate, getResultFromApi } from "./webapi-handler.js";
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -10,13 +11,30 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 const app = express();
+
 app.use(express.json());
 
-app.get("/about", (req, res) => {
-  res.send("Welcome to about us page");
+app.engine("handlebars", engine());
+app.set("views", __dirname + "/views");
+app.set("view engine", "handlebars");
+app.use(express.static("./"));
+
+app.get("/", (req, res) => {
+  res.render("home", { title: "Home Page" });
 });
 
-console.log(__dirname);
+app.get("/about", (req, res) => {
+  res.render("about", { title: "About Page" });
+});
+
+app.get("/contact", (req, res) => {
+  res.render("contact", { title: "Contact Page" });
+});
+
+app.get("/admin", (req, res) => {
+  res.render("admin", { title: "Automatches" });
+});
+
 app.get("/starting11", (req, res) => {
   res.sendFile(path.resolve(__dirname + "/../pitch/palya.html"));
 });

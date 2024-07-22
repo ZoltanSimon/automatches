@@ -1,3 +1,6 @@
+import { allLeagues } from "./data/leagues.js";
+import { matchList } from "./components/match-list.js";
+
 export let download = function () {
   var link = document.createElement("a");
   link.download = "mysquad.png";
@@ -73,4 +76,19 @@ export function copyToClipboard(element) {
   document.execCommand("copy");
   window.getSelection().removeAllRanges();
   document.getElementById("btn").value = "Copied";
+}
+
+export async function showMatchesOnDate(date) {
+  let matches = [];
+  for (let i = 0; i < allLeagues.length; i++) {
+    let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
+    let league = await response.json();
+    for (let j = 0; j < league.length; j++) {
+      let fixtureDate = new Date(league[j].fixture.date);
+      if (fixtureDate.toDateString() == date.toDateString()) {
+        matches.push(league[j]);
+      }
+    }
+  }
+  if (matches.length > 0) matchList(matches, true);
 }

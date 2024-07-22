@@ -1,45 +1,25 @@
-import { matchList, matchesToCanvas } from "./components/match-list.js";
+import { matchesToCanvas } from "./components/match-list.js";
 import { matchStatsToCanvas } from "./components/match-statistics.js";
 import { playerStatsToCanvas } from "./components/player-stats.js";
 import { standingsToCanvas } from "./components/league-standings.js";
 import { playerListToCanvas } from "./components/player-list.js";
-import { allLeagues } from "./data/leagues.js";
 import { imagePath, download } from "./common-functions.js";
 
 let c = document.getElementById("myCanvas");
-export let ctx = c.getContext("2d");
+export let ctx = c?.getContext("2d");
 const font = "Source Sans Pro";
 const fontSize = 46;
 const backgroundImageName = "images/insta_new_no_pic.png";
 const borderImage = "images/border.png";
 const lineheight = 50;
-let inputTextValue,
-  newWidth,
-  newHeight,
-  base_image,
-  imgHeight,
-  fontY,
-  fixtureDate;
+let inputTextValue, newWidth, newHeight, base_image, imgHeight, fontY;
 export let imgs = {};
-
-const picker = datepicker(document.querySelector("#calendar"), {
-  position: "bl",
-  alwaysShow: true,
-  onSelect: (instance, date) => {
-    document.getElementById("fixtures-info").innerHTML = "";
-    showMatchesOnDate(date);
-  },
-});
-
-const date = new Date();
-
-showMatchesOnDate(date);
 
 //Preload images
 let border_image = new Image();
 border_image.src = borderImage;
 
-make_base("", "");
+if (c) make_base("", "");
 
 function make_base(text, breakingText) {
   let lines = text.split(/\r|\r\n|\n/);
@@ -263,19 +243,4 @@ export function leagueBannerBig(yPos) {
   });
 
   ctx.drawImage(imgs.leagues[leagueID], 90, yPos - 160, 150, 150);
-}
-
-async function showMatchesOnDate(date) {
-  let matches = [];
-  for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
-    let league = await response.json();
-    for (let j = 0; j < league.length; j++) {
-      fixtureDate = new Date(league[j].fixture.date);
-      if (fixtureDate.toDateString() == date.toDateString()) {
-        matches.push(league[j]);
-      }
-    }
-  }
-  if (matches.length > 0) matchList(matches, true);
 }

@@ -3,7 +3,7 @@ import {
   imgs,
   ctx,
   loadClubLogo,
-} from "./../instapics.js";
+} from "../instapics.js";
 import { removeNewlines } from "../common-functions.js";
 
 export function playerGoalList(response) {

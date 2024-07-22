@@ -4,7 +4,7 @@ import {
   loadClubLogo,
   writeStrokedText,
   ctx,
-} from "./../instapics.js";
+} from "../instapics.js";
 import { clubs } from "./../data/clubs.js";
 import { imagePath, removeNewlines, truncate } from "./../common-functions.js";
 
