@@ -1,156 +1,7 @@
 <script type="module" src="./../automatches.js"></script>
 <link rel="stylesheet" href="automatches.css" />
 <div style="height: 1100px">
-  <div class="col-md-6 canvas-div">
-    <canvas
-      id="myCanvas"
-      width="1080"
-      height="1080"
-      style="border: 1px solid #d3d3d3"
-    ></canvas>
-  </div>
-  <div class="floating-text">
-    <textarea
-      id="generated-text"
-      rows="22"
-      cols="33"
-      placeholder="This is text"
-    ></textarea>
-    <button type="button" id="generate-text" class="btn btn-primary btn-block">
-      Generate
-    </button>
-    <button type="button" id="copy-text" class="btn btn-primary btn-block">
-      Copy
-    </button>
-    <div type="text" id="calendar"></div>
-  </div>
-  <div class="floating-buttons">
-    <div class="row" style="display: flex">
-      <div id="league-list"></div>
-      <button id="select-all-leagues" style="height: 30px">
-        Select all
-      </button>
-    </div>
-    <div class="row">
-      <button id="submit-league-info" class="btn btn-primary btn-block">
-        League standings
-      </button>
-      <div class="roundandmatch">
-        <div class="automatches-row">
-          <input type="number" placeholder="Round Number" id="roundnr" />
-          <button id="get-matches-by-round">Matches in round</button>
-          <button id="update-leagues">Update Leagues</button>
-        </div>
-        <div class="automatches-row">
-          <input type="string" placeholder="2023-08-23" id="dateStart" />
-          <input type="string" placeholder="2023-08-26" id="dateEnd" />
-          <button id="submit-match-list">Get Match list</button>
-        </div>
-        <div class="automatches-row">
-          <input type="number" placeholder="Match ID" id="fixtureID" />
-          <button id="get-match-auto">Match - auto</button>
-          <button id="missing-matches">Missing Matches</button>
-        </div>
-        <div class="automatches-row">
-          <input type="number" placeholder="276" id="playerID" />
-          <input type="number" placeholder="276" id="playerID2" />
-          <button id="getPlayerStats">Player Stats</button>
-        </div>
-        <div class="automatches-row">
-          <input type="number" placeholder="541" id="teamID" />
-          <button id="getSquad">Get Squad</button>
-          <button id="get-player-goal-list">Get Player List</button>
-        </div>
-        <button id="get-all-clubs">Get all clubs</button>
-
-        <button id="get-all-players">Get all players</button>
-        <button id="get-all-matches">Get all matches</button>
-      </div>
-    </div>
-    <div class="row" style="margin-top: 5px">
-      <textarea
-        rows="5"
-        cols="44"
-        placeholder="This is the default text"
-        id="textOnPic"
-      ></textarea>
-      <textarea
-        id="pasteArea"
-        rows="5"
-        cols="10"
-        placeholder="Paste Image Here"
-      ></textarea>
-    </div>
-    <div class="row">
-      <input type="string" placeholder="OFFICIAL" id="breaking-official" />
-      <button id="add-breaking">🚨BREAKING🚨</button>
-      <button id="happy-bday">Bday</button>
-    </div>
-
-    <div class="row" style="margin-top: 5px">
-      <button
-        type="button"
-        id="download-image"
-        class="btn btn-primary btn-block"
-      >
-        Download
-      </button>
-    </div>
-    <div class="row" style="margin-top: 5px">
-      <button
-        type="button"
-        style="width: 33%"
-        class="btn btn-secondary"
-        id="copy-match-stats"
-      >
-        Match stats
-      </button>
-      <button
-        type="button"
-        style="width: 32%"
-        class="btn btn-secondary"
-        id="copy-standings"
-      >
-        Standings
-      </button>
-      <button
-        type="button"
-        style="width: 33%"
-        class="btn btn-secondary"
-        id="copy-player-stats"
-      >
-        Player Stats
-      </button>
-    </div>
-    <div class="row" style="margin-top: 5px">
-      <button
-        type="button"
-        style="width: 33%"
-        class="btn btn-secondary"
-        id="copy-matches"
-      >
-        Matches
-      </button>
-      <button
-        type="button"
-        style="width: 32%"
-        class="btn btn-secondary"
-        id="copy-selected"
-      >
-        Selected Matches
-      </button>
-      <button
-        type="button"
-        style="width: 33%"
-        class="btn btn-secondary"
-        id="copy-player-list"
-      >
-        Player List
-      </button>
-    </div>
-    <div class="row" id="missing-matches"></div>
-  </div>
-  <div class="col-md-6">
+  <div class="work-area">
     <div id="league-stuff">
       <h3 id="league-name"></h3>
       <span id="league-id"></span>
@@ -171,6 +22,168 @@
       border="1"
       id="selected-matches"
     ></table>
+  </div>
+  <div class="control-panel">
+    <!--div class="floating-text">
+      <textarea
+        id="generated-text"
+        rows="22"
+        cols="33"
+        placeholder="This is text"
+      ></textarea>
+      <button
+        type="button"
+        id="generate-text"
+        class="btn btn-primary btn-block"
+      >
+        Generate
+      </button>
+      <button type="button" id="copy-text" class="btn btn-primary btn-block">
+        Copy
+      </button>
+      <div type="text" id="calendar"></div>
+    </div-->
+    <div class="floating-buttons">
+      <div class="row" style="display: flex">
+        <div id="league-list"></div>
+        <button id="select-all-leagues" style="height: 30px">
+          Select all
+        </button>
+      </div>
+      <div class="row">
+        <button id="submit-league-info" class="btn btn-primary btn-block">
+          League standings
+        </button>
+        <div class="roundandmatch">
+          <div class="automatches-row">
+            <input type="number" placeholder="Round Number" id="roundnr" />
+            <button id="get-matches-by-round">Matches in round</button>
+            <button id="update-leagues">Update Leagues</button>
+          </div>
+          <div class="automatches-row">
+            <input type="string" placeholder="2023-08-23" id="dateStart" />
+            <input type="string" placeholder="2023-08-26" id="dateEnd" />
+            <button id="submit-match-list">Get Match list</button>
+          </div>
+          <div class="automatches-row">
+            <input type="number" placeholder="Match ID" id="fixtureID" />
+            <button id="get-match-auto">Match - auto</button>
+            <button id="missing-matches">Missing Matches</button>
+          </div>
+          <div class="automatches-row">
+            <input type="number" placeholder="276" id="playerID" />
+            <input type="number" placeholder="276" id="playerID2" />
+            <button id="getPlayerStats">Player Stats</button>
+          </div>
+          <div class="automatches-row">
+            <input type="number" placeholder="541" id="teamID" />
+            <button id="getSquad">Get Squad</button>
+            <button id="get-player-goal-list">Get Player List</button>
+          </div>
+          <button id="get-all-clubs">Get all clubs</button>
+
+          <button id="get-all-players">Get all players</button>
+          <button id="get-all-matches">Get all matches</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 5px">
+        <textarea
+          rows="5"
+          cols="44"
+          placeholder="This is the default text"
+          id="textOnPic"
+        ></textarea>
+        <textarea
+          id="pasteArea"
+          rows="5"
+          cols="10"
+          placeholder="Paste Image Here"
+        ></textarea>
+      </div>
+      <div class="row">
+        <input type="string" placeholder="OFFICIAL" id="breaking-official" />
+        <button id="add-breaking">🚨BREAKING🚨</button>
+        <button id="happy-bday">Bday</button>
+      </div>
+
+      <div class="row" style="margin-top: 5px">
+        <button
+          type="button"
+          id="download-image"
+          class="btn btn-primary btn-block"
+        >
+          Download
+        </button>
+      </div>
+      <div class="row" style="margin-top: 5px">
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-match-stats"
+        >
+          Match stats
+        </button>
+        <button
+          type="button"
+          style="width: 32%"
+          class="btn btn-secondary"
+          id="copy-standings"
+        >
+          Standings
+        </button>
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-player-stats"
+        >
+          Player Stats
+        </button>
+      </div>
+      <div class="row" style="margin-top: 5px">
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-matches"
+        >
+          Matches
+        </button>
+        <button
+          type="button"
+          style="width: 32%"
+          class="btn btn-secondary"
+          id="copy-selected"
+        >
+          Selected Matches
+        </button>
+        <button
+          type="button"
+          style="width: 33%"
+          class="btn btn-secondary"
+          id="copy-player-list"
+        >
+          Player List
+        </button>
+        <button
+          type="button"
+          style="width: 100%"
+          class="btn btn-secondary"
+          id="ucl-matches"
+        >UCL matches
+        </button>
+      </div>
+      <div class="row" id="missing-matches"></div>
+    </div>
+  </div>
+  <div class="canvas-div">
+    <canvas
+      id="myCanvas"
+      width="1080"
+      height="1080"
+      style="border: 1px solid #d3d3d3"
+    ></canvas>
   </div>
 </div>
 <div id="team-list-betting"></div>

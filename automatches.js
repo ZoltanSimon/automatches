@@ -186,11 +186,11 @@ document.getElementById("copy-for-blog").onclick = function () {
   copyToClipboard("league-stuff");
 };
 
-document.getElementById("generate-text").onclick = async function () {};
+//document.getElementById("generate-text").onclick = async function () {};
 
-document.getElementById("copy-text").onclick = async function () {
-  copyText("generated-text");
-};
+//document.getElementById("copy-text").onclick = async function () {
+//  copyText("generated-text");
+//};
 
 async function submitRequest_matchList() {
   let leagueID = selectedLeagues[0];
