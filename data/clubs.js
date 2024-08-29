@@ -245,7 +245,7 @@ export let clubs = [
   },
   {
     id: 157,
-    name: "Bayern Munich",
+    name: "Bayern München",
   },
   {
     id: 165,
@@ -285,7 +285,7 @@ export let clubs = [
   },
   {
     id: 180,
-    name: "FC Heidenheim",
+    name: "1. FC Heidenheim",
   },
   {
     id: 167,
@@ -301,7 +301,7 @@ export let clubs = [
   },
   {
     id: 163,
-    name: "Borussia Monchengladbach",
+    name: "Borussia Mönchengladbach",
   },
   {
     id: 172,
@@ -309,7 +309,7 @@ export let clubs = [
   },
   {
     id: 176,
-    name: "Vfl Bochum",
+    name: "VfL Bochum",
   },
   {
     id: 85,
@@ -4879,5 +4879,309 @@ export let clubs = [
   {
     id: 29,
     name: "Costa Rica",
+  },
+  {
+    id: 537,
+    name: "Leganes",
+  },
+  {
+    id: 720,
+    name: "Valladolid",
+  },
+  {
+    id: 540,
+    name: "Espanyol",
+  },
+  {
+    id: 895,
+    name: "Como",
+  },
+  {
+    id: 517,
+    name: "Venezia",
+  },
+  {
+    id: 523,
+    name: "Parma",
+  },
+  {
+    id: 77,
+    name: "Angers",
+  },
+  {
+    id: 108,
+    name: "Auxerre",
+  },
+  {
+    id: 202,
+    name: "Groningen",
+  },
+  {
+    id: 195,
+    name: "Willem II",
+  },
+  {
+    id: 227,
+    name: "Santa Clara",
+  },
+  {
+    id: 225,
+    name: "Nacional",
+  },
+  {
+    id: 6215,
+    name: "Dender",
+  },
+  {
+    id: 263,
+    name: "Beerschot Wilrijk",
+  },
+  {
+    id: 3588,
+    name: "Eyüpspor",
+  },
+  {
+    id: 994,
+    name: "Goztepe",
+  },
+  {
+    id: 3583,
+    name: "BB Bodrumspor",
+  },
+  {
+    id: 3745,
+    name: "Dečić",
+  },
+  {
+    id: 703,
+    name: "UE Santa Coloma",
+  },
+  {
+    id: 5308,
+    name: "Virtus",
+  },
+  {
+    id: 336,
+    name: "Jagiellonia",
+  },
+  {
+    id: 375,
+    name: "Malmo FF",
+  },
+  {
+    id: 634,
+    name: "Botev Plovdiv",
+  },
+  {
+    id: 372,
+    name: "IF elfsborg",
+  },
+  {
+    id: 3403,
+    name: "Pafos",
+  },
+  {
+    id: 2390,
+    name: "Paks",
+  },
+  {
+    id: 20034,
+    name: "Corvinul Hunedoara",
+  },
+  {
+    id: 648,
+    name: "Zira",
+  },
+  {
+    id: 338,
+    name: "Wisla Krakow",
+  },
+  {
+    id: 14395,
+    name: "Llapi",
+  },
+  {
+    id: 3549,
+    name: "Ružomberok",
+  },
+  {
+    id: 250,
+    name: "Kilmarnock",
+  },
+  {
+    id: 2073,
+    name: "Silkeborg",
+  },
+  {
+    id: 4495,
+    name: "Maccabi Petah Tikva",
+  },
+  {
+    id: 6489,
+    name: "Kryvbas KR",
+  },
+  {
+    id: 352,
+    name: "Bala Town",
+  },
+  {
+    id: 356,
+    name: "Caernarfon Town",
+  },
+  {
+    id: 275,
+    name: "Stjarnan",
+  },
+  {
+    id: 4359,
+    name: "Bravo",
+  },
+  {
+    id: 661,
+    name: "FK Liepaja",
+  },
+  {
+    id: 2036,
+    name: "UNA Strassen",
+  },
+  {
+    id: 3381,
+    name: "Velež",
+  },
+  {
+    id: 4625,
+    name: "Floriana",
+  },
+  {
+    id: 3870,
+    name: "Šiauliai",
+  },
+  {
+    id: 391,
+    name: "FC Isloch Minsk R.",
+  },
+  {
+    id: 3529,
+    name: "Tallinna Kalev",
+  },
+  {
+    id: 274,
+    name: "Valur Reykjavik",
+  },
+  {
+    id: 15576,
+    name: "Malisheva",
+  },
+  {
+    id: 14507,
+    name: "Marsaxlokk",
+  },
+  {
+    id: 3854,
+    name: "Shelbourne",
+  },
+  {
+    id: 698,
+    name: "St Joseph S Fc",
+  },
+  {
+    id: 3684,
+    name: "FC Noah",
+  },
+  {
+    id: 4348,
+    name: "Tikveš",
+  },
+  {
+    id: 3740,
+    name: "Mornar",
+  },
+  {
+    id: 650,
+    name: "vaasa PS",
+  },
+  {
+    id: 6496,
+    name: "Polessya",
+  },
+  {
+    id: 5503,
+    name: "Sumqayıt",
+  },
+  {
+    id: 610,
+    name: "Fehérvár FC",
+  },
+  {
+    id: 1163,
+    name: "Ilves Tampere",
+  },
+  {
+    id: 2391,
+    name: "Puskas Academy",
+  },
+  {
+    id: 851,
+    name: "Cherno More Varna",
+  },
+  {
+    id: 337,
+    name: "Slask Wroclaw",
+  },
+  {
+    id: 640,
+    name: "Mlada Boleslav",
+  },
+  {
+    id: 18878,
+    name: "TransINVEST Vilnius",
+  },
+  {
+    id: 2266,
+    name: "Cliftonville FC",
+  },
+  {
+    id: 4628,
+    name: "Sliema Wanderers",
+  },
+  {
+    id: 2644,
+    name: "Radnicki 1923",
+  },
+  {
+    id: 3502,
+    name: "Saburtalo",
+  },
+  {
+    id: 325,
+    name: "Tromso",
+  },
+  {
+    id: 251,
+    name: "ST Mirren",
+  },
+  {
+    id: 3713,
+    name: "Baník Ostrava",
+  },
+  {
+    id: 783,
+    name: "FC Zurich",
+  },
+  {
+    id: 407,
+    name: "Brondby",
+  },
+  {
+    id: 1011,
+    name: "FC ST. Gallen",
+  },
+  {
+    id: 6232,
+    name: "SCM Gloria Buzău",
+  },
+  {
+    id: 6916,
+    name: "Unirea Slobozia",
   },
 ];

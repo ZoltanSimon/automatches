@@ -72,7 +72,7 @@ app.get("/update-leagues", async (request, response) => {
     let dataToWrite = await getResultsDate(leagueID);
 
     fs.writeFile(
-      `../data/leagues/${leagueID}.json`,
+      `./data/leagues/${leagueID}.json`,
       JSON.stringify(dataToWrite.response),
       function (err) {
         if (err) {
@@ -89,14 +89,15 @@ app.get("/update-leagues", async (request, response) => {
 app.get("/save-match", async (request, response) => {
   let matchID = request.query.matchID;
   let dataToWrite = await getResultFromApi(matchID);
-  console.log(matchID);
+  //console.log(matchID);
 
   fs.writeFile(
-    `../data/matches/${matchID}.json`,
+    `./data/matches/${matchID}.json`,
     JSON.stringify(dataToWrite.response),
     { flag: "wx" },
     function (err) {
       if (err) {
+        console.log(err);
         console.log("Already exists");
         //throw err;
       }
@@ -112,13 +113,13 @@ app.get("/missing-matches", async (request, response) => {
 
   for (const leagueID of leagueIDs) {
     let data = JSON.parse(
-      await readFile(`../data/leagues/${leagueID}.json`, "utf8")
+      await readFile(`./data/leagues/${leagueID}.json`, "utf8")
     );
     console.log(data[0]);
 
     for (const element of data) {
       if (["FT", "AET"].includes(element.fixture.status.short))
-        if (!fs.existsSync(`../data/matches/${element.fixture.id}.json`)) {
+        if (!fs.existsSync(`./data/matches/${element.fixture.id}.json`)) {
           matchArr.push(element);
         }
     }
@@ -135,13 +136,13 @@ app.get("/get-league-matches", async (request, response) => {
   for (let i = 0; i < leagues.length; i++) {
     let leagueID = leagues[i];
     let data = JSON.parse(
-      await readFile(`../data/leagues/${leagueID}.json`, "utf8")
+      await readFile(`./data/leagues/${leagueID}.json`, "utf8")
     );
     for (const element of data) {
       if (["FT", "AET"].includes(element.fixture.status.short)) {
         matchID = element.fixture.id;
         let data2 = JSON.parse(
-          await readFile(`../data/matches/${matchID}.json`)
+          await readFile(`./data/matches/${matchID}.json`)
         );
         allMatches.push(data2);
       }
@@ -152,7 +153,7 @@ app.get("/get-league-matches", async (request, response) => {
 
 app.get("/get-all-matches", async (request, response) => {
   let bigArr = [];
-  const dirname = "../data/matches";
+  const dirname = "./data/matches";
   await readFiles(dirname);
   response.json(bigArr);
 });

@@ -118,6 +118,10 @@ document.getElementById("copy-player-list").onclick = function () {
   playerListToCanvas();
 };
 
+document.getElementById("ucl-matches").onclick = function () {
+  drawUCLMatches();
+};
+
 document.getElementById("download-image").onclick = function () {
   download();
 };

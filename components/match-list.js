@@ -147,9 +147,12 @@ export function matchesToCanvas(sourceDiv) {
         thisTr.children[0].cellPadding = 2;
       }
 
+      console.log(thisTr.children[2].innerHTML);
+
       logo1 = clubs.find((element) =>
         htmlDecode(thisTr.children[2].innerHTML).includes(element.name)
       );
+
       logo2 = clubs.find((element) =>
         htmlDecode(thisTr.children[6].innerHTML).includes(element.name)
       );
