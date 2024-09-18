@@ -1,20 +1,18 @@
-import { getResultFromApi } from "./webapi-handler.js";
-import { selectedLeagues } from "./automatches.js";
-import { downloadResult } from "./common-functions.js";
 import { Player } from "./classes/player.js";
 import { allLeagues } from "./data/leagues.js";
 import { Team } from "./classes/team.js";
 
 let allPlayers = [];
+export let selectedLeagues = [];
 
-export async function getLocalPlayerStats(inputPlayer) {
+export async function getLocalPlayerStats(inputPlayer, leagues) {
   let playerFound;
   let foundIndex = -1;
   let thisComp = "";
 
   let player = new Player(inputPlayer);
-  for (let i = 0; i < selectedLeagues.length; i++) {
-    let response = await fetch(`data/leagues/${selectedLeagues[i]}.json`);
+  for (let i = 0; i < leagues.length; i++) {
+    let response = await fetch(`data/leagues/${leagues[i]}.json`);
     let league = await response.json();
 
     for (let i = 0; i < league.length; i++) {
@@ -51,7 +49,6 @@ export async function getLocalPlayerStats(inputPlayer) {
     }
   }
 
-  console.log(player);
   return player;
 }
 
@@ -59,13 +56,23 @@ export async function getResultFromLocal(fixtureID) {
   if (fixtureID instanceof PointerEvent) {
     fixtureID = fixtureID.target.innerHTML;
   }
-  let response = await fetch(`data/matches/${fixtureID}.json`);
-  if (!response.ok) {
-    handleError(fixtureID);
-    let response = downloadResult(await getResultFromApi(fixtureID), fixtureID);
-    return response;
+
+  try {
+    let response = await fetch(`data/matches/${fixtureID}.json`);
+    if (!response.ok) {
+      handleError(fixtureID);
+      //let response = downloadResult(
+      //  await getResultFromApi(fixtureID),
+      //  fixtureID
+      //);
+    }
+    return await response.json();
+  } catch (e) {
+    //console.error(e);
+    return null;
   }
-  return await response.json();
+
+  //return await response.json();
 }
 
 async function handleError(id) {
@@ -73,44 +80,11 @@ async function handleError(id) {
   document.getElementById("missing-matches").innerHTML += id + "<br/>";
 }
 
-export async function getPlayerGoalList() {
-  let scorerList = [];
-  let scorer;
-
-  for (let i = 0; i < selectedLeagues.length; i++) {
-    let response = await fetch(`data/leagues/${selectedLeagues[i]}.json`);
-    let league = await response.json();
-
-    for (let i = 0; i < league.length; i++) {
-      if (league[i].fixture.status.short == "FT") {
-        let match = await getResultFromLocal(league[i].fixture.id);
-        if (match[0]) {
-          for (let j = 0; j < match[0].events.length; j++) {
-            if (match[0].events[j].type == "Goal") {
-              scorer = match[0].events[j].player;
-              if (!scorerList.find((e) => e.id == scorer.id)) {
-                scorer.goals = 1;
-                scorerList.push(scorer);
-              } else {
-                scorerList.find((e) => e.id == scorer.id).goals++;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  console.log(scorerList);
-  scorerList.sort((a, b) =>
-    a.goals < b.goals ? 1 : b.goals < a.goals ? -1 : 0
-  );
-
-  console.log(scorerList);
-  return scorerList;
-}
-
 export async function getAllPlayers() {
-  await getPlayerList("club", allLeagues);
+  await getPlayerList(
+    "club",
+    allLeagues.filter((el) => el.type == "league")
+  );
   //await getPlayerList("nation", allNationalComps);
   console.log(allPlayers);
 }
@@ -120,7 +94,7 @@ export async function getAllMatches(leagues) {
   let teams = [];
   let t1, t2;
   const response = await fetch(
-    `http://localhost:3000/get-league-matches?leagueID=${leagues.join(",")}`,
+    `/get-league-matches?leagueID=${leagues.join(",")}`,
     {
       method: "GET",
     }
@@ -176,8 +150,8 @@ export async function getAllMatches(leagues) {
 
     for (let i = team.stats.length - 1; i >= 0; i--) {
       let stat = team.stats[i];
-      team.total.xG += stat.xG;
-      team.total.xGA += stat.xGA;
+      team.total.xG += stat.xG || 0;
+      team.total.xGA += stat.xGA || 0;
       team.total.corners += stat.corners;
       team.total.cornersAgainst += stat.cornersAgainst;
       team.total.shotsOnGoal += stat.shotsOnGoal;
@@ -196,8 +170,8 @@ export async function getAllMatches(leagues) {
       team.getPoints();
 
       if (i > team.stats.length - 6) {
-        team.last5.xG += stat.xG;
-        team.last5.xGA += stat.xGA;
+        team.last5.xG += stat.xG || 0;
+        team.last5.xGA += stat.xGA || 0;
         team.last5.corners += stat.corners;
         team.last5.cornersAgainst += stat.cornersAgainst;
         team.last5.shotsOnGoal += stat.shotsOnGoal;
@@ -249,7 +223,7 @@ async function getPlayerList(compType, compList) {
       if (league[i].fixture.status.short == "FT") {
         console.log(league[i].fixture.id);
         let match = await getResultFromLocal(league[i].fixture.id);
-        if (match[0]) {
+        if (match) {
           for (let j = 0; j < match[0].players.length; j++) {
             thisClub = match[0].players[j].team.id;
 
@@ -293,12 +267,9 @@ export async function getMatch(fixtureID) {
   if (fixtureID instanceof PointerEvent) {
     fixtureID = fixtureID.target.innerHTML;
   }
-  const response = await fetch(
-    `http://localhost:3000/save-match?matchID=${fixtureID}`,
-    {
-      method: "GET",
-    }
-  );
+  const response = await fetch(`/save-match?matchID=${fixtureID}`, {
+    method: "GET",
+  });
   const data = await response.json();
   console.log(data);
   return data;

@@ -1,0 +1,474 @@
+<link rel="stylesheet" href="/../css/palya.css" />
+<link rel="stylesheet" href="/../css/style.css" />
+<script src="/../common-functions.js"></script>
+<div class="team-container">
+  <canvas
+    id="myCanvas"
+    width="700"
+    height="880"
+    style="border: 1px solid #d3d3d3"
+  ></canvas>
+
+  <div class="bigDiv">
+    <div class="row">
+      <button type="button" class="btn btn-primary" onclick="download()">
+        Download starting 11
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col-sm">
+        <label for="formation-selector">Choose a formation:</label>
+      </div>
+      <div class="col-sm right">
+        <select
+          onchange="val()"
+          name="formation-selector"
+          id="formation-selector"
+        >
+          <option value="1-4-0-0-3-0-20-1">4-3-3</option>
+          <option value="1-4-0-1-2-0-20-1">4-3-3 CDM</option>
+          <option value="1-4-0-0-2-1-20-1">4-3-3 CAM</option>
+          <option value="1-4-0-0-4-0-0-2">4-4-2</option>
+          <option value="1-4-0-0-4-0-1-1">4-4-1-1</option>
+          <option value="1-4-0-1-2-1-0-2">4-1-2-1-2</option>
+          <option value="1-4-0-1-20-1-0-2">4-1-2-1-2 Wide</option>
+          <option value="1-4-0-1-0-30-0-2">4-1-3-2</option>
+          <option value="1-4-0-2-0-30-0-1">4-2-3-1</option>
+          <option value="1-4-0-2-0-20-0-2">4-2-2-2</option>
+          <option value="1-4-0-0-5-0-0-1">4-5-1</option>
+          <option value="1-4-0-1-3-20-0-0">4-6-0</option>
+          <option value="1-3-0-0-5-0-0-2">3-5-2</option>
+          <option value="1-3-0-200-2-0-20-1">3-4-3</option>
+          <option value="1-3-0-300-0-3-0-1">3-3-3-1</option>
+          <option value="1-3-200-0-3-0-0-2">5-3-2</option>
+          <option value="1-3-200-0-4-0-0-1">5-4-1</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm">
+        <label for="pattern-selector">Kit pattern</label>
+      </div>
+      <div class="col-sm right">
+        <select id="pattern-selector" name="pattern-selector" onchange="val()">
+          <option value="solid">Solid</option>
+          <option value="horizontal-stripes">Horizontal stripes</option>
+          <option value="vertical-stripes">Vertical stripes</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm">
+        <label for="kit-color-selector">Select the color of the kit</label>
+      </div>
+      <div class="col-sm right">
+        <input
+          type="color"
+          id="kit-color-selector"
+          name="kit-color-selector"
+          value="#1D3557"
+          onchange="val()"
+        />
+      </div>
+    </div>
+
+    <div class="row" id="secondary-kit-color">
+      <div class="col-sm">
+        <label for="kit-color-selector2">Secondary kit color</label>
+      </div>
+      <div class="col-sm right">
+        <input
+          type="color"
+          id="kit-color-selector2"
+          name="kit-color-selector2"
+          value="#E63946"
+          onchange="val()"
+        />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm">
+        <label for="number-color-selector">Select the color of the text</label>
+      </div>
+      <div class="col-sm right">
+        <input
+          type="color"
+          id="number-color-selector"
+          name="number-color-selector"
+          value="#ffffff"
+          onchange="val()"
+        />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm">
+        <label for="kit-color-selector2">Kit text</label>
+      </div>
+
+      <div class="col-sm right">
+        <select id="bottom-text" name="bottom-text" onchange="val()">
+          <option value="show-position">Position</option>
+          <option value="show-number">Number</option>
+          <option value="show-off">Off</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm">
+        <input
+          type="checkbox"
+          id="show-team-name"
+          name="show-team-name"
+          checked
+          onchange="val()"
+        />
+        <label for="show-team-name">Show Team Name</label>
+      </div>
+
+      <input
+        type="text"
+        id="team-name"
+        name="team-name"
+        value="Team Name"
+        onchange="val()"
+        style="width: 50%; margin-right: 9px"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos1"
+        value="GK"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno1"
+        value="1"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player1"
+        value="Player1"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos2"
+        value="RB"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno2"
+        value="2"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player2"
+        value="Player2"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos3"
+        value="CB"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno3"
+        value="3"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player3"
+        value="Player3"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos4"
+        value="CB"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno4"
+        value="4"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player4"
+        value="Player4"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos5"
+        value="LB"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno5"
+        value="5"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player5"
+        value="Player5"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos6"
+        value="CM"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno6"
+        value="6"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player6"
+        value="Player6"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos7"
+        value="CM"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno7"
+        value="7"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player7"
+        value="Player7"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos8"
+        value="CM"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno8"
+        value="8"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player8"
+        value="Player8"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos9"
+        value="LW"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno9"
+        value="9"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player9"
+        value="Player9"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos10"
+        value="ST"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno10"
+        value="10"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player10"
+        value="Player10"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+
+    <div class="row">
+      <input
+        type="text"
+        id="playerpos11"
+        value="RW"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="number"
+        id="playerno11"
+        value="11"
+        class="smallInput"
+        onchange="val()"
+      />
+      <input
+        type="text"
+        id="player11"
+        value="Player11"
+        class="bigInput"
+        onchange="val()"
+      />
+    </div>
+    <br />
+    <button class="accordion">Additional Options</button>
+    <div class="panel">
+      <div class="row">
+        <div class="col-sm">
+          <label for="pitch-selector">Pitch color</label>
+        </div>
+        <div class="col-sm right">
+          <select id="pitch-selector" name="pitch-selector" onchange="val()">
+            <option value="pattern">Pattern</option>
+            <option value="solid">Solid</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <label for="watermark">Show watermark</label>
+        </div>
+        <div class="col-sm right">
+          <select id="watermark" name="watermark" onchange="val()">
+            <option value="show-watermark">Show</option>
+            <option value="hide-watermark">Hide</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm">
+          <label for="shape-selector">Kit shape</label>
+        </div>
+        <div class="col-sm right">
+          <select id="shape-selector" name="shape-selector" onchange="val()">
+            <option value="kit">Kit</option>
+            <option value="circle">Circle</option>
+            <option value="rectangle">Rectangle</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <fieldset class="col-sm right" onchange="val()">
+          <legend>Kit text shadow</legend>
+          <div style="margin-right: 10px">
+            <input
+              type="radio"
+              id="show-shadow"
+              name="shadow-switch"
+              value="show-shadow"
+            />
+            <label for="show-shadow">On</label>
+          </div>
+
+          <div>
+            <input
+              type="radio"
+              id="hide-shadow"
+              name="shadow-switch"
+              value="hide-shadow"
+              checked
+            />
+            <label for="hide-shadow">Off</label>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+  <hr />
+</div>
+<script src="/../controllers/palya.js"></script>

@@ -1,4 +1,5 @@
-function oneFixture(response) {
+import { imagePath } from "../common-functions.js";
+export function oneFixture(response) {
   let fixture = response[0];
   let players = [];
   let homeTeam = fixture.teams.home;
@@ -42,7 +43,7 @@ function oneFixture(response) {
 
   document.getElementById("standings").innerHTML = ``;
 
-  addToPage = `
+  let addToPage = `
     <table>
       <tr>
         <td><img src=${imagePath(homeTeam.id)} width="30px"></td>
@@ -73,7 +74,6 @@ function oneFixture(response) {
     Subs: ${subs(awayTeam.subs)}`;
 
   document.getElementById("one-fixture").innerHTML += addToPage;
-  addMatchStats(fixture);
 }
 
 function addGoals(goals) {

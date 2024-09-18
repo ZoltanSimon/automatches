@@ -5184,4 +5184,252 @@ export let clubs = [
     id: 6916,
     name: "Unirea Slobozia",
   },
+  {
+    id: 16118,
+    name: "Greifswalder FC",
+  },
+  {
+    id: 4266,
+    name: "Viktoria Berlin",
+  },
+  {
+    id: 4259,
+    name: "Alemannia Aachen",
+  },
+  {
+    id: 183,
+    name: "Dynamo Dresden",
+  },
+  {
+    id: 190,
+    name: "Erzgebirge Aue",
+  },
+  {
+    id: 1323,
+    name: "Sportfreunde Lotte",
+  },
+  {
+    id: 1630,
+    name: "Bremer SV",
+  },
+  {
+    id: 1318,
+    name: "SV Meppen",
+  },
+  {
+    id: 784,
+    name: "Würzburger Kickers",
+  },
+  {
+    id: 12831,
+    name: "Phönix Lübeck",
+  },
+  {
+    id: 12742,
+    name: "Borussia Hildesheim",
+  },
+  {
+    id: 1619,
+    name: "FC 08 Villingen",
+  },
+  {
+    id: 1648,
+    name: "TuS Koblenz",
+  },
+  {
+    id: 184,
+    name: "FC Ingolstadt 04",
+  },
+  {
+    id: 1652,
+    name: "SSV Ulm 1846",
+  },
+  {
+    id: 1628,
+    name: "Kickers Offenbach",
+  },
+  {
+    id: 1327,
+    name: "VfR Aalen",
+  },
+  {
+    id: 24333,
+    name: "Beverley Town",
+  },
+  {
+    id: 24338,
+    name: "Easington Colliery",
+  },
+  {
+    id: 24334,
+    name: "Blyth Town",
+  },
+  {
+    id: 24344,
+    name: "Newcastle Blue Star",
+  },
+  {
+    id: 8674,
+    name: "Abbey Hey",
+  },
+  {
+    id: 12013,
+    name: "Parkgate",
+  },
+  {
+    id: 24347,
+    name: "South Liverpool",
+  },
+  {
+    id: 1344,
+    name: "Bury",
+  },
+  {
+    id: 8851,
+    name: "Litherland Remyca",
+  },
+  {
+    id: 24349,
+    name: "St Helens",
+  },
+  {
+    id: 11956,
+    name: "Brocton",
+  },
+  {
+    id: 14450,
+    name: "OJM Black Country",
+  },
+  {
+    id: 24345,
+    name: "Pershore Town",
+  },
+  {
+    id: 11989,
+    name: "Hinckley AFC",
+  },
+  {
+    id: 24348,
+    name: "Sporting Club Inkberrow",
+  },
+  {
+    id: 8884,
+    name: "Northampton ON Chenecks",
+  },
+  {
+    id: 12027,
+    name: "Shirebrook Town",
+  },
+  {
+    id: 24335,
+    name: "Bourne Town",
+  },
+  {
+    id: 11983,
+    name: "Harrowby United",
+  },
+  {
+    id: 12028,
+    name: "Sileby Rangers",
+  },
+  {
+    id: 24355,
+    name: "Boston Town",
+  },
+  {
+    id: 8794,
+    name: "Great Yarmouth Town",
+  },
+  {
+    id: 24337,
+    name: "Cornard United",
+  },
+  {
+    id: 24351,
+    name: "Wormley Rovers",
+  },
+  {
+    id: 14406,
+    name: "Benfleet",
+  },
+  {
+    id: 24346,
+    name: "Portishead Town",
+  },
+  {
+    id: 8868,
+    name: "Malmesbury Victoria",
+  },
+  {
+    id: 9004,
+    name: "Winslow United",
+  },
+  {
+    id: 12004,
+    name: "Milton United",
+  },
+  {
+    id: 24331,
+    name: "Amersham Town",
+  },
+  {
+    id: 24332,
+    name: "Berks County",
+  },
+  {
+    id: 24336,
+    name: "British Airways",
+  },
+  {
+    id: 24341,
+    name: "Larkfield & New Hythe",
+  },
+  {
+    id: 17078,
+    name: "Rayners Lane",
+  },
+  {
+    id: 19265,
+    name: "Roffey",
+  },
+  {
+    id: 24350,
+    name: "Wick",
+  },
+  {
+    id: 24342,
+    name: "Millbrook FC",
+  },
+  {
+    id: 24339,
+    name: "Hamworthy Recreation",
+  },
+  {
+    id: 12060,
+    name: "Downton",
+  },
+  {
+    id: 12044,
+    name: "Wincanton Town",
+  },
+  {
+    id: 24340,
+    name: "Ivybridge Town",
+  },
+  {
+    id: 8947,
+    name: "St Austell",
+  },
+  {
+    id: 12082,
+    name: "Wellington",
+  },
+  {
+    id: 24343,
+    name: "Newark Town",
+  },
+  {
+    id: 24354,
+    name: "AFC Whyteleafe",
+  },
 ];

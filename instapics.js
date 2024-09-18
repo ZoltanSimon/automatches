@@ -1,9 +1,9 @@
-import { matchesToCanvas } from "./components/match-list.js";
 import { matchStatsToCanvas } from "./components/match-statistics.js";
 import { playerStatsToCanvas } from "./components/player-stats.js";
 import { standingsToCanvas } from "./components/league-standings.js";
 import { playerListToCanvas } from "./components/player-list.js";
-import { imagePath, download } from "./common-functions.js";
+import { imagePath } from "./common-functions.js";
+import { drawUCLMatches } from "./components/ucl-matches.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c?.getContext("2d");
@@ -49,82 +49,6 @@ function make_base(text, breakingText) {
     writeStrokedText({ text: lines, fontSize: fontSize, y: fontY });
   };
 }
-
-document.getElementById("textOnPic").onkeyup = function () {
-  inputTextValue = document.getElementById("textOnPic").value;
-  let breakingText = document.getElementById("breaking-official").value;
-  make_base(inputTextValue, breakingText);
-};
-
-document.getElementById("add-breaking").onclick = function () {
-  document.getElementById("breaking-official").value =
-    document.getElementById("add-breaking").innerHTML;
-};
-
-document.getElementById("happy-bday").onclick = function () {
-  document.getElementById("breaking-official").value = "🎉HAPPY BIRTHDAY🎂";
-};
-
-document.getElementById("pasteArea").onpaste = function (event) {
-  let breakingText = document.getElementById("breaking-official").value;
-  // use event.originalEvent.clipboard for newer chrome versions
-  var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-  // find pasted image among pasted items
-  var blob = null;
-  for (var i = 0; i < items.length; i++) {
-    if (items[i].type.indexOf("image") === 0) {
-      blob = items[i].getAsFile();
-    }
-  }
-  // load image if there is a pasted image
-  if (blob !== null) {
-    var reader = new FileReader();
-    reader.onload = function (event) {
-      imgHeight = fontY - 34 - lineheight;
-      if (breakingText) imgHeight -= 66;
-
-      base_image = new Image();
-      base_image.src = event.target.result;
-      base_image.onload = function () {
-        drawResizedImage(base_image, imgHeight, 1080, 30);
-        ctx.drawImage(border_image, 0, 0);
-      };
-    };
-    reader.readAsDataURL(blob);
-  }
-};
-
-document.getElementById("copy-match-stats").onclick = function () {
-  matchStatsToCanvas();
-};
-
-document.getElementById("copy-standings").onclick = function (event) {
-  standingsToCanvas();
-};
-
-document.getElementById("copy-player-stats").onclick = function () {
-  playerStatsToCanvas();
-};
-
-document.getElementById("copy-matches").onclick = function () {
-  matchesToCanvas("match-list");
-};
-
-document.getElementById("copy-selected").onclick = function () {
-  matchesToCanvas("selected-matches");
-};
-
-document.getElementById("copy-player-list").onclick = function () {
-  playerListToCanvas();
-};
-
-document.getElementById("ucl-matches").onclick = function () {
-  drawUCLMatches();
-};
-
-document.getElementById("download-image").onclick = function () {
-  download();
-};
 
 export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
@@ -185,6 +109,7 @@ export function loadClubLogo(clubToLoad) {
   img.src = imagePath(clubToLoad);
   if (!imgs.clubs) imgs.clubs = [];
   imgs.clubs[clubToLoad] = img;
+  //console.log(imgs);
 }
 
 export function loadPlayerFace(playerToLoad) {

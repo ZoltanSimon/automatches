@@ -1,5 +1,10 @@
-<script type="module" src="./../automatches.js"></script>
-<link rel="stylesheet" href="automatches.css" />
+<script type="module" src="./../controllers/admin.js"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/js-datepicker/dist/datepicker.min.css"
+/>
+<script src="https://unpkg.com/js-datepicker"></script>
+<link rel="stylesheet" href="css/automatches.css" />
 <div style="height: 1100px">
   <div class="work-area">
     <div id="league-stuff">
@@ -24,32 +29,21 @@
     ></table>
   </div>
   <div class="control-panel">
-    <!--div class="floating-text">
-      <textarea
-        id="generated-text"
-        rows="22"
-        cols="33"
-        placeholder="This is text"
-      ></textarea>
-      <button
-        type="button"
-        id="generate-text"
-        class="btn btn-primary btn-block"
-      >
-        Generate
-      </button>
-      <button type="button" id="copy-text" class="btn btn-primary btn-block">
-        Copy
-      </button>
-      <div type="text" id="calendar"></div>
-    </div-->
     <div class="floating-buttons">
       <div class="row" style="display: flex">
-        <div id="league-list"></div>
+        <div id="league-list">
+          <div id="league-list-league"></div>
+          <div id="league-list-cup"></div>
+          <div id="league-list-nt"></div>
+          <div type="text" id="calendar"></div>
+        </div>
+
         <button id="select-all-leagues" style="height: 30px">
           Select all
         </button>
+
       </div>
+
       <div class="row">
         <button id="submit-league-info" class="btn btn-primary btn-block">
           League standings
@@ -175,6 +169,24 @@
         </button>
       </div>
       <div class="row" id="missing-matches"></div>
+    </div>
+    <div class="floating-text">
+      <textarea
+        id="generated-text"
+        rows="22"
+        cols="33"
+        placeholder="This is text"
+      ></textarea>
+      <button
+        type="button"
+        id="generate-text"
+        class="btn btn-primary btn-block"
+      >
+        Generate
+      </button>
+      <button type="button" id="copy-text" class="btn btn-primary btn-block">
+        Copy
+      </button>
     </div>
   </div>
   <div class="canvas-div">
