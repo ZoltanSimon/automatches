@@ -1,5 +1,9 @@
 import { allLeagues } from "./data/leagues.js";
 import { matchList } from "./components/match-list.js";
+import { getLocalPlayerStats } from "./local-handler.js";
+import { loadPlayerFace } from "./instapics.js";
+import { players } from "./data/players.js";
+import { playerGoalList } from "./components/player-list.js";
 
 export let download = function () {
   var link = document.createElement("a");
@@ -91,4 +95,32 @@ export async function showMatchesOnDate(date) {
     }
   }
   if (matches.length > 0) matchList(matches, true);
+  /*const teams = [
+    40, 541, 530, 529, 496, 499, 157, 165, 168, 541, 530, 529, 40, 541, 530,
+    529, 40, 541, 530, 529, 40, 541, 530, 529, 40, 541, 530, 529, 40, 541, 530,
+    529, 40, 541, 530, 529,
+  ];
+  // Number of items
+  for (let i = 0; i < 9; i++) loadClubLogo(teams[i]);*/
+}
+
+export async function getTop10Players(leagues) {
+  let thisPlayer;
+  let top10 = [];
+  const response = await fetch(`get-player-list?leagues=${leagues.join(",")}`, {
+    method: "GET",
+  });
+
+  const playerList = await response.json();
+
+  for (let i = 0; i < 10; i++) {
+    //console.log(playerList[i]);
+    loadPlayerFace(playerList[i].id);
+
+    let player = players.find((x) => x.id == playerList[i].id);
+
+    thisPlayer = await getLocalPlayerStats(player, leagues);
+    top10.push(thisPlayer);
+  }
+  playerGoalList(top10);
 }

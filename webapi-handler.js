@@ -48,7 +48,7 @@ export async function getResults(leagueID, round) {
   return data;
 }
 
-export async function getResultsDate(leagueID, from, to) {
+export async function getResultsDate(leagueID, season, from, to) {
   let url = `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${season}&from=${from}&to=${to}`;
 
   if (isNaN(parseInt(from))) {

@@ -4,6 +4,7 @@ import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./backend/config.js";
 import { getResultsDate, getResultFromApi } from "./webapi-handler.js";
+import { getPlayerGoalList } from "./backend/json-reader.js";
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -36,7 +37,7 @@ app.get("/admin", (req, res) => {
 });
 
 app.get("/starting11", (req, res) => {
-  res.sendFile(path.resolve(__dirname + "/../pitch/palya.html"));
+  res.render("palya", { title: "Palya" });
 });
 
 app.listen(PORT, () => {
@@ -64,12 +65,14 @@ app.get("/status", (request, response) => {
 //updates the given league's json file
 app.get("/update-leagues", async (request, response) => {
   let leagueIDs = request.query.leagueID.split(",");
+  let seasons = request.query.seasons.split(",");
   let responseToSend = "";
 
-  for (const leagueID of leagueIDs) {
-    console.log("Delayed for 1 second.");
+  for (let i = 0; i < leagueIDs.length; i++) {
+    let leagueID = leagueIDs[i];
+    let season = seasons[i];
 
-    let dataToWrite = await getResultsDate(leagueID);
+    let dataToWrite = await getResultsDate(leagueID, season);
 
     fs.writeFile(
       `./data/leagues/${leagueID}.json`,
@@ -154,6 +157,20 @@ app.get("/get-league-matches", async (request, response) => {
 app.get("/get-all-matches", async (request, response) => {
   let bigArr = [];
   const dirname = "./data/matches";
-  await readFiles(dirname);
+  await readFile(dirname);
   response.json(bigArr);
+});
+
+/*app.get("/get-player-stats", async (request, response) => {
+  let player = request.query.player;
+  let leagues = request.query.leagues.split(",");
+  let playerStats = await getLocalPlayerStats(player, leagues);
+  return response.json(playerStats);
+});*/
+
+app.get("/get-player-list", async (request, response) => {
+  let leagues = request.query.leagues.split(",");
+  console.log(leagues);
+  let playerList = await getPlayerGoalList(leagues);
+  return response.json(playerList);
 });

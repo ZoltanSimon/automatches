@@ -136,7 +136,7 @@ footer {
 .container {
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
+  width: 80%;
 }
 
 .rectangle {
