@@ -9,13 +9,16 @@ import {
   getAllPlayers,
   getResultsByRoundLocal,
   getMatch,
-  getAllMatches,
+  buildTeamList,
 } from "../local-handler.js";
 import { allLeagues } from "../data/leagues.js";
 import { clubs } from "../data/clubs.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
 import { loadCompLogo } from "../instapics.js";
-import { leagueStandings } from "../components/league-standings.js";
+import {
+  leagueStandings,
+  standingsToCanvas,
+} from "../components/league-standings.js";
 import { addText, buildResults, buildStandings } from "../autotext.js";
 import { players } from "../data/players.js";
 import { teamList } from "../components/team-list.js";
@@ -65,7 +68,7 @@ async function submitRequest_leagueInfo() {
   const found = allLeagues.find((element) => element.id == selectedLeagues[0]);
   document.getElementById("league-name").innerHTML = found.name;
   document.getElementById("league-id").innerHTML = found.id;
-  let standingsFromApi = await getAllMatches(selectedLeagues);
+  let standingsFromApi = await buildTeamList(selectedLeagues);
   standingsFromApi.sort((a, b) => b.points - a.points); // b - a for reverse sort
   loadCompLogo(found.id);
   leagueStandings(standingsFromApi);
@@ -188,7 +191,11 @@ document.getElementById("get-all-players").onclick = async function () {
 };
 
 document.getElementById("get-all-matches").onclick = async function () {
-  teamList(await getAllMatches(selectedLeagues));
+  if (selectedLeagues.length > 0) {
+    teamList(await buildTeamList(selectedLeagues), false);
+  } else {
+    console.error("No league selected");
+  }
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
@@ -289,10 +296,6 @@ document.getElementById("copy-selected").onclick = function () {
 
 document.getElementById("copy-player-list").onclick = function () {
   playerListToCanvas();
-};
-
-document.getElementById("ucl-matches").onclick = function () {
-  drawUCLMatches();
 };
 
 document.getElementById("download-image").onclick = function () {

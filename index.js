@@ -114,20 +114,24 @@ app.get("/missing-matches", async (request, response) => {
   let leagueIDs = request.query.leagueID.split(",");
   let matchArr = [];
 
-  for (const leagueID of leagueIDs) {
-    let data = JSON.parse(
-      await readFile(`./data/leagues/${leagueID}.json`, "utf8")
-    );
-    console.log(data[0]);
+  if (leagueIDs.length == 0 || !(leagueIDs[0] > 0)) {
+    return response.json([]);
+  } else {
+    for (const leagueID of leagueIDs) {
+      let data = JSON.parse(
+        await readFile(`./data/leagues/${leagueID}.json`, "utf8")
+      );
+      console.log(data[0]);
 
-    for (const element of data) {
-      if (["FT", "AET"].includes(element.fixture.status.short))
-        if (!fs.existsSync(`./data/matches/${element.fixture.id}.json`)) {
-          matchArr.push(element);
-        }
+      for (const element of data) {
+        if (["FT", "AET"].includes(element.fixture.status.short))
+          if (!fs.existsSync(`./data/matches/${element.fixture.id}.json`)) {
+            matchArr.push(element);
+          }
+      }
     }
+    response.json(matchArr);
   }
-  response.json(matchArr);
 });
 
 app.get("/get-league-matches", async (request, response) => {
@@ -135,23 +139,27 @@ app.get("/get-league-matches", async (request, response) => {
   //let leagues = [39, 140, 135, 78, 61, 88, 94, 144, 203, 283];
   let leagues = request.query.leagueID.split(",");
   let matchID;
-  console.log(leagues);
-  for (let i = 0; i < leagues.length; i++) {
-    let leagueID = leagues[i];
-    let data = JSON.parse(
-      await readFile(`./data/leagues/${leagueID}.json`, "utf8")
-    );
-    for (const element of data) {
-      if (["FT", "AET"].includes(element.fixture.status.short)) {
-        matchID = element.fixture.id;
-        let data2 = JSON.parse(
-          await readFile(`./data/matches/${matchID}.json`)
-        );
-        allMatches.push(data2);
+
+  if (leagues.length == 0 || !(leagues[0] > 0)) {
+    return response.json([]);
+  } else {
+    for (let i = 0; i < leagues.length; i++) {
+      let leagueID = leagues[i];
+      let data = JSON.parse(
+        await readFile(`./data/leagues/${leagueID}.json`, "utf8")
+      );
+      for (const element of data) {
+        if (["FT", "AET"].includes(element.fixture.status.short)) {
+          matchID = element.fixture.id;
+          let data2 = JSON.parse(
+            await readFile(`./data/matches/${matchID}.json`)
+          );
+          allMatches.push(data2);
+        }
       }
     }
+    return response.json(allMatches);
   }
-  return response.json(allMatches);
 });
 
 app.get("/get-all-matches", async (request, response) => {
@@ -170,7 +178,6 @@ app.get("/get-all-matches", async (request, response) => {
 
 app.get("/get-player-list", async (request, response) => {
   let leagues = request.query.leagues.split(",");
-  console.log(leagues);
   let playerList = await getPlayerGoalList(leagues);
   return response.json(playerList);
 });

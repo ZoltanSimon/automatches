@@ -1,9 +1,4 @@
-import { matchStatsToCanvas } from "./components/match-statistics.js";
-import { playerStatsToCanvas } from "./components/player-stats.js";
-import { standingsToCanvas } from "./components/league-standings.js";
-import { playerListToCanvas } from "./components/player-list.js";
 import { imagePath } from "./common-functions.js";
-import { drawUCLMatches } from "./components/ucl-matches.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c?.getContext("2d");

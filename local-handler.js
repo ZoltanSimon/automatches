@@ -89,7 +89,7 @@ export async function getAllPlayers() {
   console.log(allPlayers);
 }
 
-export async function getAllMatches(leagues) {
+export async function buildTeamList(leagues) {
   console.log(leagues);
   let teams = [];
   let t1, t2;

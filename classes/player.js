@@ -18,7 +18,7 @@ export class Player {
     this.minutes = 0;
     this.gap90 = 0;
     this.name = "";
-    this.team = "";
+    this.team = inputPlayer.teamName;
     this.competitions = "";
     this.duels = "";
     this.competitionList = [];
@@ -43,6 +43,8 @@ export class Player {
     this.minutes += stats.games.minutes;
     if (!this.name) this.name = playerFound.player.name;
     if (stats.penalty.scored) this.penalties++;
+
+    this.getGAper90();
   }
 
   getGAper90() {
