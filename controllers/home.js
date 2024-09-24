@@ -1,4 +1,8 @@
-import { showMatchesOnDate, getTop10Players } from "../../common-functions.js";
+import {
+  showMatchesOnDate,
+  getTop10Players,
+  getTop10Teams,
+} from "../../common-functions.js";
 
 /*const picker = datepicker(document.querySelector("#calendar"), {
     position: "bl",
@@ -13,3 +17,5 @@ import { showMatchesOnDate, getTop10Players } from "../../common-functions.js";
 showMatchesOnDate(new Date());
 
 await getTop10Players([39, 140, 135, 78, 61, 88, 94]);
+
+await getTop10Teams([39, 140, 135, 78, 61, 88, 94]);

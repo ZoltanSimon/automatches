@@ -2,43 +2,78 @@ let addToPage;
 let tds = `<td style="text-align: center; width: 68px; padding:2px;">`;
 let thisTeam, thisTr, thisId;
 
-export function teamList(response) {
-  console.log(response);
-  createTeamsTable(response);
+export function teamList(response, onlyTotal = true, addMatches = false) {
+  let team1, team2;
+  console.log(onlyTotal);
+  addMatches = true;
+  //createTeamsTable(response, onlyTotal);
 
   let matchesTable = document.getElementById("match-list");
   let allPlayingTeams = [];
 
-  if (matchesTable) {
+  if (matchesTable && addMatches) {
     for (let i = 0; i < matchesTable.rows.length; i++) {
       if (i % 2 == 0) {
         thisTr = matchesTable.rows[i];
-        console.log(thisTr.children[1].id);
-        console.log(thisTr.children[7].id);
-        allPlayingTeams.push(findTeamById(response, thisTr.children[1].id));
-        allPlayingTeams.push(findTeamById(response, thisTr.children[7].id));
+        team1 = findTeamById(response, thisTr.children[1].id);
+        team2 = findTeamById(response, thisTr.children[7].id);
+        allPlayingTeams.push(team1, team2);
+        predictions(team1, team2);
       }
     }
-    console.log(allPlayingTeams);
-    createTeamsTable(allPlayingTeams);
+    createTeamsTable(allPlayingTeams, onlyTotal);
   }
+}
+
+function predictions(homeTeam, awayTeam) {
+  console.log(homeTeam.name);
+  console.log(homeTeam.last5PerGame);
+  console.log(awayTeam.name);
+  console.log(awayTeam.last5PerGame);
+  console.log(getGoal(homeTeam.last5PerGame, awayTeam.last5PerGame));
+  console.log(getGoal(awayTeam.last5PerGame, homeTeam.last5PerGame));
+}
+
+function getGoal(stat1, stat2) {
+  let plus = 0;
+  let minus = 0;
+  if (stat1.xG > stat1.goals + 0.25) plus += 0.4;
+  if (stat1.xG < 1) minus += 0.25;
+  if (stat1.xG < 0.75) minus += 0.1;
+
+  if (stat1.shotsOnGoal > 2.5) plus += 0.25;
+  if (stat1.shotsOnGoal < stat1.goals * 3) minus += 0.25;
+  if (stat2.shotsOnGoalAgainst > 2.5) plus += 0.25;
+
+  if (stat1.corners > 6) plus += 0.25;
+  if (stat2.cornersAgainst > 6) plus += 0.25;
+
+  return (
+    ((stat1.goals * 2 + stat1.xG) / 3 +
+      (stat2.goalsAgainst * 2 + stat2.xGA) / 3) /
+      2 +
+    plus -
+    minus
+  ).toFixed(1);
 }
 
 function findTeamById(response, thisId) {
   return response.find((element) => element.id == thisId);
 }
 
-function createTeamsTable(response) {
+function createTeamsTable(response, onlyTotal) {
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
     <thead>
     <tr>
     <th rowspan=2>Team</th>
-    <th style="text-align: center; padding:2px;" colspan=10>Total</th>
-    <th style="text-align: center; padding:2px;" colspan=8>Per Game</th>
+    <th style="text-align: center; padding:2px;" colspan=10>Total</th>`;
+  if (!onlyTotal) {
+    addToPage += `<th style="text-align: center; padding:2px;" colspan=8>Per Game</th>
     <th style="text-align: center; padding:2px;" colspan=8>Last 5</th>
     <th style="text-align: center; padding:2px;" colspan=8>Last 5 Per Game</th>
-    </tr>
-    <tr>
+    </tr>`;
+  }
+  addToPage += `<tr>
     ${tds}Form</td>
     ${tds}Matches</td>
     ${tds}Goals</td>
@@ -48,8 +83,9 @@ function createTeamsTable(response) {
     ${tds}Corners</td>
     ${tds}CornersA</td>
     ${tds}ShotsG</td>
-    ${tds}ShotsGA</td>
-    ${tds}Goals</td>
+    ${tds}ShotsGA</td>`;
+  if (!onlyTotal) {
+    addToPage += `${tds}Goals</td>
     ${tds}GoalsA</td>
     ${tds}xG</td>
     ${tds}xGA</td>
@@ -72,8 +108,9 @@ function createTeamsTable(response) {
     ${tds}Corners</td>
     ${tds}CornersA</td>
     ${tds}ShotsG</td>
-    ${tds}ShotsGA</td>
-    </tr>
+    ${tds}ShotsGA</td>`;
+  }
+  addToPage += `</tr>
     </thead>
     <tbody>`;
 
@@ -91,8 +128,9 @@ function createTeamsTable(response) {
       ${tds}${thisTeam.total.corners}</td>
       ${tds}${thisTeam.total.cornersAgainst}</td>
       ${tds}${thisTeam.total.shotsOnGoal}</td>
-      ${tds}${thisTeam.total.shotsOnGoalAgainst}</td>
-      ${tds}${thisTeam.perGame.goals.toFixed(2)}</td>
+      ${tds}${thisTeam.total.shotsOnGoalAgainst}</td>`;
+      if (!onlyTotal) {
+        addToPage += `${tds}${thisTeam.perGame.goals.toFixed(2)}</td>
       ${tds}${thisTeam.perGame.goalsAgainst.toFixed(2)}</td>
       ${tds}${thisTeam.perGame.xG.toFixed(2)}</td>
       ${tds}${thisTeam.perGame.xGA.toFixed(2)}</td>
@@ -117,15 +155,14 @@ function createTeamsTable(response) {
       ${tds}${thisTeam.last5PerGame.shotsOnGoal.toFixed(2)}</td>
       ${tds}${thisTeam.last5PerGame.shotsOnGoalAgainst.toFixed(2)}</td>
       </tr>`;
+      }
     }
   }
   addToPage += `</tbody></table>`;
 
-  document.getElementById("team-list-betting").innerHTML += addToPage;
+  document.getElementById("top-team-list").innerHTML += addToPage;
 
   let table = document.getElementById("team-list-table");
-
-  console.log(table.rows[1]);
 
   for (let i = 0; i < table.rows[1].cells.length; i++) {
     let thisTd = table.rows[1].cells[i];
@@ -197,28 +234,3 @@ function sortTable(n) {
     }
   }
 }
-
-/*      ${tds}${thisTeam.total.goals}</td>
-${tds}${thisTeam.total.goalsAgainst}</td>
-${tds}${thisTeam.total.xG.toFixed(2)}</td>
-${tds}${thisTeam.total.xGA.toFixed(2)}</td>
-${tds}${thisTeam.total.corners}</td>
-${tds}${thisTeam.total.cornersAgainst}</td>
-${tds}${thisTeam.total.shotsOnGoal}</td>
-${tds}${thisTeam.total.shotsOnGoalAgainst}</td>
-${tds}${thisTeam.perGame.goals.toFixed(2)}</td>
-${tds}${thisTeam.perGame.goalsAgainst.toFixed(2)}</td>
-${tds}${thisTeam.perGame.xG.toFixed(2)}</td>
-${tds}${thisTeam.perGame.xGA.toFixed(2)}</td>
-${tds}${thisTeam.perGame.corners.toFixed(2)}</td>
-${tds}${thisTeam.perGame.cornersAgainst.toFixed(2)}</td>
-${tds}${thisTeam.perGame.shotsOnGoal.toFixed(2)}</td>
-${tds}${thisTeam.perGame.shotsOnGoalAgainst.toFixed(2)}</td>
-
-<table id="myTable2">
-<tr>
-<!--When a header is clicked, run the sortTable function, with a parameter,
-0 for sorting by names, 1 for sorting by country: -->
-<th onclick="sortTable(0)">Name</th>
-<th onclick="sortTable(1)">Country</th>
-</tr>*/

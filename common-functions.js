@@ -1,9 +1,10 @@
 import { allLeagues } from "./data/leagues.js";
 import { matchList } from "./components/match-list.js";
-import { getLocalPlayerStats } from "./local-handler.js";
+import { getLocalPlayerStats, buildTeamList } from "./local-handler.js";
 import { loadPlayerFace } from "./instapics.js";
 import { players } from "./data/players.js";
 import { playerGoalList } from "./components/player-list.js";
+import { teamList } from "./components/team-list.js";
 
 export let download = function () {
   var link = document.createElement("a");
@@ -105,22 +106,40 @@ export async function showMatchesOnDate(date) {
 }
 
 export async function getTop10Players(leagues) {
-  let thisPlayer;
   let top10 = [];
   const response = await fetch(`get-player-list?leagues=${leagues.join(",")}`, {
     method: "GET",
   });
 
   const playerList = await response.json();
+  top10 = playerList.slice(0, 10);
+  //for (let i = 0; i < top10.length; i++) {
+  //  loadPlayerFace(playerList[i].id);
 
-  for (let i = 0; i < 10; i++) {
-    //console.log(playerList[i]);
-    loadPlayerFace(playerList[i].id);
+  //let player = players.find((x) => x.id == playerList[i].id);
 
-    let player = players.find((x) => x.id == playerList[i].id);
-
-    thisPlayer = await getLocalPlayerStats(player, leagues);
-    top10.push(thisPlayer);
-  }
+  //thisPlayer = await getLocalPlayerStats(player, leagues);
+  //top10.push(thisPlayer);
+  //}
+  console.log(top10);
+  top10.map(function (e) {
+    loadPlayerFace(e.id);
+  });
   playerGoalList(top10);
+}
+
+export async function getTop10Teams(leagues) {
+  let dasTeams = await buildTeamList([39, 140, 135, 78, 61, 88, 94]);
+  console.log(dasTeams);
+
+  dasTeams.sort((a, b) =>
+    a.perGame.goals < b.perGame.goals
+      ? 1
+      : b.perGame.goals < a.perGame.goals
+      ? -1
+      : 0
+  );
+
+  console.log(dasTeams);
+  teamList(dasTeams.slice(0, 10));
 }
