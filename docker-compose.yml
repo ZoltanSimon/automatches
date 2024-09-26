@@ -1,0 +1,25 @@
+version: "3"
+services:
+  web:
+    build: .
+    volumes:
+      - ./data/matches:/app/data/matches
+    networks:
+      - webnet
+
+  reverse-proxy:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl
+    networks:
+      - webnet
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./ssl:/etc/letsencrypt # Certbot will save the SSL certificates here
+      - ./nginx.conf:/etc/nginx/nginx.conf # To reload NGINX once certs are ready
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h; done"
