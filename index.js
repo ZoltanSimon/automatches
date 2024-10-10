@@ -4,7 +4,7 @@ import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./backend/config.js";
 import { getResultsDate, getResultFromApi } from "./webapi-handler.js";
-import { getPlayerGoalList } from "./backend/json-reader.js";
+import { getPlayerGoalList, getMatch } from "./backend/json-reader.js";
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -28,8 +28,12 @@ app.get("/about", (req, res) => {
   res.render("about", { title: "About Page" });
 });
 
-app.get("/contact", (req, res) => {
-  res.render("contact", { title: "Contact Page" });
+app.get("/players", (req, res) => {
+  res.render("players", { title: "Players" });
+});
+
+app.get("/teams", (req, res) => {
+  res.render("teams", { title: "Teams" });
 });
 
 app.get("/admin", (req, res) => {
@@ -151,14 +155,12 @@ app.get("/get-league-matches", async (request, response) => {
       for (const element of data) {
         if (["FT", "AET"].includes(element.fixture.status.short)) {
           matchID = element.fixture.id;
-          let data2 = JSON.parse(
-            await readFile(`./data/matches/${matchID}.json`)
-          );
+          let data2 = await getMatch(matchID);
           allMatches.push(data2);
         }
       }
     }
-    return response.json(allMatches);
+    response.json(allMatches);
   }
 });
 
@@ -180,4 +182,12 @@ app.get("/get-player-list", async (request, response) => {
   let leagues = request.query.leagues.split(",");
   let playerList = await getPlayerGoalList(leagues);
   return response.json(playerList);
+});
+
+app.get("/match-exists", async (request, response) => {
+  let matchID = request.query.matchID;
+  if (fs.existsSync(`./data/matches/${matchID}.json`)) {
+    return response.json(true);
+  }
+  return response.json(false);
 });

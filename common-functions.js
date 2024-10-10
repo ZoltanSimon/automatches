@@ -5,6 +5,7 @@ import { loadPlayerFace } from "./instapics.js";
 import { players } from "./data/players.js";
 import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
+import { getMatch, matchExists } from "./local-handler.js";
 
 export let download = function () {
   var link = document.createElement("a");
@@ -85,47 +86,46 @@ export function copyToClipboard(element) {
 
 export async function showMatchesOnDate(date) {
   let matches = [];
+  let downloads = 0;
   for (let i = 0; i < allLeagues.length; i++) {
     let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
     let league = await response.json();
+
     for (let j = 0; j < league.length; j++) {
-      let fixtureDate = new Date(league[j].fixture.date);
+      let match = league[j];
+      let fixtureDate = new Date(match.fixture.date);
+
       if (fixtureDate.toDateString() == date.toDateString()) {
-        matches.push(league[j]);
+        const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
+        if (matchEnd < new Date()) {
+          let exists = await matchExists(match.fixture.id);
+          if (downloads < 10 && !exists) {
+            let thisMatch = await getMatch(match.fixture.id);
+            matches.push(thisMatch[0]);
+            downloads++;
+          }
+        }
+        matches.push(match);
       }
     }
   }
+
   if (matches.length > 0) matchList(matches, true);
-  /*const teams = [
-    40, 541, 530, 529, 496, 499, 157, 165, 168, 541, 530, 529, 40, 541, 530,
-    529, 40, 541, 530, 529, 40, 541, 530, 529, 40, 541, 530, 529, 40, 541, 530,
-    529, 40, 541, 530, 529,
-  ];
-  // Number of items
-  for (let i = 0; i < 9; i++) loadClubLogo(teams[i]);*/
 }
 
-export async function getTop10Players(leagues) {
-  let top10 = [];
+export async function getTopPlayers(leagues, amount, big) {
+  let topPlayers = [];
   const response = await fetch(`get-player-list?leagues=${leagues.join(",")}`, {
     method: "GET",
   });
 
   const playerList = await response.json();
-  top10 = playerList.slice(0, 10);
-  //for (let i = 0; i < top10.length; i++) {
-  //  loadPlayerFace(playerList[i].id);
-
-  //let player = players.find((x) => x.id == playerList[i].id);
-
-  //thisPlayer = await getLocalPlayerStats(player, leagues);
-  //top10.push(thisPlayer);
-  //}
-  console.log(top10);
-  top10.map(function (e) {
+  topPlayers = playerList.slice(0, amount);
+  console.log(topPlayers);
+  topPlayers.map(function (e) {
     loadPlayerFace(e.id);
   });
-  playerGoalList(top10);
+  playerGoalList(topPlayers, big);
 }
 
 export async function getTop10Teams(leagues) {
@@ -133,9 +133,9 @@ export async function getTop10Teams(leagues) {
   console.log(dasTeams);
 
   dasTeams.sort((a, b) =>
-    a.perGame.goals < b.perGame.goals
+    a.last5PerGame.points < b.last5PerGame.points
       ? 1
-      : b.perGame.goals < a.perGame.goals
+      : b.last5PerGame.points < a.last5PerGame.points
       ? -1
       : 0
   );

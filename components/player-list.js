@@ -6,29 +6,35 @@ import {
 } from "../instapics.js";
 import { removeNewlines } from "../common-functions.js";
 
-export function playerGoalList(response) {
+export function playerGoalList(response, big) {
   console.log(response);
   let addToPage;
   let tds = `<td style="text-align: center;">`;
   let thisPlayer;
 
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="player-list-table">
-  <thead><tr style="border-bottom:3px solid #1D3557"><td colspan=2>Player</td>${tds}Team</td>${tds}Apps</td>${tds}Goals</td>${tds}NPG</td>${tds}Assists</td>${tds}GA/90</td></tr></thead>
-  <tbody>`;
-
+  <thead><tr style="border-bottom:3px solid #1D3557"><td colspan=2>Player</td>${tds}Team</td>${tds}Apps</td>${tds}Goals</td>${tds}NPG</td>${tds}Assists</td>${tds}GA/90</td>`;
+  if (big)
+    addToPage += `${tds}Minutes</td>${tds}Penalties</td>${tds}Shots</td>${tds}Dribbles</td>${tds}Duels</td>${tds}Key Passes</td>${tds}Fouls Against</td>`;
+  addToPage += `</tr></thead><tbody>`;
   for (let i = 0; i < response.length; i++) {
     thisPlayer = response[i];
     loadClubLogo(thisPlayer.club);
-    addToPage += `<tr><td>${thisPlayer.id}</td><td>${
-      thisPlayer.name
-    }</td><td id="${thisPlayer.club}">${thisPlayer.team}</td>${tds}${
+    addToPage += `<tr><td style="text-align:center;padding:0"><img height="60" src="images/player-pictures/${
+      thisPlayer.id
+    }.png"</td><td>${thisPlayer.name}</td><td id="${thisPlayer.club}">${
+      thisPlayer.team
+    }</td>${tds}${
       thisPlayer.apps
     }</td><td style="text-align: center; font-weight: bold">${
       thisPlayer.goals
     }</td>${tds}${thisPlayer.goals - thisPlayer.penalties}</td>${tds}${
       thisPlayer.assists
     }</td>
-    ${tds}${thisPlayer.gap90}</td></tr>`;
+    ${tds}${thisPlayer.gap90}</td>`;
+    if (big)
+      addToPage += `${tds}${thisPlayer.minutes}</td>${tds}${thisPlayer.penalties}</td>${tds}${thisPlayer.shots}</td>${tds}${thisPlayer.dribbles}</td>${tds}${thisPlayer.duels}</td>${tds}${thisPlayer.key_passes}</td>${tds}${thisPlayer.fouls_drawn}</td>`;
+    addToPage += `</tr>`;
   }
   addToPage += `</tbody></table>`;
 

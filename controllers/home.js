@@ -1,6 +1,6 @@
 import {
   showMatchesOnDate,
-  getTop10Players,
+  getTopPlayers,
   getTop10Teams,
 } from "../../common-functions.js";
 
@@ -16,6 +16,6 @@ import {
 
 showMatchesOnDate(new Date());
 
-await getTop10Players([39, 140, 135, 78, 61, 88, 94]);
+await getTopPlayers([39, 140, 135, 78, 61, 88, 94], 10, false);
 
 await getTop10Teams([39, 140, 135, 78, 61, 88, 94]);

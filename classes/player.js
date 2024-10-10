@@ -1,7 +1,10 @@
+import { players } from "../data/players.js";
 export class Player {
   constructor(inputPlayer) {
+    let thisPlayer = players.find((element) => element.id == inputPlayer.id);
     this.id = inputPlayer.id;
-    this.club = inputPlayer.club;
+    this.club = thisPlayer.club;
+    this.nation = thisPlayer.nation;
     this.goals = 0;
     this.assists = 0;
     this.shotsOn = 0;
@@ -17,7 +20,7 @@ export class Player {
     this.apps = 0;
     this.minutes = 0;
     this.gap90 = 0;
-    this.name = "";
+    this.name = thisPlayer.name;
     this.team = inputPlayer.teamName;
     this.competitions = "";
     this.duels = "";
@@ -41,7 +44,6 @@ export class Player {
     if (stats.fouls.drawn) this.fouls_drawn += stats.fouls.drawn;
     if (stats.games.minutes) this.apps++;
     this.minutes += stats.games.minutes;
-    if (!this.name) this.name = playerFound.player.name;
     if (stats.penalty.scored) this.penalties++;
 
     this.getGAper90();
