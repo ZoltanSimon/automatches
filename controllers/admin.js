@@ -1,7 +1,7 @@
 import {
   showMatchesOnDate,
   download,
-  getTop10Players,
+  getTopPlayers,
 } from "../common-functions.js";
 import {
   selectedLeagues,
@@ -69,7 +69,8 @@ async function submitRequest_leagueInfo() {
   document.getElementById("league-name").innerHTML = found.name;
   document.getElementById("league-id").innerHTML = found.id;
   let standingsFromApi = await buildTeamList(selectedLeagues);
-  standingsFromApi.sort((a, b) => b.points - a.points); // b - a for reverse sort
+  console.log(standingsFromApi);
+  standingsFromApi.sort((a, b) => b.total.points - a.total.points); // b - a for reverse sort
   loadCompLogo(found.id);
   leagueStandings(standingsFromApi);
   buildStandings(standingsFromApi);
@@ -150,7 +151,7 @@ document.getElementById("missing-matches").onclick = async function () {
 };
 
 document.getElementById("get-player-goal-list").onclick = async function () {
-  getTop10Players(selectedLeagues);
+  getTopPlayers(selectedLeagues, 10, false);
 };
 
 document.getElementById("get-all-clubs").onclick = async function () {

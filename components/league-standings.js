@@ -57,7 +57,7 @@ export function leagueStandings(standings) {
       }; padding:2px; text-align: center; font-weight: bold;">${f}</td>`;
     }
 
-    addToPage += `<td style="padding:5px 3px; text-align: center; font-weight: bold">${team.points}</td>
+    addToPage += `<td style="padding:5px 3px; text-align: center; font-weight: bold">${team.total.points}</td>
       </tr>`;
   }
   addToPage += `</tbody></table>`;

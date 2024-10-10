@@ -4,13 +4,6 @@ body {
   padding: 0;
 }
 
-header {
-  background-color: #333;
-  color: white;
-  padding: 1em 0;
-  text-align: center;
-}
-
 nav ul {
   list-style-type: none;
   padding: 0;
@@ -21,14 +14,9 @@ nav ul li {
   margin: 0 1em;
 }
 
-nav ul li a {
-  color: white;
-  text-decoration: none;
-}
-
 main {
   padding: 1rem;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 
 section {
@@ -36,8 +24,7 @@ section {
 }
 
 h2 {
-  border-bottom: 2px solid #333;
-  padding-bottom: 0.5em;
+  margin-top: 0px;
 }
 
 table {
@@ -81,16 +68,6 @@ form button:hover {
   background-color: #555;
 }
 
-footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 1em 0;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-}
-
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -99,41 +76,147 @@ body {
 }
 
 header {
-  background-color: #333;
+  background: linear-gradient(
+    to bottom,
+    #457b9d 60%,
+    #4f8ea9 80%,
+    #5fa3c1 100%
+  );
   color: #fff;
-  padding: 1rem;
   text-align: center;
+  align-items: center;
+  padding: 10px;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: bold; /* Make the text bold */
+}
+
+.logo-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.logo-title img {
+  height: 50px; /* Adjust this size as needed */
+  margin-right: 10px; /* Space between the logo and the text */
+}
+
+.logo-title h1 {
+  font-size: 50px; /* Make the title as tall as the logo */
+  font-weight: 900; /* Extra bold */
+  margin: 0; /* Remove default margin */
+}
+
+nav {
+  margin-top: 10px; /* Add some spacing above the nav */
+  margin-bottom: 10px;
 }
 
 nav ul {
-  list-style: none;
+  display: inline-block;
   padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
 nav ul li {
   display: inline;
-  margin: 0 1rem;
+  margin-right: 10px;
+}
+
+nav ul li:last-child {
+  margin-right: 0;
 }
 
 nav ul li a {
-  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 6px 20px;
+  background-color: rgba(29, 53, 87, 0.7); /* More transparent background */
+  color: white;
   text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Add transform for hover effect */
+}
+
+nav ul li a:hover {
+  background-color: rgba(230, 57, 70, 0.9); /* Transparent hover background */
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.form-indicator {
+  display: inline-block;
+  width: 10px; /* Adjust size for fitting */
+  height: 20px; /* Adjust size for fitting */
+  margin-right: 2px;
+  border-radius: 2px; /* Makes the rectangle slightly rounded */
+}
+
+td .form-indicator:last-child {
+  margin-right: 0;
+}
+
+.W {
+  background-color: green; /* Green for win */
+}
+
+.L {
+  background-color: red; /* Red for loss */
+}
+
+.D {
+  background-color: gray; /* Gray for draw */
 }
 
 footer {
-  background-color: #333;
+  background-color: #1d3557;
   color: #fff;
   text-align: center;
-  padding: 1rem;
+  padding: 5px;
   position: fixed;
   width: 100%;
   bottom: 0;
+}
+
+footer p {
+  margin: 3px;
 }
 
 .container {
   display: flex;
   flex-wrap: wrap;
   width: 80%;
+}
+
+.small-container {
+  display: grid;
+  place-items: center; /* Centers both horizontally and vertically */
+}
+
+.content {
+  width: 50%; /* Set the desired width for the content */
+  padding: 20px; /* Add padding if needed */
+}
+.sortable {
+  cursor: pointer; /* Makes the header look clickable */
+}
+
+.sortable .sort-indicator::before {
+  content: "↕"; /* Default state, showing both directions */
+  font-size: 12px;
+}
+
+.sortable.asc .sort-indicator::before {
+  content: "▲"; /* Ascending order */
+}
+
+.sortable.desc .sort-indicator::before {
+  content: "▼"; /* Descending order */
+}
+
+.sortable:hover {
+  background-color: #f0f0f0; /* Highlight the header */
 }
 
 .rectangle {
@@ -146,11 +229,12 @@ footer {
 }
 
 #rectangle1 {
-  background-color: #f4a261;
+  background-color: #f1faee;
 }
 
-#rectangle2 {
-  background-color: #2a9d8f;
+#rectangle2,
+#rectangle3 {
+  background-color: #a8dadc;
 }
 
 /* Media query for mobile devices */

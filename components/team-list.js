@@ -1,12 +1,13 @@
 let addToPage;
-let tds = `<td style="text-align: center; width: 68px; padding:2px;">`;
+let ths = `<th title="Click to sort" style="text-align: center; padding:2px;" class="sortable"">`;
+let tds = `<td style="text-align: center; padding:2px;">`;
 let thisTeam, thisTr, thisId;
 
 export function teamList(response, onlyTotal = true, addMatches = false) {
   let team1, team2;
   console.log(onlyTotal);
   addMatches = true;
-  //createTeamsTable(response, onlyTotal);
+  createTeamsTable(response, onlyTotal);
 
   let matchesTable = document.getElementById("match-list");
   let allPlayingTeams = [];
@@ -18,10 +19,10 @@ export function teamList(response, onlyTotal = true, addMatches = false) {
         team1 = findTeamById(response, thisTr.children[1].id);
         team2 = findTeamById(response, thisTr.children[7].id);
         allPlayingTeams.push(team1, team2);
-        predictions(team1, team2);
+        //predictions(team1, team2);
       }
     }
-    createTeamsTable(allPlayingTeams, onlyTotal);
+    //createTeamsTable(allPlayingTeams, onlyTotal);
   }
 }
 
@@ -63,27 +64,32 @@ function findTeamById(response, thisId) {
 
 function createTeamsTable(response, onlyTotal) {
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
-    <thead>
-    <tr>
-    <th rowspan=2>Team</th>
-    <th style="text-align: center; padding:2px;" colspan=10>Total</th>`;
+    <thead>`;
   if (!onlyTotal) {
-    addToPage += `<th style="text-align: center; padding:2px;" colspan=8>Per Game</th>
-    <th style="text-align: center; padding:2px;" colspan=8>Last 5</th>
-    <th style="text-align: center; padding:2px;" colspan=8>Last 5 Per Game</th>
-    </tr>`;
+    addToPage += `
+    <tr>
+      <th rowspan=2 colspan=2>Team</th>
+      <th style="text-align: center; padding:2px;" colspan=10>Total</th>
+      <th style="text-align: center; padding:2px;" colspan=8>Per Game</th>
+      <th style="text-align: center; padding:2px;" colspan=8>Last 5</th>
+      <th style="text-align: center; padding:2px;" colspan=8>Last 5 Per Game</th>
+    </tr>
+    <tr>`;
+  } else {
+    addToPage += `
+    <th colspan=2>Teams</td>`;
   }
-  addToPage += `<tr>
-    ${tds}Form</td>
-    ${tds}Matches</td>
-    ${tds}Goals</td>
-    ${tds}GoalsA</td>
-    ${tds}xG</td>
-    ${tds}xGA</td>
-    ${tds}Corners</td>
-    ${tds}CornersA</td>
-    ${tds}ShotsG</td>
-    ${tds}ShotsGA</td>`;
+  addToPage += `
+    <th style="width:59px">Form</td>
+    ${ths}Played<span class="sort-indicator"></th>
+    ${ths}Goals<span class="sort-indicator"></th>
+    ${ths}Goals Ag<span class="sort-indicator"></th>
+    ${ths}xG<span class="sort-indicator"></th>
+    ${ths}xG Ag<span class="sort-indicator"></th>
+    ${ths}Corners<span class="sort-indicator"></th>
+    ${ths}Corners Ag<span class="sort-indicator"></th>
+    ${ths}Shots<span class="sort-indicator"></th>
+    ${ths}Shots Ag<span class="sort-indicator"></th>`;
   if (!onlyTotal) {
     addToPage += `${tds}Goals</td>
     ${tds}GoalsA</td>
@@ -118,8 +124,14 @@ function createTeamsTable(response, onlyTotal) {
     thisTeam = response[i];
     if (thisTeam) {
       addToPage += `<tr>
-      <td>${thisTeam.name}</td>
-      <td>${thisTeam.form}</td>
+      <td style="padding:4px; border-right:none"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
+      <td style="border-left:none;">${thisTeam.name}</td><td style="padding:0">`;
+
+      for (const result of thisTeam.form) {
+        addToPage += `<span class="form-indicator ${result}"></span>`;
+      }
+
+      addToPage += `</td>
       ${tds}${thisTeam.matches}</td>
       ${tds}${thisTeam.total.goals}</td>
       ${tds}${thisTeam.total.goalsAgainst}</td>
@@ -164,15 +176,15 @@ function createTeamsTable(response, onlyTotal) {
 
   let table = document.getElementById("team-list-table");
 
-  for (let i = 0; i < table.rows[1].cells.length; i++) {
-    let thisTd = table.rows[1].cells[i];
+  for (let i = 0; i < table.rows[0].cells.length; i++) {
+    let thisTd = table.rows[0].cells[i];
     thisTd.addEventListener("click", function (e) {
-      sortTable(i + 1);
+      sortTable(i + 1, thisTd);
     });
   }
 }
 
-function sortTable(n) {
+function sortTable(n, td) {
   var table,
     rows,
     switching,
@@ -194,7 +206,7 @@ function sortTable(n) {
     rows = table.rows;
     /* Loop through all table rows (except the
     first, which contains table headers): */
-    for (i = 2; i < rows.length - 1; i++) {
+    for (i = 1; i < rows.length - 1; i++) {
       // Start by saying there should be no switching:
       shouldSwitch = false;
       /* Get the two elements you want to compare,
@@ -233,4 +245,6 @@ function sortTable(n) {
       }
     }
   }
+
+  td.classList.add(dir);
 }
