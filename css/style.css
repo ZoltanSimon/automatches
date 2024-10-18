@@ -25,6 +25,7 @@ section {
 
 h2 {
   margin-top: 0px;
+  display: inline-block;
 }
 
 table {
@@ -184,16 +185,22 @@ footer p {
 }
 
 .container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 22px; /* Add space between rectangles */
   width: 80%;
 }
 
 .small-container {
   display: grid;
   place-items: center; /* Centers both horizontally and vertically */
+  width: 60%; /* Set the desired width */
+  margin: 0 auto; /* This will center it horizontally */
 }
 
+#top-team-list {
+  width: 100%;
+}
 .content {
   width: 50%; /* Set the desired width for the content */
   padding: 20px; /* Add padding if needed */
@@ -220,12 +227,15 @@ footer p {
 }
 
 .rectangle {
-  flex: 1 1 48%; /* Grow to fill space, shrink if needed, base width 50% */
+  display: grid;
+  grid-template-columns: 1fr auto; /* Title and link side by side */
+  grid-template-rows: auto 1fr; /* Header (title and link) + content */
   padding: 20px;
   border: 1px solid #333;
-  text-align: center;
+  text-align: left;
   box-sizing: border-box;
-  margin: 8px;
+  gap: 10px; /* Space between elements inside the rectangle */
+  height: 100%; /* Ensure equal height for both rectangles */
 }
 
 #rectangle1 {
@@ -235,6 +245,43 @@ footer p {
 #rectangle2,
 #rectangle3 {
   background-color: #a8dadc;
+}
+
+.container::before {
+  display: none; /* Prevents it from displaying */
+}
+
+/* Adjust the table or content area to fill the remaining space */
+.rectangle div {
+  grid-column: 1 / -1; /* Span both columns for content */
+  align-self: start; /* Content starts at the top */
+}
+
+.rectangle h2 {
+  grid-column: 1 / 2; /* First column */
+  grid-row: 1 / 2; /* First row */
+  margin: 0;
+  font-size: 24px;
+}
+
+.rectangle .more-link {
+  grid-column: 2 / 3; /* Second column */
+  grid-row: 1 / 2; /* First row */
+  justify-self: end; /* Align the link to the right */
+  font-size: 20px;
+  color: #457b9d;
+  text-decoration: none;
+}
+
+.rectangle .more-link:hover {
+  text-decoration: underline;
+}
+
+#player-list,
+#top-team-list {
+  grid-column: 1 / 3; /* Span across both columns */
+  grid-row: 2 / 3; /* Second row */
+  padding-top: 6px;
 }
 
 /* Media query for mobile devices */

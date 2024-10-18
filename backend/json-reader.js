@@ -43,7 +43,7 @@ export async function getPlayerGoalList(leagues) {
 }
 
 export async function getMatch(fixtureID) {
-  let file = `./data/matches/${fixtureID}.json`;
+  let file = `\\\\DESKTOP-1MDUJM7\\data\\matches\\${fixtureID}.json`;
   try {
     if (cache.has(file)) {
       return cache.get(file);

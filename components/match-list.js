@@ -35,7 +35,11 @@ export function matchList(fixtures, showID = false) {
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="match-list">`;
 
   fixtures.forEach((element) => {
-    if (showID) thisID = `<td class="match-id">${element.fixture.id}</td>`;
+    if (showID) {
+      thisID = `<td rowspan=2 class="match-id">${element.fixture.id}</td>`;
+    } else {
+      thisID = `<td rowspan=2><img width=50 src="images/competitions/${element.league.id}.png"/></td>`;
+    }
     date = new Date(element.fixture.date);
     let dateToAdd = `${date.getDate()}.${
       (date.getMonth() + 1 < 10 ? "0" : "") + (parseInt(date.getMonth()) + 1)

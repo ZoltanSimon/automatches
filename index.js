@@ -12,6 +12,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 const app = express();
+const matchesDir = "\\\\DESKTOP-1MDUJM7\\data\\matches";
 
 app.use(express.json());
 
@@ -99,7 +100,7 @@ app.get("/save-match", async (request, response) => {
   //console.log(matchID);
 
   fs.writeFile(
-    `./data/matches/${matchID}.json`,
+    `${matchesDir}/${matchID}.json`,
     JSON.stringify(dataToWrite.response),
     { flag: "wx" },
     function (err) {
@@ -129,7 +130,7 @@ app.get("/missing-matches", async (request, response) => {
 
       for (const element of data) {
         if (["FT", "AET"].includes(element.fixture.status.short))
-          if (!fs.existsSync(`./data/matches/${element.fixture.id}.json`)) {
+          if (!fs.existsSync(`${matchesDir}/${element.fixture.id}.json`)) {
             matchArr.push(element);
           }
       }
@@ -166,8 +167,7 @@ app.get("/get-league-matches", async (request, response) => {
 
 app.get("/get-all-matches", async (request, response) => {
   let bigArr = [];
-  const dirname = "./data/matches";
-  await readFile(dirname);
+  await readFile(matchesDir);
   response.json(bigArr);
 });
 
@@ -186,7 +186,7 @@ app.get("/get-player-list", async (request, response) => {
 
 app.get("/match-exists", async (request, response) => {
   let matchID = request.query.matchID;
-  if (fs.existsSync(`./data/matches/${matchID}.json`)) {
+  if (fs.existsSync(`${matchesDir}/${matchID}.json`)) {
     return response.json(true);
   }
   return response.json(false);
