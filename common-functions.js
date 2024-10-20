@@ -84,11 +84,11 @@ export function copyToClipboard(element) {
   document.getElementById("btn").value = "Copied";
 }
 
-export async function showMatchesOnDate(date) {
+export async function showMatchesOnDate(date, showID) {
   let matches = [];
   let downloads = 0;
   for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
+    let response = await fetch(`get-league?leagueID=${allLeagues[i].id}`);
     let league = await response.json();
 
     for (let j = 0; j < league.length; j++) {
@@ -101,7 +101,18 @@ export async function showMatchesOnDate(date) {
           let exists = await matchExists(match.fixture.id);
           if (downloads < 10 && !exists) {
             let thisMatch = await getMatch(match.fixture.id);
-            matches.push(thisMatch[0]);
+            let matchIndex = matches.findIndex(
+              (m) => m.fixture.id === thisMatch[0].fixture.id
+            );
+
+            if (matchIndex !== -1) {
+              // If a match with the same fixture.id exists, replace it
+              matches[matchIndex] = thisMatch[0];
+            } else {
+              // If it doesn't exist, push the new match
+              matches.push(thisMatch[0]);
+            }
+
             downloads++;
           }
         }
@@ -110,7 +121,7 @@ export async function showMatchesOnDate(date) {
     }
   }
 
-  if (matches.length > 0) matchList(matches, true);
+  if (matches.length > 0) matchList(matches, showID);
 }
 
 export async function getTopPlayers(leagues, amount, big) {
@@ -128,8 +139,8 @@ export async function getTopPlayers(leagues, amount, big) {
   playerGoalList(topPlayers, big);
 }
 
-export async function getTop10Teams(leagues) {
-  let dasTeams = await buildTeamList([39, 140, 135, 78, 61, 88, 94]);
+export async function getTopTeams(leagues, amount, big) {
+  let dasTeams = await buildTeamList(leagues);
   console.log(dasTeams);
 
   dasTeams.sort((a, b) =>
@@ -141,5 +152,5 @@ export async function getTop10Teams(leagues) {
   );
 
   console.log(dasTeams);
-  teamList(dasTeams.slice(0, 10));
+  teamList(dasTeams.slice(0, amount), true, false, big);
 }

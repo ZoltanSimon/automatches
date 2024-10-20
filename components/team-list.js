@@ -1,13 +1,19 @@
 let addToPage;
-let ths = `<th title="Click to sort" style="text-align: center; padding:2px;" class="sortable"">`;
+let ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:8%;" class="sortable"">`;
 let tds = `<td style="text-align: center; padding:2px;">`;
 let thisTeam, thisTr, thisId;
 
-export function teamList(response, onlyTotal = true, addMatches = false) {
+export function teamList(
+  response,
+  onlyTotal = true,
+  addMatches = false,
+  big = false
+) {
+  console.log(big);
   let team1, team2;
   console.log(onlyTotal);
   addMatches = true;
-  createTeamsTable(response, onlyTotal);
+  createTeamsTable(response, onlyTotal, big);
 
   let matchesTable = document.getElementById("match-list");
   let allPlayingTeams = [];
@@ -62,7 +68,7 @@ function findTeamById(response, thisId) {
   return response.find((element) => element.id == thisId);
 }
 
-function createTeamsTable(response, onlyTotal) {
+function createTeamsTable(response, onlyTotal, big) {
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
     <thead>`;
   if (!onlyTotal) {
@@ -80,9 +86,10 @@ function createTeamsTable(response, onlyTotal) {
     <th colspan=2>Teams</td>`;
   }
   addToPage += `
-    <th style="width:59px">Form</td>
-    ${ths}Played<span class="sort-indicator"></th>
-    ${ths}Goals<span class="sort-indicator"></th>
+    <th style="width:61px">Form</td>
+    ${ths}Played<span class="sort-indicator"></th>`;
+  if (big) addToPage += `${ths}Win %`;
+  addToPage += `${ths}Goals<span class="sort-indicator"></th>
     ${ths}Goals Ag<span class="sort-indicator"></th>
     ${ths}xG<span class="sort-indicator"></th>
     ${ths}xG Ag<span class="sort-indicator"></th>
@@ -125,15 +132,20 @@ function createTeamsTable(response, onlyTotal) {
     if (thisTeam) {
       addToPage += `<tr>
       <td style="padding:4px; border-right:none"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
-      <td style="border-left:none;">${thisTeam.name}</td><td style="padding:0">`;
+      <td style="border-left:none;">${thisTeam.name}</td><td style="padding:1">`;
 
       for (const result of thisTeam.form) {
         addToPage += `<span class="form-indicator ${result}"></span>`;
       }
 
       addToPage += `</td>
-      ${tds}${thisTeam.matches}</td>
-      ${tds}${thisTeam.total.goals}</td>
+      ${tds}${thisTeam.matches}</td>`;
+      if (big)
+        addToPage += `${tds}${(
+          (100 * thisTeam.wins) /
+          thisTeam.matches
+        ).toFixed(1)}</td>`; //(100 * partialValue) / totalValue
+      addToPage += `${tds}${thisTeam.total.goals}</td>
       ${tds}${thisTeam.total.goalsAgainst}</td>
       ${tds}${thisTeam.total.xG.toFixed(2)}</td>
       ${tds}${thisTeam.total.xGA.toFixed(2)}</td>

@@ -28,12 +28,12 @@ const picker = datepicker(document.querySelector("#calendar"), {
   alwaysShow: true,
   onSelect: (instance, date) => {
     document.getElementById("fixtures-info").innerHTML = "";
-    showMatchesOnDate(date);
+    showMatchesOnDate(date, true);
   },
 });
 picker.calendarContainer.style.setProperty("left", "374px");
 
-showMatchesOnDate(new Date());
+showMatchesOnDate(new Date(), true);
 
 for (const element of allLeagues) {
   document.getElementById(
