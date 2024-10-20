@@ -3,19 +3,18 @@ import { Player } from "./../classes/player.js";
 
 const cache = new Map();
 let allPlayers = [];
+export const matchesDir = "\\\\DESKTOP-1MDUJM7\\data2\\matches";
+export const leaguesDir = "\\\\DESKTOP-1MDUJM7\\data2\\leagues";
 
 export async function getPlayerGoalList(leagues) {
   allPlayers = [];
   let teams,
     teamNames = {};
   for (let i = 0; i < leagues.length; i++) {
-    let league = JSON.parse(
-      await readFile(`./data/leagues/${leagues[i]}.json`)
-    );
-
+    let league = JSON.parse(await readFile(`${leaguesDir}/${leagues[i]}.json`));
     for (let i = 0; i < league.length; i++) {
       if (league[i].fixture.status.short == "FT") {
-        let match = await getMatch(league[i].fixture.id);
+        let match = await getMatchFromServer(league[i].fixture.id);
         if (match != null && match[0]) {
           for (let { players } of match) {
             teams = {
@@ -42,8 +41,24 @@ export async function getPlayerGoalList(leagues) {
   return allPlayers;
 }
 
-export async function getMatch(fixtureID) {
-  let file = `\\\\DESKTOP-1MDUJM7\\data\\matches\\${fixtureID}.json`;
+export async function getMatchFromServer(fixtureID) {
+  let file = `${matchesDir}/${fixtureID}.json`;
+  try {
+    if (cache.has(file)) {
+      return cache.get(file);
+    } else {
+      let response = JSON.parse(await readFile(file));
+      cache.set(file, response);
+      return response;
+    }
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+export async function getLeagueFromServer(leagueID) {
+  let file = `${leaguesDir}/${leagueID}.json`;
   try {
     if (cache.has(file)) {
       return cache.get(file);
@@ -71,4 +86,63 @@ function getBothTeams(players, home, teamName) {
       allPlayers.push(thisPlayer);
     }
   }
+}
+
+export async function getAllPlayers(compType, compList, nationList) {
+  let player, thisClub;
+  for (let i = 0; i < compList.length; i++) {
+    let league = JSON.parse(
+      await readFile(`${leaguesDir}/${compList[i].id}.json`)
+    );
+
+    for (let i = 0; i < league.length; i++) {
+      if (league[i].fixture.status.short == "FT") {
+        let match = await getMatchFromServer(league[i].fixture.id);
+        if (match) {
+          for (let j = 0; j < match[0].players.length; j++) {
+            thisClub = match[0].players[j].team.id;
+
+            for (let k = 0; k < match[0].players[j].players.length; k++) {
+              player = {
+                id: match[0].players[j].players[k].player.id,
+                name: match[0].players[j].players[k].player.name,
+                nation: 0,
+              };
+              player[compType] = thisClub;
+              if (!allPlayers.find((e) => e.id == player.id)) {
+                allPlayers.push(player);
+              } else {
+                allPlayers.find((e) => e.id == player.id)[compType] = thisClub;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (let i = 0; i < nationList.length; i++) {
+    let nt = JSON.parse(
+      await readFile(`${leaguesDir}/${nationList[i].id}.json`)
+    );
+
+    for (let i = 0; i < nt.length; i++) {
+      let match = await getMatchFromServer(nt[i].fixture.id);
+      if (match) {
+        for (let j = 0; j < match[0].players.length; j++) {
+          let thisNation = match[0].players[j].team.id;
+          for (let k = 0; k < match[0].players[j].players.length; k++) {
+            let id = match[0].players[j].players[k].player.id;
+
+            let playerFound = allPlayers.find((e) => e.id == id);
+            if (!playerFound) {
+            } else {
+              allPlayers.find((e) => e.id == id).nation = thisNation;
+            }
+          }
+        }
+      }
+    }
+  }
+  return allPlayers;
 }

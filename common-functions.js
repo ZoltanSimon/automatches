@@ -88,7 +88,7 @@ export async function showMatchesOnDate(date, showID) {
   let matches = [];
   let downloads = 0;
   for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
+    let response = await fetch(`get-league?leagueID=${allLeagues[i].id}`);
     let league = await response.json();
 
     for (let j = 0; j < league.length; j++) {
@@ -101,7 +101,18 @@ export async function showMatchesOnDate(date, showID) {
           let exists = await matchExists(match.fixture.id);
           if (downloads < 10 && !exists) {
             let thisMatch = await getMatch(match.fixture.id);
-            matches.push(thisMatch[0]);
+            let matchIndex = matches.findIndex(
+              (m) => m.fixture.id === thisMatch[0].fixture.id
+            );
+
+            if (matchIndex !== -1) {
+              // If a match with the same fixture.id exists, replace it
+              matches[matchIndex] = thisMatch[0];
+            } else {
+              // If it doesn't exist, push the new match
+              matches.push(thisMatch[0]);
+            }
+
             downloads++;
           }
         }

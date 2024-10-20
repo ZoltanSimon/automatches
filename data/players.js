@@ -314,7 +314,7 @@ export let players = [
   {
     id: 18397,
     name: "Jack Taylor",
-    nation: 0,
+    nation: 776,
     club: 57,
   },
   {
@@ -464,7 +464,7 @@ export let players = [
   {
     id: 293,
     name: "Curtis Jones",
-    nation: 0,
+    nation: 10,
     club: 40,
   },
   {
@@ -1556,7 +1556,7 @@ export let players = [
   {
     id: 68466,
     name: "Andy Irving",
-    nation: 0,
+    nation: 1108,
     club: 48,
   },
   {
@@ -1688,7 +1688,7 @@ export let players = [
   {
     id: 15745,
     name: "Mads Roerslev",
-    nation: 0,
+    nation: 21,
     club: 55,
   },
   {
@@ -1742,7 +1742,7 @@ export let players = [
   {
     id: 178077,
     name: "Kevin Schade",
-    nation: 0,
+    nation: 25,
     club: 55,
   },
   {
@@ -2210,7 +2210,7 @@ export let players = [
   {
     id: 311334,
     name: "Facundo Buonanotte",
-    nation: 0,
+    nation: 26,
     club: 46,
   },
   {
@@ -2336,7 +2336,7 @@ export let players = [
   {
     id: 18883,
     name: "Dominic Solanke",
-    nation: 0,
+    nation: 10,
     club: 47,
   },
   {
@@ -3548,7 +3548,7 @@ export let players = [
   {
     id: 155,
     name: "Abel Ruíz",
-    nation: 0,
+    nation: 9,
     club: 547,
   },
   {
@@ -4136,7 +4136,7 @@ export let players = [
   {
     id: 174918,
     name: "Loïc Badé",
-    nation: 0,
+    nation: 2,
     club: 536,
   },
   {
@@ -4604,7 +4604,7 @@ export let players = [
   {
     id: 396623,
     name: "Pau Cubarsí",
-    nation: 0,
+    nation: 9,
     club: 529,
   },
   {
@@ -4796,7 +4796,7 @@ export let players = [
   {
     id: 23,
     name: "Sergio Gómez",
-    nation: 0,
+    nation: 9,
     club: 548,
   },
   {
@@ -5042,7 +5042,7 @@ export let players = [
   {
     id: 190485,
     name: "Samuel Costa",
-    nation: 0,
+    nation: 27,
     club: 798,
   },
   {
@@ -5672,7 +5672,7 @@ export let players = [
   {
     id: 2280,
     name: "César Azpilicueta",
-    nation: 0,
+    nation: 9,
     club: 530,
   },
   {
@@ -6086,7 +6086,7 @@ export let players = [
   {
     id: 311773,
     name: "Santiago Mouriño",
-    nation: 0,
+    nation: 7,
     club: 542,
   },
   {
@@ -6554,7 +6554,7 @@ export let players = [
   {
     id: 538,
     name: "Frenkie de Jong",
-    nation: 0,
+    nation: 1118,
     club: 529,
   },
   {
@@ -6578,7 +6578,7 @@ export let players = [
   {
     id: 162141,
     name: "Koni De Winter",
-    nation: 0,
+    nation: 1,
     club: 495,
   },
   {
@@ -7232,7 +7232,7 @@ export let players = [
   {
     id: 56473,
     name: "Matteo Gabbia",
-    nation: 0,
+    nation: 768,
     club: 489,
   },
   {
@@ -7586,7 +7586,7 @@ export let players = [
   {
     id: 134926,
     name: "Daniel Maldini",
-    nation: 0,
+    nation: 768,
     club: 1579,
   },
   {
@@ -7868,7 +7868,7 @@ export let players = [
   {
     id: 199089,
     name: "Lorenzo Lucca",
-    nation: 0,
+    nation: 768,
     club: 494,
   },
   {
@@ -8186,7 +8186,7 @@ export let players = [
   {
     id: 85,
     name: "Cyril Ngonge",
-    nation: 0,
+    nation: 1,
     club: 492,
   },
   {
@@ -8240,7 +8240,7 @@ export let players = [
   {
     id: 31099,
     name: "Nicolò Casale",
-    nation: 0,
+    nation: 768,
     club: 500,
   },
   {
@@ -8384,7 +8384,7 @@ export let players = [
   {
     id: 7090,
     name: "Michael Svoboda",
-    nation: 0,
+    nation: 775,
     club: 517,
   },
   {
@@ -8450,7 +8450,7 @@ export let players = [
   {
     id: 48406,
     name: "Domen Črnigoj",
-    nation: 0,
+    nation: 1091,
     club: 517,
   },
   {
@@ -8762,7 +8762,7 @@ export let players = [
   {
     id: 356888,
     name: "Niccolò Pisilli",
-    nation: 0,
+    nation: 768,
     club: 497,
   },
   {
@@ -9074,7 +9074,7 @@ export let players = [
   {
     id: 30670,
     name: "Michele Di Gregorio",
-    nation: 0,
+    nation: 768,
     club: 496,
   },
   {
@@ -9536,7 +9536,7 @@ export let players = [
   {
     id: 350037,
     name: "Nico Paz",
-    nation: 0,
+    nation: 26,
     club: 895,
   },
   {
@@ -9752,7 +9752,7 @@ export let players = [
   {
     id: 30422,
     name: "Robin Gosens",
-    nation: 0,
+    nation: 25,
     club: 182,
   },
   {
@@ -10202,7 +10202,7 @@ export let players = [
   {
     id: 26256,
     name: "Tim Kleindienst",
-    nation: 0,
+    nation: 25,
     club: 163,
   },
   {
@@ -10532,13 +10532,13 @@ export let players = [
   {
     id: 24963,
     name: "Atakan Karazor",
-    nation: 0,
+    nation: 777,
     club: 172,
   },
   {
     id: 128533,
     name: "Jamie Leweling",
-    nation: 0,
+    nation: 25,
     club: 172,
   },
   {
@@ -10676,7 +10676,7 @@ export let players = [
   {
     id: 25926,
     name: "Jonathan Burkardt",
-    nation: 0,
+    nation: 25,
     club: 164,
   },
   {
@@ -11222,7 +11222,7 @@ export let players = [
   {
     id: 25314,
     name: "Marco Friedl",
-    nation: 0,
+    nation: 775,
     club: 162,
   },
   {
@@ -11252,7 +11252,7 @@ export let players = [
   {
     id: 15592,
     name: "Jens Stage",
-    nation: 0,
+    nation: 21,
     club: 162,
   },
   {
@@ -11426,7 +11426,7 @@ export let players = [
   {
     id: 1924,
     name: "Maarten Vandevoordt",
-    nation: 0,
+    nation: 1,
     club: 173,
   },
   {
@@ -11978,7 +11978,7 @@ export let players = [
   {
     id: 510,
     name: "Serge Gnabry",
-    nation: 0,
+    nation: 25,
     club: 157,
   },
   {
@@ -12554,7 +12554,7 @@ export let players = [
   {
     id: 1298,
     name: "Robert Skov",
-    nation: 0,
+    nation: 21,
     club: 182,
   },
   {
@@ -12920,7 +12920,7 @@ export let players = [
   {
     id: 746,
     name: "Marco Asensio",
-    nation: 0,
+    nation: 9,
     club: 85,
   },
   {
@@ -13118,7 +13118,7 @@ export let players = [
   {
     id: 6,
     name: "Leonardo Balerdi",
-    nation: 0,
+    nation: 26,
     club: 81,
   },
   {
@@ -13466,7 +13466,7 @@ export let players = [
   {
     id: 7313,
     name: "Philipp Köhn",
-    nation: 0,
+    nation: 15,
     club: 91,
   },
   {
@@ -14810,7 +14810,7 @@ export let players = [
   {
     id: 9700,
     name: "Abner Vinícius",
-    nation: 0,
+    nation: 6,
     club: 80,
   },
   {
@@ -14846,7 +14846,7 @@ export let players = [
   {
     id: 361348,
     name: "Malick Fofana",
-    nation: 0,
+    nation: 1,
     club: 80,
   },
   {
@@ -15782,7 +15782,7 @@ export let players = [
   {
     id: 28733,
     name: "Brynjólfur Darri Willumsson",
-    nation: 0,
+    nation: 18,
     club: 202,
   },
   {
@@ -16808,7 +16808,7 @@ export let players = [
   {
     id: 544,
     name: "Noa Lang",
-    nation: 0,
+    nation: 1118,
     club: 197,
   },
   {
@@ -16820,7 +16820,7 @@ export let players = [
   {
     id: 36905,
     name: "Guus Til",
-    nation: 0,
+    nation: 1118,
     club: 197,
   },
   {
@@ -17972,7 +17972,7 @@ export let players = [
   {
     id: 48074,
     name: "Simon Olsson",
-    nation: 0,
+    nation: 5,
     club: 210,
   },
   {
@@ -19898,7 +19898,7 @@ export let players = [
   {
     id: 41960,
     name: "Ricardo Velho",
-    nation: 0,
+    nation: 27,
     club: 231,
   },
   {
@@ -20456,7 +20456,7 @@ export let players = [
   {
     id: 122259,
     name: "Bartłomiej Wdowik",
-    nation: 0,
+    nation: 24,
     club: 217,
   },
   {
@@ -20798,7 +20798,7 @@ export let players = [
   {
     id: 103958,
     name: "Jesús Ramírez",
-    nation: 0,
+    nation: 2379,
     club: 224,
   },
   {
@@ -21842,7 +21842,7 @@ export let players = [
   {
     id: 8741,
     name: "Ortwin De Wolf",
-    nation: 0,
+    nation: 1,
     club: 266,
   },
   {
@@ -22688,7 +22688,7 @@ export let players = [
   {
     id: 377009,
     name: "Matte Smets",
-    nation: 0,
+    nation: 1,
     club: 742,
   },
   {
@@ -23492,7 +23492,7 @@ export let players = [
   {
     id: 57242,
     name: "Jesper Daland",
-    nation: 0,
+    nation: 1090,
     club: 741,
   },
   {
@@ -25724,7 +25724,7 @@ export let players = [
   {
     id: 422,
     name: "Ahmed Kutucu",
-    nation: 0,
+    nation: 777,
     club: 3588,
   },
   {
@@ -26480,7 +26480,7 @@ export let players = [
   {
     id: 64304,
     name: "Kacper Kozłowski",
-    nation: 0,
+    nation: 24,
     club: 3573,
   },
   {
@@ -26558,7 +26558,7 @@ export let players = [
   {
     id: 341234,
     name: "Elias Jelert",
-    nation: 0,
+    nation: 21,
     club: 645,
   },
   {
@@ -27152,7 +27152,7 @@ export let players = [
   {
     id: 119780,
     name: "Blaž Kramer",
-    nation: 0,
+    nation: 1091,
     club: 607,
   },
   {
@@ -27524,7 +27524,7 @@ export let players = [
   {
     id: 128375,
     name: "Victor Dican",
-    nation: 0,
+    nation: 774,
     club: 2596,
   },
   {
@@ -29330,7 +29330,7 @@ export let players = [
   {
     id: 42569,
     name: "Valentin Țicu",
-    nation: 0,
+    nation: 774,
     club: 2598,
   },
   {
@@ -30210,6 +30210,30 @@ export let players = [
     club: 6232,
   },
   {
+    id: 43125,
+    name: "Relu Stoian",
+    nation: 0,
+    club: 632,
+  },
+  {
+    id: 267785,
+    name: "Aleksander Mitrovic",
+    nation: 0,
+    club: 2589,
+  },
+  {
+    id: 57249,
+    name: "Tobias Christensen",
+    nation: 0,
+    club: 6231,
+  },
+  {
+    id: 70483,
+    name: "Jakub Hromada",
+    nation: 0,
+    club: 6231,
+  },
+  {
     id: 30890,
     name: "Dragan Lovrić",
     nation: 0,
@@ -30234,18 +30258,6 @@ export let players = [
     club: 2596,
   },
   {
-    id: 43125,
-    name: "Relu Stoian",
-    nation: 0,
-    club: 632,
-  },
-  {
-    id: 267785,
-    name: "Aleksander Mitrovic",
-    nation: 0,
-    club: 2589,
-  },
-  {
     id: 28384,
     name: "Dániel Zsóri",
     nation: 0,
@@ -30256,18 +30268,6 @@ export let players = [
     name: "Stefan Georgescu",
     nation: 0,
     club: 6916,
-  },
-  {
-    id: 70483,
-    name: "Jakub Hromada",
-    nation: 0,
-    club: 6231,
-  },
-  {
-    id: 57249,
-    name: "Tobias Christensen",
-    nation: 0,
-    club: 6231,
   },
   {
     id: 21651,
@@ -30340,5 +30340,341 @@ export let players = [
     name: "Giannis Anestis",
     nation: 0,
     club: 2581,
+  },
+  {
+    id: 383770,
+    name: "Jack Fletcher",
+    nation: 0,
+    club: 33,
+  },
+  {
+    id: 328105,
+    name: "Lewis Miley",
+    nation: 0,
+    club: 34,
+  },
+  {
+    id: 1904,
+    name: "Boubacar Kamara",
+    nation: 2,
+    club: 66,
+  },
+  {
+    id: 199837,
+    name: "Kamaldeen Sulemana",
+    nation: 0,
+    club: 41,
+  },
+  {
+    id: 126791,
+    name: "Nathan Broadhead",
+    nation: 767,
+    club: 57,
+  },
+  {
+    id: 138417,
+    name: "Nathan Patterson",
+    nation: 1108,
+    club: 45,
+  },
+  {
+    id: 1150,
+    name: "Tyler Adams",
+    nation: 2384,
+    club: 35,
+  },
+  {
+    id: 161842,
+    name: "Alejandro Jay",
+    nation: 0,
+    club: 542,
+  },
+  {
+    id: 461502,
+    name: "Llorenç Serred",
+    nation: 0,
+    club: 540,
+  },
+  {
+    id: 397941,
+    name: "Min-su Kim",
+    nation: 0,
+    club: 547,
+  },
+  {
+    id: 496425,
+    name: "Lucas García",
+    nation: 0,
+    club: 547,
+  },
+  {
+    id: 439700,
+    name: "Enric Garcia",
+    nation: 0,
+    club: 547,
+  },
+  {
+    id: 402281,
+    name: "Silvi Clúa",
+    nation: 0,
+    club: 547,
+  },
+  {
+    id: 21584,
+    name: "Mihailo Ristić",
+    nation: 0,
+    club: 538,
+  },
+  {
+    id: 7228,
+    name: "Franz Stolz",
+    nation: 0,
+    club: 495,
+  },
+  {
+    id: 31069,
+    name: "Marco Sportiello",
+    nation: 0,
+    club: 489,
+  },
+  {
+    id: 410396,
+    name: "Mattia Liberali",
+    nation: 0,
+    club: 489,
+  },
+  {
+    id: 203269,
+    name: "Yannik Lührs",
+    nation: 0,
+    club: 165,
+  },
+  {
+    id: 380583,
+    name: "Ronny Seibt",
+    nation: 0,
+    club: 186,
+  },
+  {
+    id: 449985,
+    name: "Marwin Schmitz",
+    nation: 0,
+    club: 186,
+  },
+  {
+    id: 413065,
+    name: "Noahkai Banks",
+    nation: 0,
+    club: 170,
+  },
+  {
+    id: 24814,
+    name: "Leopold Zingerle",
+    nation: 0,
+    club: 173,
+  },
+  {
+    id: 25919,
+    name: "Gerrit Holtmann",
+    nation: 0,
+    club: 176,
+  },
+  {
+    id: 323449,
+    name: "Ameen Al-Dakhil",
+    nation: 1,
+    club: 172,
+  },
+  {
+    id: 21233,
+    name: "Akim Zedadka",
+    nation: 0,
+    club: 79,
+  },
+  {
+    id: 374503,
+    name: "Yoni Gomis",
+    nation: 0,
+    club: 95,
+  },
+  {
+    id: 437760,
+    name: "Rayane Messi Tanfouri",
+    nation: 0,
+    club: 95,
+  },
+  {
+    id: 305819,
+    name: "Kayky",
+    nation: 0,
+    club: 426,
+  },
+  {
+    id: 416341,
+    name: "Aymane Bais",
+    nation: 0,
+    club: 426,
+  },
+  {
+    id: 272691,
+    name: "Jorn Berkhout",
+    nation: 0,
+    club: 201,
+  },
+  {
+    id: 361351,
+    name: "Faissal Al Mazyani",
+    nation: 0,
+    club: 417,
+  },
+  {
+    id: 496426,
+    name: "Owen Panneflek",
+    nation: 0,
+    club: 415,
+  },
+  {
+    id: 381812,
+    name: "Omar Fayed",
+    nation: 0,
+    club: 263,
+  },
+  {
+    id: 396222,
+    name: "Michiel Haentjens",
+    nation: 0,
+    club: 554,
+  },
+  {
+    id: 393193,
+    name: "Kaye Iyowuna Furo",
+    nation: 0,
+    club: 569,
+  },
+  {
+    id: 41182,
+    name: "Vitó",
+    nation: 0,
+    club: 6232,
+  },
+  {
+    id: 48506,
+    name: "Martin Angha",
+    nation: 0,
+    club: 6886,
+  },
+  {
+    id: 42534,
+    name: "Cosmin Dur Bozoanca",
+    nation: 0,
+    club: 6886,
+  },
+  {
+    id: 31691,
+    name: "Agustín Vuletich",
+    nation: 0,
+    club: 2589,
+  },
+  {
+    id: 449245,
+    name: "Pedro Lima",
+    nation: 0,
+    club: 39,
+  },
+  {
+    id: 293604,
+    name: "Javi Llabrés",
+    nation: 0,
+    club: 798,
+  },
+  {
+    id: 485609,
+    name: "Federico Steffanoni",
+    nation: 0,
+    club: 499,
+  },
+  {
+    id: 197779,
+    name: "Mohamed Kaba",
+    nation: 0,
+    club: 867,
+  },
+  {
+    id: 989,
+    name: "Kevin Volland",
+    nation: 0,
+    club: 182,
+  },
+  {
+    id: 1370,
+    name: "André Ayew",
+    nation: 1504,
+    club: 111,
+  },
+  {
+    id: 30833,
+    name: "Alessio Da Cruz",
+    nation: 0,
+    club: 205,
+  },
+  {
+    id: 41592,
+    name: "Úmaro Embaló",
+    nation: 0,
+    club: 205,
+  },
+  {
+    id: 282682,
+    name: "Alex Mortensen",
+    nation: 0,
+    club: 202,
+  },
+  {
+    id: 47814,
+    name: "Niklas Vesterlund",
+    nation: 0,
+    club: 207,
+  },
+  {
+    id: 413074,
+    name: "Diego van Oorschot",
+    nation: 0,
+    club: 206,
+  },
+  {
+    id: 368174,
+    name: "Laurit Krasniqi",
+    nation: 0,
+    club: 740,
+  },
+  {
+    id: 496446,
+    name: "Barış Nazlı",
+    nation: 0,
+    club: 1002,
+  },
+  {
+    id: 454288,
+    name: "Oguzhan Aksoy",
+    nation: 0,
+    club: 1002,
+  },
+  {
+    id: 394221,
+    name: "Emir Yasar",
+    nation: 0,
+    club: 549,
+  },
+  {
+    id: 445967,
+    name: "Yakup Arda Kilic",
+    nation: 0,
+    club: 549,
+  },
+  {
+    id: 474037,
+    name: "Mihai Ninaci",
+    nation: 0,
+    club: 632,
   },
 ];

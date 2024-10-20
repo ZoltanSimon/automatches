@@ -81,13 +81,14 @@ async function handleError(id) {
 }
 
 export async function getAllPlayers() {
-  await getPlayerList(
-    "club",
-    allLeagues.filter((el) => el.type == "league"),
-    allLeagues.filter((el) => el.type == "nt")
-  );
-  //await getPlayerList("nation", allNationalComps);
-  console.log(allPlayers);
+  try {
+    const response = await fetch(`/get-all-players`);
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error("Failed to fetch and build player list:", error);
+    return [];
+  }
 }
 
 export async function buildTeamList(leagues) {
@@ -145,63 +146,6 @@ function extractStats(match, teamIndex, opponentIndex) {
     xG: parseFloat(match[0].statistics[teamIndex].statistics[16].value),
     xGA: parseFloat(match[0].statistics[opponentIndex].statistics[16].value),
   };
-}
-
-async function getPlayerList(compType, compList, nationList) {
-  let player, thisClub;
-  for (let i = 0; i < compList.length; i++) {
-    let response = await fetch(`data/leagues/${compList[i].id}.json`);
-    let league = await response.json();
-
-    for (let i = 0; i < league.length; i++) {
-      if (league[i].fixture.status.short == "FT") {
-        let match = await getResultFromLocal(league[i].fixture.id);
-        if (match) {
-          for (let j = 0; j < match[0].players.length; j++) {
-            thisClub = match[0].players[j].team.id;
-
-            for (let k = 0; k < match[0].players[j].players.length; k++) {
-              player = {
-                id: match[0].players[j].players[k].player.id,
-                name: match[0].players[j].players[k].player.name,
-                nation: 0,
-              };
-              player[compType] = thisClub;
-              if (!allPlayers.find((e) => e.id == player.id)) {
-                allPlayers.push(player);
-              } else {
-                allPlayers.find((e) => e.id == player.id)[compType] = thisClub;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  for (let i = 0; i < nationList.length; i++) {
-    let response = await fetch(`data/leagues/${nationList[i].id}.json`);
-    let nt = await response.json();
-
-    for (let i = 0; i < nt.length; i++) {
-      let match = await getResultFromLocal(nt[i].fixture.id);
-      if (match) {
-        for (let j = 0; j < match[0].players.length; j++) {
-          let thisNation = match[0].players[j].team.id;
-          for (let k = 0; k < match[0].players[j].players.length; k++) {
-            let id = match[0].players[j].players[k].player.id;
-
-            let playerFound = allPlayers.find((e) => e.id == id);
-            if (!playerFound) {
-              console.log(id);
-              console.log(match[0].players[j].players[k].player.name);
-            } else {
-              allPlayers.find((e) => e.id == id).nation = thisNation;
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
 export async function getResultsByRoundLocal(leagueID, roundNo) {
