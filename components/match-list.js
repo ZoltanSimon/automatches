@@ -127,6 +127,7 @@ export function matchesToCanvas(sourceDiv) {
         thisTr.children[0].style.width = "131px";
         thisTr.children[3].style.width = "78px";
       } else {
+        thisTr.deleteCell(8);
         thisTr.children[0].style.width = "120px";
         thisTr.children[1].style.width = "238px";
         thisTr.children[2].style.width = "50px"; //logo
@@ -183,7 +184,7 @@ export function matchesToCanvas(sourceDiv) {
       ctx.fillStyle = "#e63946";
       ctx.fillText(bottomText, 540, yPos - 22);
     }
-
+  console.log(matchesTable.outerHTML);
   buildTableForTableType(
     removeNewlines(matchesTable.outerHTML),
     imgToAdd,

@@ -23,7 +23,7 @@ export async function getLocalPlayerStats(inputPlayer, leagues) {
       ) {
         thisComp = league[i].league.name;
         foundIndex = -1;
-
+        console.log("ide");
         let match = await getResultFromLocal(league[i].fixture.id);
         for (let { players } of match) {
           playerFound = players[0].players.find(
@@ -61,18 +61,12 @@ export async function getResultFromLocal(fixtureID) {
     let response = await fetch(`data/matches/${fixtureID}.json`);
     if (!response.ok) {
       handleError(fixtureID);
-      //let response = downloadResult(
-      //  await getResultFromApi(fixtureID),
-      //  fixtureID
-      //);
     }
     return await response.json();
   } catch (e) {
-    //console.error(e);
+    console.error(e);
     return null;
   }
-
-  //return await response.json();
 }
 
 async function handleError(id) {
@@ -99,16 +93,16 @@ export async function buildTeamList(leagues) {
       `/get-league-matches?leagueID=${leagues.join(",")}`
     );
     const data = await response.json();
-
+    console.log(data);
     data.forEach((match) => {
       if (match != null) {
-        const team1Data = match[0].teams.home;
-        const team2Data = match[0].teams.away;
+        const team1Data = match.teams.home;
+        const team2Data = match.teams.away;
 
         const team1 = findOrCreateTeam(teams, team1Data);
         const team2 = findOrCreateTeam(teams, team2Data);
 
-        if (match[0].statistics[0]) {
+        if (match.statistics[0]) {
           const stats1 = extractStats(match, 0, 1);
           const stats2 = extractStats(match, 1, 0);
 
@@ -137,32 +131,28 @@ function findOrCreateTeam(teams, teamData) {
 
 function extractStats(match, teamIndex, opponentIndex) {
   return {
-    goalsFor: match[0].score.fulltime[teamIndex === 0 ? "home" : "away"],
-    goalsAgainst: match[0].score.fulltime[teamIndex === 0 ? "away" : "home"],
-    corners: match[0].statistics[teamIndex].statistics[7].value,
-    cornersAgainst: match[0].statistics[opponentIndex].statistics[7].value,
-    shotsOnGoal: match[0].statistics[teamIndex].statistics[0].value,
-    shotsOnGoalAgainst: match[0].statistics[opponentIndex].statistics[0].value,
-    xG: parseFloat(match[0].statistics[teamIndex].statistics[16].value),
-    xGA: parseFloat(match[0].statistics[opponentIndex].statistics[16].value),
+    goalsFor: match.score.fulltime[teamIndex === 0 ? "home" : "away"],
+    goalsAgainst: match.score.fulltime[teamIndex === 0 ? "away" : "home"],
+    corners: match.statistics[teamIndex].statistics[7].value,
+    cornersAgainst: match.statistics[opponentIndex].statistics[7].value,
+    shotsOnGoal: match.statistics[teamIndex].statistics[0].value,
+    shotsOnGoalAgainst: match.statistics[opponentIndex].statistics[0].value,
+    xG: parseFloat(match.statistics[teamIndex].statistics[16].value),
+    xGA: parseFloat(match.statistics[opponentIndex].statistics[16].value),
   };
 }
 
 export async function getResultsByRoundLocal(leagueID, roundNo) {
   let allGames = [];
-  let response = await fetch(`data/leagues/${leagueID}.json`);
-  let league = await response.json();
+  const response = await fetch(`/get-league-matches?leagueID=${leagueID}`);
+  const league = await response.json();
+  console.log(league);
   for (let i = 0; i < league.length; i++) {
     if (league[i].league.round == roundNo) {
-      if (league[i].fixture.status.short == "FT") {
-        allGames.push((await getResultFromLocal(league[i].fixture.id))[0]);
-      } else {
-        allGames.push(league[i]);
-      }
+      allGames.push(league[i]);
     }
   }
   return allGames;
-  //matchList(allGames);
 }
 
 export async function getMatch(fixtureID) {
