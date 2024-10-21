@@ -76,14 +76,14 @@ async function submitRequest_leagueInfo() {
   buildStandings(standingsFromApi);
 }
 
-export async function matchesByRound() {
+async function matchesByRound() {
   let leagueID = selectedLeagues[0];
   let roundNumber = document.getElementById("roundnr").value;
   let resultsFromApi = await getResultsByRoundLocal(
     leagueID,
     `Regular Season - ${roundNumber}`
   );
-  matchList(resultsFromApi);
+  matchList(resultsFromApi, false);
   addText(resultsFromApi);
   buildResults(resultsFromApi);
 }

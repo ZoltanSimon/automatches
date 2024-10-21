@@ -105,7 +105,6 @@ app.get("/update-leagues", async (request, response) => {
 app.get("/save-match", async (request, response) => {
   let matchID = request.query.matchID;
   let dataToWrite = await getResultFromApi(matchID);
-  //console.log(matchID);
 
   fs.writeFile(
     `${matchesDir}/${matchID}.json`,
@@ -131,16 +130,17 @@ app.get("/missing-matches", async (request, response) => {
     return response.json([]);
   } else {
     for (const leagueID of leagueIDs) {
-      let data = JSON.parse(
-        await readFile(`${leaguesDir}/${leagueID}.json`, "utf8")
-      );
-      console.log(data[0]);
+      let data = await getLeagueFromServer(leagueID);
 
       for (const element of data) {
         if (["FT", "AET"].includes(element.fixture.status.short))
-          if (!fs.existsSync(`${matchesDir}/${element.fixture.id}.json`)) {
-            matchArr.push(element);
-          }
+          fs.access(
+            `${matchesDir}/${element.fixture.id}.json`,
+            fs.constants.F_OK,
+            (err) => {
+              matchArr.push(element);
+            }
+          );
       }
     }
     response.json(matchArr);
@@ -157,14 +157,12 @@ app.get("/get-league-matches", async (request, response) => {
   } else {
     for (let i = 0; i < leagues.length; i++) {
       let leagueID = leagues[i];
-      let data = JSON.parse(
-        await readFile(`${leaguesDir}/${leagueID}.json`, "utf8")
-      );
+      let data = await getLeagueFromServer(leagueID);
       for (const element of data) {
         if (["FT", "AET"].includes(element.fixture.status.short)) {
           matchID = element.fixture.id;
           let data2 = await getMatchFromServer(matchID);
-          allMatches.push(data2);
+          allMatches.push(data2[0]);
         }
       }
     }
@@ -194,15 +192,15 @@ app.get("/get-all-players", async (request, response) => {
 app.get("/get-player-list", async (request, response) => {
   let leagues = request.query.leagues.split(",");
   let playerList = await getPlayerGoalList(leagues);
-  return response.json(playerList);
+  response.json(playerList);
 });
 
 app.get("/match-exists", async (request, response) => {
   let matchID = request.query.matchID;
-  if (fs.existsSync(`${matchesDir}/${matchID}.json`)) {
+  fs.access(`${matchesDir}/${matchID}.json`, fs.constants.F_OK, (err) => {
     return response.json(true);
-  }
-  return response.json(false);
+  });
+  response.json(false);
 });
 
 app.get("/get-league", async (request, response) => {

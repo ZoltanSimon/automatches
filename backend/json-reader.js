@@ -11,7 +11,7 @@ export async function getPlayerGoalList(leagues) {
   let teams,
     teamNames = {};
   for (let i = 0; i < leagues.length; i++) {
-    let league = JSON.parse(await readFile(`${leaguesDir}/${leagues[i]}.json`));
+    let league = await getLeagueFromServer(leagues[i]);
     for (let i = 0; i < league.length; i++) {
       if (league[i].fixture.status.short == "FT") {
         let match = await getMatchFromServer(league[i].fixture.id);
