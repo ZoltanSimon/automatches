@@ -188,7 +188,8 @@ footer p {
   display: grid;
   grid-template-columns: 1fr 1fr; /* Two equal columns */
   gap: 22px; /* Add space between rectangles */
-  width: 80%;
+  width: 1800px;
+  margin: 0 auto; /* Center the container */
 }
 
 .small-container {
@@ -229,13 +230,18 @@ footer p {
 .rectangle {
   display: grid;
   grid-template-columns: 1fr auto; /* Title and link side by side */
-  grid-template-rows: auto 1fr; /* Header (title and link) + content */
   padding: 20px;
   border: 1px solid #333;
   text-align: left;
   box-sizing: border-box;
   gap: 10px; /* Space between elements inside the rectangle */
-  height: 100%; /* Ensure equal height for both rectangles */
+  width: 100%; /* Ensure the rectangle takes the full width of the parent */
+  overflow: visible; /* Allow overflow to expand the rectangle */
+}
+
+.table-container {
+  overflow-x: auto; /* Allow horizontal scrolling for tables that are too wide */
+  width: 100%; /* Ensure the container takes the full width */
 }
 
 #rectangle1 {
@@ -283,10 +289,57 @@ footer p {
   grid-row: 2 / 3; /* Second row */
   padding-top: 6px;
 }
-
-/* Media query for mobile devices */
-@media (max-width: 768px) {
+@media (max-width: 1820px) {
+  main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .container {
+    width: 100%;
+    gap: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
   .rectangle {
-    flex: 1 1 100%; /* Base width 100% for mobile, stack on top of each other */
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media (max-width: 1670px) {
+  main {
+    padding: 2px 0px;
+  }
+  .container {
+    gap: 4px;
+  }
+  .form-indicator {
+    width: 8px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 1400px) {
+  .container {
+    gap: 2px;
+  }
+  .rectangle {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .container {
+    grid-template-columns: 1fr; /* Switch to a single column */
+    width: 100%;
+  }
+  .rectangle {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .form-indicator {
+    width: 10px;
+    height: 16px;
   }
 }

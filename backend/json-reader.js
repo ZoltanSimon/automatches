@@ -1,5 +1,6 @@
 import { readFile } from "fs/promises";
 import { Player } from "./../classes/player.js";
+import * as fs from "fs";
 
 const cache = new Map();
 let allPlayers = [];
@@ -71,6 +72,21 @@ export async function getLeagueFromServer(leagueID) {
     console.error(e);
     return null;
   }
+}
+
+export async function writeLeagueToServer(leagueID, dataToWrite) {
+  let file = `${leaguesDir}/${leagueID}.json`;
+  let responseToSend = "";
+
+  fs.writeFile(file, JSON.stringify(dataToWrite), function (err) {
+    if (err) {
+      return console.log(err);
+    }
+    responseToSend += `${leagueID} was saved!<br/>`;
+  });
+
+  cache.set(file, dataToWrite);
+  return responseToSend;
 }
 
 function getBothTeams(players, home, teamName) {

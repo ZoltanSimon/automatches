@@ -99,6 +99,7 @@ export async function showMatchesOnDate(date, showID) {
         const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
         if (matchEnd < new Date()) {
           let exists = await matchExists(match.fixture.id);
+          console.log(exists);
           if (downloads < 10 && !exists) {
             let thisMatch = await getMatch(match.fixture.id);
             let matchIndex = matches.findIndex(
@@ -141,7 +142,6 @@ export async function getTopPlayers(leagues, amount, big) {
 
 export async function getTopTeams(leagues, amount, big) {
   let dasTeams = await buildTeamList(leagues);
-  console.log(dasTeams);
 
   dasTeams.sort((a, b) =>
     a.last5PerGame.points < b.last5PerGame.points
@@ -151,6 +151,5 @@ export async function getTopTeams(leagues, amount, big) {
       : 0
   );
 
-  console.log(dasTeams);
   teamList(dasTeams.slice(0, amount), true, false, big);
 }

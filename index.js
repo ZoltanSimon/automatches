@@ -8,9 +8,9 @@ import {
   getPlayerGoalList,
   getMatchFromServer,
   matchesDir,
-  leaguesDir,
   getAllPlayers,
   getLeagueFromServer,
+  writeLeagueToServer,
 } from "./backend/json-reader.js";
 import { createRequire } from "module";
 import path from "path";
@@ -87,16 +87,7 @@ app.get("/update-leagues", async (request, response) => {
 
     let dataToWrite = await getResultsDate(leagueID, season);
 
-    fs.writeFile(
-      `${leaguesDir}/${leagueID}.json`,
-      JSON.stringify(dataToWrite.response),
-      function (err) {
-        if (err) {
-          return console.log(err);
-        }
-        responseToSend += `${leagueID} was saved!<br/>`;
-      }
-    );
+    responseToSend += await writeLeagueToServer(leagueID, dataToWrite.response);
   }
   response.send(responseToSend);
 });
@@ -134,17 +125,19 @@ app.get("/missing-matches", async (request, response) => {
 
       for (const element of data) {
         if (["FT", "AET"].includes(element.fixture.status.short))
-          fs.access(
-            `${matchesDir}/${element.fixture.id}.json`,
-            fs.constants.F_OK,
-            (err) => {
-              matchArr.push(element);
-            }
-          );
+          try {
+            fs.accessSync(
+              `${matchesDir}/${element.fixture.id}.json`,
+              fs.constants.R_OK
+            );
+          } catch (err) {
+            matchArr.push(element);
+          }
       }
     }
-    response.json(matchArr);
   }
+
+  response.json(matchArr);
 });
 
 app.get("/get-league-matches", async (request, response) => {
@@ -197,9 +190,11 @@ app.get("/get-player-list", async (request, response) => {
 
 app.get("/match-exists", async (request, response) => {
   let matchID = request.query.matchID;
-  fs.access(`${matchesDir}/${matchID}.json`, fs.constants.F_OK, (err) => {
+
+  try {
+    fs.accessSync(`${matchesDir}/${matchID}.json`, fs.constants.R_OK);
     return response.json(true);
-  });
+  } catch (err) {}
   response.json(false);
 });
 
