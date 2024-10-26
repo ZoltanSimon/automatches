@@ -93,7 +93,7 @@ export async function buildTeamList(leagues) {
       `/get-league-matches?leagueID=${leagues.join(",")}`
     );
     const data = await response.json();
-    console.log(data);
+
     data.forEach((match) => {
       if (match != null) {
         const team1Data = match.teams.home;
