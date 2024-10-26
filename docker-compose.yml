@@ -1,25 +1,39 @@
-version: "3"
-services:
-  web:
-    build: .
-    volumes:
-      - ./data/matches:/app/data/matches
-    networks:
-      - webnet
+version: '3.8'
 
-  reverse-proxy:
-    image: nginx
+services:
+  app:
+    image: automatches-app  # Replace this with your actual Node.js app image
+    container_name: app
+    ports:
+      - "3000:3000"
+    volumes:
+      - C:/GenerationFootball/data/leagues:/app/data/leagues
+      - C:/GenerationFootball/data/matches:/app/data/matches
+    networks:
+      - caddy_network
+    restart: always  # To ensure your app restarts if it crashes
+
+  caddy:
+    image: caddy:latest
     ports:
       - "80:80"
-      - "443:443"
+      - "443:8443"
+      - "8443:8443"     # Additional HTTPS port
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/ssl
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - ACME_AGREE=true
+    command: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
     networks:
-      - webnet
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./ssl:/etc/letsencrypt # Certbot will save the SSL certificates here
-      - ./nginx.conf:/etc/nginx/nginx.conf # To reload NGINX once certs are ready
-    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h; done"
+      - caddy_network
+    restart: always
+
+networks:
+  caddy_network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

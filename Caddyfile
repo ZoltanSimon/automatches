@@ -1,0 +1,18 @@
+generationfootball.net, www.generationfootball.net {
+    reverse_proxy app:3000
+    tls zoltansimon89@gmail.com
+
+    log {
+        output file /var/log/caddy/access.log
+        level debug
+    }
+}
+
+http://generationfootball.net, http://www.generationfootball.net {
+    redir https://generationfootball.net
+}
+
+:8443 {
+    reverse_proxy app:3000
+    tls zoltansimon89@gmail.com
+}
