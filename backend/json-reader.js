@@ -1,11 +1,21 @@
 import { readFile } from "fs/promises";
 import { Player } from "./../classes/player.js";
 import * as fs from "fs";
+import { networkPath } from "./config.js";
 
 const cache = new Map();
 let allPlayers = [];
-export const matchesDir = "\\\\DESKTOP-1MDUJM7\\data2\\matches";
-export const leaguesDir = "\\\\DESKTOP-1MDUJM7\\data2\\leagues";
+export const matchesDir = `${networkPath}matches`;
+export const leaguesDir = `${networkPath}leagues`;
+export const dataDir = `${networkPath}`;
+
+export const players = JSON.parse(
+  await readFile(`${dataDir}players.json`, "utf-8")
+);
+
+export function getPlayerByID(playerID) {
+  return players.find((element) => element.id == playerID);
+}
 
 export async function getPlayerGoalList(leagues) {
   allPlayers = [];
@@ -96,7 +106,7 @@ function getBothTeams(players, home, teamName) {
     if (playerFound) {
       playerFound.getPlayerStats(player);
     } else {
-      let inputPlayer = { id: playerID, teamName: teamName };
+      let inputPlayer = getPlayerByID(playerID);
       let thisPlayer = new Player(inputPlayer);
       thisPlayer.getPlayerStats(player);
       allPlayers.push(thisPlayer);

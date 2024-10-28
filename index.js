@@ -11,12 +11,12 @@ import {
   getAllPlayers,
   getLeagueFromServer,
   writeLeagueToServer,
+  players,
 } from "./backend/json-reader.js";
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
 import { allLeagues } from "./data/leagues.js";
-import { players } from "./data/players.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -201,4 +201,9 @@ app.get("/match-exists", async (request, response) => {
 app.get("/get-league", async (request, response) => {
   let leagueID = request.query.leagueID;
   response.json(await getLeagueFromServer(leagueID));
+});
+
+app.get("/find-player-by-id", async (request, response) => {
+  let playerID = request.query.playerID;
+  response.json(await getPlayerByID(playerID));
 });

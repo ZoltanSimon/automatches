@@ -1,2 +1,5 @@
-/data/matches
 /node_modules
+/certs
+/data/caddy
+/config
+/backend/config.js

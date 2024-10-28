@@ -10,6 +10,7 @@ import {
   getResultsByRoundLocal,
   getMatch,
   buildTeamList,
+  findPlayerByID,
 } from "../local-handler.js";
 import { allLeagues } from "../data/leagues.js";
 import { clubs } from "../data/clubs.js";
@@ -20,7 +21,6 @@ import {
   standingsToCanvas,
 } from "../components/league-standings.js";
 import { addText, buildResults, buildStandings } from "../autotext.js";
-import { players } from "../data/players.js";
 import { teamList } from "../components/team-list.js";
 
 const picker = datepicker(document.querySelector("#calendar"), {
@@ -200,12 +200,8 @@ document.getElementById("get-all-matches").onclick = async function () {
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
-  let player1 = players.find(
-    (x) => x.id == document.getElementById("playerID").value
-  );
-  let player2 = players.find(
-    (x) => x.id == document.getElementById("playerID2").value
-  );
+  let player1 = findPlayerByID(document.getElementById("playerID").value);
+  let player2 = findPlayerByID(document.getElementById("playerID2").value);
   playerFromApi = await getLocalPlayerStats(player1);
   playerFromApi2 = await getLocalPlayerStats(player2);
   addPlayerStats(playerFromApi, playerFromApi2);
