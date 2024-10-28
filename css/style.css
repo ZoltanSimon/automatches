@@ -327,6 +327,9 @@ footer p {
     padding-left: 2px;
     padding-right: 2px;
   }
+  .small-container {
+    width: 100%;
+  }
 }
 
 @media (max-width: 1100px) {

@@ -1,10 +1,8 @@
-import { players } from "../data/players.js";
 export class Player {
   constructor(inputPlayer) {
-    let thisPlayer = players.find((element) => element.id == inputPlayer.id);
     this.id = inputPlayer.id;
-    this.club = thisPlayer.club;
-    this.nation = thisPlayer.nation;
+    this.club = inputPlayer.club;
+    this.nation = inputPlayer.nation;
     this.goals = 0;
     this.assists = 0;
     this.shotsOn = 0;
@@ -20,7 +18,7 @@ export class Player {
     this.apps = 0;
     this.minutes = 0;
     this.gap90 = 0;
-    this.name = thisPlayer.name;
+    this.name = inputPlayer.name;
     this.team = inputPlayer.teamName;
     this.competitions = "";
     this.duels = "";

@@ -2,7 +2,6 @@ import { allLeagues } from "./data/leagues.js";
 import { matchList } from "./components/match-list.js";
 import { buildTeamList } from "./local-handler.js";
 import { loadPlayerFace } from "./instapics.js";
-import { players } from "./data/players.js";
 import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
 import { getMatch, matchExists } from "./local-handler.js";

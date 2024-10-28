@@ -13,18 +13,31 @@ export function playerGoalList(response, big) {
   let thisPlayer;
 
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="player-list-table">
-  <thead><tr style="border-bottom:3px solid #1D3557"><td colspan=2>Player</td>${tds}Team</td>${tds}Apps</td>${tds}Goals</td>${tds}NPG</td>${tds}Assists</td>${tds}GA/90</td>`;
+  <thead>
+    <tr style="border-bottom:3px solid #1D3557">
+      <td colspan=3>Player</td>
+      <td width=50 style="text-align: center;">Team</td>
+      ${tds}Apps</td>
+      ${tds}Goals</td>
+      ${tds}NPG</td>
+      ${tds}Assists</td>
+      ${tds}GA/90</td>`;
   if (big)
     addToPage += `${tds}Minutes</td>${tds}Penalties</td>${tds}Shots</td>${tds}Dribbles</td>${tds}Duels</td>${tds}Key Passes</td>${tds}Fouls Against</td>`;
   addToPage += `</tr></thead><tbody>`;
   for (let i = 0; i < response.length; i++) {
     thisPlayer = response[i];
     loadClubLogo(thisPlayer.club);
-    addToPage += `<tr><td style="text-align:center;padding:0"><img height="60" src="images/player-pictures/${
+    addToPage += `<tr><td style="text-align:center;padding:0; border-right: none;""><img height="60" src="images/player-pictures/${
       thisPlayer.id
-    }.png"</td><td>${thisPlayer.name}</td><td id="${thisPlayer.club}">${
-      thisPlayer.team
-    }</td>${tds}${
+    }.png"</td>
+    <td style="border-left: none;"><img height="30" src="images/logos/${
+      thisPlayer.nation
+    }.png" /></td">
+    <td>${thisPlayer.name}</td>
+    <td id="${thisPlayer.club}"><img height="50" src="images/logos/${
+      thisPlayer.club
+    }.png" /></td>${tds}${
       thisPlayer.apps
     }</td><td style="text-align: center; font-weight: bold">${
       thisPlayer.goals

@@ -2,14 +2,13 @@ import { Player } from "./classes/player.js";
 import { allLeagues } from "./data/leagues.js";
 import { Team } from "./classes/team.js";
 
-let allPlayers = [];
 export let selectedLeagues = [];
 
 export async function getLocalPlayerStats(inputPlayer, leagues) {
   let playerFound;
   let foundIndex = -1;
   let thisComp = "";
-
+  inputPlayer = findPlayerByID(inputPlayer.id);
   let player = new Player(inputPlayer);
   for (let i = 0; i < leagues.length; i++) {
     let response = await fetch(`data/leagues/${leagues[i]}.json`);
@@ -23,7 +22,6 @@ export async function getLocalPlayerStats(inputPlayer, leagues) {
       ) {
         thisComp = league[i].league.name;
         foundIndex = -1;
-        console.log("ide");
         let match = await getResultFromLocal(league[i].fixture.id);
         for (let { players } of match) {
           playerFound = players[0].players.find(
@@ -174,4 +172,8 @@ export async function matchExists(fixtureID) {
   const data = await response.json();
   console.log(data);
   return data;
+}
+
+export async function findPlayerByID(playerID) {
+  return await fetch(`/find-player-by-id?playerID=${playerID}`);
 }
