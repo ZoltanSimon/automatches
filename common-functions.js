@@ -98,7 +98,6 @@ export async function showMatchesOnDate(date, showID) {
         const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
         if (matchEnd < new Date()) {
           let exists = await matchExists(match.fixture.id);
-          console.log(exists);
           if (downloads < 10 && !exists) {
             let thisMatch = await getMatch(match.fixture.id);
             let matchIndex = matches.findIndex(
