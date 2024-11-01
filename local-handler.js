@@ -1,5 +1,4 @@
 import { Player } from "./classes/player.js";
-import { allLeagues } from "./data/leagues.js";
 import { Team } from "./classes/team.js";
 
 export let selectedLeagues = [];

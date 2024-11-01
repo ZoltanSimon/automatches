@@ -14,6 +14,9 @@ export let allLeagues = [
   { id: 848, name: "Conference League", season: 2024, type: "cup" },
   { id: 4, name: "EURO 2024", season: 2024, type: "nt" },
   { id: 9, name: "Copa America", season: 2024, type: "nt" },
+  { id: 45, name: "fa-cup", season: 2024, type: "cup" },
+  { id: 143, name: "Copa del Rey", season: 2024, type: "cup" },
+  { id: 137, name: "Copa Italia", season: 2024, type: "cup" },
   { id: 81, name: "pokal", season: 2024, type: "cup" },
   { id: 5, name: "nations-league", season: 2024, type: "nt" },
   { id: 960, name: "euro-quali", season: 2024, type: "nt" },
@@ -24,7 +27,6 @@ export let allLeagues = [
     type: "nt",
   },
   { id: 1, name: "world-cup-2022", season: 2022, type: "nt" },
-  { id: 45, name: "fa-cup", season: 2024, type: "cup" },
   { id: 556, name: "spanish-super-cup", season: 2024, type: "cup" },
   { id: 6, name: "afcon", season: 2024, type: "nt" },
 ];
