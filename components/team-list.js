@@ -1,7 +1,8 @@
+import { tds } from "../common-styles.js";
+
 let addToPage;
-let ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:8%;" class="sortable"">`;
-let tds = `<td style="text-align: center; padding:2px;">`;
-let thisTeam, thisTr, thisId;
+let ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:9%; border-right:1px solid #F1FAEE" class="sortable"">`;
+let thisTeam, thisTr;
 
 export function teamList(
   response,
@@ -80,23 +81,29 @@ function createTeamsTable(response, onlyTotal, big) {
       <th style="text-align: center; padding:2px;" colspan=8>Last 5</th>
       <th style="text-align: center; padding:2px;" colspan=8>Last 5 Per Game</th>
     </tr>
-    <tr>`;
+    <tr class="main-table-header">`;
   } else {
     addToPage += `
-    <th colspan=2>Teams</td>`;
+    <tr class="main-table-header">
+    <th style="border-right:1px solid #F1FAEE" colspan=2>Teams</th>`;
   }
   addToPage += `
-    <th style="width:61px">Form</td>
+    <th style="width:61px; border-right:1px solid #F1FAEE;">Form</td>
     ${ths}Played<span class="sort-indicator"></th>`;
+
   if (big) addToPage += `${ths}Win %`;
+
   addToPage += `${ths}Goals<span class="sort-indicator"></th>
     ${ths}Goals Ag<span class="sort-indicator"></th>
     ${ths}xG<span class="sort-indicator"></th>
     ${ths}xG Ag<span class="sort-indicator"></th>
-    ${ths}Corners<span class="sort-indicator"></th>
-    ${ths}Corners Ag<span class="sort-indicator"></th>
-    ${ths}Shots<span class="sort-indicator"></th>
-    ${ths}Shots Ag<span class="sort-indicator"></th>`;
+    ${ths}Corners<span class="sort-indicator"></th>   
+    ${ths}Shots<span class="sort-indicator"></th>`;
+
+  if (big)
+    addToPage += `${ths}Corners Ag<span class="sort-indicator"></th>
+                        ${ths}Shots Ag<span class="sort-indicator"></th>`;
+
   if (!onlyTotal) {
     addToPage += `${tds}Goals</td>
     ${tds}GoalsA</td>
@@ -139,22 +146,28 @@ function createTeamsTable(response, onlyTotal, big) {
       }
 
       addToPage += `</td>
-      ${tds}${thisTeam.matches}</td>`;
+                  ${tds}${thisTeam.matches}</td>`;
+
       if (big)
         addToPage += `${tds}${(
           (100 * thisTeam.wins) /
           thisTeam.matches
         ).toFixed(1)}</td>`; //(100 * partialValue) / totalValue
+
       addToPage += `${tds}${thisTeam.total.goals}</td>
       ${tds}${thisTeam.total.goalsAgainst}</td>
       ${tds}${thisTeam.total.xG.toFixed(2)}</td>
       ${tds}${thisTeam.total.xGA.toFixed(2)}</td>
-      ${tds}${thisTeam.total.corners}</td>
-      ${tds}${thisTeam.total.cornersAgainst}</td>
-      ${tds}${thisTeam.total.shotsOnGoal}</td>
+      ${tds}${thisTeam.total.corners}</td>  
+      ${tds}${thisTeam.total.shotsOnGoal}</td>`;
+
+      if (big)
+        addToPage += `${tds}${thisTeam.total.cornersAgainst}</td>
       ${tds}${thisTeam.total.shotsOnGoalAgainst}</td>`;
+
       if (!onlyTotal) {
         addToPage += `${tds}${thisTeam.perGame.goals.toFixed(2)}</td>
+
       ${tds}${thisTeam.perGame.goalsAgainst.toFixed(2)}</td>
       ${tds}${thisTeam.perGame.xG.toFixed(2)}</td>
       ${tds}${thisTeam.perGame.xGA.toFixed(2)}</td>
