@@ -5,25 +5,25 @@ import {
   loadClubLogo,
 } from "../instapics.js";
 import { removeNewlines } from "../common-functions.js";
+import { ths, tds } from "../common-styles.js";
 
 export function playerGoalList(response, big) {
-  console.log(response);
   let addToPage;
-  let tds = `<td style="text-align: center;">`;
+
   let thisPlayer;
 
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="player-list-table">
   <thead>
-    <tr style="border-bottom:3px solid #1D3557">
-      <td colspan=3>Player</td>
-      <td width=50 style="text-align: center;">Team</td>
-      ${tds}Apps</td>
-      ${tds}Goals</td>
-      ${tds}NPG</td>
-      ${tds}Assists</td>
-      ${tds}GA/90</td>`;
+    <tr class="main-table-header">
+      <th colspan=3 style="border-right:1px solid #F1FAEE">Player</th>
+      <th width=50 style="text-align: center; border-right:1px solid #F1FAEE">Team</th>
+      ${ths}Apps</th>
+      ${ths}Goals</th>
+      ${ths}NPG</th>
+      ${ths}Assists</th>
+      ${ths}GA/90</th>`;
   if (big)
-    addToPage += `${tds}Minutes</td>${tds}Penalties</td>${tds}Shots</td>${tds}Dribbles</td>${tds}Duels</td>${tds}Key Passes</td>${tds}Fouls Against</td>`;
+    addToPage += `${ths}Minutes</th>${ths}Penalties</th>${ths}Shots</th>${ths}Dribbles</th>${ths}Duels</th>${ths}Key Passes</th>${ths}Fouls Against</th>`;
   addToPage += `</tr></thead><tbody>`;
   for (let i = 0; i < response.length; i++) {
     thisPlayer = response[i];
@@ -35,7 +35,7 @@ export function playerGoalList(response, big) {
       thisPlayer.nation
     }.png" /></td">
     <td>${thisPlayer.name}</td>
-    <td id="${thisPlayer.club}"><img height="50" src="images/logos/${
+    <td id="${thisPlayer.club}"><img height="44" src="images/logos/${
       thisPlayer.club
     }.png" /></td>${tds}${
       thisPlayer.apps
