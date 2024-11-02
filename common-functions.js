@@ -37,18 +37,6 @@ export function truncate(str, n) {
   return str.length > n ? str.slice(0, n - 1) + "&hellip;" : str;
 }
 
-export function downloadResult(matchID, response) {
-  let dataStr =
-    "data:text/json;charset=utf-8," +
-    encodeURIComponent(JSON.stringify(response));
-  let downloadAnchorNode = document.createElement("a");
-  downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", matchID + ".json");
-  document.body.appendChild(downloadAnchorNode); // required for firefox
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
-}
-
 export function copyText(field) {
   // Get the text field
   var copyText = document.getElementById(field);
@@ -86,41 +74,45 @@ export function copyToClipboard(element) {
 export async function showMatchesOnDate(date, showID) {
   let matches = [];
   let downloads = 0;
-  for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`get-league?leagueID=${allLeagues[i].id}`);
-    let league = await response.json();
 
-    for (let j = 0; j < league.length; j++) {
-      let match = league[j];
+  for (let league of allLeagues) {
+    let leagueMatches = await fetch(`get-league?leagueID=${league.id}`);
+    let leagueData = await leagueMatches.json();
+
+    for (let match of leagueData) {
       let fixtureDate = new Date(match.fixture.date);
 
-      if (fixtureDate.toDateString() == date.toDateString()) {
-        const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
-        if (matchEnd < new Date()) {
-          let exists = await matchExists(match.fixture.id);
-          if (downloads < 10 && !exists) {
-            let thisMatch = await getMatch(match.fixture.id);
-            let matchIndex = matches.findIndex(
-              (m) => m.fixture.id === thisMatch[0].fixture.id
-            );
+      if (fixtureDate.toDateString() !== date.toDateString()) continue;
 
-            if (matchIndex !== -1) {
-              // If a match with the same fixture.id exists, replace it
-              matches[matchIndex] = thisMatch[0];
-            } else {
-              // If it doesn't exist, push the new match
-              matches.push(thisMatch[0]);
-            }
-
-            downloads++;
-          }
-        }
+      const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
+      if (matchEnd >= new Date()) {
         matches.push(match);
+        continue;
+      }
+
+      let cachedMatch = await matchExists(match.fixture.id);
+      if (cachedMatch) {
+        updateOrAddMatch(matches, cachedMatch[0]);
+      } else if (downloads < 10) {
+        let downloadedMatch = await getMatch(match.fixture.id);
+        updateOrAddMatch(matches, downloadedMatch[0]);
+        downloads++;
       }
     }
   }
 
   if (matches.length > 0) matchList(matches, showID);
+}
+
+function updateOrAddMatch(matchArray, matchData) {
+  const index = matchArray.findIndex(
+    (m) => m.fixture.id === matchData.fixture.id
+  );
+  if (index !== -1) {
+    matchArray[index] = matchData;
+  } else {
+    matchArray.push(matchData);
+  }
 }
 
 export async function getTopPlayers(leagues, amount, big) {

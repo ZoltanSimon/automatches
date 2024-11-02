@@ -193,9 +193,9 @@ app.get("/match-exists", async (request, response) => {
 
   try {
     fs.accessSync(`${matchesDir}/${matchID}.json`, fs.constants.R_OK);
-    return response.json(true);
+    return response.json(await getMatchFromServer(matchID));
   } catch (err) {}
-  response.json(false);
+  response.json(null);
 });
 
 app.get("/get-league", async (request, response) => {

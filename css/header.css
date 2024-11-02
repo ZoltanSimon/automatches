@@ -81,8 +81,13 @@ nav ul li a:hover {
     padding: 4px;
   }
 
+  .logo-title img {
+    height: 40px; /* Adjust this size as needed */
+    margin-right: 2px; /* Space between the logo and the text */
+  }
+
   .logo-title h1 {
-    font-size: 40px;
+    font-size: 37px;
   }
 
   nav ul li {
