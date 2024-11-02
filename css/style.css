@@ -216,7 +216,7 @@ footer p {
 }
 
 .form-column {
-  width: 61px;
+  width: 44px;
   border-right: 1px solid #f1faee;
 }
 
@@ -245,7 +245,7 @@ footer p {
     gap: 4px;
   }
   .form-column {
-    width: 57px;
+    width: 40px;
   }
   .form-indicator {
     width: 9px;
@@ -275,7 +275,7 @@ footer p {
     padding-right: 6px;
   }
   .form-column {
-    width: 61px;
+    width: 44px;
   }
   .form-indicator {
     width: 10px;

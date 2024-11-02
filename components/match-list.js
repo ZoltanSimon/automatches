@@ -77,10 +77,10 @@ export function matchList(fixtures, showID = false) {
       (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
     }</td>
       <td style="text-align: center;">(${
-        element.statistics ? element.statistics[0].statistics[16].value : ""
+        element.statistics ? element.statistics[0]?.statistics[16].value : ""
       })</td>
       <td style="text-align: center;">(${
-        element.statistics ? element.statistics[1].statistics[16].value : ""
+        element.statistics ? element.statistics[1]?.statistics[16].value : ""
       })</td>
     </tr>`;
   });
