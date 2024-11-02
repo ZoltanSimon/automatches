@@ -1,0 +1,96 @@
+header {
+  background: linear-gradient(
+    to bottom,
+    #457b9d 60%,
+    #4f8ea9 80%,
+    #5fa3c1 100%
+  );
+  color: #fff;
+  text-align: center;
+  align-items: center;
+  padding: 10px;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: bold; /* Make the text bold */
+}
+
+.logo-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.logo-title img {
+  height: 50px; /* Adjust this size as needed */
+  margin-right: 10px; /* Space between the logo and the text */
+}
+
+.logo-title h1 {
+  font-size: 50px;
+  font-weight: 1000;
+  margin: 0;
+  color: #f1faee;
+
+  text-shadow: -1px -1px 0 #1d3557, /* Top-left shadow */ 1px -1px 0 #1d3557,
+    /* Top-right shadow */ -1px 1px 0 #1d3557,
+    /* Bottom-left shadow */ 1px 1px 0 #1d3557; /* Bottom-right shadow */
+}
+
+nav {
+  margin-top: 0px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0 auto;
+  list-style: none;
+  max-width: 700px; /* Optional: limit nav width on larger screens */
+  justify-content: center;
+}
+
+nav ul li {
+  flex: 1 1 18%; /* Set each button to occupy 20% of row width */
+  margin: 5px; /* Add some spacing around buttons */
+  box-sizing: border-box;
+}
+
+nav ul li a {
+  font-weight: 700;
+  font-size: 15px;
+  padding: 6px 20px;
+  background-color: rgba(29, 53, 87, 0.7);
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  display: block; /* Make links take up full li width */
+  text-align: center;
+}
+
+nav ul li a:hover {
+  background-color: rgba(230, 57, 70, 0.9);
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 4px;
+  }
+
+  .logo-title h1 {
+    font-size: 40px;
+  }
+
+  nav ul li {
+    flex: 1 1 30%; /* Change to 30% width to show 3 per row */
+    margin-bottom: 10px;
+  }
+
+  nav ul li:nth-last-child(-n + 3) {
+    margin-bottom: 0;
+  }
+}
