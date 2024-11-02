@@ -75,7 +75,8 @@ export function standingsToCanvas() {
   let leagueName = document.getElementById("league-name").innerHTML;
   let leagueID = document.getElementById("league-id").innerHTML;
 
-  standingsTable.rows[0].style.backgroundColor = "#457B9D";
+  standingsTable.rows[0].style.backgroundColor = "#1D3557";
+  standingsTable.rows[0].style.color = "#F1FAEE";
 
   if (standingsTable.rows.length < 20) yPos = 150;
 

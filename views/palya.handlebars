@@ -1,9 +1,8 @@
 <link rel="stylesheet" href="/../css/palya.css" />
 
-<script src="/../common-functions.js"></script>
 <div class="team-container">
   <canvas
-    id="myCanvas"
+    id="starting-eleven-builder"
     width="700"
     height="880"
     style="border: 1px solid #d3d3d3"
@@ -11,9 +10,10 @@
 
   <div class="bigDiv">
     <div class="row">
-      <button type="button" class="btn btn-primary" onclick="download()">
+      <button type="button" class="btn btn-primary" id="downloadButton">
         Download starting 11
       </button>
+
     </div>
 
     <div class="row">
@@ -471,4 +471,4 @@
   </div>
   <hr />
 </div>
-<script src="/../controllers/palya.js"></script>
+<script type="module" src="/../controllers/palya.js"></script>

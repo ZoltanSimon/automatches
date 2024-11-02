@@ -296,6 +296,11 @@ footer p {
   color: #f1faee;
 }
 
+.form-column {
+  width: 61px;
+  border-right: 1px solid #f1faee;
+}
+
 @media (max-width: 1820px) {
   main {
     padding-left: 0;
@@ -320,9 +325,11 @@ footer p {
   .container {
     gap: 4px;
   }
+  .form-column {
+    width: 57px;
+  }
   .form-indicator {
-    width: 8px;
-    height: 16px;
+    width: 9px;
   }
 }
 
@@ -348,8 +355,20 @@ footer p {
     padding-left: 6px;
     padding-right: 6px;
   }
+  .form-column {
+    width: 61px;
+  }
   .form-indicator {
     width: 10px;
-    height: 16px;
+  }
+}
+
+@media (max-width: 664px) {
+  .form-indicator {
+    width: 9px;
+  }
+
+  nav ul li {
+    margin: 0 1px;
   }
 }

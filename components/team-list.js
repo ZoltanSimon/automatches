@@ -10,9 +10,7 @@ export function teamList(
   addMatches = false,
   big = false
 ) {
-  console.log(big);
   let team1, team2;
-  console.log(onlyTotal);
   addMatches = true;
   createTeamsTable(response, onlyTotal, big);
 
@@ -70,6 +68,9 @@ function findTeamById(response, thisId) {
 }
 
 function createTeamsTable(response, onlyTotal, big) {
+  if (big)
+    ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:8%; border-right:1px solid #F1FAEE" class="sortable"">`;
+
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
     <thead>`;
   if (!onlyTotal) {
@@ -88,7 +89,7 @@ function createTeamsTable(response, onlyTotal, big) {
     <th style="border-right:1px solid #F1FAEE" colspan=2>Teams</th>`;
   }
   addToPage += `
-    <th style="width:61px; border-right:1px solid #F1FAEE;">Form</td>
+    <th class="form-column">Form</td>
     ${ths}Played<span class="sort-indicator"></th>`;
 
   if (big) addToPage += `${ths}Win %`;

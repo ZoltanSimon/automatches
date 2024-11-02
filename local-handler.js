@@ -143,7 +143,6 @@ export async function getResultsByRoundLocal(leagueID, roundNo) {
   let allGames = [];
   const response = await fetch(`/get-league-matches?leagueID=${leagueID}`);
   const league = await response.json();
-  console.log(league);
   for (let i = 0; i < league.length; i++) {
     if (league[i].league.round == roundNo) {
       allGames.push(league[i]);
@@ -160,7 +159,6 @@ export async function getMatch(fixtureID) {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data);
   return data;
 }
 
@@ -169,7 +167,6 @@ export async function matchExists(fixtureID) {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data);
   return data;
 }
 

@@ -30,7 +30,7 @@ app.set("view engine", "handlebars");
 app.use(express.static("./"));
 
 app.get("/", (req, res) => {
-  res.render("home", { title: "Home Page" });
+  res.render("home", { title: "Generation:Football - Home" });
 });
 
 app.get("/about", (req, res) => {
@@ -50,7 +50,7 @@ app.get("/admin", (req, res) => {
 });
 
 app.get("/starting11", (req, res) => {
-  res.render("palya", { title: "Palya" });
+  res.render("palya", { title: "Starting 11 Builder" });
 });
 
 app.listen(PORT, () => {
