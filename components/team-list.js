@@ -31,45 +31,9 @@ export function teamList(
   }
 }
 
-function predictions(homeTeam, awayTeam) {
-  console.log(homeTeam.name);
-  console.log(homeTeam.last5PerGame);
-  console.log(awayTeam.name);
-  console.log(awayTeam.last5PerGame);
-  console.log(getGoal(homeTeam.last5PerGame, awayTeam.last5PerGame));
-  console.log(getGoal(awayTeam.last5PerGame, homeTeam.last5PerGame));
-}
-
-function getGoal(stat1, stat2) {
-  let plus = 0;
-  let minus = 0;
-  if (stat1.xG > stat1.goals + 0.25) plus += 0.4;
-  if (stat1.xG < 1) minus += 0.25;
-  if (stat1.xG < 0.75) minus += 0.1;
-
-  if (stat1.shotsOnGoal > 2.5) plus += 0.25;
-  if (stat1.shotsOnGoal < stat1.goals * 3) minus += 0.25;
-  if (stat2.shotsOnGoalAgainst > 2.5) plus += 0.25;
-
-  if (stat1.corners > 6) plus += 0.25;
-  if (stat2.cornersAgainst > 6) plus += 0.25;
-
-  return (
-    ((stat1.goals * 2 + stat1.xG) / 3 +
-      (stat2.goalsAgainst * 2 + stat2.xGA) / 3) /
-      2 +
-    plus -
-    minus
-  ).toFixed(1);
-}
-
-function findTeamById(response, thisId) {
-  return response.find((element) => element.id == thisId);
-}
-
 function createTeamsTable(response, onlyTotal, big) {
   if (big)
-    ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:8%; border-right:1px solid #F1FAEE" class="sortable"">`;
+    ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:7%; border-right:1px solid #F1FAEE" class="sortable"">`;
 
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
     <thead>`;
@@ -273,4 +237,40 @@ function sortTable(n, td) {
   }
 
   td.classList.add(dir);
+}
+
+function predictions(homeTeam, awayTeam) {
+  console.log(homeTeam.name);
+  console.log(homeTeam.last5PerGame);
+  console.log(awayTeam.name);
+  console.log(awayTeam.last5PerGame);
+  console.log(getGoal(homeTeam.last5PerGame, awayTeam.last5PerGame));
+  console.log(getGoal(awayTeam.last5PerGame, homeTeam.last5PerGame));
+}
+
+function getGoal(stat1, stat2) {
+  let plus = 0;
+  let minus = 0;
+  if (stat1.xG > stat1.goals + 0.25) plus += 0.4;
+  if (stat1.xG < 1) minus += 0.25;
+  if (stat1.xG < 0.75) minus += 0.1;
+
+  if (stat1.shotsOnGoal > 2.5) plus += 0.25;
+  if (stat1.shotsOnGoal < stat1.goals * 3) minus += 0.25;
+  if (stat2.shotsOnGoalAgainst > 2.5) plus += 0.25;
+
+  if (stat1.corners > 6) plus += 0.25;
+  if (stat2.cornersAgainst > 6) plus += 0.25;
+
+  return (
+    ((stat1.goals * 2 + stat1.xG) / 3 +
+      (stat2.goalsAgainst * 2 + stat2.xGA) / 3) /
+      2 +
+    plus -
+    minus
+  ).toFixed(1);
+}
+
+function findTeamById(response, thisId) {
+  return response.find((element) => element.id == thisId);
 }
