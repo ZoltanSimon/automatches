@@ -1,6 +1,10 @@
-let c = document.getElementById("myCanvas");
+import { download } from "../common-functions.js";
+
+let c = document.getElementById("starting-eleven-builder");
 let ctx = c.getContext("2d");
 var BB = c.getBoundingClientRect();
+
+document.getElementById("downloadButton").addEventListener("click", download);
 
 // get canvas related references
 var offsetX = BB.left;
@@ -376,7 +380,7 @@ class gkArea extends Rectangle {
 }
 
 const horizontalPos = [];
-for (i = 0; i < 9; i++) {
+for (let i = 0; i < 9; i++) {
   let item = {};
   item.pos = xMarg + (pitchWidth / 10) * (i + 1);
   switch (i) {
@@ -399,7 +403,7 @@ for (i = 0; i < 9; i++) {
 }
 
 let verticalPos = [];
-for (i = 0; i < 7; i++) {
+for (let i = 0; i < 7; i++) {
   let item = {};
   item.pos = marg + ((pitchHeight - 35) / 8) * (i + 1);
   switch (i) {
