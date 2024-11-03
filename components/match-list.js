@@ -7,7 +7,7 @@ import {
   leagueBannerBig,
 } from "../instapics.js";
 import { clubs } from "./../data/clubs.js";
-import { getMatch } from "../local-handler.js";
+import { downloadMatch } from "../local-handler.js";
 import {
   imagePath,
   truncate,
@@ -97,7 +97,7 @@ export function matchList(fixtures, showID = false) {
 
   document
     .querySelectorAll(".match-id")
-    .forEach((e) => e.addEventListener("click", getMatch));
+    .forEach((e) => e.addEventListener("click", downloadMatch));
 }
 
 export function matchesToCanvas(sourceDiv) {

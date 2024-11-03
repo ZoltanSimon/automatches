@@ -151,7 +151,7 @@ export async function getResultsByRoundLocal(leagueID, roundNo) {
   return allGames;
 }
 
-export async function getMatch(fixtureID) {
+export async function downloadMatch(fixtureID) {
   if (fixtureID instanceof PointerEvent) {
     fixtureID = fixtureID.target.innerHTML;
   }
@@ -159,6 +159,7 @@ export async function getMatch(fixtureID) {
     method: "GET",
   });
   const data = await response.json();
+  console.log(data);
   return data;
 }
 

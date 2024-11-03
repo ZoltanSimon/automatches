@@ -8,7 +8,7 @@ import {
   getLocalPlayerStats,
   getAllPlayers,
   getResultsByRoundLocal,
-  getMatch,
+  downloadMatch,
   buildTeamList,
   findPlayerByID,
 } from "../local-handler.js";
@@ -32,6 +32,7 @@ const picker = datepicker(document.querySelector("#calendar"), {
   },
 });
 picker.calendarContainer.style.setProperty("left", "374px");
+picker.calendarContainer.style.setProperty("font-size", "0.6rem");
 
 showMatchesOnDate(new Date(), true);
 
@@ -135,7 +136,7 @@ document.getElementById("update-leagues").onclick = async function () {
 
 document.getElementById("get-match-auto").onclick = async function () {
   let fixtureID = document.getElementById("fixtureID").value;
-  let match = await getMatch(fixtureID);
+  let match = await downloadMatch(fixtureID);
   oneFixture(match);
   addMatchStats(match[0]);
 };

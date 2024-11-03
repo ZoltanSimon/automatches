@@ -81,6 +81,11 @@ nav ul li a:hover {
     padding: 4px;
   }
 
+  .logo-title {
+    justify-content: space-between;
+    width: 100%; /* Ensures the items stretch to the edges */
+  }
+
   .logo-title img {
     height: 40px; /* Adjust this size as needed */
     margin-right: 2px; /* Space between the logo and the text */
@@ -93,6 +98,30 @@ nav ul li a:hover {
   nav ul li {
     flex: 1 1 30%; /* Change to 30% width to show 3 per row */
     margin-bottom: 10px;
+  }
+
+  nav ul li:nth-last-child(-n + 3) {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  header {
+    padding: 2px;
+  }
+
+  .logo-title img {
+    height: 36px; /* Adjust this size as needed */
+    margin-right: 2px; /* Space between the logo and the text */
+  }
+
+  .logo-title h1 {
+    font-size: 34px;
+  }
+
+  nav ul li {
+    flex: 1 1 30%; /* Change to 30% width to show 3 per row */
+    margin-bottom: 4px;
   }
 
   nav ul li:nth-last-child(-n + 3) {
