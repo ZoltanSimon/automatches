@@ -7,6 +7,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      - C:/GenerationFootball/automatches:/app
+      - C:/GenerationFootball/data:/app/data
       - C:/GenerationFootball/data/leagues:/app/data/leagues
       - C:/GenerationFootball/data/matches:/app/data/matches
     networks:
