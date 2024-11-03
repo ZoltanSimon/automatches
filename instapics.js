@@ -1,4 +1,5 @@
 import { imagePath } from "./common-functions.js";
+import { darkColor, redColor } from "./common-styles.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c?.getContext("2d");
@@ -7,7 +8,7 @@ const fontSize = 46;
 const backgroundImageName = "images/insta_new_no_pic.png";
 const borderImage = "images/border.png";
 const lineheight = 50;
-let inputTextValue, newWidth, newHeight, base_image, imgHeight, fontY;
+let newWidth, newHeight, base_image, fontY;
 export let imgs = {};
 
 //Preload images
@@ -35,8 +36,8 @@ function make_base(text, breakingText) {
       writeStrokedText({
         text: [breakingText],
         fontSize: fontSize + 20,
-        strokeStyle: "#1d3557",
-        fillStyle: "#e63946",
+        strokeStyle: darkColor,
+        fillStyle: redColor,
         lineWidth: 4,
         y: fontY - 56,
       });
@@ -45,7 +46,12 @@ function make_base(text, breakingText) {
   };
 }
 
-export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
+export function buildTableForTableType(
+  lines,
+  imgToAdd,
+  yPos = 100,
+  allForms = []
+) {
   lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
   ctx.drawImage(border_image, 0, 0);
   console.log(lines);
@@ -59,13 +65,6 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
   img.onload = function () {
     ctx.drawImage(img, (1080 - img.width) / 2, yPos);
     for (let i = 0; i < imgToAdd.length; i++) {
-      /*ctx.drawImage(
-        imgToAdd[i].img,
-        imgToAdd[i].startX,
-        imgToAdd[i].startY,
-        imgToAdd[i].imgHeight,
-        imgToAdd[i].imgHeight
-      );*/
       drawCentre(
         imgToAdd[i].img,
         imgToAdd[i].startX,
@@ -73,6 +72,7 @@ export function buildTableForTableType(lines, imgToAdd, yPos = 100) {
         imgToAdd[i].imgHeight
       );
     }
+    drawFormBars(allForms);
   };
 
   img.src = buildSvgImageUrl(data);
@@ -104,7 +104,6 @@ export function loadClubLogo(clubToLoad) {
   img.src = imagePath(clubToLoad);
   if (!imgs.clubs) imgs.clubs = [];
   imgs.clubs[clubToLoad] = img;
-  //console.log(imgs);
 }
 
 export function loadPlayerFace(playerToLoad) {
@@ -128,7 +127,7 @@ export function writeStrokedText({
   fontSize = 46,
   textAlign = "center",
   strokeStyle = "black",
-  fillStyle = "#1d3557",
+  fillStyle = darkColor,
   lineWidth = 1,
   x = 540,
   y,
@@ -152,8 +151,8 @@ export function leagueBannerBig(yPos) {
     text: [leagueName],
     fontSize: 60,
     textAlign: "right",
-    strokeStyle: "#1d3557",
-    fillStyle: "#e63946",
+    strokeStyle: darkColor,
+    fillStyle: redColor,
     lineWidth: 2,
     x: 990,
     y: yPos - 80,
@@ -167,4 +166,24 @@ export function leagueBannerBig(yPos) {
   });
 
   ctx.drawImage(imgs.leagues[leagueID], 90, yPos - 160, 150, 150);
+}
+
+function drawFormBars(formArrays) {
+  const barWidth = 18;
+  const barHeight = 37;
+  const spacing = 3;
+
+  for (let i = 0; i < formArrays.length; i++) {
+    let formArray = formArrays[i];
+    formArray.forEach((result, index) => {
+      let color;
+      if (result === "W") color = "green";
+      else if (result === "D") color = darkColor;
+      else if (result === "L") color = redColor;
+
+      ctx.fillStyle = color;
+      const x = 823 + index * (barWidth + spacing);
+      ctx.fillRect(x, 130 + i * (barHeight + 5), barWidth, barHeight);
+    });
+  }
 }

@@ -69,8 +69,8 @@ table tr:nth-of-type(2n) td {
 }
 
 .control-panel {
-  padding-left: 25px;
-  width: 540px;
+  padding-left: 10px;
+  width: 510px;
   float: left;
   margin-right: 3px;
 }
@@ -87,6 +87,9 @@ table tr:nth-of-type(2n) td {
 
 .selected-league {
   border: 2px solid red;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 }
 
 .automatches-row {

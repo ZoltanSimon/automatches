@@ -4,7 +4,7 @@ import { buildTeamList } from "./local-handler.js";
 import { loadPlayerFace } from "./instapics.js";
 import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
-import { getMatch, matchExists } from "./local-handler.js";
+import { downloadMatch, matchExists } from "./local-handler.js";
 
 export let download = function () {
   var link = document.createElement("a");
@@ -94,7 +94,7 @@ export async function showMatchesOnDate(date, showID) {
       if (cachedMatch) {
         updateOrAddMatch(matches, cachedMatch[0]);
       } else if (downloads < 10) {
-        let downloadedMatch = await getMatch(match.fixture.id);
+        let downloadedMatch = await downloadMatch(match.fixture.id);
         updateOrAddMatch(matches, downloadedMatch[0]);
         downloads++;
       }

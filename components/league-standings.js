@@ -7,6 +7,7 @@ import {
 } from "../instapics.js";
 import { clubs } from "./../data/clubs.js";
 import { imagePath, removeNewlines, truncate } from "./../common-functions.js";
+import { darkColor } from "../common-styles.js";
 
 export function leagueStandings(standings) {
   let addToPage = ``;
@@ -15,7 +16,7 @@ export function leagueStandings(standings) {
   addToPage += `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="league-standings">
         <thead>    
         <tr style="border-bottom: 2px solid #1D3557">
-        <th style="width:46px; padding:4px 2px; text-align: center;"><b>#</b></th>
+        <th style="width:48px; padding:4px 2px; text-align: center;"><b>#</b></th>
         <th style="width:258px; padding:4px 3px; text-align: center;" colspan="2"><b>Team</b></th>
         <th style="width:52px; padding:5px 2px; text-align: center;"><b>P</b></th>
         <th style="width:52px; padding:5px 2px; text-align: center;"><b>W</b></th>
@@ -23,7 +24,7 @@ export function leagueStandings(standings) {
         <th style="width:52px; padding:5px 2px; text-align: center;"><b>L</b></th>
         <th style="width:90px; text-align: center;"><b>Goals</b></th>
         <th style="width:86px; text-align: center;"><b>xG</b></th>
-        <th style="width:52px; padding: 4px; text-align: center;" colspan=5><b>Form</b></th>
+        <th style="width:98px; padding: 4px; text-align: center;" colspan=5><b>Form</b></th>
         <th style="width:52px; padding:5px 3px; text-align: center;"><b>Pts</b></th>
       </tr>
       </thead><tbody>`;
@@ -74,22 +75,26 @@ export function standingsToCanvas() {
   let standingsTable = document.getElementById("league-standings");
   let leagueName = document.getElementById("league-name").innerHTML;
   let leagueID = document.getElementById("league-id").innerHTML;
+  let allForms = [],
+    thisForm = [];
 
-  standingsTable.rows[0].style.backgroundColor = "#1D3557";
+  standingsTable.rows[0].style.backgroundColor = darkColor;
   standingsTable.rows[0].style.color = "#F1FAEE";
+  standingsTable.rows[0].style.borderRightColor = "#F1FAEE";
 
   if (standingsTable.rows.length < 20) yPos = 150;
 
   for (let i = 0; i < standingsTable.rows.length; i++) {
+    thisForm = [];
     thisTr = standingsTable.rows[i];
 
     if (i > 0) {
       thisTr.children[8].style.fontSize = "22px";
-      thisTr.children[9].style.fontSize = "22px";
-      thisTr.children[10].style.fontSize = "22px";
-      thisTr.children[11].style.fontSize = "22px";
-      thisTr.children[12].style.fontSize = "22px";
-      thisTr.children[13].style.fontSize = "22px";
+      thisTr.children[9].style.fontSize = "0px";
+      thisTr.children[10].style.fontSize = "0px";
+      thisTr.children[11].style.fontSize = "0px";
+      thisTr.children[12].style.fontSize = "0px";
+      thisTr.children[13].style.fontSize = "0px";
 
       thisTr.children[10].style.borderLeftStyle = "hidden";
       thisTr.children[11].style.borderLeftStyle = "hidden";
@@ -105,21 +110,23 @@ export function standingsToCanvas() {
           imgToAdd.push({
             img: imgs.clubs[clubs[k].id],
             imgHeight: 40,
-            startX: 166,
+            startX: 168,
             startY: yPos + 46 + l * 42,
           });
           l++;
           thisTd.innerHTML = " ";
         }
       }
+      if (i > 0 && j > 8 && j < 14) thisForm.push(thisTd.innerHTML);
     }
+    allForms.push(thisForm);
   }
 
   writeStrokedText({
     text: [leagueName],
     fontSize: 60,
     textAlign: "right",
-    strokeStyle: "#1d3557",
+    strokeStyle: darkColor,
     fillStyle: "#e63946",
     lineWidth: 2,
     x: 990,
@@ -130,6 +137,7 @@ export function standingsToCanvas() {
   buildTableForTableType(
     removeNewlines(standingsTable.outerHTML),
     imgToAdd,
-    yPos
+    yPos,
+    allForms
   );
 }
