@@ -1,7 +1,7 @@
 import { tds } from "../common-styles.js";
 
 let addToPage;
-let ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:9%; border-right:1px solid #F1FAEE" class="sortable"">`;
+let ths = `<th title="Click to sort" class="team-list-header sortable">`;
 let thisTeam, thisTr;
 
 export function teamList(
