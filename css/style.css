@@ -221,6 +221,13 @@ footer p {
   border-right: 1px solid #f1faee;
 }
 
+.team-list-header {
+  text-align: center;
+  padding: 2px;
+  width: 9%;
+  border-right: 1px solid #f1faee;
+}
+
 @media (max-width: 1820px) {
   main {
     padding-left: 0;
@@ -289,5 +296,9 @@ footer p {
   }
   .form-indicator {
     width: 9px;
+  }
+  .team-list-header {
+    padding: 1px;
+    width: 9%;
   }
 }

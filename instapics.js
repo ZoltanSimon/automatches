@@ -72,7 +72,7 @@ export function buildTableForTableType(
         imgToAdd[i].imgHeight
       );
     }
-    drawFormBars(allForms);
+    drawFormBars(allForms, yPos);
   };
 
   img.src = buildSvgImageUrl(data);
@@ -168,7 +168,7 @@ export function leagueBannerBig(yPos) {
   ctx.drawImage(imgs.leagues[leagueID], 90, yPos - 160, 150, 150);
 }
 
-function drawFormBars(formArrays) {
+function drawFormBars(formArrays, yPos) {
   const barWidth = 18;
   const barHeight = 37;
   const spacing = 3;
@@ -183,7 +183,7 @@ function drawFormBars(formArrays) {
 
       ctx.fillStyle = color;
       const x = 823 + index * (barWidth + spacing);
-      ctx.fillRect(x, 130 + i * (barHeight + 5), barWidth, barHeight);
+      ctx.fillRect(x, yPos + 6 + i * (barHeight + 5), barWidth, barHeight);
     });
   }
 }
