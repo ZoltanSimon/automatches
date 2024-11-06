@@ -33,7 +33,7 @@ export function teamList(
 
 function createTeamsTable(response, onlyTotal, big) {
   if (big)
-    ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:7%; border-right:1px solid #F1FAEE" class="sortable"">`;
+    ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:7%; border-right:1px solid #F1FAEE" class="sortable"><span class="header-title">`;
 
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
     <thead>`;
@@ -58,16 +58,16 @@ function createTeamsTable(response, onlyTotal, big) {
 
   if (big) addToPage += `${ths}Win %`;
 
-  addToPage += `${ths}Goals<span class="sort-indicator"></th>
-    ${ths}Goals Ag<span class="sort-indicator"></th>
-    ${ths}xG<span class="sort-indicator"></th>
-    ${ths}xG Ag<span class="sort-indicator"></th>
-    ${ths}Corners<span class="sort-indicator"></th>   
-    ${ths}Shots<span class="sort-indicator"></th>`;
+  addToPage += `${ths}Goals</span><span class="sort-indicator"></th>
+    ${ths}Goals A</span><span class="sort-indicator"></th>
+    ${ths}xG</span><span class="sort-indicator"></th>
+    ${ths}xG Ag</span><span class="sort-indicator"></th>
+    ${ths}Corners</span><span class="sort-indicator"></th>   
+    ${ths}Shots</span><span class="sort-indicator"></th>`;
 
   if (big)
-    addToPage += `${ths}Corners Ag<span class="sort-indicator"></th>
-                        ${ths}Shots Ag<span class="sort-indicator"></th>`;
+    addToPage += `${ths}Corners A</span><span class="sort-indicator"></th>
+                        ${ths}Shots A</span><span class="sort-indicator"></th>`;
 
   if (!onlyTotal) {
     addToPage += `${tds}Goals</td>

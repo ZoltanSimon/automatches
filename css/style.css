@@ -129,6 +129,12 @@ footer p {
   cursor: pointer; /* Makes the header look clickable */
 }
 
+.header-title,
+.sort-indicator {
+  display: block; /* Makes each element take a full line */
+  text-align: center; /* Centers text horizontally */
+}
+
 .sortable .sort-indicator::before {
   content: "↕"; /* Default state, showing both directions */
   font-size: 12px;

@@ -5432,4 +5432,496 @@ export let clubs = [
     id: 24354,
     name: "AFC Whyteleafe",
   },
+  {
+    id: 25122,
+    name: "Wokingham Town",
+  },
+  {
+    id: 25038,
+    name: "San Tirso",
+  },
+  {
+    id: 9645,
+    name: "Selaya",
+  },
+  {
+    id: 25039,
+    name: "Sonseca",
+  },
+  {
+    id: 25035,
+    name: "Parla Escuela",
+  },
+  {
+    id: 9843,
+    name: "Baztán",
+  },
+  {
+    id: 25034,
+    name: "Ontiñena",
+  },
+  {
+    id: 17562,
+    name: "UD San Pedro",
+  },
+  {
+    id: 18090,
+    name: "Ceuta 6 de Junio",
+  },
+  {
+    id: 25030,
+    name: "Astur",
+  },
+  {
+    id: 25037,
+    name: "Promesas EDF",
+  },
+  {
+    id: 25042,
+    name: "Villamuriel",
+  },
+  {
+    id: 20259,
+    name: "Aurrerá Vitoria",
+  },
+  {
+    id: 25031,
+    name: "Dolorense",
+  },
+  {
+    id: 25033,
+    name: "Manises",
+  },
+  {
+    id: 25032,
+    name: "Gévora",
+  },
+  {
+    id: 25036,
+    name: "Playas Sotavento",
+  },
+  {
+    id: 25041,
+    name: "Vic",
+  },
+  {
+    id: 25040,
+    name: "Sporting Mahón",
+  },
+  {
+    id: 21905,
+    name: "Chiclana",
+  },
+  {
+    id: 7524,
+    name: "Melilla CD",
+  },
+  {
+    id: 5256,
+    name: "Compostela",
+  },
+  {
+    id: 9388,
+    name: "Guijuelo",
+  },
+  {
+    id: 9612,
+    name: "Ourense CF",
+  },
+  {
+    id: 5273,
+    name: "Poblense",
+  },
+  {
+    id: 5274,
+    name: "Real Jaén",
+  },
+  {
+    id: 9392,
+    name: "L'Hospitalet",
+  },
+  {
+    id: 732,
+    name: "Zaragoza",
+  },
+  {
+    id: 9797,
+    name: "Lanzarote",
+  },
+  {
+    id: 4665,
+    name: "Racing Santander",
+  },
+  {
+    id: 593,
+    name: "Europa Fc",
+  },
+  {
+    id: 722,
+    name: "Albacete",
+  },
+  {
+    id: 9395,
+    name: "Las Rozas",
+  },
+  {
+    id: 9403,
+    name: "Olot",
+  },
+  {
+    id: 713,
+    name: "Cordoba",
+  },
+  {
+    id: 9756,
+    name: "Ciudad de Lucena",
+  },
+  {
+    id: 9781,
+    name: "Ibiza Islas Pitiusas",
+  },
+  {
+    id: 714,
+    name: "Gimnastic",
+  },
+  {
+    id: 5265,
+    name: "Langreo",
+  },
+  {
+    id: 9404,
+    name: "Orihuela",
+  },
+  {
+    id: 9383,
+    name: "Bergantiños",
+  },
+  {
+    id: 5267,
+    name: "Marbella",
+  },
+  {
+    id: 9657,
+    name: "Beasain",
+  },
+  {
+    id: 5262,
+    name: "FC Cartagena",
+  },
+  {
+    id: 9712,
+    name: "Móstoles",
+  },
+  {
+    id: 9580,
+    name: "Burgos",
+  },
+  {
+    id: 717,
+    name: "Numancia",
+  },
+  {
+    id: 731,
+    name: "Sporting Gijon",
+  },
+  {
+    id: 5250,
+    name: "Badalona",
+  },
+  {
+    id: 726,
+    name: "Huesca",
+  },
+  {
+    id: 5266,
+    name: "Lleida Esportiu",
+  },
+  {
+    id: 5251,
+    name: "Barakaldo",
+  },
+  {
+    id: 5277,
+    name: "Sant Andreu",
+  },
+  {
+    id: 799,
+    name: "Mirandes",
+  },
+  {
+    id: 5280,
+    name: "UD Logroñés",
+  },
+  {
+    id: 545,
+    name: "Eibar",
+  },
+  {
+    id: 9386,
+    name: "Escobedo",
+  },
+  {
+    id: 4907,
+    name: "Ponferradina",
+  },
+  {
+    id: 9394,
+    name: "Laredo",
+  },
+  {
+    id: 5283,
+    name: "Yeclano",
+  },
+  {
+    id: 9588,
+    name: "Salamanca UDS",
+  },
+  {
+    id: 711,
+    name: "Alcorcon",
+  },
+  {
+    id: 9849,
+    name: "Cortes",
+  },
+  {
+    id: 9891,
+    name: "Utebo",
+  },
+  {
+    id: 5281,
+    name: "Unionistas de Salamanca",
+  },
+  {
+    id: 15359,
+    name: "Juventud Torremolinos",
+  },
+  {
+    id: 9418,
+    name: "Zamora",
+  },
+  {
+    id: 5257,
+    name: "Conquense",
+  },
+  {
+    id: 9390,
+    name: "Ibiza",
+  },
+  {
+    id: 9384,
+    name: "Cacereño",
+  },
+  {
+    id: 9387,
+    name: "Gimnástica Segoviana",
+  },
+  {
+    id: 9827,
+    name: "CD Coria",
+  },
+  {
+    id: 797,
+    name: "Elche",
+  },
+  {
+    id: 9412,
+    name: "SS Reyes",
+  },
+  {
+    id: 9823,
+    name: "Águilas",
+  },
+  {
+    id: 5254,
+    name: "Castellón",
+  },
+  {
+    id: 24612,
+    name: "Extremadura 1924",
+  },
+  {
+    id: 9791,
+    name: "Atlético Paso",
+  },
+  {
+    id: 9692,
+    name: "Eldense",
+  },
+  {
+    id: 9879,
+    name: "Barbastro",
+  },
+  {
+    id: 9380,
+    name: "Amorebieta",
+  },
+  {
+    id: 5279,
+    name: "Tudelano",
+  },
+  {
+    id: 9811,
+    name: "Deportiva Minera",
+  },
+  {
+    id: 9736,
+    name: "Real Ávila",
+  },
+  {
+    id: 718,
+    name: "Oviedo",
+  },
+  {
+    id: 5259,
+    name: "Don Benito",
+  },
+  {
+    id: 8157,
+    name: "FC Andorra",
+  },
+  {
+    id: 9627,
+    name: "Llanera",
+  },
+  {
+    id: 725,
+    name: "Cultural Leonesa",
+  },
+  {
+    id: 9860,
+    name: "Alfaro",
+  },
+  {
+    id: 719,
+    name: "Tenerife",
+  },
+  {
+    id: 9886,
+    name: "Cuarte",
+  },
+  {
+    id: 9409,
+    name: "Racing Ferrol",
+  },
+  {
+    id: 15358,
+    name: "Estepona",
+  },
+  {
+    id: 535,
+    name: "Malaga",
+  },
+  {
+    id: 9770,
+    name: "Xerez",
+  },
+  {
+    id: 10139,
+    name: "AD Ceuta FC",
+  },
+  {
+    id: 9589,
+    name: "Ejea",
+  },
+  {
+    id: 4666,
+    name: "Hércules",
+  },
+  {
+    id: 9407,
+    name: "Pontevedra",
+  },
+  {
+    id: 539,
+    name: "Levante",
+  },
+  {
+    id: 9694,
+    name: "Jove Español",
+  },
+  {
+    id: 1581,
+    name: "Carrarese",
+  },
+  {
+    id: 1580,
+    name: "Catania",
+  },
+  {
+    id: 9534,
+    name: "Torres",
+  },
+  {
+    id: 1693,
+    name: "Mantova",
+  },
+  {
+    id: 509,
+    name: "Cesena",
+  },
+  {
+    id: 870,
+    name: "Padova",
+  },
+  {
+    id: 528,
+    name: "Avellino",
+  },
+  {
+    id: 863,
+    name: "Juve Stabia",
+  },
+  {
+    id: 510,
+    name: "Cittadella",
+  },
+  {
+    id: 880,
+    name: "Reggiana",
+  },
+  {
+    id: 1578,
+    name: "Sudtirol",
+  },
+  {
+    id: 520,
+    name: "Cremonese",
+  },
+  {
+    id: 508,
+    name: "Bari",
+  },
+  {
+    id: 1687,
+    name: "Catanzaro",
+  },
+  {
+    id: 899,
+    name: "Modena",
+  },
+  {
+    id: 518,
+    name: "Brescia",
+  },
+  {
+    id: 522,
+    name: "Palermo",
+  },
+  {
+    id: 498,
+    name: "Sampdoria",
+  },
+  {
+    id: 10137,
+    name: "Cosenza",
+  },
+  {
+    id: 801,
+    name: "Pisa",
+  },
+  {
+    id: 515,
+    name: "Spezia",
+  },
 ];
