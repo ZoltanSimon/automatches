@@ -123,7 +123,6 @@ export async function getTopPlayers(leagues, amount, big) {
 
   const playerList = await response.json();
   topPlayers = playerList.slice(0, amount);
-  console.log(topPlayers);
   topPlayers.map(function (e) {
     loadPlayerFace(e.id);
   });

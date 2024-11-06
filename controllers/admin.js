@@ -158,9 +158,8 @@ document.getElementById("get-player-goal-list").onclick = async function () {
 document.getElementById("get-all-clubs").onclick = async function () {
   let teamsNew = [];
   let homeTeam, awayTeam;
-
   for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`data/leagues/${allLeagues[i].id}.json`);
+    let response = await fetch(`get-league?leagueID=${allLeagues[i].id}`);
     let league = await response.json();
     for (let j = 0; j < league.length; j++) {
       homeTeam = {

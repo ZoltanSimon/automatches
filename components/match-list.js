@@ -19,7 +19,6 @@ let imgToAdd = [];
 let yPos = 200;
 
 export function matchList(fixtures, showID = false) {
-  console.log(fixtures);
   let addToPage, date;
   let leagueName = fixtures[0].league.name;
   let leagueID = fixtures[0].league.id;

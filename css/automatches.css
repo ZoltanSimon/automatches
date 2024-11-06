@@ -109,3 +109,10 @@ table tr:nth-of-type(2n) td {
 #submit-league-info {
   margin-bottom: 3px;
 }
+
+#league-name,
+#league-id,
+#round-no {
+  display: inline-block;
+  margin-right: 10px; /* Adds space between spans */
+}
