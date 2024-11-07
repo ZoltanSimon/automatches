@@ -104,7 +104,7 @@ function createTeamsTable(response, onlyTotal, big) {
     if (thisTeam) {
       addToPage += `<tr>
       <td style="padding:4px; border-right:none"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
-      <td style="border-left:none;">${thisTeam.name}</td><td style="padding:1">`;
+      <td style="border-left:none;">${thisTeam.name}</td><td style="padding:0">`;
 
       for (const result of thisTeam.form) {
         addToPage += `<span class="form-indicator ${result}"></span>`;
