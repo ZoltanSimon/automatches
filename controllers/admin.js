@@ -22,6 +22,7 @@ import {
 } from "../components/league-standings.js";
 import { addText, buildResults, buildStandings } from "../autotext.js";
 import { teamList } from "../components/team-list.js";
+import { playerListToCanvas } from "../components/player-list.js";
 
 const picker = datepicker(document.querySelector("#calendar"), {
   position: "bl",

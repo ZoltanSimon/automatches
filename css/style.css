@@ -1,7 +1,8 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Source Sans Pro", Arial, sans-serif;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 main {
@@ -35,6 +36,9 @@ td {
   text-align: left;
 }
 
+th {
+  font-size: 16px;
+}
 form label {
   display: inline-block;
   width: 100px;
@@ -57,37 +61,6 @@ form button {
 
 form button:hover {
   background-color: #555;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.form-indicator {
-  display: inline-block;
-  width: 10px;
-  height: 28px;
-  margin-right: 2px;
-  border-radius: 2px; /* Makes the rectangle slightly rounded */
-}
-
-td .form-indicator:last-child {
-  margin-right: 0;
-}
-
-.W {
-  background-color: green; /* Green for win */
-}
-
-.L {
-  background-color: red; /* Red for loss */
-}
-
-.D {
-  background-color: gray; /* Gray for draw */
 }
 
 footer {
@@ -223,14 +196,38 @@ footer p {
 }
 
 .form-column {
-  width: 42px;
+  width: 45px;
   border-right: 1px solid #f1faee;
+}
+
+.form-indicator {
+  display: inline-block;
+  width: 18%;
+  height: 28px;
+  margin-right: 1px;
+  border-radius: 2px; /* Makes the rectangle slightly rounded */
+}
+
+td .form-indicator:first-child {
+  margin-left: 1px;
+}
+
+.W {
+  background-color: green; /* Green for win */
+}
+
+.L {
+  background-color: red; /* Red for loss */
+}
+
+.D {
+  background-color: gray; /* Gray for draw */
 }
 
 .team-list-header {
   text-align: center;
   padding: 2px;
-  width: 9%;
+  width: 58px;
   border-right: 1px solid #f1faee;
 }
 
@@ -258,12 +255,6 @@ footer p {
   .container {
     gap: 4px;
   }
-  .form-column {
-    width: 40px;
-  }
-  .form-indicator {
-    width: 9px;
-  }
 }
 
 @media (max-width: 1400px) {
@@ -288,12 +279,6 @@ footer p {
     padding-left: 6px;
     padding-right: 6px;
   }
-  .form-column {
-    width: 44px;
-  }
-  .form-indicator {
-    width: 10px;
-  }
 }
 
 @media (max-width: 645px) {
@@ -301,14 +286,7 @@ footer p {
   td {
     padding: 4px;
   }
-  .form-column {
-    width: 48px;
-  }
-  .form-indicator {
-    width: 8px;
-  }
   .team-list-header {
     padding: 1px;
-    width: 8%;
   }
 }

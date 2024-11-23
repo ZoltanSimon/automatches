@@ -107,6 +107,11 @@ function getBothTeams(players, home, teamName) {
       playerFound.getPlayerStats(player);
     } else {
       let inputPlayer = getPlayerByID(playerID);
+
+      if (!inputPlayer) {
+        console.error(`Player with ID ${playerID} not found.`);
+        return;
+      }
       let thisPlayer = new Player(inputPlayer);
       thisPlayer.getPlayerStats(player);
       allPlayers.push(thisPlayer);

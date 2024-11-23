@@ -9,7 +9,6 @@ import { ths, tds } from "../common-styles.js";
 
 export function playerGoalList(response, big) {
   let addToPage;
-
   let thisPlayer;
 
   addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="player-list-table">
@@ -28,10 +27,15 @@ export function playerGoalList(response, big) {
   for (let i = 0; i < response.length; i++) {
     thisPlayer = response[i];
     loadClubLogo(thisPlayer.club);
-    addToPage += `<tr><td style="text-align:center;padding:0; border-right: none;""><img height="60" src="images/player-pictures/${
+    loadClubLogo(thisPlayer.nation);
+    addToPage += `<tr><td id="${
+      thisPlayer.id
+    }" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${
       thisPlayer.id
     }.png"</td>
-    <td style="border-left: none;"><img height="30" src="images/logos/${
+    <td id="${
+      thisPlayer.nation
+    }" style="border-left: none;"><img height="30" src="images/logos/${
       thisPlayer.nation
     }.png" /></td">
     <td>${thisPlayer.name}</td>
@@ -62,14 +66,15 @@ export function playerListToCanvas() {
 
   playerListTable.cellPadding = 10;
 
-  playerListTable.rows[0].style.backgroundColor = "#457B9D";
+  playerListTable.rows[0].style.backgroundColor = "#1D3557";
+  playerListTable.rows[0].style.color = "#F1FAEE";
   playerListTable.rows[0].style.fontWeight = "bold";
 
   console.log(imgs);
 
   for (let i = 1; i < playerListTable.rows.length; i++) {
     thisTr = playerListTable.rows[i];
-    playerFace = imgs.players[thisTr.children[0].innerHTML];
+    playerFace = imgs.players[thisTr.children[0].id];
 
     imgToAdd.push({
       img: playerFace,
@@ -77,29 +82,41 @@ export function playerListToCanvas() {
       startX: 134,
       startY: 84 + i * 80,
     });
-    let clubLogo = thisTr.children[2].id;
+
+    let clubLogo = thisTr.children[1].id;
 
     console.log(imgs.clubs[clubLogo]);
     imgToAdd.push({
       img: imgs.clubs[clubLogo],
-      imgHeight: 76,
-      startX: 470,
-      startY: 88 + i * 80,
+      imgHeight: 56,
+      startX: 200,
+      startY: 99 + i * 80,
+    });
+    clubLogo = thisTr.children[3].id;
+
+    console.log(imgs.clubs[clubLogo]);
+    imgToAdd.push({
+      img: imgs.clubs[clubLogo],
+      imgHeight: 72,
+      startX: 510,
+      startY: 90 + i * 80,
     });
 
     thisTr.style.height = "80px";
     thisTr.children[0].innerHTML = "";
-    thisTr.children[0].style.width = "62px";
-    thisTr.children[1].style.width = "226px";
-    thisTr.children[2].style.width = normalWidth;
-    thisTr.children[2].innerHTML = "";
-    thisTr.children[3].style.width = normalWidth;
+    thisTr.children[0].style.width = "120px";
+    thisTr.children[1].style.width = "60px";
+    thisTr.children[2].style.width = "260px";
+    thisTr.children[1].innerHTML = "";
+    thisTr.children[3].innerHTML = "";
+    thisTr.children[3].style.width = "60px";
     thisTr.children[4].style.width = normalWidth;
     thisTr.children[5].style.width = normalWidth;
     thisTr.children[6].style.width = normalWidth;
     thisTr.children[7].style.width = normalWidth;
   }
 
+  console.log(imgToAdd);
   buildTableForTableType(
     removeNewlines(playerListTable.outerHTML),
     imgToAdd,
