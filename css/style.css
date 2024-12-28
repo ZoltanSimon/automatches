@@ -125,6 +125,10 @@ footer p {
   background-color: #f0f0f0; /* Highlight the header */
 }
 
+.sub-header {
+  font-size: 12;
+}
+
 .rectangle {
   display: grid;
   grid-template-columns: 1fr auto; /* Title and link side by side */
