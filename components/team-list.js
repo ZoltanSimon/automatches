@@ -30,6 +30,26 @@ export function teamList(
     //createTeamsTable(allPlayingTeams, onlyTotal);
   }
 }
+/*const templateSource = document.getElementById(
+  "teams-table-template"
+).innerHTML;
+const template = Handlebars.compile(templateSource);
+
+// Function to render the table
+function createTeamsTable(response, onlyTotal, big) {
+  const data = { response, onlyTotal, big };
+  const tableHtml = template(data);
+  document.getElementById("top-team-list").innerHTML = tableHtml;
+
+  // Add click events to headers for sorting
+  const headers = document.querySelectorAll("#team-list-table th.sortable");
+  headers.forEach((header, index) => {
+    header.addEventListener("click", () => sortTable(index + 1, header));
+  });
+}
+
+// Usage example
+createTeamsTable(responseData, false, true);*/
 
 function createTeamsTable(response, onlyTotal, big) {
   if (big)
@@ -50,11 +70,11 @@ function createTeamsTable(response, onlyTotal, big) {
   } else {
     addToPage += `
     <tr class="main-table-header">
-    <th style="border-right:1px solid #F1FAEE" colspan=2>Teams</th>`;
+      <th style="border-right:1px solid #F1FAEE" rowspan=2 colspan=2>Teams</th>`;
   }
   addToPage += `
-    <th class="form-column">Form</td>
-    ${ths}Played<span class="sort-indicator"></th>`;
+    <th rowspan=2 class="form-column">Form</td>
+    ${ths}Played</th><th><span class="sort-indicator"></th>`;
 
   if (big) addToPage += `${ths}Win %`;
 

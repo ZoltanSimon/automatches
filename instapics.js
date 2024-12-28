@@ -8,7 +8,8 @@ const fontSize = 46;
 const backgroundImageName = "images/insta_new_no_pic.png";
 const borderImage = "images/border.png";
 const lineheight = 50;
-let newWidth, newHeight, base_image, fontY;
+let newWidth, newHeight, base_image;
+export let fontY;
 export let imgs = {};
 
 //Preload images
@@ -17,7 +18,7 @@ border_image.src = borderImage;
 
 if (c) make_base("", "");
 
-function make_base(text, breakingText) {
+export function make_base(text, breakingText) {
   let lines = text.split(/\r|\r\n|\n/);
 
   base_image = new Image();
@@ -26,7 +27,7 @@ function make_base(text, breakingText) {
     ctx.drawImage(base_image, 0, 0);
     ctx.textAlign = "center";
 
-    if (lines.count > 10) {
+    if (lines.length > 10) {
       ctx.drawImage(border_image, 0, 0);
     }
 
@@ -52,7 +53,6 @@ export function buildTableForTableType(
   yPos = 100,
   allForms = []
 ) {
-  lines = lines.replaceAll(`width="30px">`, `width="30px" />`);
   ctx.drawImage(border_image, 0, 0);
   console.log(lines);
   let data = `<svg xmlns='http://www.w3.org/2000/svg' width='900'>

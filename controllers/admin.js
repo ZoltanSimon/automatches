@@ -15,7 +15,7 @@ import {
 import { allLeagues } from "../data/leagues.js";
 import { clubs } from "../data/clubs.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
-import { loadCompLogo } from "../instapics.js";
+import { loadCompLogo, make_base, fontY } from "../instapics.js";
 import {
   leagueStandings,
   standingsToCanvas,
@@ -229,7 +229,7 @@ document.getElementById("copy-text").onclick = async function () {
 };
 
 document.getElementById("textOnPic").onkeyup = function () {
-  inputTextValue = document.getElementById("textOnPic").value;
+  let inputTextValue = document.getElementById("textOnPic").value;
   let breakingText = document.getElementById("breaking-official").value;
   make_base(inputTextValue, breakingText);
 };
