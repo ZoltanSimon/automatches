@@ -24,7 +24,17 @@ const app = express();
 
 app.use(express.json());
 
-app.engine("handlebars", engine());
+const partialsPath = path.join(__dirname, "/views/partials"); 
+console.log("Partials Directory:", partialsPath);
+console.log("Files in Partials Directory:", fs.readdirSync(partialsPath)); 
+
+app.engine(
+  "handlebars",
+  engine({
+    partialsDir: [partialsPath] // Use the variable directly
+  })
+);
+
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./"));
