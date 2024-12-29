@@ -127,11 +127,15 @@ function createTeamsTable(response, onlyTotal, big) {
 
 
   let table = document.getElementById("team-list-table");
+  let subHeaderLength = table.rows[1].cells.length;
+  let lastRowLength = table.rows[table.rows.length - 1].cells.length;
 
-  for (let i = 0; i < table.rows[1].cells.length; i++) {
-    let thisTd = table.rows[1].cells[i];
-    thisTd.addEventListener("click", function (e) {
-      sortTable(i + 4, thisTd);
+  for (let i = subHeaderLength -1; i >= 0; i--) {
+    let subheaderCell = table.rows[1].cells[i];
+
+    subheaderCell.addEventListener("click", function () {
+      let index = lastRowLength - subHeaderLength + i;
+      sortTable(index, subheaderCell); 
     });
   }
 }
@@ -165,8 +169,6 @@ function sortTable(n, td) {
       one from current row and one from the next: */
       x = rows[i].getElementsByTagName("TD")[n];
       y = rows[i + 1].getElementsByTagName("TD")[n];
-      console.log(x);
-      console.log(y);
       /* Check if the two rows should switch place,
       based on the direction, asc or desc: */
       if (dir == "asc") {
