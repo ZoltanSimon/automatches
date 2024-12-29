@@ -104,7 +104,6 @@ footer p {
 
 .header-title,
 .sort-indicator {
-  display: block; /* Makes each element take a full line */
   text-align: center; /* Centers text horizontally */
 }
 
@@ -122,7 +121,7 @@ footer p {
 }
 
 .sortable:hover {
-  background-color: #f0f0f0; /* Highlight the header */
+  background-color: #457B9D;
 }
 
 .sub-header {
@@ -193,14 +192,13 @@ footer p {
   padding-top: 6px;
 }
 
-.main-table-header {
-  border-bottom: 3px solid #1d3557;
+.main-table-header { 
   background-color: #1d3557;
   color: #f1faee;
 }
 
 .form-column {
-  width: 45px;
+  width: 43px;
   border-right: 1px solid #f1faee;
 }
 
@@ -214,6 +212,10 @@ footer p {
 
 td .form-indicator:first-child {
   margin-left: 1px;
+}
+
+td .form-indicator:last-child {
+  margin-right: 0px;
 }
 
 .W {
@@ -233,6 +235,10 @@ td .form-indicator:first-child {
   padding: 2px;
   width: 58px;
   border-right: 1px solid #f1faee;
+}
+
+.top-row {
+  border-bottom: 1px solid #f1faee;
 }
 
 @media (max-width: 1820px) {
@@ -292,5 +298,8 @@ td .form-indicator:first-child {
   }
   .team-list-header {
     padding: 1px;
+  }
+  .form-indicator {
+    width:17%;
   }
 }
