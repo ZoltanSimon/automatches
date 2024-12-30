@@ -11,21 +11,21 @@ import { darkColor } from "../common-styles.js";
 
 export function leagueStandings(standings) {
   let addToPage = ``;
-  let tds = `<td style="padding:5px 3px; text-align: center;">`;
+  let tds = `<td style="padding:6px; text-align: center;">`;
 
   addToPage += `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="league-standings">
         <thead>    
         <tr style="border-bottom: 2px solid #1D3557">
-        <th style="width:48px; padding:4px 2px; text-align: center;"><b>#</b></th>
-        <th style="width:258px; padding:4px 3px; text-align: center;" colspan="2"><b>Team</b></th>
-        <th style="width:52px; padding:5px 2px; text-align: center;"><b>P</b></th>
-        <th style="width:52px; padding:5px 2px; text-align: center;"><b>W</b></th>
-        <th style="width:52px; padding:5px 2px; text-align: center;"><b>D</b></th>
-        <th style="width:52px; padding:5px 2px; text-align: center;"><b>L</b></th>
-        <th style="width:90px; text-align: center;"><b>Goals</b></th>
-        <th style="width:86px; text-align: center;"><b>xG</b></th>
-        <th style="width:98px; padding: 4px; text-align: center;" colspan=5><b>Form</b></th>
-        <th style="width:52px; padding:5px 3px; text-align: center;"><b>Pts</b></th>
+        <th style="width:48px;"><b>#</b></th>
+        <th style="width:264px;" colspan="2"><b>Team</b></th>
+        <th style="width:52px;"><b>P</b></th>
+        <th style="width:52px;"><b>W</b></th>
+        <th style="width:52px;"><b>D</b></th>
+        <th style="width:52px;"><b>L</b></th>
+        <th style="width:90px;"><b>Goals</b></th>
+        <th style="width:86px;"><b>xG</b></th>
+        <th style="width:98px; padding: 4px;" colspan=5><b>Form</b></th>
+        <th style="width:58px;"><b>Pts</b></th>
       </tr>
       </thead><tbody>`;
 
@@ -35,7 +35,7 @@ export function leagueStandings(standings) {
     loadClubLogo(team.id);
     addToPage += `
       <tr>
-      <td style="padding:5px 2px; text-align: center;"><b>${i + 1}</b></td>
+      <td style="padding:6px; text-align: center; font-weight: bold">${i + 1}</td>
       <td style="width:36px; padding: 4px; text-align: center;"><img src="${imagePath(
         team.id
       )}" alt="*${team.name}*" width="40px" /> </td>
@@ -44,12 +44,12 @@ export function leagueStandings(standings) {
         17
       )}</td>
 
-      <td style="padding:5px 2px; text-align: center;">${team.matches}</td>
-      <td style="padding:5px 2px; text-align: center;">${team.wins}</td>
-      <td style="padding:5px 2px; text-align: center;">${team.draws}</td>
-      <td style="padding:5px 2px; text-align: center;">${team.losses}</td>
+      ${tds}${team.matches}</td>
+      ${tds}${team.wins}</td>
+      ${tds}${team.draws}</td>
+      ${tds}${team.losses}</td>
       ${tds}${team.total.goals} : ${team.total.goalsAgainst}</td>
-      <td style="padding:5px 3px; text-align: center; font-style: italic">${team.total.xG.toFixed(
+      ${tds}${team.total.xG.toFixed(
         0
       )} : ${team.total.xGA.toFixed(0)}</td>`;
     for (let f of form) {
@@ -58,7 +58,7 @@ export function leagueStandings(standings) {
       }; padding:2px; text-align: center; font-weight: bold;">${f}</td>`;
     }
 
-    addToPage += `<td style="padding:5px 3px; text-align: center; font-weight: bold">${team.total.points}</td>
+    addToPage += `<td style="padding:6px; text-align: center; font-weight: bold">${team.total.points}</td>
       </tr>`;
   }
   addToPage += `</tbody></table>`;
@@ -111,7 +111,7 @@ export function standingsToCanvas() {
             img: imgs.clubs[clubs[k].id],
             imgHeight: 40,
             startX: 168,
-            startY: yPos + 46 + l * 42,
+            startY: yPos + 40 + l * 42,
           });
           l++;
           thisTd.innerHTML = " ";
@@ -124,10 +124,10 @@ export function standingsToCanvas() {
 
   writeStrokedText({
     text: [leagueName],
-    fontSize: 60,
+    fontSize: 50,
     textAlign: "right",
     strokeStyle: darkColor,
-    fillStyle: "#e63946",
+    fillStyle: "#1D3557",
     lineWidth: 2,
     x: 990,
     y: yPos - 20,

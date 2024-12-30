@@ -3,7 +3,7 @@ import { darkColor, redColor } from "./common-styles.js";
 
 let c = document.getElementById("myCanvas");
 export let ctx = c?.getContext("2d");
-const font = "Source Sans Pro";
+const font = "sans-serif";
 const fontSize = 46;
 const backgroundImageName = "images/insta_new_no_pic.png";
 const borderImage = "images/border.png";
@@ -57,7 +57,8 @@ export function buildTableForTableType(
   console.log(lines);
   let data = `<svg xmlns='http://www.w3.org/2000/svg' width='900'>
     <foreignObject width='100%' height='100%'>
-    <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Source Sans Pro; font-size:24px; background-color: #A8DADC;'>
+    <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Helvetica, sans-serif;
+    font-weight: 400; font-size:24px; background-color: #A8DADC;'>
     ${lines}
     </div></foreignObject></svg>`;
 
@@ -132,7 +133,8 @@ export function writeStrokedText({
   x = 540,
   y,
 } = {}) {
-  ctx.font = `bold ${fontSize}px ${font}`; //title
+  console.log(fontSize);
+  ctx.font = `bold ${fontSize}px ${font}`;
   ctx.strokeStyle = strokeStyle;
   ctx.lineWidth = lineWidth;
   ctx.fillStyle = fillStyle;

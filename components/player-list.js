@@ -35,7 +35,7 @@ export function playerGoalList(response, big) {
     }.png"</td>
     <td id="${
       thisPlayer.nation
-    }" style="border-left: none;"><img height="30" src="images/logos/${
+    }" class="player-country"><img height="30" src="images/logos/${
       thisPlayer.nation
     }.png" /></td">
     <td>${thisPlayer.name}</td>

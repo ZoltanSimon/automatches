@@ -40,7 +40,7 @@ app.set("view engine", "handlebars");
 app.use(express.static("./"));
 
 app.get("/", (req, res) => {
-  res.render("home", { title: "Generation:Football - Home" });
+  res.render("home", { title: "generationFOOTBALL - Home" });
 });
 
 app.get("/about", (req, res) => {

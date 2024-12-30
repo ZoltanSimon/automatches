@@ -1,15 +1,10 @@
 header {
-  background: linear-gradient(
-    to bottom,
-    #457b9d 60%,
-    #4f8ea9 80%,
-    #5fa3c1 100%
-  );
+  background-color: #457B9D;
   color: #fff;
   text-align: center;
   align-items: center;
   padding: 10px;
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: "Source Sans 3", sans-serif;
   font-weight: bold; /* Make the text bold */
 }
 
@@ -27,13 +22,13 @@ header {
 
 .logo-title h1 {
   font-size: 50px;
-  font-weight: 1000;
+  font-weight: 900;
   margin: 0;
-  color: #f1faee;
+  color: #1D3557;
 
-  text-shadow: -1px -1px 0 #1d3557, /* Top-left shadow */ 1px -1px 0 #1d3557,
-    /* Top-right shadow */ -1px 1px 0 #1d3557,
-    /* Bottom-left shadow */ 1px 1px 0 #1d3557; /* Bottom-right shadow */
+  text-shadow: -1px -1px 0 #A8DADC, /* Top-left shadow */ 1px -1px 0 #A8DADC,
+    /* Top-right shadow */ -1px 1px 0 #A8DADC,
+    /* Bottom-left shadow */ 1px 1px 0 #A8DADC; /* Bottom-right shadow */
 }
 
 nav {
