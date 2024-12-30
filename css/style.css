@@ -197,6 +197,13 @@ footer p {
   color: #f1faee;
 }
 
+.team-name {
+  border-left: none;
+}
+
+.small-played {
+  display: none;
+}
 .form-column {
   width: 43px;
   border-right: 1px solid #f1faee;
@@ -301,5 +308,14 @@ td .form-indicator:last-child {
   }
   .form-indicator {
     width:17%;
+  }
+  .team-name {
+    display: none;
+  }
+  .big-played {
+    display: none;
+  }
+  .small-played {
+    display: inline;
   }
 }

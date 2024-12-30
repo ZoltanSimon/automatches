@@ -30,98 +30,81 @@ export function teamList(
     //createTeamsTable(allPlayingTeams, onlyTotal);
   }
 }
-/*const templateSource = document.getElementById(
-  "teams-table-template"
-).innerHTML;
-const template = Handlebars.compile(templateSource);
-
-// Function to render the table
-function createTeamsTable(response, onlyTotal, big) {
-  const data = { response, onlyTotal, big };
-  const tableHtml = template(data);
-  document.getElementById("top-team-list").innerHTML = tableHtml;
-
-  // Add click events to headers for sorting
-  const headers = document.querySelectorAll("#team-list-table th.sortable");
-  headers.forEach((header, index) => {
-    header.addEventListener("click", () => sortTable(index + 1, header));
-  });
-}
-
-// Usage example
-createTeamsTable(responseData, false, true);*/
 
 function createTeamsTable(response, onlyTotal, big) {
-  if (big)
+  let toFixed = 1;
+  if (big) {
+    toFixed = 2
     ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:7%; border-right:1px solid #F1FAEE" class="sortable"><span class="header-title">`;
+  }
 
-    addToPage = ""; // Initialize the string to build the table rows
-    const tableBody = document.querySelector("#team-list-table tbody"); // Target the table body
+  addToPage = ""; // Initialize the string to build the table rows
+  const tableBody = document.querySelector("#team-list-table tbody"); // Target the table body
   
-    if (!tableBody) {
-      console.error("Table body not found! Ensure the table has a <tbody> element.");
-      return;
-    }
+  if (!tableBody) {
+    console.error("Table body not found! Ensure the table has a <tbody> element.");
+    return;
+  }
   
-    for (let i = 0; i < response.length; i++) {
-      const thisTeam = response[i];
-      if (thisTeam) {
-        addToPage += `<tr>
-          <td style="padding:4px; border-right:none"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
-          <td style="border-left:none;">${thisTeam.name}</td>
-          <td style="padding:0">`;
-  
-        for (const result of thisTeam.form) {
-          addToPage += `<span class="form-indicator ${result}"></span>`;
-        }
-  
-        addToPage += `</td>${tds}${thisTeam.matches}</td>`;
-  
-        if (big) {
-          addToPage += `${tds}${((100 * thisTeam.wins) / thisTeam.matches).toFixed(1)}</td>`;
-        }
-  
-        addToPage += `
-          ${tds}${thisTeam.total.goals}</td>
-          ${tds}${thisTeam.total.goalsAgainst}</td>
-          ${tds}${thisTeam.total.xG.toFixed(2)}</td>
-          ${tds}${thisTeam.total.xGA.toFixed(2)}</td>
-          ${tds}${thisTeam.total.corners}</td>
-          ${tds}${thisTeam.total.cornersAgainst}</td>
-          ${tds}${thisTeam.total.shotsOnGoal}</td>
-          ${tds}${thisTeam.total.shotsOnGoalAgainst}</td>`;
-  
-        if (!onlyTotal) {
-          addToPage += `
-            ${tds}${thisTeam.perGame.goals.toFixed(2)}</td>
-            ${tds}${thisTeam.perGame.goalsAgainst.toFixed(2)}</td>
-            ${tds}${thisTeam.perGame.xG.toFixed(2)}</td>
-            ${tds}${thisTeam.perGame.xGA.toFixed(2)}</td>
-            ${tds}${thisTeam.perGame.corners.toFixed(2)}</td>
-            ${tds}${thisTeam.perGame.cornersAgainst.toFixed(2)}</td>
-            ${tds}${thisTeam.perGame.shotsOnGoal.toFixed(2)}</td>
-            ${tds}${thisTeam.perGame.shotsOnGoalAgainst.toFixed(2)}</td>
-            ${tds}${thisTeam.last5.goals}</td>
-            ${tds}${thisTeam.last5.goalsAgainst}</td>
-            ${tds}${thisTeam.last5.xG.toFixed(2)}</td>
-            ${tds}${thisTeam.last5.xGA.toFixed(2)}</td>
-            ${tds}${thisTeam.last5.corners}</td>
-            ${tds}${thisTeam.last5.cornersAgainst}</td>
-            ${tds}${thisTeam.last5.shotsOnGoal}</td>
-            ${tds}${thisTeam.last5.shotsOnGoalAgainst}</td>
-            ${tds}${thisTeam.last5PerGame.goals.toFixed(2)}</td>
-            ${tds}${thisTeam.last5PerGame.goalsAgainst.toFixed(2)}</td>
-            ${tds}${thisTeam.last5PerGame.xG.toFixed(2)}</td>
-            ${tds}${thisTeam.last5PerGame.xGA.toFixed(2)}</td>
-            ${tds}${thisTeam.last5PerGame.corners.toFixed(2)}</td>
-            ${tds}${thisTeam.last5PerGame.cornersAgainst.toFixed(2)}</td>
-            ${tds}${thisTeam.last5PerGame.shotsOnGoal.toFixed(2)}</td>
-            ${tds}${thisTeam.last5PerGame.shotsOnGoalAgainst.toFixed(2)}</td>`;
-        }
-  
-        addToPage += "</tr>";
+  for (let i = 0; i < response.length; i++) {
+    const thisTeam = response[i];
+    if (thisTeam) {
+      addToPage += `<tr>
+        <td style="padding:4px; border-right:none"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
+        <td class="team-name">${thisTeam.name}</td>
+        <td style="padding:0">`;
+
+      for (const result of thisTeam.form) {
+        addToPage += `<span class="form-indicator ${result}"></span>`;
       }
+
+      addToPage += `</td>${tds}${thisTeam.matches}</td>`;
+
+      if (big) {
+        addToPage += `${tds}${((100 * thisTeam.wins) / thisTeam.matches).toFixed(1)}</td>`;
+      }
+
+      addToPage += `
+        ${tds}${thisTeam.total.goals}</td>
+        ${tds}${thisTeam.total.goalsAgainst}</td>
+        ${tds}${thisTeam.total.xG.toFixed(toFixed)}</td>
+        ${tds}${thisTeam.total.xGA.toFixed(toFixed)}</td>
+        ${tds}${thisTeam.total.corners}</td>
+        ${tds}${thisTeam.total.cornersAgainst}</td>
+        ${tds}${thisTeam.total.shotsOnGoal}</td>
+        ${tds}${thisTeam.total.shotsOnGoalAgainst}</td>`;
+
+      if (!onlyTotal) {
+        addToPage += `
+          ${tds}${thisTeam.perGame.goals.toFixed(2)}</td>
+          ${tds}${thisTeam.perGame.goalsAgainst.toFixed(2)}</td>
+          ${tds}${thisTeam.perGame.xG.toFixed(2)}</td>
+          ${tds}${thisTeam.perGame.xGA.toFixed(2)}</td>
+          ${tds}${thisTeam.perGame.corners.toFixed(2)}</td>
+          ${tds}${thisTeam.perGame.cornersAgainst.toFixed(2)}</td>
+          ${tds}${thisTeam.perGame.shotsOnGoal.toFixed(2)}</td>
+          ${tds}${thisTeam.perGame.shotsOnGoalAgainst.toFixed(2)}</td>
+          ${tds}${thisTeam.last5.goals}</td>
+          ${tds}${thisTeam.last5.goalsAgainst}</td>
+          ${tds}${thisTeam.last5.xG.toFixed(2)}</td>
+          ${tds}${thisTeam.last5.xGA.toFixed(2)}</td>
+          ${tds}${thisTeam.last5.corners}</td>
+          ${tds}${thisTeam.last5.cornersAgainst}</td>
+          ${tds}${thisTeam.last5.shotsOnGoal}</td>
+          ${tds}${thisTeam.last5.shotsOnGoalAgainst}</td>
+          ${tds}${thisTeam.last5PerGame.goals.toFixed(2)}</td>
+          ${tds}${thisTeam.last5PerGame.goalsAgainst.toFixed(2)}</td>
+          ${tds}${thisTeam.last5PerGame.xG.toFixed(2)}</td>
+          ${tds}${thisTeam.last5PerGame.xGA.toFixed(2)}</td>
+          ${tds}${thisTeam.last5PerGame.corners.toFixed(2)}</td>
+          ${tds}${thisTeam.last5PerGame.cornersAgainst.toFixed(2)}</td>
+          ${tds}${thisTeam.last5PerGame.shotsOnGoal.toFixed(2)}</td>
+          ${tds}${thisTeam.last5PerGame.shotsOnGoalAgainst.toFixed(2)}</td>`;
+      }
+
+      addToPage += "</tr>";
     }
+  }
   
     tableBody.innerHTML = addToPage;
 
