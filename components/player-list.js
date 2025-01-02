@@ -22,7 +22,7 @@ export function playerGoalList(response, big) {
       ${ths}Assists</th>
       ${ths}GA/90</th>`;
   if (big)
-    addToPage += `${ths}Minutes</th>${ths}Penalties</th>${ths}Shots</th>${ths}Dribbles</th>${ths}Duels</th>${ths}Key Passes</th>${ths}Fouls Against</th>`;
+    addToPage += `${ths}Minutes</th>${ths}Pens</th>${ths}Shots</th>${ths}Dribbles</th>${ths}Duels</th>${ths}Key Passes</th>${ths}Fouls Against</th>`;
   addToPage += `</tr></thead><tbody>`;
   for (let i = 0; i < response.length; i++) {
     thisPlayer = response[i];
@@ -62,7 +62,7 @@ export function playerListToCanvas() {
   let imgToAdd = [];
   let playerFace, thisTr;
   let playerListTable = document.getElementById("player-list-table");
-  let normalWidth = `73px`;
+  let normalWidth = `72px`;
 
   playerListTable.cellPadding = 10;
 
@@ -79,8 +79,8 @@ export function playerListToCanvas() {
     imgToAdd.push({
       img: playerFace,
       imgHeight: 80,
-      startX: 134,
-      startY: 84 + i * 80,
+      startX: 132,
+      startY: 82 + i * 80,
     });
 
     let clubLogo = thisTr.children[1].id;
@@ -88,35 +88,34 @@ export function playerListToCanvas() {
     console.log(imgs.clubs[clubLogo]);
     imgToAdd.push({
       img: imgs.clubs[clubLogo],
-      imgHeight: 56,
-      startX: 200,
-      startY: 99 + i * 80,
+      imgHeight: 50,
+      startX: 180,
+      startY: 97 + i * 80,
     });
     clubLogo = thisTr.children[3].id;
 
-    console.log(imgs.clubs[clubLogo]);
     imgToAdd.push({
       img: imgs.clubs[clubLogo],
       imgHeight: 72,
-      startX: 510,
-      startY: 90 + i * 80,
+      startX: 477,
+      startY: 88 + i * 80,
     });
 
     thisTr.style.height = "80px";
     thisTr.children[0].innerHTML = "";
     thisTr.children[0].style.width = "120px";
+    thisTr.children[0].style.borderRightStyle = "hidden";
     thisTr.children[1].style.width = "60px";
     thisTr.children[2].style.width = "260px";
     thisTr.children[1].innerHTML = "";
     thisTr.children[3].innerHTML = "";
-    thisTr.children[3].style.width = "60px";
+    thisTr.children[3].style.width = "50px";
     thisTr.children[4].style.width = normalWidth;
     thisTr.children[5].style.width = normalWidth;
     thisTr.children[6].style.width = normalWidth;
     thisTr.children[7].style.width = normalWidth;
   }
 
-  console.log(imgToAdd);
   buildTableForTableType(
     removeNewlines(playerListTable.outerHTML),
     imgToAdd,

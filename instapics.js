@@ -58,7 +58,7 @@ export function buildTableForTableType(
   let data = `<svg xmlns='http://www.w3.org/2000/svg' width='900'>
     <foreignObject width='100%' height='100%'>
     <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Helvetica, sans-serif;
-    font-weight: 400; font-size:24px; background-color: #A8DADC;'>
+    font-weight: 400; font-size:25px; background-color: #A8DADC;'>
     ${lines}
     </div></foreignObject></svg>`;
 
@@ -185,7 +185,7 @@ function drawFormBars(formArrays, yPos) {
 
       ctx.fillStyle = color;
       const x = 823 + index * (barWidth + spacing);
-      ctx.fillRect(x, yPos + 6 + i * (barHeight + 5), barWidth, barHeight);
+      ctx.fillRect(x, yPos +2+ i * (barHeight + 5), barWidth, barHeight);
     });
   }
 }

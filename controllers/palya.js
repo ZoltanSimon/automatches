@@ -6,23 +6,7 @@ var BB = c.getBoundingClientRect();
 
 document.getElementById("downloadButton").addEventListener("click", download);
 
-// get canvas related references
-var offsetX = BB.left;
-var offsetY = BB.top;
-var WIDTH = c.width;
-var HEIGHT = c.height;
-
-// drag related variables
-var dragok = false;
-var startX;
-var startY;
-
-// listen for mouse events
-c.onmousedown = myDown;
-c.onmouseup = myUp;
-c.onmousemove = myMove;
-
-const font = "Verdana";
+const font = "sans-serif";
 const ratio = 0.8;
 const kitSize = 80 * ratio;
 const marg = 20;
@@ -36,6 +20,37 @@ const goalHeight = 18;
 
 let number = 1;
 let players = [];
+
+const ids = [
+  'formation-selector',
+  'kit-color-selector',
+  'number-color-selector',
+  'show-team-name',
+  'team-name',
+  'pattern-selector',
+  'kit-color-selector2',
+  'bottom-text',
+  'pitch-selector',
+  'watermark',
+  'shape-selector',
+  'shadow-switch',
+];
+
+for (let i = 1; i <= 11; i++) {
+  ids.push(`playerpos${i}`);
+  ids.push(`playerno${i}`);
+  ids.push(`player${i}`);
+}
+
+ids.forEach(id => {
+  const select = document.getElementById(id);
+
+  if (select) {
+    select.addEventListener('change', val);
+  }
+});
+
+
 
 class Shape {
   constructor(x, y) {
@@ -63,7 +78,7 @@ class Shape {
       : (ctx.shadowColor = "rgba(0,0,0,0)");
 
     ctx.fillText(text, marg + x, y + 4);
-    ctx.strokeText(text, marg + x, y + 4);
+    //ctx.strokeText(text, marg + x, y + 4);
   }
 }
 
@@ -580,146 +595,3 @@ for (let i = 0; i < acc.length; i++) {
   });
 }
 
-// an array of objects that define different rectangles
-/*var rects = [];
-rects.push({
-  x: 75 - 15,
-  y: 50 - 15,
-  width: 30,
-  height: 30,
-  fill: "#444444",
-  isDragging: false,
-});
-rects.push({
-  x: 75 - 25,
-  y: 50 - 25,
-  width: 30,
-  height: 30,
-  fill: "#ff550d",
-  isDragging: false,
-});
-rects.push({
-  x: 75 - 35,
-  y: 50 - 35,
-  width: 30,
-  height: 30,
-  fill: "#800080",
-  isDragging: false,
-});
-rects.push({
-  x: 75 - 45,
-  y: 50 - 45,
-  width: 30,
-  height: 30,
-  fill: "#0c64e8",
-  isDragging: false,
-});*/
-
-// call to draw the scene
-//draw();
-
-// draw a single rect
-/*function rect(x, y, w, h) {
-  ctx.beginPath();
-  ctx.rect(x, y, w, h);
-  ctx.closePath();
-  ctx.fill();
-}*/
-
-// clear the canvas
-/*function clear() {
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
-}*/
-
-// redraw the scene
-/*function draw() {
-  clear();
-  ctx.fillStyle = "#FAF7F8";
-  rect(0, 0, WIDTH, HEIGHT);
-  // redraw each rect in the rects[] array
-  for (var i = 0; i < rects.length; i++) {
-    var r = rects[i];
-    ctx.fillStyle = r.fill;
-    rect(r.x, r.y, r.width, r.height);
-  }
-}*/
-
-// handle mousedown events
-function myDown(e) {
-  // tell the browser we're handling this mouse event
-  console.log("down");
-  e.preventDefault();
-  e.stopPropagation();
-
-  // get the current mouse position
-  var mx = parseInt(e.clientX - offsetX);
-  var my = parseInt(e.clientY - offsetY);
-
-  // test each rect to see if mouse is inside
-  dragok = false;
-  for (var i = 0; i < players.length; i++) {
-    var r = players[i];
-    console.log(mx);
-    console.log(r.width);
-    if (mx > r.x && mx < r.x + r.width && my > r.y && my < r.y + r.height) {
-      console.log("ide");
-      // if yes, set that rects isDragging=true
-      dragok = true;
-      r.isDragging = true;
-    }
-  }
-  // save the current mouse position
-  startX = mx;
-  startY = my;
-}
-
-// handle mouseup events
-function myUp(e) {
-  console.log("up");
-  // tell the browser we're handling this mouse event
-  e.preventDefault();
-  e.stopPropagation();
-
-  // clear all the dragging flags
-  dragok = false;
-  for (var i = 0; i < players.length; i++) {
-    players[i].isDragging = false;
-  }
-}
-
-// handle mouse moves
-function myMove(e) {
-  // if we're dragging anything...
-  if (dragok) {
-    // tell the browser we're handling this mouse event
-    e.preventDefault();
-    e.stopPropagation();
-
-    // get the current mouse position
-    var mx = parseInt(e.clientX - offsetX);
-    var my = parseInt(e.clientY - offsetY);
-
-    // calculate the distance the mouse has moved
-    // since the last mousemove
-    var dx = mx - startX;
-    var dy = my - startY;
-
-    // move each rect that isDragging
-    // by the distance the mouse has moved
-    // since the last mousemove
-    for (var i = 0; i < players.length; i++) {
-      var r = players[i];
-      if (r.isDragging) {
-        r.x += dx;
-        r.y += dy;
-      }
-    }
-
-    // redraw the scene with the new rect positions
-    draw();
-
-    // reset the starting mouse position for the next mousemove
-    startX = mx;
-    startY = my;
-  }
-}

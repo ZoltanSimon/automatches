@@ -17,7 +17,7 @@ export function leagueStandings(standings) {
         <thead>    
         <tr style="border-bottom: 2px solid #1D3557">
         <th style="width:48px;"><b>#</b></th>
-        <th style="width:264px;" colspan="2"><b>Team</b></th>
+        <th style="width:272px;" colspan="2"><b>Team</b></th>
         <th style="width:52px;"><b>P</b></th>
         <th style="width:52px;"><b>W</b></th>
         <th style="width:52px;"><b>D</b></th>
@@ -41,7 +41,7 @@ export function leagueStandings(standings) {
       )}" alt="*${team.name}*" width="40px" /> </td>
       <td style="border-left-style: hidden; padding: 3px;">${truncate(
         team.name,
-        17
+        16
       )}</td>
 
       ${tds}${team.matches}</td>
@@ -111,7 +111,7 @@ export function standingsToCanvas() {
             img: imgs.clubs[clubs[k].id],
             imgHeight: 40,
             startX: 168,
-            startY: yPos + 40 + l * 42,
+            startY: yPos + 42 + l * 42,
           });
           l++;
           thisTd.innerHTML = " ";
