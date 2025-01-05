@@ -151,7 +151,7 @@ export function leagueBannerBig(yPos) {
   let round = document.getElementById("round-no").innerHTML;
   writeStrokedText({
     text: [leagueName],
-    fontSize: 60,
+    fontSize: 54,
     textAlign: "right",
     strokeStyle: darkColor,
     fillStyle: redColor,
@@ -161,7 +161,7 @@ export function leagueBannerBig(yPos) {
   });
   writeStrokedText({
     text: [round.replace(`Regular Season -`, "Round")],
-    fontSize: 60,
+    fontSize: 50,
     textAlign: "right",
     x: 990,
     y: yPos - 20,

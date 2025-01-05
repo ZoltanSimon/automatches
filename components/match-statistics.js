@@ -55,10 +55,10 @@ export function addMatchStats(apiResponse) {
 
   addToPage = `
   <table id='match-stats' style='border-collapse: collapse; border: 3px solid #1D3557;' border='1'><thead>
-  <tr style='font-size:30;'>
-  <td style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${homeTeamName}</td>
-  <td style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>*${homeTeamName}* - *${awayTeamName}*</td>
-  <td style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${awayTeamName}</td>
+  <tr class="main-table-header" style='font-size:30;'>
+  <th style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${homeTeamName}</th>
+  <th style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>*${homeTeamName}* - *${awayTeamName}*</th>
+  <th style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${awayTeamName}</th>
   </tr></thead><tbody>`;
 
   for (let i = 0; i < stats.length; i++) {
@@ -90,8 +90,9 @@ export function matchStatsToCanvas() {
   let teamLogos = statisticsTable.rows[0].children[1].innerHTML.split(" - ");
   let yPos = 190;
 
-  statisticsTable.rows[0].style.backgroundColor = "#457B9D";
+  statisticsTable.rows[0].style.backgroundColor = "#1D3557";
   statisticsTable.rows[0].style.fontWeight = "bold";
+  statisticsTable.rows[0].style.color = "#F1FAEE";
 
   for (let i = 0; i < teamLogos.length; i++) {
     for (let j = 0; j < clubs.length; j++) {
@@ -99,7 +100,7 @@ export function matchStatsToCanvas() {
         imgToAdd.push({
           img: imgs.clubs[clubs[j].id],
           imgHeight: 56,
-          startX: 430 + i * 164,
+          startX: 490 + i * 106,
           startY: yPos,
         });
       }

@@ -23,6 +23,8 @@ import {
 import { addText, buildResults, buildStandings } from "../autotext.js";
 import { teamList } from "../components/team-list.js";
 import { playerListToCanvas } from "../components/player-list.js";
+import { oneFixture } from "../components/match-details.js";
+import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
 
 const picker = datepicker(document.querySelector("#calendar"), {
   position: "bl",

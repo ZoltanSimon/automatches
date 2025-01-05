@@ -2,7 +2,7 @@ import { tds } from "../common-styles.js";
 
 let addToPage;
 let ths = `<th title="Click to sort" class="team-list-header sortable">`;
-let thisTeam, thisTr;
+let thisTr;
 
 export function teamList(
   response,
