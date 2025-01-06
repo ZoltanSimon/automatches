@@ -6,10 +6,10 @@ import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
 import { downloadMatch, matchExists } from "./local-handler.js";
 
-export let download = function () {
+export let download = function (canvasName = "myCanvas") {
   var link = document.createElement("a");
-  link.download = "mysquad.png";
-  link.href = document.getElementById("myCanvas").toDataURL();
+  link.download = "genfoot.png";
+  link.href = document.getElementById(canvasName).toDataURL();
   link.click();
 };
 
@@ -141,4 +141,34 @@ export async function getTopTeams(leagues, amount, big) {
   );
 
   teamList(dasTeams.slice(0, amount), true, false, big);
+}
+
+export function sortTable(n, td, table, startingRow = 1) {
+  let rows,
+    switching = true,
+    dir = "asc",
+    switchcount = 0;
+
+  while (switching) {
+    switching = false;
+    rows = table.rows;
+
+    for (let i = startingRow; i < rows.length - 1; i++) {
+      let x = rows[i].getElementsByTagName("TD")[n];
+      let y = rows[i + 1].getElementsByTagName("TD")[n];
+      let shouldSwitch = (dir === "asc" && parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) || (dir === "desc" && parseFloat(x.innerHTML) < parseFloat(y.innerHTML));
+      
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount++;
+        break;
+      }
+    }
+    if (!switching && dir === "asc" && switchcount === 0) {
+      dir = "desc";
+      switching = true;
+    }
+  }
+  td.classList.add(dir);
 }

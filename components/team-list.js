@@ -1,8 +1,9 @@
 import { tds } from "../common-styles.js";
 
 let addToPage;
-let ths = `<th title="Click to sort" class="team-list-header sortable">`;
+let ths = `<th title="Click to sort" class="list-header sortable">`;
 let thisTr;
+import { sortTable } from "../common-functions.js";
 
 export function teamList(
   response,
@@ -39,6 +40,7 @@ function createTeamsTable(response, onlyTotal, big) {
   }
 
   addToPage = ""; // Initialize the string to build the table rows
+  let table = document.getElementById("team-list-table");
   const tableBody = document.querySelector("#team-list-table tbody"); // Target the table body
   
   if (!tableBody) {
@@ -106,10 +108,8 @@ function createTeamsTable(response, onlyTotal, big) {
     }
   }
   
-    tableBody.innerHTML = addToPage;
+  tableBody.innerHTML = addToPage;
 
-
-  let table = document.getElementById("team-list-table");
   let subHeaderLength = table.rows[1].cells.length;
   let lastRowLength = table.rows[table.rows.length - 1].cells.length;
 
@@ -118,74 +118,9 @@ function createTeamsTable(response, onlyTotal, big) {
 
     subheaderCell.addEventListener("click", function () {
       let index = lastRowLength - subHeaderLength + i;
-      sortTable(index, subheaderCell); 
+      sortTable(index, subheaderCell, table, 2); 
     });
   }
-}
-
-function sortTable(n, td) {
-  var table,
-    rows,
-    switching,
-    i,
-    x,
-    y,
-    shouldSwitch,
-    dir,
-    switchcount = 0;
-  table = document.getElementById("team-list-table");
-  switching = true;
-  // Set the sorting direction to ascending:
-  dir = "asc";
-  /* Make a loop that will continue until
-  no switching has been done: */
-  while (switching) {
-    // Start by saying: no switching is done:
-    switching = false;
-    rows = table.rows;
-    /* Loop through all table rows (except the
-    first, which contains table headers): */
-    for (i = 2; i < rows.length - 1; i++) {
-      // Start by saying there should be no switching:
-      shouldSwitch = false;
-      /* Get the two elements you want to compare,
-      one from current row and one from the next: */
-      x = rows[i].getElementsByTagName("TD")[n];
-      y = rows[i + 1].getElementsByTagName("TD")[n];
-      /* Check if the two rows should switch place,
-      based on the direction, asc or desc: */
-      if (dir == "asc") {
-        if (parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) {
-          // If so, mark as a switch and break the loop:
-          shouldSwitch = true;
-          break;
-        }
-      } else if (dir == "desc") {
-        if (parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) {
-          // If so, mark as a switch and break the loop:
-          shouldSwitch = true;
-          break;
-        }
-      }
-    }
-    if (shouldSwitch) {
-      /* If a switch has been marked, make the switch
-      and mark that a switch has been done: */
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-      switching = true;
-      // Each time a switch is done, increase this count by 1:
-      switchcount++;
-    } else {
-      /* If no switching has been done AND the direction is "asc",
-      set the direction to "desc" and run the while loop again. */
-      if (switchcount == 0 && dir == "asc") {
-        dir = "desc";
-        switching = true;
-      }
-    }
-  }
-
-  td.classList.add(dir);
 }
 
 function predictions(homeTeam, awayTeam) {

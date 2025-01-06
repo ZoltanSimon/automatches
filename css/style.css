@@ -197,6 +197,11 @@ footer p {
   color: #f1faee;
 }
 
+#player-list-table .main-table-header .list-header:first-child {
+  text-align: left; 
+  padding: 8px;
+}
+
 .team-name, .player-country {
   border-left: none;
 }
@@ -237,7 +242,7 @@ td .form-indicator:last-child {
   background-color: gray; /* Gray for draw */
 }
 
-.team-list-header {
+.list-header {
   text-align: center;
   padding: 2px;
   width: 58px;
@@ -303,7 +308,7 @@ td .form-indicator:last-child {
   td {
     padding: 4px;
   }
-  .team-list-header {
+  .list-header {
     padding: 1px;
   }
   .form-indicator {

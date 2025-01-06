@@ -4,7 +4,9 @@ let c = document.getElementById("starting-eleven-builder");
 let ctx = c.getContext("2d");
 var BB = c.getBoundingClientRect();
 
-document.getElementById("downloadButton").addEventListener("click", download);
+document.getElementById("downloadButton").addEventListener("click", () => {
+  download("starting-eleven-builder");
+});
 
 const font = "sans-serif";
 const ratio = 0.8;

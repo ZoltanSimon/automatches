@@ -5,57 +5,59 @@ import {
   loadClubLogo,
 } from "../instapics.js";
 import { removeNewlines } from "../common-functions.js";
-import { ths, tds } from "../common-styles.js";
+import { tds } from "../common-styles.js";
+import { sortTable } from "../common-functions.js";
 
 export function playerGoalList(response, big) {
   let addToPage;
   let thisPlayer;
 
-  addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="player-list-table">
-  <thead>
-    <tr class="main-table-header">
-      <th colspan=3 style="border-right:1px solid #F1FAEE">Player</th>
-      <th width=50 style="text-align: center; border-right:1px solid #F1FAEE">Team</th>
-      ${ths}Apps</th>
-      ${ths}Goals</th>
-      ${ths}NPG</th>
-      ${ths}Assists</th>
-      ${ths}GA/90</th>`;
-  if (big)
-    addToPage += `${ths}Minutes</th>${ths}Pens</th>${ths}Shots</th>${ths}Dribbles</th>${ths}Duels</th>${ths}Key Passes</th>${ths}Fouls Against</th>`;
-  addToPage += `</tr></thead><tbody>`;
+  addToPage = "";
+  const table = document.getElementById("player-list-table");
+  const tableBody = table.getElementsByTagName("tbody")[0];
+  
+  if (!tableBody) {
+    console.error("Table body not found! Ensure the table has a <tbody> element.");
+    return;
+  }
   for (let i = 0; i < response.length; i++) {
     thisPlayer = response[i];
     loadClubLogo(thisPlayer.club);
     loadClubLogo(thisPlayer.nation);
-    addToPage += `<tr><td id="${
-      thisPlayer.id
-    }" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${
-      thisPlayer.id
-    }.png"</td>
-    <td id="${
-      thisPlayer.nation
-    }" class="player-country"><img height="30" src="images/logos/${
-      thisPlayer.nation
-    }.png" /></td">
+
+    addToPage += `<tr
+    ><td id="${thisPlayer.id}" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${thisPlayer.id}.png"</td>
+    <td id="${thisPlayer.nation}" class="player-country"><img height="30" src="images/logos/${thisPlayer.nation}.png" /></td">
     <td>${thisPlayer.name}</td>
-    <td id="${thisPlayer.club}"><img height="44" src="images/logos/${
-      thisPlayer.club
-    }.png" /></td>${tds}${
-      thisPlayer.apps
-    }</td><td style="text-align: center; font-weight: bold">${
-      thisPlayer.goals
-    }</td>${tds}${thisPlayer.goals - thisPlayer.penalties}</td>${tds}${
-      thisPlayer.assists
-    }</td>
+    <td id="${thisPlayer.club}"><img height="44" src="images/logos/${thisPlayer.club}.png" /></td>
+    ${tds}${thisPlayer.apps}</td>
+    <td style="text-align: center; font-weight: bold">${thisPlayer.goals}</td>
+    ${tds}${thisPlayer.goals - thisPlayer.penalties}</td>
+    ${tds}${thisPlayer.assists}</td>
+    <td style="text-align: center; font-weight: bold">${thisPlayer.goals + thisPlayer.assists}</td>
     ${tds}${thisPlayer.gap90}</td>`;
+
     if (big)
       addToPage += `${tds}${thisPlayer.minutes}</td>${tds}${thisPlayer.penalties}</td>${tds}${thisPlayer.shots}</td>${tds}${thisPlayer.dribbles}</td>${tds}${thisPlayer.duels}</td>${tds}${thisPlayer.key_passes}</td>${tds}${thisPlayer.fouls_drawn}</td>`;
     addToPage += `</tr>`;
   }
   addToPage += `</tbody></table>`;
 
-  document.getElementById("player-list").innerHTML += addToPage;
+  tableBody.innerHTML = addToPage;
+
+  let headerLength = table.rows[0].cells.length;
+  let lastRowLength = table.rows[table.rows.length - 1].cells.length;
+
+  for (let i = 0; i < table.rows[0].cells.length; i++) {
+    let headerCell = table.rows[0].cells[i];
+    if (headerCell.classList.contains("sortable")) {
+      headerCell.addEventListener("click", function () {
+        let index = lastRowLength - headerLength + i;
+        sortTable(index, headerCell, table);
+      });
+    }
+  }
+  
 }
 
 export function playerListToCanvas() {
