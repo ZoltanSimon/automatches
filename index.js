@@ -164,8 +164,17 @@ app.get("/get-league-matches", async (request, response) => {
       for (const element of data) {
         if (["FT", "AET"].includes(element.fixture.status.short)) {
           matchID = element.fixture.id;
-          let data2 = await getMatchFromServer(matchID);
-          allMatches.push(data2[0]);
+          try {
+            let data2 = await getMatchFromServer(matchID);
+            if (data2 && data2[0]) {
+                allMatches.push(data2[0]);
+            } else {
+                console.warn(`No data found for matchID: ${matchID}`);
+            }
+        } catch (error) {
+            console.error(`Error fetching match with ID ${matchID}:`, error);
+        }
+        
         }
       }
     }

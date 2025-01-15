@@ -28,18 +28,20 @@ export async function getPlayerGoalList(leagues) {
         let match = await getMatchFromServer(league[i].fixture.id);
         if (match != null && match[0]) {
           for (let { players } of match) {
-            teams = {
-              home: players[0].team.id,
-              away: players[1].team.id,
-            };
+            if (Array.isArray(players) && players.length >= 2) {
+              teams = {
+                home: players[0].team.id,
+                away: players[1].team.id,
+              };
 
-            teamNames = {
-              home: players[0].team.name,
-              away: players[1].team.name,
-            };
+              teamNames = {
+                home: players[0].team.name,
+                away: players[1].team.name,
+              };
 
-            getBothTeams(players, 0, teamNames.home);
-            getBothTeams(players, 1, teamNames.away);
+              getBothTeams(players, 0, teamNames.home);
+              getBothTeams(players, 1, teamNames.away);
+            }
           }
         }
       }
@@ -129,6 +131,7 @@ export async function getAllPlayers(compType, compList, nationList) {
     for (let i = 0; i < league.length; i++) {
       if (league[i].fixture.status.short == "FT") {
         let match = await getMatchFromServer(league[i].fixture.id);
+        console.log(league[i].fixture.id);
         if (match) {
           for (let j = 0; j < match[0].players.length; j++) {
             thisClub = match[0].players[j].team.id;

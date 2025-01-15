@@ -15,6 +15,7 @@ export let allLeagues = [
   { id: 4, name: "EURO 2024", season: 2024, type: "nt" },
   { id: 9, name: "Copa America", season: 2024, type: "nt" },
   { id: 45, name: "fa-cup", season: 2024, type: "cup" },
+  { id: 48, name: "EFL Cup", season: 2024, type: "cup" },
   { id: 143, name: "Copa del Rey", season: 2024, type: "cup" },
   { id: 137, name: "Copa Italia", season: 2024, type: "cup" },
   { id: 81, name: "pokal", season: 2024, type: "cup" },

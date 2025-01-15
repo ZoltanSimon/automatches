@@ -17,14 +17,14 @@ export function leagueStandings(standings) {
         <thead>    
         <tr style="border-bottom: 2px solid #1D3557">
         <th style="width:48px;"><b>#</b></th>
-        <th style="width:272px;" colspan="2"><b>Team</b></th>
+        <th style="width:274px;" colspan="2"><b>Team</b></th>
         <th style="width:52px;"><b>P</b></th>
         <th style="width:52px;"><b>W</b></th>
         <th style="width:52px;"><b>D</b></th>
         <th style="width:52px;"><b>L</b></th>
         <th style="width:90px;"><b>Goals</b></th>
         <th style="width:86px;"><b>xG</b></th>
-        <th style="width:98px; padding: 4px;" colspan=5><b>Form</b></th>
+        <th style="width:96px; padding: 4px;" colspan=5><b>Form</b></th>
         <th style="width:58px;"><b>Pts</b></th>
       </tr>
       </thead><tbody>`;
@@ -110,7 +110,7 @@ export function standingsToCanvas() {
           imgToAdd.push({
             img: imgs.clubs[clubs[k].id],
             imgHeight: 40,
-            startX: 168,
+            startX: 166,
             startY: yPos + 42 + l * 42,
           });
           l++;

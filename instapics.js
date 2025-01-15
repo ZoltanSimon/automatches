@@ -54,7 +54,7 @@ export function buildTableForTableType(
   allForms = []
 ) {
   ctx.drawImage(border_image, 0, 0);
-  console.log(lines);
+
   let data = `<svg xmlns='http://www.w3.org/2000/svg' width='900'>
     <foreignObject width='100%' height='100%'>
     <div xmlns='http://www.w3.org/1999/xhtml' style='font-family:Helvetica, sans-serif;
@@ -151,17 +151,17 @@ export function leagueBannerBig(yPos) {
   let round = document.getElementById("round-no").innerHTML;
   writeStrokedText({
     text: [leagueName],
-    fontSize: 54,
+    fontSize: 56,
     textAlign: "right",
     strokeStyle: darkColor,
     fillStyle: redColor,
-    lineWidth: 2,
+    lineWidth: 1,
     x: 990,
     y: yPos - 80,
   });
   writeStrokedText({
     text: [round.replace(`Regular Season -`, "Round")],
-    fontSize: 50,
+    fontSize: 46,
     textAlign: "right",
     x: 990,
     y: yPos - 20,
@@ -180,7 +180,7 @@ function drawFormBars(formArrays, yPos) {
     formArray.forEach((result, index) => {
       let color;
       if (result === "W") color = "green";
-      else if (result === "D") color = darkColor;
+      else if (result === "D") color = "gray";
       else if (result === "L") color = redColor;
 
       ctx.fillStyle = color;

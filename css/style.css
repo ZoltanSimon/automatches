@@ -235,7 +235,7 @@ td .form-indicator:last-child {
 }
 
 .L {
-  background-color: red; /* Red for loss */
+  background-color: #E63946; /* Red for loss */
 }
 
 .D {

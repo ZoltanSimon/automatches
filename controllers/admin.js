@@ -87,7 +87,7 @@ async function matchesByRound() {
     leagueID,
     `Regular Season - ${roundNumber}`
   );
-  matchList(resultsFromApi, false);
+  matchList(resultsFromApi, true);
   addText(resultsFromApi);
   buildResults(resultsFromApi);
 }

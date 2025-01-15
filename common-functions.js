@@ -38,14 +38,11 @@ export function truncate(str, n) {
 }
 
 export function copyText(field) {
-  // Get the text field
   var copyText = document.getElementById(field);
 
-  // Select the text field
   copyText.select();
   copyText.setSelectionRange(0, 99999); // For mobile devices
 
-  // Copy the text inside the text field
   navigator.clipboard.writeText(copyText.value);
 }
 
@@ -171,4 +168,13 @@ export function sortTable(n, td, table, startingRow = 1) {
     }
   }
   td.classList.add(dir);
+}
+
+export function getDate(date) {
+  let d = new Date(date);
+  let month = d.getMonth() + 1;
+  let day = d.getDate();
+  let year = d.getFullYear();
+
+  return `${day < 10 ? "0" + day : day}.${month < 10 ? "0" + month : month}.${year}`;
 }

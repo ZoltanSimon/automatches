@@ -13,17 +13,20 @@ import {
   truncate,
   htmlDecode,
   removeNewlines,
+  getDate,
 } from "../common-functions.js";
 
 let imgToAdd = [];
-let yPos = 200;
+let yPos = 220;
 
 export function matchList(fixtures, showID = false) {
   let addToPage, date;
   let leagueName = fixtures[0].league.name;
   let leagueID = fixtures[0].league.id;
   let round = fixtures[0].league.round;
-  let thisID = ``;
+  let thisID = ``,
+  thisDate = ``,
+  thisTime = ``;
 
   loadCompLogo(leagueID);
 
@@ -31,60 +34,47 @@ export function matchList(fixtures, showID = false) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);
   });
 
-  addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="match-list">`;
+  addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="match-list"><thead>
+    <tr class="main-table-header"><th colspan=9>${getDate(new Date())}</th></tr></thead><tbody>`;
 
   fixtures.forEach((element) => {
-    if (showID) {
-      thisID = `<td rowspan=2 class="match-id">${element.fixture.id}</td>`;
-    } else {
-      thisID = `<td rowspan=2><img width=50 src="images/competitions/${element.league.id}.png"/></td>`;
-    }
     date = new Date(element.fixture.date);
-    let dateToAdd = `${date.getDate()}.${
-      (date.getMonth() + 1 < 10 ? "0" : "") + (parseInt(date.getMonth()) + 1)
-    }.${date.getFullYear()}`;
+    let dateToAdd = getDate(date);
+
+    if (showID) {
+      thisID = `<td rowspan=2 class="match-id">${element.fixture.id}</td>`;      
+      thisTime = `<td style="text-align: center;">${date.getUTCHours()} : ${(date.getMinutes() < 10 ? "0" : "") + date.getMinutes()}</td>`;
+      thisDate = `<td style="text-align: center;">${dateToAdd}</td>`;
+    } else {
+      thisID = `<td width=40 rowspan=2><img width=40 src="images/competitions/${element.league.id}.png"/></td>`;
+      thisTime = ``;
+      thisDate = `<td rowspan=2 style="text-align: center;">${date.getUTCHours()} : ${(date.getMinutes() < 10 ? "0" : "") + date.getMinutes()}</td>`;
+    }
 
     loadClubLogo(element.teams.home.id);
     loadClubLogo(element.teams.away.id);
 
     addToPage += `
     <tr>
-      <td style="text-align: center;">${dateToAdd}</td>
-      <td style="text-align: left;" rowspan=2 id="${element.teams.home.id}">${
-      element.teams.home.name
-    }</td>
-      <td style="text-align: center;" rowspan=2><img src=${imagePath(
-        element.teams.home.id
-      )} alt="*${element.teams.home.name}*" width="30px"></td>
-      <td style="text-align: center; font-weight: bold">${
-        !isNaN(parseInt(element.goals.home)) ? element.goals.home : ""
-      }</td>
+      ${thisDate}
+      <td style="text-align: left;" rowspan=2 id="${element.teams.home.id}">${element.teams.home.name}</td>
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.home.id)} alt="*${element.teams.home.name}*" width="40px"></td>
+      <td style="text-align: center; font-weight: bold">${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
       <td style="text-align: center;" rowspan=2> - </td>
-      <td style="text-align: center; font-weight: bold">${
-        !isNaN(parseInt(element.goals.away)) ? element.goals.away : ""
-      }</td>
-      <td style="text-align: center;" rowspan=2><img src=${imagePath(
-        element.teams.away.id
-      )} alt="*${element.teams.away.name}*" width="30px">
-      <td style="text-align: left;" rowspan=2 id="${
-        element.teams.away.id
-      }">${truncate(element.teams.away.name, 19)}</td>
+      <td style="text-align: center; font-weight: bold">${!isNaN(parseInt(element.goals.away)) ? element.goals.away : ""}</td>
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.away.id)} alt="*${element.teams.away.name}*" width="40px">
+      <td style="text-align: left;" rowspan=2 id="${element.teams.away.id}">${truncate(element.teams.away.name, 19)}</td>
       ${thisID}
     </tr>
     <tr>
-      <td style="text-align: center;">${date.getUTCHours()} : ${
-      (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
-    }</td>
-      <td style="text-align: center;">(${
-        element.statistics ? element.statistics[0]?.statistics[16].value : ""
-      })</td>
-      <td style="text-align: center;">(${
-        element.statistics ? element.statistics[1]?.statistics[16].value : ""
-      })</td>
+      ${thisTime}
+      <td style="text-align: center;">(${element.statistics ? element.statistics[0]?.statistics[16].value : ""})</td>
+      <td style="text-align: center;">(${element.statistics ? element.statistics[1]?.statistics[16].value : ""})</td>
     </tr>`;
   });
 
-  addToPage += `</table>`;
+  addToPage += `</tbody></table>`;
+
   document.getElementById("league-name").innerHTML = leagueName;
   document.getElementById("league-id").innerHTML = leagueID;
   document.getElementById("round-no").innerHTML = round;
@@ -101,6 +91,7 @@ export function matchList(fixtures, showID = false) {
 
 export function matchesToCanvas(sourceDiv) {
   let matchesTable = document.getElementById(sourceDiv);
+  matchesTable.deleteRow(0);
   var rowCount = matchesTable.rows.length;
   let thisTr;
   let isResult = true;
@@ -200,6 +191,6 @@ function addImgToArray(xPos, logo, i) {
     img: imgs.clubs[logo],
     imgHeight: 50,
     startX: xPos,
-    startY: yPos + 16 + i * 77,
+    startY: yPos + 16 + i * 72,
   });
 }
