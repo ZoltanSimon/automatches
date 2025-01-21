@@ -1,7 +1,8 @@
 import { readFile } from "fs/promises";
 import { Player } from "./../classes/player.js";
 import * as fs from "fs";
-import { networkPath } from "./config.js";
+import { networkPath, miniPC } from "./config.js";
+import mysql from "mysql2/promise";
 
 const cache = new Map();
 let allPlayers = [];
@@ -9,9 +10,37 @@ export const matchesDir = `${networkPath}matches`;
 export const leaguesDir = `${networkPath}leagues`;
 export const dataDir = `${networkPath}`;
 
-export const players = JSON.parse(
-  await readFile(`${dataDir}players.json`, "utf-8")
-);
+// Database connection details
+const dbConfig = {
+  host: miniPC,
+  user: "football_user",
+  password: "password",
+  database: "football_db",
+};
+
+export let players = [];
+
+async function loadPlayers() {
+  let connection;
+
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM Player");
+    players = rows; // Update the in-memory cache
+    console.log("Players loaded from the database:", players);
+  } catch (error) {
+    console.error("Error loading players from the database:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+}
+
+(async () => {
+  await loadPlayers();
+})();
 
 export function getPlayerByID(playerID) {
   return players.find((element) => element.id == playerID);

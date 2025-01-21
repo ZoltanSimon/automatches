@@ -19,7 +19,10 @@ export function playerGoalList(response, big) {
   if (!tableBody) {
     console.error("Table body not found! Ensure the table has a <tbody> element.");
     return;
+  } else {
+    table.style.visibility = 'visible';
   }
+  
   for (let i = 0; i < response.length; i++) {
     thisPlayer = response[i];
     loadClubLogo(thisPlayer.club);

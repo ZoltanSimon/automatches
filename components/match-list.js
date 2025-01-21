@@ -58,18 +58,18 @@ export function matchList(fixtures, showID = false) {
     <tr>
       ${thisDate}
       <td style="text-align: left;" rowspan=2 id="${element.teams.home.id}">${element.teams.home.name}</td>
-      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.home.id)} alt="*${element.teams.home.name}*" width="40px"></td>
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.home.id)} alt="*${element.teams.home.name}*" width="44px"></td>
       <td style="text-align: center; font-weight: bold">${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
       <td style="text-align: center;" rowspan=2> - </td>
       <td style="text-align: center; font-weight: bold">${!isNaN(parseInt(element.goals.away)) ? element.goals.away : ""}</td>
-      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.away.id)} alt="*${element.teams.away.name}*" width="40px">
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.away.id)} alt="*${element.teams.away.name}*" width="44px">
       <td style="text-align: left;" rowspan=2 id="${element.teams.away.id}">${truncate(element.teams.away.name, 19)}</td>
       ${thisID}
     </tr>
     <tr>
       ${thisTime}
-      <td style="text-align: center;">(${element.statistics ? element.statistics[0]?.statistics[16].value : ""})</td>
-      <td style="text-align: center;">(${element.statistics ? element.statistics[1]?.statistics[16].value : ""})</td>
+      <td style="text-align: center;">(${element.statistics?.[0]?.statistics?.[16]?.value || ""})</td>
+      <td style="text-align: center;">(${element.statistics?.[1]?.statistics?.[16]?.value || ""})</td>
     </tr>`;
   });
 

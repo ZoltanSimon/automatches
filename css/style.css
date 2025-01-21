@@ -190,6 +190,7 @@ footer p {
   grid-column: 1 / 3; /* Span across both columns */
   grid-row: 2 / 3; /* Second row */
   padding-top: 6px;
+  visibility: hidden; /* Hide the table by default */
 }
 
 .main-table-header { 

@@ -51,6 +51,10 @@ app.get("/players", (req, res) => {
   res.render("players", { title: "Players" });
 });
 
+app.get("/compare-players", (req, res) => {
+  res.render("compare-players", { title: "Compare Players" });
+});
+
 app.get("/teams", (req, res) => {
   res.render("teams", { title: "Teams" });
 });

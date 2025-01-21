@@ -46,8 +46,10 @@ function createTeamsTable(response, onlyTotal, big) {
   if (!tableBody) {
     console.error("Table body not found! Ensure the table has a <tbody> element.");
     return;
+  } else {
+    table.style.visibility = 'visible';
   }
-  
+
   for (let i = 0; i < response.length; i++) {
     const thisTeam = response[i];
     if (thisTeam) {
