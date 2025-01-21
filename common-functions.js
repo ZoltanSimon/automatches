@@ -69,24 +69,16 @@ export function copyToClipboard(element) {
 }
 
 export async function showMatchesOnDate(date, showID) {
-  let matches = [];
   let downloads = 0;
 
-  for (let league of allLeagues) {
-    let leagueMatches = await fetch(`get-league?leagueID=${league.id}`);
-    let leagueData = await leagueMatches.json();
+  let allLeaguematches = await fetch(`get-todays-matches`);
+  let matches = await allLeaguematches.json();
+  
+  for (let match of matches) {
+    let fixtureDate = new Date(match.fixture.date);
+    const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
 
-    for (let match of leagueData) {
-      let fixtureDate = new Date(match.fixture.date);
-
-      if (fixtureDate.toDateString() !== date.toDateString()) continue;
-
-      const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
-      if (matchEnd >= new Date()) {
-        matches.push(match);
-        continue;
-      }
-
+    if (matchEnd <= new Date()) {
       let cachedMatch = await matchExists(match.fixture.id);
       if (cachedMatch) {
         updateOrAddMatch(matches, cachedMatch[0]);

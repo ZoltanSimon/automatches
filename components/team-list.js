@@ -15,7 +15,7 @@ export function teamList(
   addMatches = true;
   createTeamsTable(response, onlyTotal, big);
 
-  let matchesTable = document.getElementById("match-list");
+  /*let matchesTable = document.getElementById("match-list");
   let allPlayingTeams = [];
 
   if (matchesTable && addMatches) {
@@ -25,11 +25,11 @@ export function teamList(
         team1 = findTeamById(response, thisTr.children[1].id);
         team2 = findTeamById(response, thisTr.children[7].id);
         allPlayingTeams.push(team1, team2);
-        //predictions(team1, team2);
+        predictions(team1, team2);
       }
     }
-    //createTeamsTable(allPlayingTeams, onlyTotal);
-  }
+    createTeamsTable(allPlayingTeams, onlyTotal);
+  }*/
 }
 
 function createTeamsTable(response, onlyTotal, big) {

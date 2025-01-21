@@ -221,9 +221,22 @@ app.get("/match-exists", async (request, response) => {
   response.json(null);
 });
 
-app.get("/get-league", async (request, response) => {
-  let leagueID = request.query.leagueID;
-  response.json(await getLeagueFromServer(leagueID));
+app.get("/get-todays-matches", async (request, response) => {
+  let todaysMatches = [];
+
+  for (let i=0; i<allLeagues.length; i++) {
+    let leagueID = allLeagues[i].id;
+    let data = await getLeagueFromServer(leagueID);
+
+    for (const element of data) {
+      let fixtureDate = new Date(element.fixture.date);
+      let todaysDate = new Date();
+      if (fixtureDate.toDateString() === todaysDate.toDateString()) {
+        todaysMatches.push(element);
+      }
+    }
+  }
+  response.json(todaysMatches);
 });
 
 app.get("/find-player-by-id", async (request, response) => {
