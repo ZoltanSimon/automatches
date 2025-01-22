@@ -12,6 +12,7 @@ import {
   getLeagueFromServer,
   writeLeagueToServer,
   players,
+  buildTeamList
 } from "./backend/json-reader.js";
 import { createRequire } from "module";
 import path from "path";
@@ -154,7 +155,7 @@ app.get("/missing-matches", async (request, response) => {
   response.json(matchArr);
 });
 
-app.get("/get-league-matches", async (request, response) => {
+app.get("/get-teams", async (request, response) => {
   let allMatches = [];
   let leagues = request.query.leagueID.split(",");
   let matchID;
@@ -182,7 +183,7 @@ app.get("/get-league-matches", async (request, response) => {
         }
       }
     }
-    response.json(allMatches);
+    response.json(buildTeamList(allMatches));
   }
 });
 

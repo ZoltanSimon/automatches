@@ -1,6 +1,4 @@
-import { allLeagues } from "./data/leagues.js";
 import { matchList } from "./components/match-list.js";
-import { buildTeamList } from "./local-handler.js";
 import { loadPlayerFace } from "./instapics.js";
 import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
@@ -119,7 +117,10 @@ export async function getTopPlayers(leagues, amount, big) {
 }
 
 export async function getTopTeams(leagues, amount, big) {
-  let dasTeams = await buildTeamList(leagues);
+  const response = await fetch(
+    `/get-teams?leagueID=${leagues.join(",")}`
+  );
+  const dasTeams = await response.json();
 
   dasTeams.sort((a, b) =>
     a.last5PerGame.points < b.last5PerGame.points

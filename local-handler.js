@@ -82,63 +82,6 @@ export async function getAllPlayers() {
   }
 }
 
-export async function buildTeamList(leagues) {
-  let teams = [];
-
-  try {
-    const response = await fetch(
-      `/get-league-matches?leagueID=${leagues.join(",")}`
-    );
-    const data = await response.json();
-
-    data.forEach((match) => {
-      if (match != null) {
-        const team1Data = match.teams.home;
-        const team2Data = match.teams.away;
-
-        const team1 = findOrCreateTeam(teams, team1Data);
-        const team2 = findOrCreateTeam(teams, team2Data);
-
-        if (match.statistics[0]) {
-          const stats1 = extractStats(match, 0, 1);
-          const stats2 = extractStats(match, 1, 0);
-
-          team1.stats.push(stats1);
-          team2.stats.push(stats2);
-        }
-      }
-    });
-
-    teams.forEach((team) => team.calculateStats());
-    return teams;
-  } catch (error) {
-    console.error("Failed to fetch and build team list:", error);
-    return [];
-  }
-}
-
-function findOrCreateTeam(teams, teamData) {
-  let team = teams.find((t) => t.name === teamData.name);
-  if (!team) {
-    team = new Team(teamData);
-    teams.push(team);
-  }
-  return team;
-}
-
-function extractStats(match, teamIndex, opponentIndex) {
-  return {
-    goalsFor: match.score.fulltime[teamIndex === 0 ? "home" : "away"],
-    goalsAgainst: match.score.fulltime[teamIndex === 0 ? "away" : "home"],
-    corners: match.statistics[teamIndex].statistics[7].value,
-    cornersAgainst: match.statistics[opponentIndex].statistics[7].value,
-    shotsOnGoal: match.statistics[teamIndex].statistics[0].value,
-    shotsOnGoalAgainst: match.statistics[opponentIndex].statistics[0].value,
-    xG: parseFloat(match.statistics[teamIndex].statistics[16].value),
-    xGA: parseFloat(match.statistics[opponentIndex].statistics[16].value),
-  };
-}
-
 export async function getResultsByRoundLocal(leagueID, roundNo) {
   let allGames = [];
   const response = await fetch(`/get-league-matches?leagueID=${leagueID}`);

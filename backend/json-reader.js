@@ -3,6 +3,7 @@ import { Player } from "./../classes/player.js";
 import * as fs from "fs";
 import { networkPath, miniPC } from "./config.js";
 import mysql from "mysql2/promise";
+import { findOrCreateTeam, extractStats } from "./backend-helper.js";
 
 const cache = new Map();
 let allPlayers = [];
@@ -208,4 +209,33 @@ export async function getAllPlayers(compType, compList, nationList) {
     }
   }
   return allPlayers;
+}
+
+export function buildTeamList(data) {
+  let teams = [];
+  try {
+    data.forEach((match) => {
+      if (match != null) {
+        const team1Data = match.teams.home;
+        const team2Data = match.teams.away;
+
+        const team1 = findOrCreateTeam(teams, team1Data);
+        const team2 = findOrCreateTeam(teams, team2Data);
+
+        if (match.statistics[0]) {
+          const stats1 = extractStats(match, 0, 1);
+          const stats2 = extractStats(match, 1, 0);
+
+          team1.stats.push(stats1);
+          team2.stats.push(stats2);
+        }
+      }
+    });
+
+    teams.forEach((team) => team.calculateStats());
+    return teams;
+  } catch (error) {
+    console.error("Failed to fetch and build team list:", error);
+    return [];
+  }
 }
