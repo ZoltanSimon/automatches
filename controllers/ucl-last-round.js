@@ -70,17 +70,29 @@ document.querySelectorAll(".score-pred").forEach(input => {
                 points.innerHTML = team.total.points + 3; 
                 opPoints.innerHTML = opponent.total.points;
                 wins.innerHTML = team.wins + 1;
+                opWins.innerHTML = opponent.wins;
+                losses.innerHTML = team.losses;
                 opLosses.innerHTML = opponent.losses + 1;
+                draws.innerHTML = team.draws;
+                opDraws.innerHTML = opponent.draws;
             } else if (opponentScore > teamScore) {
                 points.innerHTML = team.total.points;
                 opPoints.innerHTML = opponent.total.points + 3;
                 losses.innerHTML = team.losses + 1;
+                wins.innerHTML = team.wins;
+                draws.innerHTML = team.draws;
+                opLosses.innerHTML = opponent.losses;
                 opWins.innerHTML = opponent.wins + 1;
+                opDraws.innerHTML = opponent.draws;
             } else if (teamScore === opponentScore) {
-                points.innerHTML = team.total.points + 3
+                points.innerHTML = team.total.points + 1
                 opPoints.innerHTML = opponent.total.points + 1;
                 draws.innerHTML = team.draws + 1;
                 opDraws.innerHTML = opponent.draws + 1;
+                wins.innerHTML = team.wins;
+                opWins.innerHTML = opponent.wins;
+                losses.innerHTML = team.losses;
+                opLosses.innerHTML = opponent.losses;
             }
             goalsFor.innerHTML = team.total.goals + teamScore;
             opGoalsFor.innerHTML = opponent.total.goals + opponentScore;
