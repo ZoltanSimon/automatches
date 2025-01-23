@@ -128,7 +128,7 @@ footer p {
   font-size: 12;
 }
 
-.rectangle {
+.rectangle, #left, #right {
   display: grid;
   grid-template-columns: 1fr auto; /* Title and link side by side */
   padding: 20px;
@@ -250,8 +250,34 @@ td .form-indicator:last-child {
   border-right: 1px solid #f1faee;
 }
 
+.list-header2 {
+  text-align: center;
+  padding: 2px;
+  border-right: 1px solid #f1faee;
+}
+
 .top-row {
   border-bottom: 1px solid #f1faee;
+}
+
+#ucl-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal-sized columns */
+  width: 1200px;
+  gap: 10px; /* Optional: spacing between the columns */
+  margin: 0 auto; /* This will center it horizontally */
+  place-items: center; /* Centers both horizontally and vertically */
+}
+
+#left,
+#right {
+  border: 1px solid #ccc; /* Optional: border for visibility */
+  padding: 10px;          /* Optional: inner spacing */
+  height: 100%;           /* Ensure both sides stretch equally */
+}
+
+.score-pred {
+  width: 50px;
 }
 
 @media (max-width: 1820px) {
@@ -259,7 +285,7 @@ td .form-indicator:last-child {
     padding-left: 0;
     padding-right: 0;
   }
-  .container {
+  .container, #ucl-container {
     width: 100%;
     gap: 10px;
     padding-left: 0;
@@ -294,11 +320,11 @@ td .form-indicator:last-child {
 }
 
 @media (max-width: 1100px) {
-  .container {
+  .container, #ucl-container {
     grid-template-columns: 1fr; /* Switch to a single column */
     width: 100%;
   }
-  .rectangle {
+  .rectangle, #left, #right {
     padding-left: 6px;
     padding-right: 6px;
   }

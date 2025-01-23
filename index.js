@@ -68,6 +68,10 @@ app.get("/starting11", (req, res) => {
   res.render("palya", { title: "Starting 11 Builder" });
 });
 
+app.get("/ucl-last-round", (req, res) => {
+  res.render("ucl-last-round", { title: "UCL Last Round simulation" });
+});
+
 app.listen(PORT, () => {
   console.log("Server Listening on PORT:", PORT);
 });
@@ -156,35 +160,46 @@ app.get("/missing-matches", async (request, response) => {
 });
 
 app.get("/get-teams", async (request, response) => {
-  let allMatches = [];
   let leagues = request.query.leagueID.split(",");
+  let date = request.query.date;
+  let allMatches = [];
   let matchID;
+  let filterDate;
 
-  if (leagues.length == 0 || !(leagues[0] > 0)) {
-    return response.json([]);
+  if (date) {
+    const [day, month, year] = date.split("-").map(Number);
+    filterDate = new Date(year, month - 1, day);
+    if (isNaN(filterDate.getTime())) {
+      return response.status(400).json({ success: false, message: "Invalid date format. Use 'DD-MM-YYYY'." });
+    }
   } else {
-    for (let i = 0; i < leagues.length; i++) {
-      let leagueID = leagues[i];
-      let data = await getLeagueFromServer(leagueID);
-      for (const element of data) {
-        if (["FT", "AET"].includes(element.fixture.status.short)) {
-          matchID = element.fixture.id;
-          try {
-            let data2 = await getMatchFromServer(matchID);
-            if (data2 && data2[0]) {
-                allMatches.push(data2[0]);
-            } else {
-                console.warn(`No data found for matchID: ${matchID}`);
-            }
+    filterDate = new Date(2000, 0, 1); // January 1, 2000
+  }
+
+  for (let i = 0; i < leagues.length; i++) {
+    let leagueID = leagues[i];
+    let data = await getLeagueFromServer(leagueID);
+    for (const element of data) {
+      let thisFixture = element.fixture;
+      let fixtureDate = new Date(thisFixture.date);
+      if (["FT", "AET"].includes(thisFixture.status.short) && fixtureDate > filterDate) {
+        matchID = thisFixture.id;
+        try {
+          let data2 = await getMatchFromServer(matchID);
+          if (data2 && data2[0]) {
+              allMatches.push(data2[0]);
+          } else {
+              console.warn(`No data found for matchID: ${matchID}`);
+          }
         } catch (error) {
             console.error(`Error fetching match with ID ${matchID}:`, error);
         }
-        
-        }
+      
       }
     }
-    response.json(buildTeamList(allMatches));
   }
+  response.json(buildTeamList(allMatches));
+  
 });
 
 app.get("/get-all-matches", async (request, response) => {
@@ -199,11 +214,26 @@ app.get("/get-all-players", async (request, response) => {
     allLeagues.filter((el) => el.type == "league"),
     allLeagues.filter((el) => el.type == "nt")
   );
-  // Create a 3rd array with elements in allPlayers but not in players
-  const difference = allPlayers.filter(
-    (player) => !players.some((p) => p.id === player.id)
-  );
-  response.json(difference);
+
+  try {
+    // Create a database connection
+    const connection = await mysql.createConnection(dbConfig);
+
+    // Insert players into the database
+    for (const player of allPlayers) {
+      const { id, name, club, nation } = player;
+      await connection.execute(
+        'INSERT IGNORE INTO Player (id, name, club, nation) VALUES (?, ?, ?, ?)',
+        [id, name, club, nation]
+      );
+    }
+
+    await connection.end(); // Close the connection
+    response.status(200).json({ message: 'Players loaded successfully!' }); // Send a success response
+  } catch (error) {
+    response.status(500).json({ error: 'Error loading players.', details: error.message });
+  }
+  
 });
 
 app.get("/get-player-list", async (request, response) => {

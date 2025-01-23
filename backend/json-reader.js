@@ -27,7 +27,7 @@ async function loadPlayers() {
   try {
     connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.query("SELECT * FROM Player");
-    players = rows; // Update the in-memory cache
+    players = rows;
     console.log("Players loaded from the database:", players);
   } catch (error) {
     console.error("Error loading players from the database:", error);
@@ -161,7 +161,6 @@ export async function getAllPlayers(compType, compList, nationList) {
     for (let i = 0; i < league.length; i++) {
       if (league[i].fixture.status.short == "FT") {
         let match = await getMatchFromServer(league[i].fixture.id);
-        console.log(league[i].fixture.id);
         if (match) {
           for (let j = 0; j < match[0].players.length; j++) {
             thisClub = match[0].players[j].team.id;
@@ -191,17 +190,20 @@ export async function getAllPlayers(compType, compList, nationList) {
     );
 
     for (let i = 0; i < nt.length; i++) {
-      let match = await getMatchFromServer(nt[i].fixture.id);
-      if (match) {
-        for (let j = 0; j < match[0].players.length; j++) {
-          let thisNation = match[0].players[j].team.id;
-          for (let k = 0; k < match[0].players[j].players.length; k++) {
-            let id = match[0].players[j].players[k].player.id;
+      if (nt[i].fixture.status.short == "FT") {
+        let match = await getMatchFromServer(nt[i].fixture.id);
+        if (match) {
+          for (let j = 0; j < match[0].players.length; j++) {
+            let thisNation = match[0].players[j].team.id;
+            for (let k = 0; k < match[0].players[j].players.length; k++) {
+              let player = match[0].players[j].players[k].player;
 
-            let playerFound = allPlayers.find((e) => e.id == id);
-            if (!playerFound) {
-            } else {
-              allPlayers.find((e) => e.id == id).nation = thisNation;
+              let playerFound = allPlayers.find((e) => e.id == player.id);
+              if (!playerFound) {
+                allPlayers.push({ id: player.id, name: player.name, club: 0, nation: thisNation });
+              } else {
+                allPlayers.find((e) => e.id == player.id).nation = thisNation;
+              }
             }
           }
         }

@@ -4,10 +4,35 @@ import {
   loadClubLogo,
   writeStrokedText,
   ctx,
+  loadCompLogo,
 } from "../instapics.js";
 import { clubs } from "./../data/clubs.js";
 import { imagePath, removeNewlines, truncate } from "./../common-functions.js";
 import { darkColor } from "../common-styles.js";
+import { allLeagues } from "../data/leagues.js";
+import { buildStandings } from "../autotext.js";
+
+export async function standingsFromTeamList(selectedLeague) {
+  const found = allLeagues.find((element) => element.id == selectedLeague);
+
+  if (document.getElementById("league-name")) {
+    document.getElementById("league-name").innerHTML = found.name;
+  }
+  
+  if (document.getElementById("league-id")) {
+    document.getElementById("league-id").innerHTML = found.id;
+  }
+  
+  const response = await fetch(
+    `/get-teams?leagueID=${found.id}&date=01-09-2024`
+  );
+  const standingsFromApi = await response.json();
+  standingsFromApi.sort((a, b) => (b.total.goals-b.total.goalsAgainst) - (a.total.goals-a.total.goalsAgainst)); 
+  standingsFromApi.sort((a, b) => b.total.points - a.total.points); 
+  loadCompLogo(found.id);
+  return standingsFromApi;
+  //buildStandings(standingsFromApi);
+}
 
 export function leagueStandings(standings) {
   let addToPage = ``;
@@ -15,26 +40,27 @@ export function leagueStandings(standings) {
 
   addToPage += `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="league-standings">
         <thead>    
-        <tr style="border-bottom: 2px solid #1D3557">
-        <th style="width:48px;"><b>#</b></th>
-        <th style="width:274px;" colspan="2"><b>Team</b></th>
-        <th style="width:52px;"><b>P</b></th>
-        <th style="width:52px;"><b>W</b></th>
-        <th style="width:52px;"><b>D</b></th>
-        <th style="width:52px;"><b>L</b></th>
-        <th style="width:90px;"><b>Goals</b></th>
-        <th style="width:86px;"><b>xG</b></th>
-        <th style="width:96px; padding: 4px;" colspan=5><b>Form</b></th>
-        <th style="width:58px;"><b>Pts</b></th>
-      </tr>
-      </thead><tbody>`;
+          <tr style="border-bottom: 2px solid #1D3557" class="main-table-header">
+            <th style="width:48px;" class="list-header"><b>#</b></th>
+            <th style="width:274px;" class="list-header" colspan="2"><b>Team</b></th>
+            <th style="width:52px;" class="list-header"><b>P</b></th>
+            <th style="width:52px;" class="list-header"><b>W</b></th>
+            <th style="width:52px;" class="list-header"><b>D</b></th>
+            <th style="width:52px;" class="list-header"><b>L</b></th>
+            <th style="width:45px;" class="list-header"><b>GF</b></th>
+            <th style="width:45px;" class="list-header"><b>GA</b></th>
+            <th style="width:90px;" class="list-header"><b>xG</b></th>
+            <th style="width:96px; padding: 4px;" class="list-header" colspan=5><b>Form</b></th>
+            <th style="width:58px;" class="list-header"><b>Pts</b></th>
+          </tr>
+        </thead><tbody>`;
 
   for (let i = 0; i < standings.length; i++) {
     let team = standings[i];
     let form = team.form.split("");
     loadClubLogo(team.id);
     addToPage += `
-      <tr>
+      <tr data-id=${team.id}>
       <td style="padding:6px; text-align: center; font-weight: bold">${i + 1}</td>
       <td style="width:36px; padding: 4px; text-align: center;"><img src="${imagePath(
         team.id
@@ -48,7 +74,8 @@ export function leagueStandings(standings) {
       ${tds}${team.wins}</td>
       ${tds}${team.draws}</td>
       ${tds}${team.losses}</td>
-      ${tds}${team.total.goals} : ${team.total.goalsAgainst}</td>
+      ${tds}${team.total.goals}</td>
+      ${tds}${team.total.goalsAgainst}</td>
       ${tds}${team.total.xG.toFixed(
         0
       )} : ${team.total.xGA.toFixed(0)}</td>`;

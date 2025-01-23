@@ -9,18 +9,17 @@ import {
   getAllPlayers,
   getResultsByRoundLocal,
   downloadMatch,
-  buildTeamList,
   findPlayerByID,
 } from "../local-handler.js";
 import { allLeagues } from "../data/leagues.js";
 import { clubs } from "../data/clubs.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
-import { loadCompLogo, make_base, fontY } from "../instapics.js";
+import { make_base, fontY } from "../instapics.js";
 import {
-  leagueStandings,
+  standingsFromTeamList,
   standingsToCanvas,
 } from "../components/league-standings.js";
-import { addText, buildResults, buildStandings } from "../autotext.js";
+import { addText, buildResults } from "../autotext.js";
 import { teamList } from "../components/team-list.js";
 import { playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
@@ -68,18 +67,6 @@ async function submitRequest_matchList() {
   });
 }
 
-async function submitRequest_leagueInfo() {
-  const found = allLeagues.find((element) => element.id == selectedLeagues[0]);
-  document.getElementById("league-name").innerHTML = found.name;
-  document.getElementById("league-id").innerHTML = found.id;
-  let standingsFromApi = await buildTeamList(selectedLeagues);
-  console.log(standingsFromApi);
-  standingsFromApi.sort((a, b) => b.total.points - a.total.points); // b - a for reverse sort
-  loadCompLogo(found.id);
-  leagueStandings(standingsFromApi);
-  buildStandings(standingsFromApi);
-}
-
 async function matchesByRound() {
   let leagueID = selectedLeagues[0];
   let roundNumber = document.getElementById("roundnr").value;
@@ -93,7 +80,6 @@ async function matchesByRound() {
 }
 
 document.getElementById("select-all-leagues").onclick = function () {
-  console.log("ide");
   const allTheLeagues = document
     .getElementById("league-list")
     .querySelectorAll("img");
@@ -105,7 +91,7 @@ document.getElementById("select-all-leagues").onclick = function () {
 };
 
 document.getElementById("submit-league-info").onclick = async function () {
-  await submitRequest_leagueInfo();
+  leagueStandings(await standingsFromTeamList(selectedLeagues[0]));
 };
 
 document.getElementById("get-matches-by-round").onclick = async function () {

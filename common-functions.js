@@ -133,10 +133,10 @@ export async function getTopTeams(leagues, amount, big) {
   teamList(dasTeams.slice(0, amount), true, false, big);
 }
 
-export function sortTable(n, td, table, startingRow = 1) {
+export function sortTable(n, td, table, startingRow = 1, toSwitch = true, secondaryColumn = null, thirdColumn = null) {
   let rows,
     switching = true,
-    dir = "asc",
+    dir = "desc",
     switchcount = 0;
 
   while (switching) {
@@ -144,10 +144,36 @@ export function sortTable(n, td, table, startingRow = 1) {
     rows = table.rows;
 
     for (let i = startingRow; i < rows.length - 1; i++) {
-      let x = rows[i].getElementsByTagName("TD")[n];
-      let y = rows[i + 1].getElementsByTagName("TD")[n];
-      let shouldSwitch = (dir === "asc" && parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) || (dir === "desc" && parseFloat(x.innerHTML) < parseFloat(y.innerHTML));
-      
+      const x = parseFloat(rows[i].getElementsByTagName("TD")[n].innerHTML);
+      const y = parseFloat(rows[i + 1].getElementsByTagName("TD")[n].innerHTML);
+      let shouldSwitch = false;
+
+      let secondaryX = null,
+        secondaryY = null,
+        thirdX = null,
+        thirdY = null;
+
+      if (secondaryColumn !== null && thirdColumn !== null) {
+        secondaryX = parseFloat(rows[i].getElementsByTagName("TD")[secondaryColumn].innerHTML);
+        secondaryY = parseFloat(rows[i + 1].getElementsByTagName("TD")[secondaryColumn].innerHTML);
+        thirdX = parseFloat(rows[i].getElementsByTagName("TD")[thirdColumn].innerHTML);
+        thirdY = parseFloat(rows[i + 1].getElementsByTagName("TD")[thirdColumn].innerHTML);
+      }
+
+      if (dir === "asc") {
+        if (x > y) {
+          shouldSwitch = true;
+        } else if (x === y && secondaryColumn !== null && thirdColumn !== null) {
+          shouldSwitch = (secondaryX - thirdX) > (secondaryY - thirdY);
+        }
+      } else if (dir === "desc") {
+        if (x < y) {
+          shouldSwitch = true;
+        } else if (x === y && secondaryColumn !== null && thirdColumn !== null) {
+          shouldSwitch = (secondaryX - thirdX) < (secondaryY - thirdY);
+        }
+      }
+
       if (shouldSwitch) {
         rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
         switching = true;
@@ -155,11 +181,15 @@ export function sortTable(n, td, table, startingRow = 1) {
         break;
       }
     }
-    if (!switching && dir === "asc" && switchcount === 0) {
-      dir = "desc";
-      switching = true;
+
+    if (toSwitch) {
+      if (!switching && dir === "desc" && switchcount === 0) {
+        dir = "asc";
+        switching = true;
+      }
     }
   }
+
   td.classList.add(dir);
 }
 
