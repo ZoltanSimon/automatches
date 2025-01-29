@@ -3,6 +3,7 @@ import mysql from 'mysql2/promise'; // Use import syntax
 // Example database connection and JSON loading code:
 import fs from 'fs/promises'; // For reading the JSON file
 import { miniPC, networkPath } from './config.js';
+import { pathToFileURL } from 'url';
 
 // Database connection settings
 const dbConfig = {
@@ -38,4 +39,34 @@ async function loadPlayers() {
   }
 }
 
-loadPlayers();
+async function loadClubs() {
+  try {
+    // Convert the network path to a file URL
+    const fileURL = pathToFileURL(networkPath + 'clubs.js');
+
+    // Dynamically import the clubs array from clubs.js
+    const { clubs } = await import(fileURL.href);
+
+    // Create a database connection
+    const connection = await mysql.createConnection(dbConfig);
+
+    // Insert clubs into the database
+    for (const club of clubs) {
+      const { id, name } = club;
+      await connection.execute(
+        'INSERT IGNORE INTO Team (ID, name) VALUES (?, ?)',
+        [id, name]
+      );
+    }
+
+    console.log('Clubs loaded successfully!');
+    await connection.end(); // Close the connection
+  } catch (error) {
+    console.error('Error loading clubs:', error);
+  }
+}
+
+
+
+//loadPlayers();
+loadClubs();

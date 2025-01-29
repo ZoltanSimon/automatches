@@ -20,6 +20,7 @@ const dbConfig = {
 };
 
 export let players = [];
+export let teams = [];
 
 async function loadPlayers() {
   let connection;
@@ -39,8 +40,27 @@ async function loadPlayers() {
   }
 }
 
+async function loadTeams() {
+  let connection;
+
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM Team");
+    teams = rows;
+    console.log("Team loaded from the database:", teams);
+  } catch (error) {
+    console.error("Error loading teams from the database:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+}
+
 (async () => {
   await loadPlayers();
+  await loadTeams();
 })();
 
 export function getPlayerByID(playerID) {

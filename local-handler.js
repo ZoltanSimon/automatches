@@ -82,18 +82,6 @@ export async function getAllPlayers() {
   }
 }
 
-export async function getResultsByRoundLocal(leagueID, roundNo) {
-  let allGames = [];
-  const response = await fetch(`/get-league-matches?leagueID=${leagueID}`);
-  const league = await response.json();
-  for (let i = 0; i < league.length; i++) {
-    if (league[i].league.round == roundNo) {
-      allGames.push(league[i]);
-    }
-  }
-  return allGames;
-}
-
 export async function downloadMatch(fixtureID) {
   if (fixtureID instanceof PointerEvent) {
     fixtureID = fixtureID.target.innerHTML;

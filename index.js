@@ -11,7 +11,6 @@ import {
   getAllPlayers,
   getLeagueFromServer,
   writeLeagueToServer,
-  players,
   buildTeamList
 } from "./backend/json-reader.js";
 import { createRequire } from "module";
@@ -273,4 +272,12 @@ app.get("/get-todays-matches", async (request, response) => {
 app.get("/find-player-by-id", async (request, response) => {
   let playerID = request.query.playerID;
   response.json(await getPlayerByID(playerID));
+});
+
+app.get("/get-matches-by-round", async (request, response) => {
+  let leagueID = request.query.leagueID;
+  let round = request.query.roundNo;
+  let data = await getLeagueFromServer(leagueID);
+  let matches = data.filter((element) => element.league.round == round);
+  response.json(matches);
 });

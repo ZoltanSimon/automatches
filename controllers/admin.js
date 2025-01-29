@@ -7,17 +7,16 @@ import {
   selectedLeagues,
   getLocalPlayerStats,
   getAllPlayers,
-  getResultsByRoundLocal,
   downloadMatch,
   findPlayerByID,
 } from "../local-handler.js";
 import { allLeagues } from "../data/leagues.js";
-import { clubs } from "../data/clubs.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
 import { make_base, fontY } from "../instapics.js";
 import {
   standingsFromTeamList,
   standingsToCanvas,
+  leagueStandings
 } from "../components/league-standings.js";
 import { addText, buildResults } from "../autotext.js";
 import { teamList } from "../components/team-list.js";
@@ -70,13 +69,11 @@ async function submitRequest_matchList() {
 async function matchesByRound() {
   let leagueID = selectedLeagues[0];
   let roundNumber = document.getElementById("roundnr").value;
-  let resultsFromApi = await getResultsByRoundLocal(
-    leagueID,
-    `Regular Season - ${roundNumber}`
-  );
-  matchList(resultsFromApi, true);
-  addText(resultsFromApi);
-  buildResults(resultsFromApi);
+  const response = await fetch(`/get-matches-by-round?leagueID=${leagueID}&roundNo=${`Regular Season - ${roundNumber}`}`);
+  const matches = await response.json();
+  matchList(matches, true);
+  addText(matches);
+  buildResults(matches);
 }
 
 document.getElementById("select-all-leagues").onclick = function () {
@@ -144,7 +141,7 @@ document.getElementById("get-player-goal-list").onclick = async function () {
   getTopPlayers(selectedLeagues, 10, false);
 };
 
-document.getElementById("get-all-clubs").onclick = async function () {
+/*document.getElementById("get-all-clubs").onclick = async function () {
   let teamsNew = [];
   let homeTeam, awayTeam;
   for (let i = 0; i < allLeagues.length; i++) {
@@ -174,7 +171,7 @@ document.getElementById("get-all-clubs").onclick = async function () {
     return !clubs.some((el) => el.id === obj.id);
   });
   console.log(teamsNew);
-};
+};*/
 
 document.getElementById("get-all-players").onclick = async function () {
   getAllPlayers();

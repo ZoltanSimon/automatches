@@ -5,20 +5,19 @@ import {
   leagueBannerBig,
 } from "../instapics.js";
 import { Stat } from "../classes/stat.js";
-import { clubs } from "./../data/clubs.js";
 import { removeNewlines } from "../common-functions.js";
 
 const tds = `<td width='33%' style='text-align: center; border-color: #1D3557; padding: 10px;'>`;
 
 export function addMatchStats(apiResponse) {
   let statsAPI = apiResponse.statistics;
-  let homeTeamName = statsAPI[0].team.name;
-  let awayTeamName = statsAPI[1].team.name;
+  let homeTeam = statsAPI[0].team;
+  let awayTeam = statsAPI[1].team;
   let addToPage = ``;
   let values;
 
-  loadClubLogo(statsAPI[0].team.id);
-  loadClubLogo(statsAPI[1].team.id);
+  loadClubLogo(homeTeam.id);
+  loadClubLogo(awayTeam.id);
 
   let stats = [];
   stats.push(new Stat("goals", "Score"));
@@ -56,9 +55,9 @@ export function addMatchStats(apiResponse) {
   addToPage = `
   <table id='match-stats' style='border-collapse: collapse; border: 3px solid #1D3557;' border='1'><thead>
   <tr class="main-table-header" style='font-size:30;'>
-  <th style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${homeTeamName}</th>
-  <th style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>*${homeTeamName}* - *${awayTeamName}*</th>
-  <th style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;'>${awayTeamName}</th>
+  <th style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;' id="${homeTeam.id}">${homeTeam.name}</th>
+  <th style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>-</th>
+  <th style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;' id="${awayTeam.id}">${awayTeam.name}</th>
   </tr></thead><tbody>`;
 
   for (let i = 0; i < stats.length; i++) {
@@ -78,34 +77,30 @@ export function addMatchStats(apiResponse) {
     "Regular Season - ",
     "Round "
   )} - ${apiResponse.league.name}</div>`;
-  //1035067
-  //1035093
-  //1038016
-  //1048908
 }
 
 export function matchStatsToCanvas() {
   let imgToAdd = [];
   let statisticsTable = document.getElementById("match-stats");
-  let teamLogos = statisticsTable.rows[0].children[1].innerHTML.split(" - ");
   let yPos = 190;
 
   statisticsTable.rows[0].style.backgroundColor = "#1D3557";
   statisticsTable.rows[0].style.fontWeight = "bold";
   statisticsTable.rows[0].style.color = "#F1FAEE";
 
-  for (let i = 0; i < teamLogos.length; i++) {
-    for (let j = 0; j < clubs.length; j++) {
-      if (teamLogos[i].indexOf(`*${clubs[j].name}*`) > -1) {
-        imgToAdd.push({
-          img: imgs.clubs[clubs[j].id],
-          imgHeight: 56,
-          startX: 490 + i * 106,
-          startY: yPos,
-        });
-      }
-    }
-  }
+  imgToAdd.push({
+    img: imgs.clubs[statisticsTable.rows[0].children[0].id],
+    imgHeight: 56,
+    startX: 490,
+    startY: yPos,
+  });
+
+  imgToAdd.push({
+    img: imgs.clubs[statisticsTable.rows[0].children[2].id],
+    imgHeight: 56,
+    startX: 490 + 106,
+    startY: yPos,
+  });
 
   statisticsTable.rows[0].children[1].innerHTML = "-";
 

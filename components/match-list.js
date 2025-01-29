@@ -6,7 +6,6 @@ import {
   loadCompLogo,
   leagueBannerBig,
 } from "../instapics.js";
-import { clubs } from "./../data/clubs.js";
 import { downloadMatch } from "../local-handler.js";
 import {
   imagePath,
@@ -51,19 +50,22 @@ export function matchList(fixtures, showID = false) {
       thisDate = `<td rowspan=2 style="text-align: center;">${date.getUTCHours()} : ${(date.getMinutes() < 10 ? "0" : "") + date.getMinutes()}</td>`;
     }
 
-    loadClubLogo(element.teams.home.id);
-    loadClubLogo(element.teams.away.id);
+    let homeTeam = element.teams.home;
+    let awayTeam = element.teams.away;
+
+    loadClubLogo(homeTeam.id);
+    loadClubLogo(awayTeam.id);
 
     addToPage += `
     <tr>
       ${thisDate}
-      <td style="text-align: left;" rowspan=2 id="${element.teams.home.id}">${element.teams.home.name}</td>
-      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.home.id)} alt="*${element.teams.home.name}*" width="44px"></td>
+      <td style="text-align: left;" rowspan=2 id="${homeTeam.id}">${homeTeam.name}</td>
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(homeTeam.id)} alt="${homeTeam.name}" id="${homeTeam.id}" width="44px"></td>
       <td style="text-align: center; font-weight: bold">${!isNaN(parseInt(element.goals.home)) ? element.goals.home : ""}</td>
       <td style="text-align: center;" rowspan=2> - </td>
       <td style="text-align: center; font-weight: bold">${!isNaN(parseInt(element.goals.away)) ? element.goals.away : ""}</td>
-      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.away.id)} alt="*${element.teams.away.name}*" width="44px">
-      <td style="text-align: left;" rowspan=2 id="${element.teams.away.id}">${truncate(element.teams.away.name, 19)}</td>
+      <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.away.id)} alt="${awayTeam.name}" id="${awayTeam.id}" width="44px">
+      <td style="text-align: left;" rowspan=2 id="${awayTeam.id}">${truncate(awayTeam.name, 19)}</td>
       ${thisID}
     </tr>
     <tr>
@@ -142,19 +144,15 @@ export function matchesToCanvas(sourceDiv) {
         thisTr.children[0].cellPadding = 2;
       }
 
-      logo1 = clubs.find((element) =>
-        htmlDecode(thisTr.children[2].innerHTML).includes(element.name)
-      );
+      logo1 = thisTr.children[1].id;
 
-      logo2 = clubs.find((element) =>
-        htmlDecode(thisTr.children[6].innerHTML).includes(element.name)
-      );
+      logo2 = thisTr.children[7].id;
 
       thisTr.children[2].innerHTML = "";
       thisTr.children[6].innerHTML = "";
 
-      addImgToArray(494 + notResultGap, logo1.id, i / 2);
-      addImgToArray(714 + notResultGap2, logo2.id, i / 2);
+      addImgToArray(494 + notResultGap, logo1, i / 2);
+      addImgToArray(714 + notResultGap2, logo2, i / 2);
     } else {
       thisTr.children[0].style.fontSize = "22px";
       thisTr.children[1].style.fontSize = "18px";
@@ -172,8 +170,8 @@ export function matchesToCanvas(sourceDiv) {
       ctx.fillStyle = "#e63946";
       ctx.fillText(bottomText, 540, yPos - 22);
     }
-  console.log(matchesTable.outerHTML);
-  buildTableForTableType(
+
+    buildTableForTableType(
     removeNewlines(matchesTable.outerHTML),
     imgToAdd,
     yPos
