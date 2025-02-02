@@ -11,12 +11,12 @@ import {
   getAllPlayers,
   getLeagueFromServer,
   writeLeagueToServer,
-  buildTeamList
+  buildTeamList,
+  allLeagues,
 } from "./backend/json-reader.js";
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
-import { allLeagues } from "./data/leagues.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -107,7 +107,8 @@ app.get("/update-leagues", async (request, response) => {
 
     responseToSend += await writeLeagueToServer(leagueID, dataToWrite.response);
   }
-  response.send(responseToSend);
+  console.log(responseToSend);
+  response.json(responseToSend);
 });
 
 //saves match
@@ -123,7 +124,6 @@ app.get("/save-match", async (request, response) => {
       if (err) {
         console.log(err);
         console.log("Already exists");
-        //throw err;
       }
       response.json(dataToWrite.response);
     }
@@ -280,4 +280,8 @@ app.get("/get-matches-by-round", async (request, response) => {
   let data = await getLeagueFromServer(leagueID);
   let matches = data.filter((element) => element.league.round == round);
   response.json(matches);
+});
+
+app.get("/get-all-leagues", (req, res) => {
+  res.json(allLeagues);
 });

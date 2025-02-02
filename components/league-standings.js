@@ -8,27 +8,24 @@ import {
 } from "../instapics.js";
 import { imagePath, removeNewlines, truncate } from "./../common-functions.js";
 import { darkColor } from "../common-styles.js";
-import { allLeagues } from "../data/leagues.js";
 import { buildStandings } from "../autotext.js";
 
 export async function standingsFromTeamList(selectedLeague) {
-  const found = allLeagues.find((element) => element.id == selectedLeague);
-
   if (document.getElementById("league-name")) {
-    document.getElementById("league-name").innerHTML = found.name;
+    document.getElementById("league-name").innerHTML = document.getElementById(`img-${selectedLeague}`).title;
   }
   
   if (document.getElementById("league-id")) {
-    document.getElementById("league-id").innerHTML = found.id;
+    document.getElementById("league-id").innerHTML = selectedLeague;
   }
   
   const response = await fetch(
-    `/get-teams?leagueID=${found.id}&date=01-08-2024`
+    `/get-teams?leagueID=${selectedLeague}&date=01-08-2024`
   );
   const standingsFromApi = await response.json();
   standingsFromApi.sort((a, b) => (b.total.goals-b.total.goalsAgainst) - (a.total.goals-a.total.goalsAgainst)); 
   standingsFromApi.sort((a, b) => b.total.points - a.total.points); 
-  loadCompLogo(found.id);
+  loadCompLogo(selectedLeague);
   return standingsFromApi;
 }
 

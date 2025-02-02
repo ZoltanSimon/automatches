@@ -10,7 +10,6 @@ import {
   downloadMatch,
   findPlayerByID,
 } from "../local-handler.js";
-import { allLeagues } from "../data/leagues.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
 import { make_base, fontY } from "../instapics.js";
 import {
@@ -23,6 +22,9 @@ import { teamList } from "../components/team-list.js";
 import { playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
+
+const response = await fetch(`/get-all-leagues`);
+const allLeagues = await response.json();
 
 const picker = datepicker(document.querySelector("#calendar"), {
   position: "bl",
@@ -102,21 +104,18 @@ document.getElementById("submit-match-list").onclick = async function () {
 document.getElementById("update-leagues").onclick = async function () {
   let leagueID = selectedLeagues.join(",");
   let seasonsArr = [];
-  console.log(selectedLeagues);
   for (let id of selectedLeagues) {
     seasonsArr.push(allLeagues.find((element) => element.id == id).season);
   }
 
   let seasons = seasonsArr.join(",");
-  console.log(seasons);
-
   const response = await fetch(
     `/update-leagues?leagueID=${leagueID}&seasons=${seasons}`,
     {
       method: "GET",
     }
   );
-  const data = await response.text();
+  const data = await response.json();
   console.log(data);
 };
 

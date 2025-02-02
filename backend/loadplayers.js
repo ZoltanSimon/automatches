@@ -4,6 +4,7 @@ import mysql from 'mysql2/promise'; // Use import syntax
 import fs from 'fs/promises'; // For reading the JSON file
 import { miniPC, networkPath } from './config.js';
 import { pathToFileURL } from 'url';
+import { allLeagues } from "./../data/leagues.js"; // Import the leagues data
 
 // Database connection settings
 const dbConfig = {
@@ -66,7 +67,25 @@ async function loadClubs() {
   }
 }
 
+async function insertLeagues() {
+  const connection = await mysql.createConnection(dbConfig);
 
+  try {
+    const insertQuery = `INSERT INTO League (id, name, season, type) VALUES (?, ?, ?, ?)
+                         ON DUPLICATE KEY UPDATE name=VALUES(name), season=VALUES(season), type=VALUES(type)`;
+
+    for (const league of allLeagues) {
+      await connection.execute(insertQuery, [league.id, league.name, league.season, league.type]);
+      console.log(`Inserted/Updated: ${league.name}`);
+    }
+  } catch (error) {
+    console.error("Error inserting leagues:", error);
+  } finally {
+    await connection.end();
+  }
+}
+
+insertLeagues();
 
 //loadPlayers();
-loadClubs();
+//loadClubs();

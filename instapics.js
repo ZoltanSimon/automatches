@@ -185,7 +185,7 @@ function drawFormBars(formArrays, yPos) {
 
       ctx.fillStyle = color;
       const x = 824 + index * (barWidth + spacing);
-      ctx.fillRect(x, yPos +2+ i * (barHeight + 5), barWidth, barHeight);
+      ctx.fillRect(x, yPos + 44 + i * (barHeight + 5), barWidth, barHeight);
     });
   }
 }

@@ -21,6 +21,7 @@ const dbConfig = {
 
 export let players = [];
 export let teams = [];
+export let allLeagues = [];
 
 async function loadPlayers() {
   let connection;
@@ -58,9 +59,28 @@ async function loadTeams() {
   }
 }
 
+async function loadLeagues() {
+  let connection;
+
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.query("SELECT * FROM League");
+    allLeagues = rows;
+    console.log("League loaded from the database:", teams);
+  } catch (error) {
+    console.error("Error loading leagues from the database:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+}
+
 (async () => {
   await loadPlayers();
   await loadTeams();
+  await loadLeagues();
 })();
 
 export function getPlayerByID(playerID) {
@@ -144,8 +164,8 @@ export async function writeLeagueToServer(leagueID, dataToWrite) {
     if (err) {
       return console.log(err);
     }
-    responseToSend += `${leagueID} was saved!<br/>`;
   });
+  responseToSend += `${leagueID} was saved!<br/>`;
 
   cache.set(file, dataToWrite);
   return responseToSend;
