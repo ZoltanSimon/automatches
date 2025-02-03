@@ -67,11 +67,11 @@ export function copyToClipboard(element) {
 }
 
 export async function showMatchesOnDate(date, showID) {
-  let downloads = 0;
+  //let downloads = 0;
   let allLeaguematches = await fetch(`get-matches-on-day?matchDate=${date}`);
   let matches = await allLeaguematches.json();
   
-  for (let match of matches) {
+  /*for (let match of matches) {
     let fixtureDate = new Date(match.fixture.date);
     const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
 
@@ -85,7 +85,7 @@ export async function showMatchesOnDate(date, showID) {
         downloads++;
       }
     }
-  }
+  }*/
 
   if (matches.length > 0) matchList(matches, showID);
 }

@@ -264,6 +264,14 @@ app.get("/get-matches-on-day", async (request, response) => {
         todaysMatches.push(element);
       }
     }
+
+    for (let i = 0; i < todaysMatches.length; i++) {
+      let matchID = todaysMatches[i].fixture.id;
+      let matchData = await getMatchFromServer(matchID);
+      if (matchData && matchData[0]) {
+        todaysMatches[i] = matchData[0];
+      }
+    }
   }
   response.json(todaysMatches);
 });
