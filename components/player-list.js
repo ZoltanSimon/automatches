@@ -30,7 +30,7 @@ export function playerGoalList(response, big) {
 
     addToPage += `
     <tr>
-      <td id="${thisPlayer.id}" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${thisPlayer.id}.png"</td>
+      <td id="${thisPlayer.id}" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${thisPlayer.id}.png" /></td>
       <td id="${thisPlayer.nation}" class="player-country"><img height="30" src="images/logos/${thisPlayer.nation}.png" /></td">
       <td>${thisPlayer.name}</td>
       <td id="${thisPlayer.club}"><img height="44" src="images/logos/${thisPlayer.club}.png" /></td>
