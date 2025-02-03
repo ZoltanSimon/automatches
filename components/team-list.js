@@ -73,8 +73,8 @@ function createTeamsTable(response, onlyTotal, big) {
         ${tds}${thisTeam.total.goalsAgainst}</td>
         ${tds}${thisTeam.total.xG.toFixed(toFixed)}</td>
         ${tds}${thisTeam.total.xGA.toFixed(toFixed)}</td>
-        ${tds}${thisTeam.total.corners}</td>
-        ${tds}${thisTeam.total.cornersAgainst}</td>
+        <td style="text-align: center;" class="corners">${thisTeam.total.corners}</td>
+        <td style="text-align: center;" class="corners">${thisTeam.total.cornersAgainst}</td>
         ${tds}${thisTeam.total.shotsOnGoal}</td>
         ${tds}${thisTeam.total.shotsOnGoalAgainst}</td>`;
 

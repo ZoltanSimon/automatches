@@ -65,7 +65,7 @@ export function matchList(fixtures, showID = false) {
       <td style="text-align: center;" rowspan=2> - </td>
       <td style="text-align: center; font-weight: bold">${!isNaN(parseInt(element.goals.away)) ? element.goals.away : ""}</td>
       <td style="text-align: center;" rowspan=2><img src=${imagePath(element.teams.away.id)} alt="${awayTeam.name}" id="${awayTeam.id}" width="44px">
-      <td style="text-align: left;" rowspan=2 id="${awayTeam.id}">${truncate(awayTeam.name, 19)}</td>
+      <td style="text-align: left;" rowspan=2 id="${awayTeam.id}">${awayTeam.name}</td>
       ${thisID}
     </tr>
     <tr>

@@ -2,7 +2,7 @@ import { matchList } from "./components/match-list.js";
 import { loadPlayerFace } from "./instapics.js";
 import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
-import { downloadMatch, matchExists } from "./local-handler.js";
+import { downloadMatch } from "./local-handler.js";
 
 export let download = function (canvasName = "myCanvas") {
   var link = document.createElement("a");
@@ -68,8 +68,7 @@ export function copyToClipboard(element) {
 
 export async function showMatchesOnDate(date, showID) {
   let downloads = 0;
-
-  let allLeaguematches = await fetch(`get-todays-matches`);
+  let allLeaguematches = await fetch(`get-matches-on-day?matchDate=${date}`);
   let matches = await allLeaguematches.json();
   
   for (let match of matches) {
@@ -77,7 +76,7 @@ export async function showMatchesOnDate(date, showID) {
     const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
 
     if (matchEnd <= new Date()) {
-      let cachedMatch = await matchExists(match.fixture.id);
+      let cachedMatch = await (await fetch(`/match-exists?matchID=${match.fixture.id}`)).json();
       if (cachedMatch) {
         updateOrAddMatch(matches, cachedMatch[0]);
       } else if (downloads < 10) {

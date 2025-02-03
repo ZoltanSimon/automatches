@@ -1,4 +1,5 @@
 import { Team } from "../classes/team.js";
+
 export function findOrCreateTeam(teams, teamData) {
     let team = teams.find((t) => t.name === teamData.name);
     if (!team) {

@@ -68,16 +68,6 @@ async function submitRequest_matchList() {
   });
 }
 
-async function matchesByRound() {
-  let leagueID = selectedLeagues[0];
-  let roundNumber = document.getElementById("roundnr").value;
-  const response = await fetch(`/get-matches-by-round?leagueID=${leagueID}&roundNo=${`Regular Season - ${roundNumber}`}`);
-  const matches = await response.json();
-  matchList(matches, true);
-  addText(matches);
-  buildResults(matches);
-}
-
 document.getElementById("select-all-leagues").onclick = function () {
   const allTheLeagues = document
     .getElementById("league-list")
@@ -94,7 +84,13 @@ document.getElementById("submit-league-info").onclick = async function () {
 };
 
 document.getElementById("get-matches-by-round").onclick = async function () {
-  await matchesByRound();
+  let leagueID = selectedLeagues[0];
+  let roundNumber = document.getElementById("roundnr").value;
+  const response = await fetch(`/get-matches-by-round?leagueID=${leagueID}&roundNo=${`Regular Season - ${roundNumber}`}`);
+  const matches = await response.json();
+  matchList(matches, true);
+  addText(matches);
+  buildResults(matches);
 };
 
 document.getElementById("submit-match-list").onclick = async function () {

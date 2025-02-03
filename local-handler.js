@@ -94,14 +94,6 @@ export async function downloadMatch(fixtureID) {
   return data;
 }
 
-export async function matchExists(fixtureID) {
-  const response = await fetch(`/match-exists?matchID=${fixtureID}`, {
-    method: "GET",
-  });
-  const data = await response.json();
-  return data;
-}
-
 export async function findPlayerByID(playerID) {
   return await fetch(`/find-player-by-id?playerID=${playerID}`);
 }

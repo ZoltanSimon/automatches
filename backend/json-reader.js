@@ -1,87 +1,15 @@
 import { readFile } from "fs/promises";
 import { Player } from "./../classes/player.js";
 import * as fs from "fs";
-import { networkPath, miniPC } from "./config.js";
-import mysql from "mysql2/promise";
+import { networkPath } from "./config.js";
 import { findOrCreateTeam, extractStats } from "./backend-helper.js";
+import { players } from "./data-access.js";
 
 const cache = new Map();
 let allPlayers = [];
 export const matchesDir = `${networkPath}matches`;
 export const leaguesDir = `${networkPath}leagues`;
 export const dataDir = `${networkPath}`;
-
-// Database connection details
-const dbConfig = {
-  host: miniPC,
-  user: "football_user",
-  password: "password",
-  database: "football_db",
-};
-
-export let players = [];
-export let teams = [];
-export let allLeagues = [];
-
-async function loadPlayers() {
-  let connection;
-
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.query("SELECT * FROM Player");
-    players = rows;
-    console.log("Players loaded from the database:", players);
-  } catch (error) {
-    console.error("Error loading players from the database:", error);
-    throw error;
-  } finally {
-    if (connection) {
-      await connection.end();
-    }
-  }
-}
-
-async function loadTeams() {
-  let connection;
-
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.query("SELECT * FROM Team");
-    teams = rows;
-    console.log("Team loaded from the database:", teams);
-  } catch (error) {
-    console.error("Error loading teams from the database:", error);
-    throw error;
-  } finally {
-    if (connection) {
-      await connection.end();
-    }
-  }
-}
-
-async function loadLeagues() {
-  let connection;
-
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.query("SELECT * FROM League");
-    allLeagues = rows;
-    console.log("League loaded from the database:", teams);
-  } catch (error) {
-    console.error("Error loading leagues from the database:", error);
-    throw error;
-  } finally {
-    if (connection) {
-      await connection.end();
-    }
-  }
-}
-
-(async () => {
-  await loadPlayers();
-  await loadTeams();
-  await loadLeagues();
-})();
 
 export function getPlayerByID(playerID) {
   return players.find((element) => element.id == playerID);

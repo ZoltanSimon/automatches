@@ -28,17 +28,18 @@ export function playerGoalList(response, big) {
     loadClubLogo(thisPlayer.club);
     loadClubLogo(thisPlayer.nation);
 
-    addToPage += `<tr
-    ><td id="${thisPlayer.id}" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${thisPlayer.id}.png"</td>
-    <td id="${thisPlayer.nation}" class="player-country"><img height="30" src="images/logos/${thisPlayer.nation}.png" /></td">
-    <td>${thisPlayer.name}</td>
-    <td id="${thisPlayer.club}"><img height="44" src="images/logos/${thisPlayer.club}.png" /></td>
-    ${tds}${thisPlayer.apps}</td>
-    <td style="text-align: center; font-weight: bold">${thisPlayer.goals}</td>
-    ${tds}${thisPlayer.goals - thisPlayer.penalties}</td>
-    ${tds}${thisPlayer.assists}</td>
-    <td style="text-align: center; font-weight: bold">${thisPlayer.goals + thisPlayer.assists}</td>
-    ${tds}${thisPlayer.gap90}</td>`;
+    addToPage += `
+    <tr>
+      <td id="${thisPlayer.id}" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${thisPlayer.id}.png"</td>
+      <td id="${thisPlayer.nation}" class="player-country"><img height="30" src="images/logos/${thisPlayer.nation}.png" /></td">
+      <td>${thisPlayer.name}</td>
+      <td id="${thisPlayer.club}"><img height="44" src="images/logos/${thisPlayer.club}.png" /></td>
+      ${tds}${thisPlayer.apps}</td>
+      <td style="text-align: center; font-weight: bold">${thisPlayer.goals}</td>
+      <td style="text-align: center;" class="sec-stats">${thisPlayer.goals - thisPlayer.penalties}</td>
+      ${tds}${thisPlayer.assists}</td>
+      <td style="text-align: center; font-weight: bold">${thisPlayer.goals + thisPlayer.assists}</td>
+      <td style="text-align: center;" class="sec-stats">${thisPlayer.gap90}</td>`;
 
     if (big)
       addToPage += `${tds}${thisPlayer.minutes}</td>${tds}${thisPlayer.penalties}</td>${tds}${thisPlayer.shots}</td>${tds}${thisPlayer.dribbles}</td>${tds}${thisPlayer.duels}</td>${tds}${thisPlayer.key_passes}</td>${tds}${thisPlayer.fouls_drawn}</td>`;

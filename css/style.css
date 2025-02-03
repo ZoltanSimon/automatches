@@ -341,7 +341,7 @@ td .form-indicator:last-child {
   .form-indicator {
     width:17%;
   }
-  .team-name, .player-country {
+  .team-name, .player-country, .corners, .sec-stats {
     display: none;
   }
   .big-played {

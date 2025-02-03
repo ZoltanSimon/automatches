@@ -12,8 +12,8 @@ import {
   getLeagueFromServer,
   writeLeagueToServer,
   buildTeamList,
-  allLeagues,
 } from "./backend/json-reader.js";
+import { allLeagues} from "./backend/data-access.js"; 
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -79,7 +79,7 @@ const require = createRequire(import.meta.url);
 const cors = require("cors");
 const corsOptions = {
   origin: "*",
-  credentials: true, //access-control-allow-credentials:true
+  credentials: true,
   optionSuccessStatus: 200,
 };
 
@@ -93,7 +93,6 @@ app.get("/status", (request, response) => {
   response.send(status);
 });
 
-//updates the given league's json file
 app.get("/update-leagues", async (request, response) => {
   let leagueIDs = request.query.leagueID.split(",");
   let seasons = request.query.seasons.split(",");
@@ -251,8 +250,9 @@ app.get("/match-exists", async (request, response) => {
   response.json(null);
 });
 
-app.get("/get-todays-matches", async (request, response) => {
+app.get("/get-matches-on-day", async (request, response) => {
   let todaysMatches = [];
+  let checkDate = new Date(request.query.matchDate) || new Date();
 
   for (let i=0; i<allLeagues.length; i++) {
     let leagueID = allLeagues[i].id;
@@ -260,8 +260,7 @@ app.get("/get-todays-matches", async (request, response) => {
 
     for (const element of data) {
       let fixtureDate = new Date(element.fixture.date);
-      let todaysDate = new Date();
-      if (fixtureDate.toDateString() === todaysDate.toDateString()) {
+      if (fixtureDate.toDateString() === checkDate.toDateString()) {
         todaysMatches.push(element);
       }
     }
@@ -279,6 +278,15 @@ app.get("/get-matches-by-round", async (request, response) => {
   let round = request.query.roundNo;
   let data = await getLeagueFromServer(leagueID);
   let matches = data.filter((element) => element.league.round == round);
+
+  for (let i = 0; i < matches.length; i++) {
+    let matchID = matches[i].fixture.id;
+    let matchData = await getMatchFromServer(matchID);
+    if (matchData && matchData[0]) {
+      matches[i] = matchData[0];
+    }
+  }
+  
   response.json(matches);
 });
 
