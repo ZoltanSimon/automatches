@@ -75,7 +75,7 @@ export async function showMatchesOnDate(date, showID) {
     let fixtureDate = new Date(match.fixture.date);
     const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
 
-    if (matchEnd <= new Date() && match.statistics.length === 0) {
+    if (matchEnd <= new Date() && !match.statistics) {
       let cachedMatch = await (await fetch(`/match-exists?matchID=${match.fixture.id}`)).json();
       if (!cachedMatch && downloads < 10) {
         let downloadedMatch = await downloadMatch(match.fixture.id);
