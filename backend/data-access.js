@@ -54,7 +54,7 @@ export async function loadLeagues() {
 
   try {
     connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.query("SELECT * FROM League");
+    const [rows] = await connection.query("SELECT * FROM League WHERE Visible = 1");
     allLeagues = rows;
     console.log("League loaded from the database:", teams);
   } catch (error) {

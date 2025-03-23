@@ -1,5 +1,4 @@
 import { Player } from "./classes/player.js";
-import { Team } from "./classes/team.js";
 
 export let selectedLeagues = [];
 
@@ -69,17 +68,6 @@ export async function getResultFromLocal(fixtureID) {
 async function handleError(id) {
   console.log(id);
   document.getElementById("missing-matches").innerHTML += id + "<br/>";
-}
-
-export async function getAllPlayers() {
-  try {
-    const response = await fetch(`/get-all-players`);
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.error("Failed to fetch and build player list:", error);
-    return [];
-  }
 }
 
 export async function downloadMatch(fixtureID) {

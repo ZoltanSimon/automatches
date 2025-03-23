@@ -6,7 +6,6 @@ import {
 import {
   selectedLeagues,
   getLocalPlayerStats,
-  getAllPlayers,
   downloadMatch,
   findPlayerByID,
 } from "../local-handler.js";
@@ -169,7 +168,14 @@ document.getElementById("get-player-goal-list").onclick = async function () {
 };*/
 
 document.getElementById("get-all-players").onclick = async function () {
-  getAllPlayers();
+  try {
+    const response = await fetch(`/get-all-players`);
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error("Failed to fetch and build player list:", error);
+    return [];
+  }
 };
 
 document.getElementById("get-all-matches").onclick = async function () {

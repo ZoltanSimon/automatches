@@ -99,7 +99,7 @@ export async function writeLeagueToServer(leagueID, dataToWrite) {
   return responseToSend;
 }
 
-function getBothTeams(players, home, teamName) {
+function getBothTeams(players, home) {
   for (let player of players[home].players) {
     let playerID = player.player.id;
     let playerFound = allPlayers.find((x) => x.id == playerID);
