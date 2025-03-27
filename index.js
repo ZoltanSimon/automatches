@@ -13,7 +13,7 @@ import {
   writeLeagueToServer,
   buildTeamList,
 } from "./backend/json-reader.js";
-import { allLeagues} from "./backend/data-access.js"; 
+import { allLeagues, insertPlayers } from "./backend/data-access.js"; 
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -31,24 +31,58 @@ console.log("Files in Partials Directory:", fs.readdirSync(partialsPath));
 app.engine(
   "handlebars",
   engine({
-    partialsDir: [partialsPath] // Use the variable directly
+    partialsDir: [partialsPath],
+    helpers: {
+      gt: function (a, b) {
+        return a > b;
+      },
+      json: function (context) {
+        return JSON.stringify(context);
+      },
+      lt: function (a, b) {
+        return a < b; 
+      }
+    }
   })
 );
+
 
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use(express.static("./"));
 
-app.get("/", (req, res) => {
-  res.render("home", { title: "generationFOOTBALL - Home" });
+app.get("/", async (req, res) => {
+  try {
+    let leagues = [39, 140, 135, 78, 61, 88, 94];
+    let players = await getPlayerGoalList(leagues);
+
+    res.render("home", { 
+      title: "generationFootball", 
+      players: players.slice(0,10)
+    });
+  } catch (error) {
+    console.error('Error fetching players:', error);
+    res.status(500).send('Error fetching players');
+  }
 });
 
 app.get("/about", (req, res) => {
   res.render("about", { title: "About Page" });
 });
 
-app.get("/players", (req, res) => {
-  res.render("players", { title: "Players" });
+app.get("/players", async (req, res) => {
+  try {
+    let leagues = [39, 140, 135, 78, 61, 88, 94];
+    let players = await getPlayerGoalList(leagues);
+
+    res.render("players", { 
+      title: "Players", 
+      players: players
+    });
+  } catch (error) {
+    console.error('Error fetching players:', error);
+    res.status(500).send('Error fetching players');
+  }
 });
 
 app.get("/compare-players", (req, res) => {
@@ -213,29 +247,12 @@ app.get("/get-all-players", async (request, response) => {
     allLeagues.filter((el) => el.type == "nt")
   );
 
-  try {
-    // Create a database connection
-    const connection = await mysql.createConnection(dbConfig);
-
-    // Insert players into the database
-    for (const player of allPlayers) {
-      const { id, name, club, nation } = player;
-      await connection.execute(
-        'INSERT IGNORE INTO Player (id, name, club, nation) VALUES (?, ?, ?, ?)',
-        [id, name, club, nation]
-      );
-    }
-
-    await connection.end(); // Close the connection
-    response.status(200).json({ message: 'Players loaded successfully!' }); // Send a success response
-  } catch (error) {
-    response.status(500).json({ error: 'Error loading players.', details: error.message });
-  }
-  
+  await insertPlayers(allPlayers);
+  response.json(allPlayers);
 });
 
 app.get("/get-player-list", async (request, response) => {
-  let leagues = request.query.leagues.split(",");
+  let leagues = request.query.leagues ? request.query.leagues.split(",") : [39, 140, 135, 78, 61, 88, 94];
   let playerList = await getPlayerGoalList(leagues);
   response.json(playerList);
 });
