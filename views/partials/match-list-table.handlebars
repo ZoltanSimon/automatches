@@ -1,0 +1,36 @@
+  <table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="match-list">
+    <thead>
+      <tr class="main-table-header">
+        <th colspan=9>{{currentDate}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each fixtures}}
+        <tr>
+          {{#if ../showID}}
+            <td rowspan=2 class="match-id">{{fixture.id}}</td>
+            <td style="text-align: center;">{{formatTime fixture.date}}</td>
+            <td style="text-align: center;">{{formatDate fixture.date}}</td>
+          {{else}}
+            <td width=40 rowspan=2><img width=40 src="images/competitions/{{league.id}}.png"/></td>
+            <td rowspan=2 style="text-align: center;">{{formatTime fixture.date}}</td>
+          {{/if}}
+
+          <td style="text-align: left;" rowspan=2 id="{{teams.home.id}}">{{teams.home.name}}</td>
+          <td style="text-align: center;" rowspan=2><img src="{{imagePath teams.home.id}}" alt="{{teams.home.name}}" width="44px"></td>
+          <td style="text-align: center; font-weight: bold">{{#if (isNumber goals.home)}}{{goals.home}}{{/if}}</td>
+          <td style="text-align: center;" rowspan=2> - </td>
+          <td style="text-align: center; font-weight: bold">{{#if (isNumber goals.away)}}{{goals.away}}{{/if}}</td>
+          <td style="text-align: center;" rowspan=2><img src="{{imagePath teams.away.id}}" alt="{{teams.away.name}}" width="44px"></td>
+          <td style="text-align: left;" rowspan=2 id="{{teams.away.id}}">{{teams.away.name}}</td>
+        </tr>
+        <tr>
+          {{#if ../showID}}
+            <td style="text-align: center;">{{formatTime fixture.date}}</td>
+          {{/if}}
+          <td style="text-align: center;">({{statistics.[0].statistics.[16].value}})</td>
+          <td style="text-align: center;">({{statistics.[1].statistics.[16].value}})</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>

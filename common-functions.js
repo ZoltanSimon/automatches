@@ -100,17 +100,8 @@ function updateOrAddMatch(matchArray, matchData) {
 }
 
 export async function getTopPlayers(leagues, amount, big) {
-  let topPlayers = [];
-  const response = await fetch(`get-player-list?leagues=${leagues.join(",")}`, {
-    method: "GET",
-  });
 
-  const playerList = await response.json();
-  topPlayers = playerList.slice(0, amount);
-  topPlayers.map(function (e) {
-    loadPlayerFace(e.id);
-  });
-  playerGoalList(topPlayers, big);
+  playerGoalList([], big);
 }
 
 export async function getTopTeams(leagues, amount, big) {
@@ -188,6 +179,34 @@ export function sortTable(n, td, table, startingRow = 1, toSwitch = true, second
   }
 
   td.classList.add(dir);
+}
+
+export function removeColumn(theTable, columnIndex) {  
+  // Remove header cell
+  theTable.querySelectorAll("thead tr").forEach(row => {
+      if (row.cells.length > columnIndex) row.deleteCell(columnIndex);
+  });
+
+  // Remove each cell in body rows
+  theTable.querySelectorAll("tbody tr").forEach(row => {
+      if (row.cells.length > columnIndex) row.deleteCell(columnIndex);
+  });
+}
+
+export function hideColumn(stat) {
+  document.querySelectorAll(`#player-list-table th[data-stat="${stat}"], 
+                             #player-list-table td[data-stat="${stat}"]`)
+      .forEach(cell => {
+          cell.style.display = "none";
+      });
+}
+
+export function showColumn(stat) {
+  document.querySelectorAll(`#player-list-table th[data-stat="${stat}"], 
+                             #player-list-table td[data-stat="${stat}"]`)
+      .forEach(cell => {
+          cell.style.display = "";
+      });
 }
 
 export function getDate(date) {

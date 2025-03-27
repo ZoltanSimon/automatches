@@ -49,6 +49,7 @@ export async function getPlayerGoalList(leagues) {
     a.goals < b.goals ? 1 : b.goals < a.goals ? -1 : 0
   );
 
+  allPlayers = allPlayers.filter(player => player.apps >= 5);
   return allPlayers;
 }
 

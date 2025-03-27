@@ -88,7 +88,7 @@ footer p {
 .small-container {
   display: grid;
   place-items: center; /* Centers both horizontally and vertically */
-  width: 1200px; /* Set the desired width */
+  width: 1400px; /* Set the desired width */
   margin: 0 auto; /* This will center it horizontally */
 }
 
@@ -246,8 +246,12 @@ td .form-indicator:last-child {
 .list-header {
   text-align: center;
   padding: 2px;
-  width: 58px;
+  width: 60px;
   border-right: 1px solid #f1faee;
+  white-space: nowrap;  /* Prevents text from wrapping */
+  overflow: hidden;      /* Hides overflowing text */
+  text-overflow: ellipsis; /* Adds "..." when text is too long */
+  max-width: 80px;      /* Set a max width (adjust as needed) */
 }
 
 .list-header2 {
@@ -278,6 +282,64 @@ td .form-indicator:last-child {
 
 .score-pred {
   width: 50px;
+}
+
+#statSelectorContainer {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 220px;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+}
+
+#statSelectorContainer .stat-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: block;
+  text-align: center;
+}
+
+#statSelectorContainer #statCheckboxes {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr;
+}
+
+#statSelectorContainer label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#statSelectorContainer input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.yellow-card, .red-card {
+  display: inline-block;
+  width: 16px; /* Adjust size */
+  height: 24px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.yellow-card {
+  background-color: yellow;
+  border: 1px solid #ccc;
+}
+
+.red-card {
+  background-color: red;
+  border: 1px solid #900;
 }
 
 @media (max-width: 1820px) {
@@ -327,6 +389,31 @@ td .form-indicator:last-child {
   .rectangle, #left, #right {
     padding-left: 6px;
     padding-right: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  #statSelectorContainer {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    transform: none;
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+
+  #statSelectorContainer #statCheckboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  #statSelectorContainer label {
+    font-size: 12px;
   }
 }
 

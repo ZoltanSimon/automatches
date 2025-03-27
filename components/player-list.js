@@ -2,19 +2,16 @@ import {
   buildTableForTableType,
   imgs,
   ctx,
-  loadClubLogo,
 } from "../instapics.js";
-import { removeNewlines } from "../common-functions.js";
-import { tds } from "../common-styles.js";
-import { sortTable } from "../common-functions.js";
+import { removeNewlines, hideColumn, showColumn } from "../common-functions.js";
+
+const tableName = "player-list-table";
+const table = document.getElementById(tableName);
+const checkboxes = document.querySelectorAll("input[name='statSelector']");
 
 export function playerGoalList(response, big) {
-  let addToPage;
-  let thisPlayer;
-
-  addToPage = "";
-  const table = document.getElementById("player-list-table");
   const tableBody = table.getElementsByTagName("tbody")[0];
+
   
   if (!tableBody) {
     console.error("Table body not found! Ensure the table has a <tbody> element.");
@@ -22,46 +19,29 @@ export function playerGoalList(response, big) {
   } else {
     table.style.visibility = 'visible';
   }
-  
-  for (let i = 0; i < response.length; i++) {
-    thisPlayer = response[i];
-    loadClubLogo(thisPlayer.club);
-    loadClubLogo(thisPlayer.nation);
 
-    addToPage += `
-    <tr>
-      <td id="${thisPlayer.id}" style="text-align:center;padding:0; border-right: none;"><img height="60" src="images/player-pictures/${thisPlayer.id}.png" /></td>
-      <td id="${thisPlayer.nation}" class="player-country"><img height="30" src="images/logos/${thisPlayer.nation}.png" /></td">
-      <td>${thisPlayer.name}</td>
-      <td id="${thisPlayer.club}"><img height="44" src="images/logos/${thisPlayer.club}.png" /></td>
-      ${tds}${thisPlayer.apps}</td>
-      <td style="text-align: center; font-weight: bold">${thisPlayer.goals}</td>
-      <td style="text-align: center;" class="sec-stats">${thisPlayer.goals - thisPlayer.penalties}</td>
-      ${tds}${thisPlayer.assists}</td>
-      <td style="text-align: center; font-weight: bold">${thisPlayer.goals + thisPlayer.assists}</td>
-      <td style="text-align: center;" class="sec-stats">${thisPlayer.gap90}</td>`;
-
-    if (big)
-      addToPage += `${tds}${thisPlayer.minutes}</td>${tds}${thisPlayer.penalties}</td>${tds}${thisPlayer.shots}</td>${tds}${thisPlayer.dribbles}</td>${tds}${thisPlayer.duels}</td>${tds}${thisPlayer.key_passes}</td>${tds}${thisPlayer.fouls_drawn}</td>`;
-    addToPage += `</tr>`;
+  if (big) {
+    document.getElementById("statSelectorContainer").style.visibility = 'visible';
+  } else {
+    document.getElementById("statSelectorContainer").style.display = 'none';
   }
-  addToPage += `</tbody></table>`;
 
-  tableBody.innerHTML = addToPage;
+  document.querySelectorAll(`#${tableName} th`).forEach(header => {
+    header.addEventListener("click", function () {
+        const stat = this.getAttribute("data-stat"); // Get the column's stat name
+        const currentOrder = this.getAttribute("data-order") || "desc"; // Default order
+        
+        const newOrder = currentOrder === "asc" ? "desc" : "asc"; // Toggle order
+        this.setAttribute("data-order", newOrder);
+        
+        displayedPlayers.sort((a, b) => (a[stat] < b[stat] ? 1 : b[stat] < a[stat] ? -1 : 0));
 
-  let headerLength = table.rows[0].cells.length;
-  let lastRowLength = table.rows[table.rows.length - 1].cells.length;
+        updateTable(displayedPlayers.slice(0, 300));
+        updateTableVisibility();
+    });
+  });
 
-  for (let i = 0; i < table.rows[0].cells.length; i++) {
-    let headerCell = table.rows[0].cells[i];
-    if (headerCell.classList.contains("sortable")) {
-      headerCell.addEventListener("click", function () {
-        let index = lastRowLength - headerLength + i;
-        sortTable(index, headerCell, table);
-      });
-    }
-  }
-  
+
 }
 
 export function playerListToCanvas() {
@@ -134,4 +114,113 @@ export function playerListToCanvas() {
     110
   );
   ctx.fillStyle = "#e63946";
+}
+
+document.addEventListener("DOMContentLoaded", function () { 
+  checkboxes.forEach(checkbox => checkbox.addEventListener("change", updateTableVisibility));
+
+  updateTableVisibility();
+
+  let rows = document.querySelectorAll(`#${tableName} tbody tr`); // Select all rows inside your table
+  let rowsPerPage = 100;
+  let currentVisible = rowsPerPage;
+
+  rows.forEach((row, index) => {
+    if (index >= rowsPerPage) {
+      row.style.display = "none";
+    }
+  });
+
+  let loadMoreBtn = document.createElement("button");
+  loadMoreBtn.innerText = "Load More";
+  loadMoreBtn.style.display = "block";
+  loadMoreBtn.style.margin = "20px auto";
+  loadMoreBtn.style.padding = "10px";
+  loadMoreBtn.style.cursor = "pointer";
+  loadMoreBtn.style.background = "#007bff";
+  loadMoreBtn.style.color = "#fff";
+  loadMoreBtn.style.border = "none";
+  loadMoreBtn.style.borderRadius = "5px";
+  loadMoreBtn.style.fontSize = "16px";
+  loadMoreBtn.style.visibility = "visible";
+
+  loadMoreBtn.addEventListener("click", function () {
+    let newVisible = currentVisible + rowsPerPage;
+
+    rows.forEach((row, index) => {
+      if (index < newVisible) {
+        row.style.display = "";
+      }
+    });
+
+    currentVisible = newVisible;
+
+    if (currentVisible >= rows.length) {
+      loadMoreBtn.style.display = "none";
+    }
+  });
+
+  document.querySelector("#" + tableName).parentNode.appendChild(loadMoreBtn);
+});
+
+function updateTableVisibility() {   
+  document.querySelectorAll(`#${tableName} th`).forEach((el, index) => {   
+    if (el.dataset.stat) {
+      if(!document.getElementById(el.dataset.stat).checked) {
+        hideColumn(el.dataset.stat);
+      } else {
+        showColumn(el.dataset.stat);
+      }
+    }
+  });    
+}
+
+function updateTable(sortedPlayers) {
+  const tbody = document.querySelector(`#${tableName} tbody`);
+  tbody.innerHTML = "";
+
+  sortedPlayers.forEach((player, index) => {
+      const row = document.createElement("tr");
+      row.style.display = index < 100 ? "table-row" : "none"; 
+
+      row.innerHTML = `
+          <td style="text-align:center;padding:0; border-right: none;">
+              <img height="60" src="images/player-pictures/${player.id}.png" 
+                  onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
+          </td>
+          <td class="player-country">
+              <img height="30" src="images/logos/${player.nation}.png" />
+          </td>
+          <td>${player.name}</td>
+          <td>
+              <img height="44" src="images/logos/${player.club}.png" />
+          </td>
+          <td data-stat="apps">${player.apps}</td>
+          <td data-stat="goals">${player.goals}</td>
+          <td data-stat="npg">${player.npg}</td>
+          <td data-stat="assists">${player.assists}</td>
+          <td data-stat="ga">${player.goals}</td>
+          <td data-stat="ga90">${player.gap90}</td>
+          <td data-stat="rating">${player.avRating}</td>
+          <td data-stat="minutes">${player.minutes}</td>
+          <td data-stat="pens">${player.penalties}</td>
+          <td data-stat="penaltiesMissed">${player.penaltiesMissed}</td>
+          <td data-stat="shotsTotal">${player.shotsTotal}</td>
+          <td data-stat="shotsOn">${player.shotsOn}</td>
+          <td data-stat="dribblesAttempts">${player.dribblesAttempts}</td>
+          <td data-stat="dribblesSucc">${player.dribblesSucc}</td>
+          <td data-stat="dribblesPast">${player.dribblesPast}</td>
+          <td data-stat="duelsTotal">${player.duelsTotal}</td>
+          <td data-stat="duelsWon">${player.duelsWon}</td>
+          <td data-stat="keyPasses">${player.keyPasses}</td>
+          <td data-stat="foulsAgainst">${player.foulsAgainst}</td>
+          <td data-stat="foulsCommited">${player.foulsCommited}</td>
+          <td data-stat="blocks">${player.blocks}</td>
+          <td data-stat="interceptions">${player.interceptions}</td>
+          <td data-stat="tackles">${player.tackles}</td>
+          <td data-stat="yellowCards">${player.yellowCards}</td>
+          <td data-stat="redCards">${player.redCards}</td>
+      `;
+      tbody.appendChild(row);
+  });
 }

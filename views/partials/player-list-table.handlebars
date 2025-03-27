@@ -1,25 +1,113 @@
+<div id="statSelectorContainer">
+  <label>Select Stats:</label>
+  <div id="statCheckboxes">
+    <label><input type="checkbox" id="apps" name="statSelector" value="apps" checked>Matches Played</label>
+    <label><input type="checkbox" id="goals" name="statSelector" value="goals" checked>Goals</label>
+    <label><input type="checkbox" id="npg" name="statSelector" value="npg" checked>NPG</label>
+    <label><input type="checkbox" id="assists" name="statSelector" value="assists" checked>Assists</label>
+    <label><input type="checkbox" id="ga" name="statSelector" value="ga" checked>GA</label>
+    <label><input type="checkbox" id="gap90" name="statSelector" value="gap90" checked>GA / 90</label>
+    <label><input type="checkbox" id="avRating" name="statSelector" value="avRating" checked>Rating</label>
+    <label><input type="checkbox" id="minutes" name="statSelector" value="minutes">Minutes</label>
+    <label><input type="checkbox" id="pens" name="statSelector" value="pens">Penalties</label>
+    <label><input type="checkbox" id="penaltiesMissed" name="statSelector" value="penaltiesMissed">Pens Missed</label>
+    <label><input type="checkbox" id="shotsTotal" name="statSelector" value="shotsTotal">Total Shots</label>
+    <label><input type="checkbox" id="shotsOn" name="statSelector" value="shotsOn">Shots On Target</label>
+    <label><input type="checkbox" id="dribblesAttempts" name="statSelector" value="dribblesAttempts">Dribbles Attempts</label>
+    <label><input type="checkbox" id="dribblesSucc" name="statSelector" value="dribblesSucc">Dribbles Success</label>
+    <label><input type="checkbox" id="dribblesPast" name="statSelector" value="dribblesPast">Dribbles Past</label>
+    <label><input type="checkbox" id="duelsTotal" name="statSelector" value="duelsTotal">Duels Total</label>
+    <label><input type="checkbox" id="duelsWon" name="statSelector" value="duelsWon">Duels Won</label>
+    <label><input type="checkbox" id="keyPasses" name="statSelector" value="keyPasses">Key Passes</label>
+    <label><input type="checkbox" id="foulsAgainst" name="statSelector" value="foulsAgainst">Fouls Against</label>
+    <label><input type="checkbox" id="foulsCommited" name="statSelector" value="foulsCommited">Fouls Committed</label>
+    <label><input type="checkbox" id="blocks" name="statSelector" value="blocks">Blocks</label>
+    <label><input type="checkbox" id="interceptions" name="statSelector" value="interceptions">Interceptions</label>
+    <label><input type="checkbox" id="tackles" name="statSelector" value="tackles">Tackles</label>
+    <label><input type="checkbox" id="yellowCards" name="statSelector" value="yellowCards">Yellow Cards</label>
+    <label><input type="checkbox" id="redCards" name="statSelector" value="redCards">Red Cards</label>
+  </div>
+</div>
+
 <table style="border-collapse: collapse; border: 3px solid #1D3557;" border="1" id="player-list-table">
   <thead>
     <tr class="main-table-header">
       <th colspan="3" class="list-header">Player</th>
       <th width="50" class="list-header">Team</th>
-      <th class="list-header sortable"><span class="big-played">Apps</span><span class="small-played">P</span><span class="sort-indicator"></span></th>
-      <th class="list-header sortable"><span class="big-played">Goals</span><span class="small-played">G</span><span class="sort-indicator"></span></th>
-      <th class="list-header sortable sec-stats">NPG<span class="sort-indicator"></span></th>
-      <th class="list-header sortable"><span class="big-played">Assists</span><span class="small-played">A</span><span class="sort-indicator"></span></th>
-      <th class="list-header sortable">GA<span class="sort-indicator"></span></th>   
-      <th class="list-header sortable sec-stats">GA/90<span class="sort-indicator"></span></th>
-      {{#if big}}
-        <th class="list-header sortable">Minutes<span class="sort-indicator"></span></th>
-        <th class="list-header sortable">Pens<span class="sort-indicator"></span></th>
-        <th class="list-header sortable">Shots<span class="sort-indicator"></span></th>
-        <th class="list-header sortable">Dribbles<span class="sort-indicator"></span></th>
-        <th class="list-header sortable">Duels<span class="sort-indicator"></span></th>
-        <th class="list-header sortable">Key Passes<span class="sort-indicator"></span></th>
-        <th class="list-header sortable">Fouls Against<span class="sort-indicator"></span></th>
-      {{/if}}
+      <th class="list-header sortable" data-stat="apps"><span class="big-played">Apps</span><span class="small-played">P</span><span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="goals"><span class="big-played">Goals</span><span class="small-played">G</span><span class="sort-indicator"></span></th>
+      <th class="list-header sortable sec-stats" data-stat="npg">NPG<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="assists"><span class="big-played">Assists</span><span class="small-played">A</span><span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="ga">GA<span class="sort-indicator"></span></th>   
+      <th class="list-header sortable sec-stats" data-stat="gap90">GA/90<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="avRating">Rating<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="minutes">Mins<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="pens">Pens<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="penaltiesMissed">Pens Miss<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="shotsTotal">Shots Total<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="shotsOn">Shots OnTarget<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="dribblesAttempts">Drib. Att<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="dribblesSucc">Drib. Succ<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="dribblesPast">Drib. Past<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="duelsTotal">Duels Total<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="duelsWon">Duels Won<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="keyPasses">Key Passes<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="foulsAgainst">Fouls Ag.<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="foulsCommited">Fouls Comm.<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="blocks">Blocks<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="interceptions">Interc.<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="tackles">Tackles<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="yellowCards"><span class="yellow-card"></span><span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="redCards"> <span class="red-card"></span><span class="sort-indicator"></span></th>
     </tr>
   </thead>
   <tbody>
+      {{#each players}}
+        {{#if (lt @index 299)}}
+        <tr {{#if (gt @index 99)}}style="display:none;"{{/if}}>
+            <td id={{this.id}} style="text-align:center;padding:0; border-right: none;">
+                <img height="60" src="images/player-pictures/{{this.id}}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
+            </td>
+            <td id={{this.nation}} class="player-country">
+                <img height="30" src="images/logos/{{this.nation}}.png" />
+            </td>
+            <td>{{this.name}}</td>
+            <td id={{this.club}}>
+                <img height="44" src="images/logos/{{this.club}}.png" />
+            </td>
+            <td data-stat="apps">{{this.apps}}</td>
+            <td data-stat="goals">{{this.goals}}</td>
+            <td data-stat="npg">{{this.npg}}</td>
+            <td data-stat="assists">{{this.assists}}</td>
+            <td data-stat="ga">{{this.goals}}</td>
+            <td data-stat="gap90">{{this.gap90}}</td>
+            <td data-stat="rating">{{this.avRating}}</td>
+            <td data-stat="minutes">{{this.minutes}}</td>
+            <td data-stat="pens">{{this.penalties}}</td>
+            <td data-stat="penaltiesMissed">{{this.penaltiesMissed}}</td>
+            <td data-stat="shotsTotal">{{this.shotsTotal}}</td>
+            <td data-stat="shotsOn">{{this.shotsOn}}</td>
+            <td data-stat="dribblesAttempts">{{this.dribblesAttempts}}</td>
+            <td data-stat="dribblesSucc">{{this.dribblesSucc}}</td>
+            <td data-stat="dribblesPast">{{this.dribblesPast}}</td>
+            <td data-stat="duelsTotal">{{this.duelsTotal}}</td>
+            <td data-stat="duelsWon">{{this.duelsWon}}</td>
+            <td data-stat="keyPasses">{{this.keyPasses}}</td>
+            <td data-stat="foulsAgainst">{{this.foulsAgainst}}</td>
+            <td data-stat="foulsCommited">{{this.foulsCommited}}</td>
+            <td data-stat="blocks">{{this.blocks}}</td>
+            <td data-stat="interceptions">{{this.interceptions}}</td>
+            <td data-stat="tackles">{{this.tackles}}</td>
+            <td data-stat="yellowCards">{{this.yellowCards}}</td>
+            <td data-stat="redCards">{{this.redCards}}</td>
+        </tr>
+        {{/if}}
+      {{/each}}
   </tbody>
+
 </table>
+
+<script>
+  let allPlayers = {{{json players}}};
+  let displayedPlayers = [...allPlayers];
+</script>

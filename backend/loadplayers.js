@@ -85,7 +85,7 @@ async function insertLeagues() {
   }
 }
 
-insertLeagues();
+//insertLeagues();
 
-//loadPlayers();
+loadPlayers();
 //loadClubs();
