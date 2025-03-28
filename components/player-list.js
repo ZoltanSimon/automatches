@@ -203,8 +203,8 @@ function updateTable(sortedPlayers) {
           <td data-stat="npg">${player.npg}</td>
           <td data-stat="assists">${player.assists}</td>
           <td data-stat="ga">${player.goals}</td>
-          <td data-stat="ga90">${player.gap90}</td>
-          <td data-stat="rating">${player.avRating}</td>
+          <td data-stat="gap90">${player.gap90}</td>
+          <td data-stat="avRating">${player.avRating}</td>
           <td data-stat="minutes">${player.minutes}</td>
           <td data-stat="pens">${player.penalties}</td>
           <td data-stat="penaltiesMissed">${player.penaltiesMissed}</td>
