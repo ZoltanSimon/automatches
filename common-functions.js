@@ -213,7 +213,7 @@ export function getDate(date) {
 }
 
 export function adjustColspan(headerRow, newSpan) {
-  const screenWidth = window.innerWidth;
+  const screenWidth = window.visualViewport.width;
   const threshold = 645; // Example: 768px for small screens
 
   if (screenWidth < threshold) {
