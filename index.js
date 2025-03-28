@@ -74,6 +74,11 @@ app.get("/players", async (req, res) => {
   try {
     let leagues = [39, 140, 135, 78, 61, 88, 94];
     let players = await getPlayerGoalList(leagues);
+    const teamFilter = req.query.team;
+    
+    if (teamFilter) {
+      players = players.filter(player => player.club == teamFilter);
+    }
 
     res.render("players", { 
       title: "Players", 

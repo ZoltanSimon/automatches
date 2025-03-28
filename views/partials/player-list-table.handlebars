@@ -73,7 +73,7 @@
             </td>
             <td class="sec-stats">{{this.name}}</td>
             <td id={{this.club}}>
-                <img class="logo-picture" src="images/logos/{{this.club}}.png" />
+                <a href="/players?team={{this.club}}"><img class="logo-picture" src="images/logos/{{this.club}}.png" /></a>
             </td>
             <td data-stat="apps">{{this.apps}}</td>
             <td data-stat="goals">{{this.goals}}</td>
@@ -108,6 +108,16 @@
 </table>
 
 <script>
-  let allPlayers = {{{json players}}};
+  let allPlayers = [];
+  try {
+    let playersString = `{{{json players}}}`;
+    if (playersString) {
+      allPlayers = JSON.parse(playersString);
+    }
+  } catch (error) {
+    console.error("Error parsing players data:", error);
+    allPlayers = [];
+  }
+
   let displayedPlayers = [...allPlayers];
 </script>
