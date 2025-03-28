@@ -417,7 +417,6 @@ td .form-indicator:last-child {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    justify-content: center;
   }
 
   #statSelectorContainer label {
@@ -450,6 +449,9 @@ td .form-indicator:last-child {
     padding-right: 0px;
   }
 
+  .rectangle h2 {
+    margin-left: 2px;
+  }
   .player-picture{
     width: 44px;
   }
