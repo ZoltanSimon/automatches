@@ -107,11 +107,11 @@ nav ul li a:hover {
 
   .logo-title img {
     height: 36px; /* Adjust this size as needed */
-    margin-right: 2px; /* Space between the logo and the text */
+    margin-right: 1px; /* Space between the logo and the text */
   }
 
   .logo-title h1 {
-    font-size: 34px;
+    font-size: 30px;
   }
 
   nav ul li {

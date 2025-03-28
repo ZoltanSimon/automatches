@@ -1,6 +1,5 @@
 import { matchList } from "./components/match-list.js";
 import { loadPlayerFace } from "./instapics.js";
-import { playerGoalList } from "./components/player-list.js";
 import { teamList } from "./components/team-list.js";
 import { downloadMatch } from "./local-handler.js";
 
@@ -97,11 +96,6 @@ function updateOrAddMatch(matchArray, matchData) {
   } else {
     matchArray.push(matchData);
   }
-}
-
-export async function getTopPlayers(leagues, amount, big) {
-
-  playerGoalList([], big);
 }
 
 export async function getTopTeams(leagues, amount, big) {
@@ -216,4 +210,15 @@ export function getDate(date) {
   let year = d.getFullYear();
 
   return `${day < 10 ? "0" + day : day}.${month < 10 ? "0" + month : month}.${year}`;
+}
+
+export function adjustColspan(headerRow, newSpan) {
+  const screenWidth = window.innerWidth;
+  const threshold = 645; // Example: 768px for small screens
+
+  if (screenWidth < threshold) {
+    headerRow.colSpan = newSpan; // Reduce colspan when screen is narrow
+  } else {
+    headerRow.colSpan = newSpan +1; // Restore colspan when screen is wide
+  }
 }

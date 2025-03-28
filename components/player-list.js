@@ -3,16 +3,18 @@ import {
   imgs,
   ctx,
 } from "../instapics.js";
-import { removeNewlines, hideColumn, showColumn } from "../common-functions.js";
+import { removeNewlines, hideColumn, showColumn, adjustColspan } from "../common-functions.js";
 
 const tableName = "player-list-table";
 const table = document.getElementById(tableName);
 const checkboxes = document.querySelectorAll("input[name='statSelector']");
 
-export function playerGoalList(response, big) {
+export function playerGoalList(big) {
   const tableBody = table.getElementsByTagName("tbody")[0];
 
-  
+  window.addEventListener("resize", () => adjustColspan(table.rows[0].cells[0], 2));
+  adjustColspan(table.rows[0].cells[0], 2);
+
   if (!tableBody) {
     console.error("Table body not found! Ensure the table has a <tbody> element.");
     return;
@@ -41,7 +43,52 @@ export function playerGoalList(response, big) {
     });
   });
 
+  checkboxes.forEach(checkbox => checkbox.addEventListener("change", updateTableVisibility));
 
+  updateTableVisibility();
+
+  let rows = document.querySelectorAll(`#${tableName} tbody tr`); // Select all rows inside your table
+  let rowsPerPage = 100;
+  let currentVisible = rowsPerPage;
+
+  rows.forEach((row, index) => {
+    if (index >= rowsPerPage) {
+      row.style.display = "none";
+    }
+  });
+
+  if (big) {
+    let loadMoreBtn = document.createElement("button");
+    loadMoreBtn.innerText = "Load More";
+    loadMoreBtn.style.display = "block";
+    loadMoreBtn.style.margin = "20px auto";
+    loadMoreBtn.style.padding = "10px";
+    loadMoreBtn.style.cursor = "pointer";
+    loadMoreBtn.style.background = "#007bff";
+    loadMoreBtn.style.color = "#fff";
+    loadMoreBtn.style.border = "none";
+    loadMoreBtn.style.borderRadius = "5px";
+    loadMoreBtn.style.fontSize = "16px";
+    loadMoreBtn.style.visibility = "visible";
+
+    loadMoreBtn.addEventListener("click", function () {
+      let newVisible = currentVisible + rowsPerPage;
+
+      rows.forEach((row, index) => {
+        if (index < newVisible) {
+          row.style.display = "";
+        }
+      });
+
+      currentVisible = newVisible;
+
+      if (currentVisible >= rows.length) {
+        loadMoreBtn.style.display = "none";
+      }
+    });
+
+    document.querySelector("#" + tableName).parentNode.appendChild(loadMoreBtn);
+  }
 }
 
 export function playerListToCanvas() {
@@ -117,50 +164,7 @@ export function playerListToCanvas() {
 }
 
 document.addEventListener("DOMContentLoaded", function () { 
-  checkboxes.forEach(checkbox => checkbox.addEventListener("change", updateTableVisibility));
 
-  updateTableVisibility();
-
-  let rows = document.querySelectorAll(`#${tableName} tbody tr`); // Select all rows inside your table
-  let rowsPerPage = 100;
-  let currentVisible = rowsPerPage;
-
-  rows.forEach((row, index) => {
-    if (index >= rowsPerPage) {
-      row.style.display = "none";
-    }
-  });
-
-  let loadMoreBtn = document.createElement("button");
-  loadMoreBtn.innerText = "Load More";
-  loadMoreBtn.style.display = "block";
-  loadMoreBtn.style.margin = "20px auto";
-  loadMoreBtn.style.padding = "10px";
-  loadMoreBtn.style.cursor = "pointer";
-  loadMoreBtn.style.background = "#007bff";
-  loadMoreBtn.style.color = "#fff";
-  loadMoreBtn.style.border = "none";
-  loadMoreBtn.style.borderRadius = "5px";
-  loadMoreBtn.style.fontSize = "16px";
-  loadMoreBtn.style.visibility = "visible";
-
-  loadMoreBtn.addEventListener("click", function () {
-    let newVisible = currentVisible + rowsPerPage;
-
-    rows.forEach((row, index) => {
-      if (index < newVisible) {
-        row.style.display = "";
-      }
-    });
-
-    currentVisible = newVisible;
-
-    if (currentVisible >= rows.length) {
-      loadMoreBtn.style.display = "none";
-    }
-  });
-
-  document.querySelector("#" + tableName).parentNode.appendChild(loadMoreBtn);
 });
 
 function updateTableVisibility() {   
@@ -185,15 +189,14 @@ function updateTable(sortedPlayers) {
 
       row.innerHTML = `
           <td style="text-align:center;padding:0; border-right: none;">
-              <img height="60" src="images/player-pictures/${player.id}.png" 
-                  onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
+              <img class="player-picture" src="images/player-pictures/${player.id}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
           </td>
           <td class="player-country">
               <img height="30" src="images/logos/${player.nation}.png" />
           </td>
-          <td>${player.name}</td>
+          <td class="sec-stats">${player.name}</td>
           <td>
-              <img height="44" src="images/logos/${player.club}.png" />
+              <img class="logo-picture" src="images/logos/${player.club}.png" />
           </td>
           <td data-stat="apps">${player.apps}</td>
           <td data-stat="goals">${player.goals}</td>

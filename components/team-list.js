@@ -2,8 +2,7 @@ import { tds } from "../common-styles.js";
 
 let addToPage;
 let ths = `<th title="Click to sort" class="list-header sortable">`;
-let thisTr;
-import { sortTable } from "../common-functions.js";
+import { sortTable, adjustColspan } from "../common-functions.js";
 
 export function teamList(
   response,
@@ -43,6 +42,10 @@ function createTeamsTable(response, onlyTotal, big) {
   let table = document.getElementById("team-list-table");
   const tableBody = document.querySelector("#team-list-table tbody"); // Target the table body
   
+  window.addEventListener("resize", () => adjustColspan(table.rows[0], 1));
+
+  adjustColspan(table.rows[0].cells[0], 1);
+
   if (!tableBody) {
     console.error("Table body not found! Ensure the table has a <tbody> element.");
     return;

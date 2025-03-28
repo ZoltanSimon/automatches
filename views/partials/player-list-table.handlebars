@@ -3,17 +3,17 @@
   <div id="statCheckboxes">
     <label><input type="checkbox" id="apps" name="statSelector" value="apps" checked>Matches Played</label>
     <label><input type="checkbox" id="goals" name="statSelector" value="goals" checked>Goals</label>
-    <label><input type="checkbox" id="npg" name="statSelector" value="npg" checked>NPG</label>
+    <label><input type="checkbox" id="npg" name="statSelector" value="npg" checked>Non-Penalty Goals</label>
     <label><input type="checkbox" id="assists" name="statSelector" value="assists" checked>Assists</label>
-    <label><input type="checkbox" id="ga" name="statSelector" value="ga" checked>GA</label>
+    <label><input type="checkbox" id="ga" name="statSelector" value="ga" checked>Goals + Assists</label>
     <label><input type="checkbox" id="gap90" name="statSelector" value="gap90" checked>GA / 90</label>
     <label><input type="checkbox" id="avRating" name="statSelector" value="avRating" checked>Rating</label>
     <label><input type="checkbox" id="minutes" name="statSelector" value="minutes">Minutes</label>
     <label><input type="checkbox" id="pens" name="statSelector" value="pens">Penalties</label>
-    <label><input type="checkbox" id="penaltiesMissed" name="statSelector" value="penaltiesMissed">Pens Missed</label>
+    <label><input type="checkbox" id="penaltiesMissed" name="statSelector" value="penaltiesMissed">Penalties Missed</label>
     <label><input type="checkbox" id="shotsTotal" name="statSelector" value="shotsTotal">Total Shots</label>
     <label><input type="checkbox" id="shotsOn" name="statSelector" value="shotsOn">Shots On Target</label>
-    <label><input type="checkbox" id="dribblesAttempts" name="statSelector" value="dribblesAttempts">Dribbles Attempts</label>
+    <label><input type="checkbox" id="dribblesAttempts" name="statSelector" value="dribblesAttempts">Dribble Attempts</label>
     <label><input type="checkbox" id="dribblesSucc" name="statSelector" value="dribblesSucc">Dribbles Success</label>
     <label><input type="checkbox" id="dribblesPast" name="statSelector" value="dribblesPast">Dribbles Past</label>
     <label><input type="checkbox" id="duelsTotal" name="statSelector" value="duelsTotal">Duels Total</label>
@@ -33,14 +33,14 @@
   <thead>
     <tr class="main-table-header">
       <th colspan="3" class="list-header">Player</th>
-      <th width="50" class="list-header">Team</th>
+      <th width="50" class="list-header player-country">Team</th>
       <th class="list-header sortable" data-stat="apps"><span class="big-played">Apps</span><span class="small-played">P</span><span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="goals"><span class="big-played">Goals</span><span class="small-played">G</span><span class="sort-indicator"></span></th>
-      <th class="list-header sortable sec-stats" data-stat="npg">NPG<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="npg">NPG<span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="assists"><span class="big-played">Assists</span><span class="small-played">A</span><span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="ga">GA<span class="sort-indicator"></span></th>   
-      <th class="list-header sortable sec-stats" data-stat="gap90">GA/90<span class="sort-indicator"></span></th>
-      <th class="list-header sortable" data-stat="avRating">Rating<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="gap90">GA/90<span class="sort-indicator"></span></th>
+      <th class="list-header sortable" data-stat="avRating"><span class="big-played">Rating</span><span class="small-played">Rat.</span><span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="minutes">Mins<span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="pens">Pens<span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="penaltiesMissed">Pens Miss<span class="sort-indicator"></span></th>
@@ -66,14 +66,14 @@
         {{#if (lt @index 299)}}
         <tr {{#if (gt @index 99)}}style="display:none;"{{/if}}>
             <td id={{this.id}} style="text-align:center;padding:0; border-right: none;">
-                <img height="60" src="images/player-pictures/{{this.id}}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
+                <img class="player-picture" src="images/player-pictures/{{this.id}}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
             </td>
             <td id={{this.nation}} class="player-country">
                 <img height="30" src="images/logos/{{this.nation}}.png" />
             </td>
-            <td>{{this.name}}</td>
+            <td class="sec-stats">{{this.name}}</td>
             <td id={{this.club}}>
-                <img height="44" src="images/logos/{{this.club}}.png" />
+                <img class="logo-picture" src="images/logos/{{this.club}}.png" />
             </td>
             <td data-stat="apps">{{this.apps}}</td>
             <td data-stat="goals">{{this.goals}}</td>

@@ -342,6 +342,14 @@ td .form-indicator:last-child {
   border: 1px solid #900;
 }
 
+.player-picture{
+  width: 60px;
+}
+
+.logo-picture {
+  width: 40px;
+}
+
 @media (max-width: 1820px) {
   main {
     padding-left: 0;
@@ -437,4 +445,17 @@ td .form-indicator:last-child {
   .small-played {
     display: inline;
   }
+  .rectangle, #left, #right {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .player-picture{
+    width: 44px;
+  }
+  
+  .logo-picture {
+    width: 30px;
+  }
+  
 }

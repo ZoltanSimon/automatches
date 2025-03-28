@@ -18,7 +18,7 @@ import {
 } from "../components/league-standings.js";
 import { addText, buildResults } from "../autotext.js";
 import { teamList } from "../components/team-list.js";
-import { playerListToCanvas } from "../components/player-list.js";
+import { playerGoalList, playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
 
@@ -132,7 +132,7 @@ document.getElementById("missing-matches").onclick = async function () {
 };
 
 document.getElementById("get-player-goal-list").onclick = async function () {
-  getTopPlayers(selectedLeagues, 10, false);
+  playerGoalList(false);
 };
 
 /*document.getElementById("get-all-clubs").onclick = async function () {
