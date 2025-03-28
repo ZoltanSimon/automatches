@@ -1,7 +1,6 @@
 import {
   showMatchesOnDate,
   download,
-  getTopPlayers,
 } from "../common-functions.js";
 import {
   selectedLeagues,
