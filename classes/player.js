@@ -35,7 +35,6 @@ export class Player {
     this.shotsOn = 0;
     this.shotsTotal = 0;
     this.tackles = 0;
-    this.team = inputPlayer.teamName;
     this.yellowCards = 0;    
   }
 
