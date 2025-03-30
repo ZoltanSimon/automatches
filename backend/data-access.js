@@ -73,23 +73,28 @@ export async function loadLeagues() {
     await loadLeagues();
   })();
 
-export async function insertPlayers(allPlayers) {
-  try {
-    // Create a database connection
-    const connection = await mysql.createConnection(dbConfig);
-
-    // Insert players into the database
-    for (const player of allPlayers) {
-      const { id, name, club, nation } = player;
-      await connection.execute(
-        'INSERT IGNORE INTO Player (id, name, club, nation) VALUES (?, ?, ?, ?)',
-        [id, name, club, nation]
-      );
+  export async function insertPlayers(allPlayers) {
+    try {
+      // Create a database connection
+      const connection = await mysql.createConnection(dbConfig);
+  
+      // Insert or update players
+      for (const player of allPlayers) {
+        const { id, name, club, nation } = player;
+        await connection.execute(
+          `INSERT INTO Player (id, name, club, nation) 
+           VALUES (?, ?, ?, ?) 
+           ON DUPLICATE KEY UPDATE 
+           club = IF(club <> VALUES(club), VALUES(club), club), 
+           nation = IF(nation <> VALUES(nation), VALUES(nation), nation)`,
+          [id, name, club, nation]
+        );
+      }
+  
+      await connection.end(); // Close the connection
+      console.log({ message: 'Players loaded successfully!' });
+    } catch (error) {
+      console.error({ error: 'Error loading players.', details: error.message });
     }
-
-    await connection.end(); // Close the connection
-    console.log({ message: 'Players loaded successfully!' }); // Send a success response
-  } catch (error) {
-    console.error({ error: 'Error loading players.', details: error.message });
   }
-}
+  
