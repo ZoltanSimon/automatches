@@ -80,7 +80,7 @@ footer p {
 .container {
   display: grid;
   grid-template-columns: 1fr 1fr; /* Two equal columns */
-  gap: 22px; /* Add space between rectangles */
+  gap: 22px;
   width: 1800px;
   margin: 0 auto; /* Center the container */
 }
@@ -186,7 +186,7 @@ footer p {
 #top-team-list {
   grid-column: 1 / 3; /* Span across both columns */
   grid-row: 2 / 3; /* Second row */
-  padding-top: 6px;
+  padding-top: 0px;
   visibility: hidden; /* Hide the table by default */
 }
 
@@ -394,6 +394,8 @@ td .form-indicator:last-child {
   .rectangle, #left, #right {
     padding-left: 6px;
     padding-right: 6px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 }
 
