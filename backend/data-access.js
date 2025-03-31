@@ -54,7 +54,7 @@ export async function loadLeagues() {
 
   try {
     connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.query("SELECT * FROM League WHERE Visible = 1");
+    const [rows] = await connection.query("SELECT * FROM League");
     allLeagues = rows;
     console.log("League loaded from the database:", teams);
   } catch (error) {
@@ -86,7 +86,7 @@ export async function loadLeagues() {
            VALUES (?, ?, ?, ?) 
            ON DUPLICATE KEY UPDATE 
            club = IF(club <> VALUES(club), VALUES(club), club), 
-           nation = IF(nation <> VALUES(nation), VALUES(nation), nation)`,
+           nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation)`,
           [id, name, club, nation]
         );
       }

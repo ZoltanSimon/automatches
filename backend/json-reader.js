@@ -120,7 +120,7 @@ function getBothTeams(players, home) {
   }
 }
 
-export async function getAllPlayers(compType, compList, nationList) {
+export async function getAllPlayers(compList, nationList) {
   let player, thisClub;
   for (let i = 0; i < compList.length; i++) {
     let league = JSON.parse(
@@ -140,11 +140,11 @@ export async function getAllPlayers(compType, compList, nationList) {
                 name: match[0].players[j].players[k].player.name,
                 nation: 0,
               };
-              player[compType] = thisClub;
+              player.club = thisClub;
               if (!allPlayers.find((e) => e.id == player.id)) {
                 allPlayers.push(player);
               } else {
-                allPlayers.find((e) => e.id == player.id)[compType] = thisClub;
+                allPlayers.find((e) => e.id == player.id).club = thisClub;
               }
             }
           }

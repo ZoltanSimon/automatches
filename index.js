@@ -247,7 +247,6 @@ app.get("/get-all-matches", async (request, response) => {
 
 app.get("/get-all-players", async (request, response) => {
   let allPlayers = await getAllPlayers(
-    "club",
     allLeagues.filter((el) => el.type == "league"),
     allLeagues.filter((el) => el.type == "nt")
   );
