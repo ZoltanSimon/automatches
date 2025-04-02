@@ -2,6 +2,8 @@ import {
   buildTableForTableType,
   imgs,
   ctx,
+  loadPlayerFace,
+  loadClubLogo
 } from "../instapics.js";
 import { removeNewlines, hideColumn, showColumn, adjustColspan } from "../common-functions.js";
 
@@ -9,7 +11,7 @@ const tableName = "player-list-table";
 const table = document.getElementById(tableName);
 const checkboxes = document.querySelectorAll("input[name='statSelector']");
 
-export function playerGoalList(big) {
+export function playerGoalList(big, noOfDisplayed = 300) {
   const tableBody = table.getElementsByTagName("tbody")[0];
 
   window.addEventListener("resize", () => adjustColspan(table.rows[0].cells[0], 2));
@@ -28,6 +30,12 @@ export function playerGoalList(big) {
     document.getElementById("statSelectorContainer").style.display = 'none';
   }
 
+  displayedPlayers.forEach(player => {
+    loadPlayerFace(player.id);
+    loadClubLogo(player.club);
+    loadClubLogo(player.nation);
+  });
+
   document.querySelectorAll(`#${tableName} th`).forEach(header => {
     header.addEventListener("click", function () {
         const stat = this.getAttribute("data-stat"); // Get the column's stat name
@@ -38,7 +46,7 @@ export function playerGoalList(big) {
         
         displayedPlayers.sort((a, b) => (a[stat] < b[stat] ? 1 : b[stat] < a[stat] ? -1 : 0));
 
-        updateTable(displayedPlayers.slice(0, 300));
+        updateTable(tableName, displayedPlayers.slice(0, noOfDisplayed));
         updateTableVisibility();
     });
   });
@@ -103,8 +111,13 @@ export function playerListToCanvas() {
   playerListTable.rows[0].style.color = "#F1FAEE";
   playerListTable.rows[0].style.fontWeight = "bold";
 
-  playerListTable.rows[0].deleteCell(-1);
+  playerListTable.rows[0].deleteCell(6);
+  playerListTable.rows[0].deleteCell(6);
+
+  playerListTable.rows[0].cells[2].innerHTML = "Apps";
+  playerListTable.rows[0].cells[3].innerHTML = "Goal";
   playerListTable.rows[0].cells[5].innerHTML = "As.";
+  playerListTable.rows[0].cells[6].innerHTML = "Rate";
 
   for (let i = 0; i < playerListTable.rows[0].cells.length; i++) {
     playerListTable.rows[0].cells[i].style.borderRightColor = "#F1FAEE";
@@ -152,7 +165,16 @@ export function playerListToCanvas() {
     thisTr.children[6].style.width = normalWidth;
     thisTr.children[7].style.width = normalWidth;
 
+    thisTr.deleteCell(8);
+    thisTr.deleteCell(8);
     thisTr.deleteCell(-1);
+
+    thisTr.children[5].style.fontWeight = "bold";
+
+    //center cells from 3 to the last
+    for (let j = 3; j < thisTr.children.length; j++) {
+      thisTr.children[j].style.textAlign = "center";
+    }
   }
 
   buildTableForTableType(
@@ -179,7 +201,7 @@ function updateTableVisibility() {
   });    
 }
 
-function updateTable(sortedPlayers) {
+export function updateTable(tableName, sortedPlayers) {
   const tbody = document.querySelector(`#${tableName} tbody`);
   tbody.innerHTML = "";
 
@@ -188,21 +210,21 @@ function updateTable(sortedPlayers) {
       row.style.display = index < 100 ? "table-row" : "none"; 
 
       row.innerHTML = `
-          <td class="stat-td" style="padding:0; border-right: none;">
+          <td id="${player.id}" class="stat-td" style="padding:0; border-right: none;">
             <img class="player-picture" src="images/player-pictures/${player.id}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
           </td>
-          <td class="player-country">
+          <td id="${player.nation}" class="player-country">
             <img height="30" src="images/logos/${player.nation}.png" />
           </td>
           <td class="sec-stats">${player.name}</td>
-          <td class="stat-td">
+          <td id="${player.club}" class="stat-td">
             <img class="logo-picture" src="images/logos/${player.club}.png" />
           </td>
           <td class="stat-td" data-stat="apps">${player.apps}</td>
           <td class="stat-td" data-stat="goals">${player.goals}</td>
           <td class="stat-td" data-stat="npg">${player.npg}</td>
           <td class="stat-td" data-stat="assists">${player.assists}</td>
-          <td class="stat-td" data-stat="ga">${player.goals}</td>
+          <td class="stat-td" data-stat="ga">${player.ga}</td>
           <td class="stat-td" data-stat="gap90">${player.gap90}</td>
           <td class="stat-td" data-stat="avRating">${player.avRating}</td>
           <td class="stat-td" data-stat="minutes">${player.minutes}</td>

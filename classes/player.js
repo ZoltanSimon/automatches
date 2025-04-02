@@ -20,6 +20,7 @@ export class Player {
     this.duelsWon = 0;
     this.foulsCommited = 0;
     this.foulsAgainst = 0;
+    this.ga=0;
     this.gap90 = 0;
     this.interceptions = 0;
     this.keyPasses = 0;
@@ -41,8 +42,14 @@ export class Player {
   getPlayerStats(playerFound) {
     let stats = playerFound.statistics[0];
 
-    if (stats.goals.total) this.goals += stats.goals.total;
-    if (stats.goals.assists) this.assists += stats.goals.assists;
+    if (stats.goals.total) {
+      this.goals += stats.goals.total;
+      this.ga += stats.goals.total;
+    }
+    if (stats.goals.assists) {
+      this.assists += stats.goals.assists;
+      this.ga += stats.goals.assists;
+    }
     if (stats.shots.on) this.shotsOn += stats.shots.on;
     if (stats.shots.total) this.shotsTotal += stats.shots.total;
     if (stats.dribbles.attempts)

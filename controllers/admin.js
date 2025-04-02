@@ -134,7 +134,7 @@ document.getElementById("missing-matches").onclick = async function () {
 };
 
 document.getElementById("get-player-goal-list").onclick = async function () {
-  playerGoalList(false);
+  playerGoalList(false, 10);
 };
 
 /*document.getElementById("get-all-clubs").onclick = async function () {

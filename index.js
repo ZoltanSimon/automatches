@@ -98,8 +98,25 @@ app.get("/teams", (req, res) => {
   res.render("teams", { title: "Teams" });
 });
 
-app.get("/admin", (req, res) => {
-  res.render("admin", { title: "Automatches" });
+app.get("/admin", async (req, res) => {
+  try {
+    let leagues = [39, 140, 135, 78, 61, 88, 94];
+    let players = await getPlayerGoalList(leagues);
+    const teamFilter = req.query.team;
+    
+    if (teamFilter) {
+      players = players.filter(player => player.club == teamFilter);
+    }
+
+    res.render("admin", { 
+      title: "Automatches", 
+      players: players
+    });
+  } catch (error) {
+    console.error('Error fetching players:', error);
+    res.status(500).send('Error fetching players');
+  }
+  //res.render("admin", { title: "Automatches" });
 });
 
 app.get("/starting11", (req, res) => {
