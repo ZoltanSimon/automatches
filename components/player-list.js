@@ -188,41 +188,41 @@ function updateTable(sortedPlayers) {
       row.style.display = index < 100 ? "table-row" : "none"; 
 
       row.innerHTML = `
-          <td style="text-align:center;padding:0; border-right: none;">
-              <img class="player-picture" src="images/player-pictures/${player.id}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
+          <td class="stat-td" style="padding:0; border-right: none;">
+            <img class="player-picture" src="images/player-pictures/${player.id}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
           </td>
           <td class="player-country">
-              <img height="30" src="images/logos/${player.nation}.png" />
+            <img height="30" src="images/logos/${player.nation}.png" />
           </td>
           <td class="sec-stats">${player.name}</td>
-          <td>
-              <img class="logo-picture" src="images/logos/${player.club}.png" />
+          <td class="stat-td">
+            <img class="logo-picture" src="images/logos/${player.club}.png" />
           </td>
-          <td data-stat="apps">${player.apps}</td>
-          <td data-stat="goals">${player.goals}</td>
-          <td data-stat="npg">${player.npg}</td>
-          <td data-stat="assists">${player.assists}</td>
-          <td data-stat="ga">${player.goals}</td>
-          <td data-stat="gap90">${player.gap90}</td>
-          <td data-stat="avRating">${player.avRating}</td>
-          <td data-stat="minutes">${player.minutes}</td>
-          <td data-stat="pens">${player.penalties}</td>
-          <td data-stat="penaltiesMissed">${player.penaltiesMissed}</td>
-          <td data-stat="shotsTotal">${player.shotsTotal}</td>
-          <td data-stat="shotsOn">${player.shotsOn}</td>
-          <td data-stat="dribblesAttempts">${player.dribblesAttempts}</td>
-          <td data-stat="dribblesSucc">${player.dribblesSucc}</td>
-          <td data-stat="dribblesPast">${player.dribblesPast}</td>
-          <td data-stat="duelsTotal">${player.duelsTotal}</td>
-          <td data-stat="duelsWon">${player.duelsWon}</td>
-          <td data-stat="keyPasses">${player.keyPasses}</td>
-          <td data-stat="foulsAgainst">${player.foulsAgainst}</td>
-          <td data-stat="foulsCommited">${player.foulsCommited}</td>
-          <td data-stat="blocks">${player.blocks}</td>
-          <td data-stat="interceptions">${player.interceptions}</td>
-          <td data-stat="tackles">${player.tackles}</td>
-          <td data-stat="yellowCards">${player.yellowCards}</td>
-          <td data-stat="redCards">${player.redCards}</td>
+          <td class="stat-td" data-stat="apps">${player.apps}</td>
+          <td class="stat-td" data-stat="goals">${player.goals}</td>
+          <td class="stat-td" data-stat="npg">${player.npg}</td>
+          <td class="stat-td" data-stat="assists">${player.assists}</td>
+          <td class="stat-td" data-stat="ga">${player.goals}</td>
+          <td class="stat-td" data-stat="gap90">${player.gap90}</td>
+          <td class="stat-td" data-stat="avRating">${player.avRating}</td>
+          <td class="stat-td" data-stat="minutes">${player.minutes}</td>
+          <td class="stat-td" data-stat="pens">${player.penalties}</td>
+          <td class="stat-td" data-stat="penaltiesMissed">${player.penaltiesMissed}</td>
+          <td class="stat-td" data-stat="shotsTotal">${player.shotsTotal}</td>
+          <td class="stat-td" data-stat="shotsOn">${player.shotsOn}</td>
+          <td class="stat-td" data-stat="dribblesAttempts">${player.dribblesAttempts}</td>
+          <td class="stat-td" data-stat="dribblesSucc">${player.dribblesSucc}</td>
+          <td class="stat-td" data-stat="dribblesPast">${player.dribblesPast}</td>
+          <td class="stat-td" data-stat="duelsTotal">${player.duelsTotal}</td>
+          <td class="stat-td" data-stat="duelsWon">${player.duelsWon}</td>
+          <td class="stat-td" data-stat="keyPasses">${player.keyPasses}</td>
+          <td class="stat-td" data-stat="foulsAgainst">${player.foulsAgainst}</td>
+          <td class="stat-td" data-stat="foulsCommited">${player.foulsCommited}</td>
+          <td class="stat-td" data-stat="blocks">${player.blocks}</td>
+          <td class="stat-td" data-stat="interceptions">${player.interceptions}</td>
+          <td class="stat-td" data-stat="tackles">${player.tackles}</td>
+          <td class="stat-td" data-stat="yellowCards">${player.yellowCards}</td>
+          <td class="stat-td" data-stat="redCards">${player.redCards}</td>
       `;
       tbody.appendChild(row);
   });

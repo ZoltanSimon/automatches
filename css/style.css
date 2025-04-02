@@ -45,6 +45,10 @@ form label {
   margin-top: 10px;
 }
 
+.stat-td {
+  text-align: center;
+}
+
 form input {
   margin-bottom: 10px;
 }
