@@ -65,7 +65,7 @@ export function playerGoalList(big, noOfDisplayed = 300) {
     }
   });
 
-  if (big) {
+  if (big && displayedPlayers > 100) {
     let loadMoreBtn = document.createElement("button");
     loadMoreBtn.innerText = "Load More";
     loadMoreBtn.style.display = "block";

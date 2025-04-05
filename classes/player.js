@@ -36,7 +36,8 @@ export class Player {
     this.shotsOn = 0;
     this.shotsTotal = 0;
     this.tackles = 0;
-    this.yellowCards = 0;    
+    this.yellowCards = 0;
+    this.positions=[];    
   }
 
   getPlayerStats(playerFound) {

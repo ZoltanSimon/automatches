@@ -162,12 +162,14 @@ export async function getAllPlayers(compList, nationList) {
       if (nt[i].fixture.status.short == "FT") {
         let match = await getMatchFromServer(nt[i].fixture.id);
         if (match) {
+          if (match[0].players.length > 0) {
           for (let j = 0; j < match[0].players.length; j++) {
             let thisNation = match[0].players[j].team.id;
             for (let k = 0; k < match[0].players[j].players.length; k++) {
               let player = match[0].players[j].players[k].player;
 
               let playerFound = allPlayers.find((e) => e.id == player.id);
+
               if (!playerFound) {
                 allPlayers.push({ id: player.id, name: player.name, club: 0, nation: thisNation });
               } else {
@@ -175,6 +177,23 @@ export async function getAllPlayers(compList, nationList) {
               }
             }
           }
+        } else {
+          for (let j = 0; j < match[0].lineups.length; j++) {
+            let thisNation = match[0].lineups[j].team.id;
+            if (match[0].lineups[j].startXI) {
+            for (let k = 0; k < match[0].lineups[j].startXI.length; k++) {
+              let player = match[0].lineups[j].startXI[k].player;
+              let playerFound = allPlayers.find((e) => e.id == player.id);
+
+              if (!playerFound) {
+                allPlayers.push({ id: player.id, name: player.name, club: 0, nation: thisNation });
+              } else {
+                allPlayers.find((e) => e.id == player.id).nation = thisNation;
+              }
+            }
+          }
+        }
+        }
         }
       }
     }

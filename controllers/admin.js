@@ -24,19 +24,11 @@ import { addMatchStats, matchStatsToCanvas } from "../components/match-statistic
 const response = await fetch(`/get-all-leagues`);
 const allLeagues = await response.json();
 
-/*const picker = datepicker(document.querySelector("#calendar"), {
-  position: "bl",
-  alwaysShow: true,
-  onSelect: (instance, date) => {
-    document.getElementById("fixtures-info").innerHTML = "";
-    showMatchesOnDate(date, true);
-  },
+document.getElementById('datepicker-input').addEventListener('change', function () {
+  document.getElementById("fixtures-info").innerHTML = "";
+  const selectedDate = this.value;
+  showMatchesOnDate(selectedDate, true);
 });
-picker.calendarContainer.style.setProperty("left", "374px");
-picker.calendarContainer.style.setProperty("font-size", "0.6rem");
-  // Usage:
-  const inputField = document.querySelector('#datepicker-input');
-  new DatePicker(inputField);*/
 
 showMatchesOnDate(new Date(), true);
 
