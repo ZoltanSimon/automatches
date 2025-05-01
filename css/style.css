@@ -347,6 +347,12 @@ td .form-indicator:last-child {
   width: 60px;
 }
 
+.player-position {
+  font-size: 0.85em;
+  color: #457B9D;
+  margin-top: 2px;
+}
+
 .logo-picture {
   width: 40px;
 }

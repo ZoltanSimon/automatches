@@ -4,9 +4,7 @@ import {
 } from "../common-functions.js";
 import {
   selectedLeagues,
-  getLocalPlayerStats,
   downloadMatch,
-  findPlayerByID,
 } from "../local-handler.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
 import { make_base, fontY } from "../instapics.js";
@@ -20,6 +18,7 @@ import { teamList } from "../components/team-list.js";
 import { playerGoalList, playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
+import { getPlayerStatsFromApi } from "../webapi-handler.js";
 
 const response = await fetch(`/get-all-leagues`);
 const allLeagues = await response.json();
@@ -161,9 +160,9 @@ document.getElementById("get-player-goal-list").onclick = async function () {
   console.log(teamsNew);
 };*/
 
-document.getElementById("get-all-players").onclick = async function () {
+document.getElementById("insert-all-players").onclick = async function () {
   try {
-    const response = await fetch(`/get-all-players`);
+    const response = await fetch(`/insert-all-players`);
     const data = await response.json();
     console.log(data);
   } catch (error) {
@@ -181,11 +180,12 @@ document.getElementById("get-all-matches").onclick = async function () {
 };
 
 document.getElementById("getPlayerStats").onclick = async function () {
-  let player1 = findPlayerByID(document.getElementById("playerID").value);
-  let player2 = findPlayerByID(document.getElementById("playerID2").value);
-  playerFromApi = await getLocalPlayerStats(player1);
-  playerFromApi2 = await getLocalPlayerStats(player2);
-  addPlayerStats(playerFromApi, playerFromApi2);
+  let player1 = document.getElementById("playerID").value;
+  //let player2 = findPlayerByID(document.getElementById("playerID2").value);
+  console.log(await getPlayerStatsFromApi(player1));
+  //playerFromApi = await getLocalPlayerStats(player1);
+  //playerFromApi2 = await getLocalPlayerStats(player2);
+  //addPlayerStats(playerFromApi, playerFromApi2);
 };
 
 document.getElementById("getSquad").onclick = async function () {

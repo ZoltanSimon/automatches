@@ -58,6 +58,7 @@
       <th class="list-header sortable" data-stat="tackles">Tackles<span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="yellowCards"><span class="yellow-card"></span><span class="sort-indicator"></span></th>
       <th class="list-header sortable" data-stat="redCards"> <span class="red-card"></span><span class="sort-indicator"></span></th>
+      <!--th class="list-header sortable" data-stat="age">Age<span class="sort-indicator"></span></th-->
     </tr>
   </thead>
   <tbody>
@@ -70,7 +71,10 @@
             <td id={{this.nation}} class="player-country">
                 <img height="30" src="images/logos/{{this.nation}}.png" />
             </td>
-            <td class="sec-stats">{{this.name}}</td>
+            <td class="sec-stats">
+              <div class="player-name">{{this.name}}</div>
+              <div class="player-position">{{this.position}}</div>          
+            </td>
             <td class="stat-td" id={{this.club}}>
                 <a href="/players?team={{this.club}}"><img class="logo-picture" src="images/logos/{{this.club}}.png" /></a>
             </td>
@@ -99,6 +103,7 @@
             <td class="stat-td" data-stat="tackles">{{this.tackles}}</td>
             <td class="stat-td" data-stat="yellowCards">{{this.yellowCards}}</td>
             <td class="stat-td" data-stat="redCards">{{this.redCards}}</td>
+            <!--td class="stat-td" data-stats="age">{{this.age}}</td-->
         </tr>
         {{/if}}
       {{/each}}

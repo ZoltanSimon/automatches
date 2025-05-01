@@ -80,14 +80,15 @@ export async function loadLeagues() {
   
       // Insert or update players
       for (const player of allPlayers) {
-        const { id, name, club, nation } = player;
+        const { id, name, club, nation, position } = player;
         await connection.execute(
-          `INSERT INTO Player (id, name, club, nation) 
-           VALUES (?, ?, ?, ?) 
+          `INSERT INTO Player (id, name, club, nation, position) 
+           VALUES (?, ?, ?, ?, ?) 
            ON DUPLICATE KEY UPDATE 
            club = IF(club <> VALUES(club), VALUES(club), club), 
-           nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation)`,
-          [id, name, club, nation]
+           nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation),
+           position = VALUES(position)`,
+          [id, name, club, nation, position[0] || ""]
         );
       }
   

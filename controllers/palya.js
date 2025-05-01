@@ -515,7 +515,7 @@ function val() {
       number++;
     }
   }
-  console.log(players);
+
   if (showTeamName) {
     addTeamName(teamName);
   }

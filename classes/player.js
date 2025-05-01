@@ -4,6 +4,7 @@ export class Player {
     this.name = inputPlayer.name;
     this.club = inputPlayer.club;
     this.nation = inputPlayer.nation;
+    this.position = inputPlayer.position;
     this.goals = 0;
     this.assists = 0;
     this.apps = 0;
@@ -29,7 +30,6 @@ export class Player {
     this.passes = 0;
     this.penalties = 0;
     this.penaltiesMissed = 0;
-    this.position = "";
     this.rating = 0;
     this.redCards = 0;
     this.shots = ``;
@@ -37,7 +37,9 @@ export class Player {
     this.shotsTotal = 0;
     this.tackles = 0;
     this.yellowCards = 0;
-    this.positions=[];    
+    this.birthdate = "";
+    this.age = 0;
+    this.exactPositions = [];
   }
 
   getPlayerStats(playerFound) {

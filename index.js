@@ -41,11 +41,13 @@ app.engine(
       },
       lt: function (a, b) {
         return a < b; 
+      },
+      eq: function (a, b) {
+        return a === b;
       }
     }
   })
 );
-
 
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
@@ -262,7 +264,7 @@ app.get("/get-all-matches", async (request, response) => {
   response.json(bigArr);
 });
 
-app.get("/get-all-players", async (request, response) => {
+app.get("/insert-all-players", async (request, response) => {
   let allPlayers = await getAllPlayers(
     allLeagues.filter((el) => el.type == "league"),
     allLeagues.filter((el) => el.type == "nt")

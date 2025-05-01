@@ -4,9 +4,10 @@ import * as fs from "fs";
 import { networkPath } from "./config.js";
 import { findOrCreateTeam, extractStats } from "./backend-helper.js";
 import { players } from "./data-access.js";
+import { LineupParser } from "./../classes/lineupparser.js";
 
 const cache = new Map();
-let allPlayers = [];
+
 export const matchesDir = `${networkPath}matches`;
 export const leaguesDir = `${networkPath}leagues`;
 export const dataDir = `${networkPath}`;
@@ -16,41 +17,52 @@ export function getPlayerByID(playerID) {
 }
 
 export async function getPlayerGoalList(leagues) {
-  allPlayers = [];
-  let teams,
-    teamNames = {};
-  for (let i = 0; i < leagues.length; i++) {
-    let league = await getLeagueFromServer(leagues[i]);
-    for (let i = 0; i < league.length; i++) {
-      if (league[i].fixture.status.short == "FT") {
-        let match = await getMatchFromServer(league[i].fixture.id);
-        if (match != null && match[0]) {
-          for (let { players } of match) {
-            if (Array.isArray(players) && players.length >= 2) {
-              teams = {
-                home: players[0].team.id,
-                away: players[1].team.id,
-              };
-
-              teamNames = {
-                home: players[0].team.name,
-                away: players[1].team.name,
-              };
-
-              getBothTeams(players, 0, teamNames.home);
-              getBothTeams(players, 1, teamNames.away);
+  const allPlayers = [];
+  
+  for (let leagueIndex = 0; leagueIndex < leagues.length; leagueIndex++) {
+    const league = await getLeagueFromServer(leagues[leagueIndex]);
+    
+    for (let matchIndex = 0; matchIndex < league.length; matchIndex++) {
+      const leagueMatch = league[matchIndex];
+      
+      if (leagueMatch.fixture.status.short !== "FT") continue;
+      
+      const match = await getMatchFromServer(leagueMatch.fixture.id);
+      
+      if (!match || !match[0]) continue;
+      
+      for (let { players } of match) {
+        if (!Array.isArray(players) || players.length < 2) continue;
+        
+        for (let teamIndex = 0; teamIndex <= 1; teamIndex++) {
+          const teamPlayers = players[teamIndex].players;
+          
+          for (let player of teamPlayers) {
+            const playerID = player.player.id;
+            let playerFound = allPlayers.find(x => x.id === playerID);
+            
+            if (playerFound) {
+              playerFound.getPlayerStats(player);
+            } else {
+              const inputPlayer = getPlayerByID(playerID);
+              
+              if (!inputPlayer) {
+                console.error(`Player with ID ${playerID} not found.`);
+                continue;
+              }
+              
+              const thisPlayer = new Player(inputPlayer);
+              thisPlayer.getPlayerStats(player);
+              allPlayers.push(thisPlayer);
             }
           }
         }
       }
     }
   }
-  allPlayers.sort((a, b) =>
-    a.goals < b.goals ? 1 : b.goals < a.goals ? -1 : 0
-  );
+  allPlayers.sort((a, b) => a.goals < b.goals ? 1 : b.goals < a.goals ? -1 : 0);
 
-  allPlayers = allPlayers.filter(player => player.apps >= 5);
-  return allPlayers;
+  return allPlayers.filter(player => player.apps >= 5);
 }
 
 export async function getMatchFromServer(fixtureID) {
@@ -100,105 +112,123 @@ export async function writeLeagueToServer(leagueID, dataToWrite) {
   return responseToSend;
 }
 
-function getBothTeams(players, home) {
-  for (let player of players[home].players) {
-    let playerID = player.player.id;
-    let playerFound = allPlayers.find((x) => x.id == playerID);
-    if (playerFound) {
-      playerFound.getPlayerStats(player);
-    } else {
-      let inputPlayer = getPlayerByID(playerID);
-
-      if (!inputPlayer) {
-        console.error(`Player with ID ${playerID} not found.`);
-        return;
-      }
-      let thisPlayer = new Player(inputPlayer);
-      thisPlayer.getPlayerStats(player);
-      allPlayers.push(thisPlayer);
-    }
-  }
-}
-
 export async function getAllPlayers(compList, nationList) {
-  let player, thisClub;
-  for (let i = 0; i < compList.length; i++) {
-    let league = JSON.parse(
-      await readFile(`${leaguesDir}/${compList[i].id}.json`)
-    );
+  const playerMap = new Map();
 
-    for (let i = 0; i < league.length; i++) {
-      if (league[i].fixture.status.short == "FT") {
-        let match = await getMatchFromServer(league[i].fixture.id);
-        if (match) {
-          for (let j = 0; j < match[0].players.length; j++) {
-            thisClub = match[0].players[j].team.id;
+  const addOrUpdatePlayer = ({ id, name, club = 0, nation = 0, position = [] }) => {
+    if (!playerMap.has(id)) {
+      playerMap.set(id, { id, name, club, nation, position: Array.isArray(position) ? position : [position] });
+    } else {
+      const existing = playerMap.get(id);
+      if (club) existing.club = club;
+      if (nation) existing.nation = nation;
+      if (position && position.length) {
+        existing.position = Array.from(new Set([...existing.position, ...position]));
+      }
+    }
+  };
 
-            for (let k = 0; k < match[0].players[j].players.length; k++) {
-              player = {
-                id: match[0].players[j].players[k].player.id,
-                name: match[0].players[j].players[k].player.name,
-                nation: 0,
-              };
-              player.club = thisClub;
-              if (!allPlayers.find((e) => e.id == player.id)) {
-                allPlayers.push(player);
-              } else {
-                allPlayers.find((e) => e.id == player.id).club = thisClub;
+  for (const comp of compList) {
+    try {
+      const league = JSON.parse(await readFile(`${leaguesDir}/${comp.id}.json`));
+
+      for (const match of league) {
+        if (match.fixture.status.short !== "FT") continue;
+
+        const matchData = await getMatchFromServer(match.fixture.id);
+        if (!matchData?.[0]) continue;
+
+        const { lineups = [], players: matchPlayers = [] } = matchData[0];
+
+        // Pre-parse lineup positions only once
+        const parsedLineupsByTeam = new Map();
+        for (const lineup of lineups) {
+          parsedLineupsByTeam.set(lineup.team.id, LineupParser.parseLineups([lineup], lineup.team.id));
+        }
+
+        for (const teamData of matchPlayers) {
+          const clubId = teamData.team.id;
+
+          for (const playerData of teamData.players || []) {
+            const playerId = playerData.player.id;
+            const playerName = playerData.player.name;
+            let positions = [];
+
+            const lineup = lineups.find(l => l.team.id === clubId);
+            if (lineup) {
+              const starter = lineup.startXI?.find(s => s.player.id === playerId);
+              if (starter) {
+                const parsed = parsedLineupsByTeam.get(clubId);
+                if (parsed && parsed[playerName]?.role) {
+                  positions.push(parsed[playerName].role);
+                }
               }
+            }
+
+            addOrUpdatePlayer({
+              id: playerId,
+              name: playerName,
+              club: clubId,
+              position: positions
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`Error processing competition ${comp.id}:`, error);
+    }
+  }
+
+  for (const nation of nationList) {
+    try {
+      const nt = JSON.parse(await readFile(`${leaguesDir}/${nation.id}.json`));
+
+      for (const match of nt) {
+        if (match.fixture.status.short !== "FT") continue;
+
+        const matchData = await getMatchFromServer(match.fixture.id);
+        if (!matchData?.[0]) continue;
+
+        const matchDetail = matchData[0];
+
+        if (matchDetail.players?.length > 0) {
+          for (const teamData of matchDetail.players) {
+            const nationId = teamData.team.id;
+
+            for (const playerData of teamData.players || []) {
+              addOrUpdatePlayer({
+                id: playerData.player.id,
+                name: playerData.player.name,
+                nation: nationId
+              });
+            }
+          }
+        } else if (matchDetail.lineups?.length > 0) {
+          for (const lineup of matchDetail.lineups) {
+            const nationId = lineup.team.id;
+
+            const allLineupPlayers = [
+              ...(lineup.startXI || []),
+              ...(lineup.substitutes || [])
+            ];
+
+            for (const entry of allLineupPlayers) {
+              addOrUpdatePlayer({
+                id: entry.player.id,
+                name: entry.player.name,
+                nation: nationId,
+                position: entry.position ? [entry.position] : []
+              });
             }
           }
         }
       }
+    } catch (error) {
+      console.error(`Error processing national team ${nation.id}:`, error);
     }
   }
 
-  for (let i = 0; i < nationList.length; i++) {
-    let nt = JSON.parse(
-      await readFile(`${leaguesDir}/${nationList[i].id}.json`)
-    );
-
-    for (let i = 0; i < nt.length; i++) {
-      if (nt[i].fixture.status.short == "FT") {
-        let match = await getMatchFromServer(nt[i].fixture.id);
-        if (match) {
-          if (match[0].players.length > 0) {
-          for (let j = 0; j < match[0].players.length; j++) {
-            let thisNation = match[0].players[j].team.id;
-            for (let k = 0; k < match[0].players[j].players.length; k++) {
-              let player = match[0].players[j].players[k].player;
-
-              let playerFound = allPlayers.find((e) => e.id == player.id);
-
-              if (!playerFound) {
-                allPlayers.push({ id: player.id, name: player.name, club: 0, nation: thisNation });
-              } else {
-                allPlayers.find((e) => e.id == player.id).nation = thisNation;
-              }
-            }
-          }
-        } else {
-          for (let j = 0; j < match[0].lineups.length; j++) {
-            let thisNation = match[0].lineups[j].team.id;
-            if (match[0].lineups[j].startXI) {
-            for (let k = 0; k < match[0].lineups[j].startXI.length; k++) {
-              let player = match[0].lineups[j].startXI[k].player;
-              let playerFound = allPlayers.find((e) => e.id == player.id);
-
-              if (!playerFound) {
-                allPlayers.push({ id: player.id, name: player.name, club: 0, nation: thisNation });
-              } else {
-                allPlayers.find((e) => e.id == player.id).nation = thisNation;
-              }
-            }
-          }
-        }
-        }
-        }
-      }
-    }
-  }
-  return allPlayers;
+  return Array.from(playerMap.values());
 }
 
 export function buildTeamList(data) {

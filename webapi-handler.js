@@ -113,7 +113,7 @@ export async function getCurrentRound(leagueID) {
   return data;
 }
 
-export async function getPlayerStats(playerID) {
+export async function getPlayerStatsFromApi(playerID) {
   const response = await fetch(
     `https://v3.football.api-sports.io/players?id=${playerID}&season=${season}`,
     {
