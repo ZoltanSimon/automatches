@@ -2,31 +2,34 @@ import { readFile } from "fs/promises";
 import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
-import { PORT } from "./backend/config.js";
-import { getResultsDate, getResultFromApi } from "./webapi-handler.js";
+import { PORT } from "./config.js";
+import { getResultsDate, getResultFromApi } from "../webapi-handler.js";
 import {
-  getPlayerGoalList,
   getMatchFromServer,
   matchesDir,
   getAllPlayers,
   getLeagueFromServer,
   writeLeagueToServer,
   buildTeamList,
-} from "./backend/json-reader.js";
-import { allLeagues, insertPlayers } from "./backend/data-access.js"; 
+} from "./json-reader.js";
+import { allLeagues, insertPlayers } from "./data-access.js"; 
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
+import { getPlayerList } from "./services/players-service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 const app = express();
-
-app.use(express.json());
-
-const partialsPath = path.join(__dirname, "/views/partials"); 
-console.log("Partials Directory:", partialsPath);
-console.log("Files in Partials Directory:", fs.readdirSync(partialsPath)); 
+const require = createRequire(import.meta.url);
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
+const partialsPath = path.join(__dirname, "../views/partials"); 
 
 app.engine(
   "handlebars",
@@ -49,18 +52,18 @@ app.engine(
   })
 );
 
-app.set("views", __dirname + "/views");
+app.use(express.json());
+app.set("views", __dirname + "./../views");
 app.set("view engine", "handlebars");
 app.use(express.static("./"));
+app.use(cors(corsOptions));
 
 app.get("/", async (req, res) => {
   try {
-    let leagues = [39, 140, 135, 78, 61, 88, 94];
-    let players = await getPlayerGoalList(leagues);
-
     res.render("home", { 
       title: "generationFootball", 
-      players: players.slice(0,10)
+      players: await getPlayerList(defaultLeagues, 10),
+      matches: ""
     });
   } catch (error) {
     console.error('Error fetching players:', error);
@@ -74,17 +77,9 @@ app.get("/about", (req, res) => {
 
 app.get("/players", async (req, res) => {
   try {
-    let leagues = [39, 140, 135, 78, 61, 88, 94];
-    let players = await getPlayerGoalList(leagues);
-    const teamFilter = req.query.team;
-    
-    if (teamFilter) {
-      players = players.filter(player => player.club == teamFilter);
-    }
-
     res.render("players", { 
       title: "Players", 
-      players: players
+      players: await getPlayerList(defaultLeagues, 300, req.query.team),
     });
   } catch (error) {
     console.error('Error fetching players:', error);
@@ -102,12 +97,8 @@ app.get("/teams", (req, res) => {
 
 app.get("/admin", async (req, res) => {
   try {
-    let leagues = [39, 140, 135, 78, 61, 88, 94];
-    let players = await getPlayerGoalList(leagues);
-    const teamFilter = req.query.team;
-    
     if (teamFilter) {
-      players = players.filter(player => player.club == teamFilter);
+      players = await getPlayerList(leagues, 300, teamFilter);
     }
 
     res.render("admin", { 
@@ -118,7 +109,6 @@ app.get("/admin", async (req, res) => {
     console.error('Error fetching players:', error);
     res.status(500).send('Error fetching players');
   }
-  //res.render("admin", { title: "Automatches" });
 });
 
 app.get("/starting11", (req, res) => {
@@ -132,16 +122,6 @@ app.get("/ucl-last-round", (req, res) => {
 app.listen(PORT, () => {
   console.log("Server Listening on PORT:", PORT);
 });
-
-const require = createRequire(import.meta.url);
-const cors = require("cors");
-const corsOptions = {
-  origin: "*",
-  credentials: true,
-  optionSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
 
 app.get("/status", (request, response) => {
   const status = {
@@ -275,8 +255,8 @@ app.get("/insert-all-players", async (request, response) => {
 });
 
 app.get("/get-player-list", async (request, response) => {
-  let leagues = request.query.leagues ? request.query.leagues.split(",") : [39, 140, 135, 78, 61, 88, 94];
-  let playerList = await getPlayerGoalList(leagues);
+  let leagues = request.query.leagues ? request.query.leagues.split(",") : defaultLeagues;
+  let playerList = await getPlayerList(leagues, 300);
   response.json(playerList);
 });
 
