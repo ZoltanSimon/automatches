@@ -3,7 +3,7 @@ import { loadPlayerFace } from "./instapics.js";
 import { teamList } from "./components/team-list.js";
 import { downloadMatch } from "./local-handler.js";
 
-export let download = function (canvasName = "myCanvas") {
+export let download = function (canvasName = "my-canvas") {
   var link = document.createElement("a");
   link.download = "genfoot.png";
   link.href = document.getElementById(canvasName).toDataURL();
@@ -70,7 +70,7 @@ export async function showMatchesOnDate(date, showID) {
   let allLeaguematches = await fetch(`get-matches-on-day?matchDate=${date}`);
   let matches = await allLeaguematches.json();
   
-  for (let match of matches) {
+  /*for (let match of matches) {
     let fixtureDate = new Date(match.fixture.date);
     const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
 
@@ -82,7 +82,7 @@ export async function showMatchesOnDate(date, showID) {
         downloads++;
       }
     }
-  }
+  }*/
 
   if (matches.length > 0) matchList(matches, showID);
 }
@@ -221,4 +221,34 @@ export function adjustColspan(headerRow, newSpan) {
   } else {
     headerRow.colSpan = newSpan +1; // Restore colspan when screen is wide
   }
+}
+
+export function showToast(message, type = 'info', duration = 3000) {
+    // Remove existing toast if any
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    // Hide toast after duration
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, duration);
 }

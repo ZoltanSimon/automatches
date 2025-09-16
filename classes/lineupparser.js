@@ -41,15 +41,15 @@ export class LineupParser {
             orderedPlayers.forEach((player, i) => {
                 const role = positions?.[i] || "Unknown";
 
-                // Count role occurrences
-                if (!LineupParser.playerPositionCounts[player.name]) {
-                    LineupParser.playerPositionCounts[player.name] = {};
+                if (!LineupParser.playerPositionCounts[player.id]) {
+                    LineupParser.playerPositionCounts[player.id] = {};
                 }
-                const roleCounts = LineupParser.playerPositionCounts[player.name];
+                const roleCounts = LineupParser.playerPositionCounts[player.id];
                 roleCounts[role] = (roleCounts[role] || 0) + 1;
 
-                teamResult[player.name] = {
+                teamResult[player.id] = {
                     role,
+                    name: player.name,  // Keep name as data, not key
                     number: player.number,
                     pos: player.pos,
                     grid: player.grid
@@ -59,12 +59,12 @@ export class LineupParser {
             result[team.team.name] = teamResult;
         });
 
-        // Finalize roles to use the most frequent one
+        // Finalize roles to use the most frequent one - using player IDs
         for (const teamName in result) {
-            for (const playerName in result[teamName]) {
-                const roleCounts = LineupParser.playerPositionCounts[playerName];
+            for (const playerId in result[teamName]) {
+                const roleCounts = LineupParser.playerPositionCounts[playerId];
                 const finalRole = Object.entries(roleCounts).sort((a, b) => b[1] - a[1])[0][0]; // highest count
-                result[teamName][playerName].role = finalRole;
+                result[teamName][playerId].role = finalRole;
             }
         }
 
@@ -334,6 +334,86 @@ export class LineupParser {
                 "Central Midfielder",
                 "Central Midfielder",
                 "Left Winger",
+                "Striker"
+            ]
+        },
+        {
+            "formation": "4-3-2-1",
+            "positions": [
+                "Goalkeeper",
+                "Right Back",
+                "Center Back",
+                "Center Back",
+                "Left Back",
+                "Central Midfielder",
+                "Central Midfielder",
+                "Central Midfielder",
+                "Attacking Midfielder",
+                "Attacking Midfielder",
+                "Striker"
+            ]
+        },
+        {
+            "formation": "4-1-2-1-2",
+            "positions": [
+                "Goalkeeper",
+                "Right Back",
+                "Center Back",
+                "Center Back",
+                "Left Back",
+                "Defensive Midfielder",
+                "Right Midfielder",
+                "Left Midfielder",
+                "Attacking Midfielder",
+                "Striker",
+                "Striker"
+            ]
+        },
+        {
+            "formation": "5-2-3",
+            "positions": [
+                "Goalkeeper",
+                "Center Back",
+                "Center Back",
+                "Center Back",
+                "Right Wing Back",
+                "Left Wing Back",
+                "Central Midfielder",
+                "Central Midfielder",
+                "Right Winger",
+                "Striker",
+                "Left Winger"
+            ]
+        },
+        {
+            "formation": "4-2-4",
+            "positions": [
+                "Goalkeeper",
+                "Right Back",
+                "Center Back",
+                "Center Back",
+                "Left Back",
+                "Central Midfielder",
+                "Central Midfielder",
+                "Right Winger",
+                "Left Winger",
+                "Striker",
+                "Striker"
+            ]
+        },
+        {
+            "formation": "4-1-3-2",
+            "positions": [
+                "Goalkeeper",
+                "Right Back",
+                "Center Back",
+                "Center Back",
+                "Left Back",
+                "Defensive Midfielder",
+                "Right Midfielder",
+                "Attacking Midfielder",
+                "Left Midfielder",
+                "Striker",
                 "Striker"
             ]
         }

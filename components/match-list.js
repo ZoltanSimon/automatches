@@ -18,7 +18,7 @@ import {
 let imgToAdd = [];
 let yPos = 220;
 
-export function matchList(fixtures, showID = false) {
+ export function matchList(fixtures, showID = false) {
   let addToPage, date;
   let leagueName = fixtures[0].league.name;
   let leagueID = fixtures[0].league.id;
@@ -89,7 +89,7 @@ export function matchList(fixtures, showID = false) {
   document
     .querySelectorAll(".match-id")
     .forEach((e) => e.addEventListener("click", downloadMatch));
-}
+} 
 
 export function matchesToCanvas(sourceDiv) {
   let matchesTable = document.getElementById(sourceDiv);

@@ -1,7 +1,7 @@
 import { imagePath } from "./common-functions.js";
 import { darkColor, redColor } from "./common-styles.js";
 
-let c = document.getElementById("myCanvas");
+let c = document.getElementById("my-canvas");
 export let ctx = c?.getContext("2d");
 const font = "sans-serif";
 const fontSize = 46;

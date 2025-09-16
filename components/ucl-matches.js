@@ -5,10 +5,6 @@ import {
   loadClubLogo,
 } from "../instapics.js";
 export function drawUCLMatches() {
-  // Get the canvas element and context
-  //const canvas = document.getElementById("myCanvas");
-  //const ctx = canvas.getContext("2d");
-
   // Define the center and radius of the circle
   const centerX = 1080 / 2;
   const centerY = 1080 / 2;

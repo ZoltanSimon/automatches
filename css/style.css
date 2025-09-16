@@ -49,24 +49,6 @@ form label {
   text-align: center;
 }
 
-form input {
-  margin-bottom: 10px;
-}
-
-form button {
-  display: block;
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #333;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-form button:hover {
-  background-color: #555;
-}
-
 footer {
   background-color: #1d3557;
   color: #fff;
@@ -355,6 +337,40 @@ td .form-indicator:last-child {
 
 .logo-picture {
   width: 40px;
+}
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #333;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-width: 300px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    font-family: Arial, sans-serif;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.success {
+    background: #4CAF50;
+}
+
+.toast.error {
+    background: #f44336;
+}
+
+.toast.info {
+    background: #2196F3;
 }
 
 @media (max-width: 1820px) {

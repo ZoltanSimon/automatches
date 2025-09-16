@@ -116,3 +116,18 @@ table tr:nth-of-type(2n) td {
   display: inline-block;
   margin-right: 10px; /* Adds space between spans */
 }
+
+.main-admin-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  height: 1100px
+}
+
+.child-div {
+  flex-shrink: 0;
+}
+
+.my-canvas {
+  position: relative;
+}

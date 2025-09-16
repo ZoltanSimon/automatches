@@ -73,7 +73,7 @@ export async function loadLeagues() {
     await loadLeagues();
   })();
 
-  export async function insertPlayers(allPlayers) {
+  export async function insertPlayersToDb(allPlayers) {
     try {
       // Create a database connection
       const connection = await mysql.createConnection(dbConfig);
@@ -82,12 +82,12 @@ export async function loadLeagues() {
       for (const player of allPlayers) {
         const { id, name, club, nation, position } = player;
         await connection.execute(
-          `INSERT INTO Player (id, name, club, nation, position) 
-           VALUES (?, ?, ?, ?, ?) 
-           ON DUPLICATE KEY UPDATE 
-           club = IF(club <> VALUES(club), VALUES(club), club), 
-           nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation),
-           position = VALUES(position)`,
+          `INSERT INTO Player (id, name, club, nation, position)
+          VALUES (?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+          club = IF(VALUES(club) <> 0 AND club <> VALUES(club), VALUES(club), club),
+          nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation),
+          position = VALUES(position);`,
           [id, name, club, nation, position[0] || ""]
         );
       }

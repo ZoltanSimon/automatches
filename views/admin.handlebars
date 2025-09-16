@@ -1,8 +1,8 @@
 <script type="module" src="./../controllers/admin.js"></script>
 
 <link rel="stylesheet" href="css/automatches.css" />
-<div style="height: 1100px">
-  <div class="work-area">
+<div class="main-admin-container">
+  <div class="work-area child-div">
     <div id="league-stuff">
       <span id="league-name"></span>- ID:
       <span id="league-id"></span>- Round:
@@ -27,7 +27,7 @@
       id="selected-matches"
     ></table>
   </div>
-  <div class="control-panel">
+  <div class="control-panel child-div">
     <div class="floating-buttons">
       <div class="row" style="display: flex">
         <div id="league-list">
@@ -181,9 +181,9 @@
       </button>
     </div>
   </div>
-  <div class="canvas-div">
+  <div class="canvas-div child-div">
     <canvas
-      id="myCanvas"
+      id="my-canvas"
       width="1080"
       height="1080"
       style="border: 1px solid #d3d3d3"

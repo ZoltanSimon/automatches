@@ -1,6 +1,7 @@
 import {
   showMatchesOnDate,
   download,
+  showToast
 } from "../common-functions.js";
 import {
   selectedLeagues,
@@ -104,6 +105,7 @@ document.getElementById("update-leagues").onclick = async function () {
     }
   );
   const data = await response.json();
+  showToast(JSON.stringify(data), 'success');
   console.log(data);
 };
 

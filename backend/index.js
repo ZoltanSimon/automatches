@@ -7,16 +7,16 @@ import { getResultsDate, getResultFromApi } from "../webapi-handler.js";
 import {
   getMatchFromServer,
   matchesDir,
-  getAllPlayers,
   getLeagueFromServer,
   writeLeagueToServer,
   buildTeamList,
 } from "./json-reader.js";
-import { allLeagues, insertPlayers } from "./data-access.js"; 
+import { allLeagues } from "./data-access.js"; 
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getPlayerList } from "./services/players-service.js";
+import { getPlayerList, insertAllPlayers, getPlayerByID } from "./services/players-service.js";
+import { matchesOnDay } from "./services/matches-service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -43,14 +43,38 @@ app.engine(
         return JSON.stringify(context);
       },
       lt: function (a, b) {
-        return a < b; 
+        return a < b;
       },
       eq: function (a, b) {
         return a === b;
+      },
+      formatTime: function (datestamp) {
+        if (!datestamp) return "";
+
+        const date = datestamp instanceof Date ? datestamp : new Date(datestamp);
+        if (isNaN(date.getTime())) return "";
+
+        return date.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "Europe/Berlin" // CET/CEST
+        });
+      },
+      currentDate: function () {
+        const now = new Date();
+
+        return now.toLocaleDateString("en-GB", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          timeZone: "Europe/Berlin" // CET/CEST
+        });
       }
     }
   })
 );
+
 
 app.use(express.json());
 app.set("views", __dirname + "./../views");
@@ -60,16 +84,22 @@ app.use(cors(corsOptions));
 
 app.get("/", async (req, res) => {
   try {
+    const selectedDate = req.query.date
+      ? new Date(req.query.date)
+      : new Date();
+
     res.render("home", { 
       title: "generationFootball", 
       players: await getPlayerList(defaultLeagues, 10),
-      matches: ""
+      matches: await matchesOnDay(selectedDate),
+      selectedDate: selectedDate.toISOString().split("T")[0]
     });
   } catch (error) {
-    console.error('Error fetching players:', error);
-    res.status(500).send('Error fetching players');
+    console.error("Error fetching players:", error);
+    res.status(500).send("Error fetching players");
   }
 });
+
 
 app.get("/about", (req, res) => {
   res.render("about", { title: "About Page" });
@@ -97,13 +127,9 @@ app.get("/teams", (req, res) => {
 
 app.get("/admin", async (req, res) => {
   try {
-    if (teamFilter) {
-      players = await getPlayerList(leagues, 300, teamFilter);
-    }
-
     res.render("admin", { 
       title: "Automatches", 
-      players: players
+      players: await getPlayerList(defaultLeagues, 300, req.query.team)
     });
   } catch (error) {
     console.error('Error fetching players:', error);
@@ -245,13 +271,7 @@ app.get("/get-all-matches", async (request, response) => {
 });
 
 app.get("/insert-all-players", async (request, response) => {
-  let allPlayers = await getAllPlayers(
-    allLeagues.filter((el) => el.type == "league"),
-    allLeagues.filter((el) => el.type == "nt")
-  );
-
-  await insertPlayers(allPlayers);
-  response.json(allPlayers);
+  response.json(await insertAllPlayers());
 });
 
 app.get("/get-player-list", async (request, response) => {
@@ -271,28 +291,7 @@ app.get("/match-exists", async (request, response) => {
 });
 
 app.get("/get-matches-on-day", async (request, response) => {
-  let todaysMatches = [];
-  let checkDate = new Date(request.query.matchDate) || new Date();
-
-  for (let i=0; i<allLeagues.length; i++) {
-    let leagueID = allLeagues[i].id;
-    let data = await getLeagueFromServer(leagueID);
-
-    for (const element of data) {
-      let fixtureDate = new Date(element.fixture.date);
-      if (fixtureDate.toDateString() === checkDate.toDateString()) {
-        todaysMatches.push(element);
-      }
-    }
-
-    for (let i = 0; i < todaysMatches.length; i++) {
-      let matchID = todaysMatches[i].fixture.id;
-      let matchData = await getMatchFromServer(matchID);
-      if (matchData && matchData[0]) {
-        todaysMatches[i] = matchData[0];
-      }
-    }
-  }
+  let todaysMatches = await matchesOnDay(new Date(request.query.matchDate));
   response.json(todaysMatches);
 });
 

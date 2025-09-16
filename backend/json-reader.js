@@ -3,18 +3,14 @@ import { Player } from "./../classes/player.js";
 import * as fs from "fs";
 import { networkPath } from "./config.js";
 import { findOrCreateTeam, extractStats } from "./backend-helper.js";
-import { players } from "./data-access.js";
 import { LineupParser } from "./../classes/lineupparser.js";
+import { getPlayerByID } from "./services/players-service.js";
 
 const cache = new Map();
 
 export const matchesDir = `${networkPath}matches`;
 export const leaguesDir = `${networkPath}leagues`;
 export const dataDir = `${networkPath}`;
-
-export function getPlayerByID(playerID) {
-  return players.find((element) => element.id == playerID);
-}
 
 export async function getPlayerGoalList(leagues) {
   const allPlayers = [];
@@ -62,7 +58,7 @@ export async function getPlayerGoalList(leagues) {
   }
   allPlayers.sort((a, b) => a.goals < b.goals ? 1 : b.goals < a.goals ? -1 : 0);
 
-  return allPlayers.filter(player => player.apps >= 5);
+  return allPlayers.filter(player => player.apps >= 1);
 }
 
 export async function getMatchFromServer(fixtureID) {
@@ -76,7 +72,7 @@ export async function getMatchFromServer(fixtureID) {
       return response;
     }
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     return null;
   }
 }
@@ -159,8 +155,8 @@ export async function getAllPlayers(compList, nationList) {
               const starter = lineup.startXI?.find(s => s.player.id === playerId);
               if (starter) {
                 const parsed = parsedLineupsByTeam.get(clubId);
-                if (parsed && parsed[playerName]?.role) {
-                  positions.push(parsed[playerName].role);
+                if (parsed && parsed[playerId]?.role) { // Changed from playerName to playerId
+                  positions.push(parsed[playerId].role); // Changed from playerName to playerId
                 }
               }
             }
