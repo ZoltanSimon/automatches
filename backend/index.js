@@ -17,6 +17,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getPlayerList, insertAllPlayers, getPlayerByID } from "./services/players-service.js";
 import { matchesOnDay } from "./services/matches-service.js";
+import * as helpers from "./services/handlebars-helpers.js";
+import { groupByLeague } from "./services/leagues-service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -35,46 +37,9 @@ app.engine(
   "handlebars",
   engine({
     partialsDir: [partialsPath],
-    helpers: {
-      gt: function (a, b) {
-        return a > b;
-      },
-      json: function (context) {
-        return JSON.stringify(context);
-      },
-      lt: function (a, b) {
-        return a < b;
-      },
-      eq: function (a, b) {
-        return a === b;
-      },
-      formatTime: function (datestamp) {
-        if (!datestamp) return "";
-
-        const date = datestamp instanceof Date ? datestamp : new Date(datestamp);
-        if (isNaN(date.getTime())) return "";
-
-        return date.toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-          timeZone: "Europe/Berlin" // CET/CEST
-        });
-      },
-      currentDate: function () {
-        const now = new Date();
-
-        return now.toLocaleDateString("en-GB", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          timeZone: "Europe/Berlin" // CET/CEST
-        });
-      }
-    }
+    helpers
   })
-);
-
+)
 
 app.use(express.json());
 app.set("views", __dirname + "./../views");
@@ -88,10 +53,12 @@ app.get("/", async (req, res) => {
       ? new Date(req.query.date)
       : new Date();
 
+      console.log(groupByLeague(await matchesOnDay(selectedDate)));
+
     res.render("home", { 
       title: "generationFootball", 
       players: await getPlayerList(defaultLeagues, 10),
-      matches: await matchesOnDay(selectedDate),
+      groupedMatches: groupByLeague(await matchesOnDay(selectedDate)),
       selectedDate: selectedDate.toISOString().split("T")[0]
     });
   } catch (error) {
