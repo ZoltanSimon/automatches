@@ -1,40 +1,73 @@
-  <table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="match-list">
-    <thead>
-      <tr class="main-table-header">
-        <th colspan=6>{{currentDate}}</th>
-        <th colspan="3">
-          <form method="get" action="/" style="display: flex; justify-content: flex-end; align-items: center; height: 100%; margin: 0; padding: 0;">
-            <input 
-              type="date" 
-              id="matchDate" 
-              name="date" 
-              value="{{selectedDate}}" 
-              onchange="this.form.submit()" />
-          </form>
-        </th>
+<table
+  style="border-collapse: collapse; border: 3px solid #1D3557;"
+  border="1"
+  id="match-list"
+>
+  <thead>
+    <tr class="main-table-header">
+      <th colspan="6">{{currentDate}}</th>
+      <th colspan="3">
+        <form
+          method="get"
+          action="/"
+          style="display: flex; justify-content: flex-end; align-items: center; height: 100%; margin: 0; padding: 0;"
+        >
+          <input
+            type="date"
+            id="matchDate"
+            name="date"
+            value="{{selectedDate}}"
+            onchange="this.form.submit()"
+          />
+        </form>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each groupedMatches}}
+      <tr class="league-row">
+        <td
+          colspan="8"
+          style="text-align:left; font-weight:bold; background:#F1FAEE;"
+        >
+          <img
+            src="images/competitions/{{this.league.id}}.png"
+            alt="{{this.league.name}}"
+            width="24"
+            style="vertical-align:middle; margin-right:6px;"
+          />
+          {{this.league.name}}
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      {{#each matches}}
+
+      {{#each this.matches}}
         <tr>
-          
           <td rowspan=2 style="text-align: center;">{{formatTime fixture.date}}</td>
-          <td style="text-align: left;" rowspan=2 id="{{teams.home.id}}">{{teams.home.name}}</td>
+          <td style="text-align: left; width: 30%" rowspan=2 id="{{teams.home.id}}">{{teams.home.name}}</td>
           <td style="text-align: center;" rowspan=2><img src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}" width="44px"></td>
           <td style="text-align: center; font-weight: bold">{{goals.home}}</td>
           <td style="text-align: center;" rowspan=2> - </td>
           <td style="text-align: center; font-weight: bold">{{goals.away}}</td>
           <td style="text-align: center;" rowspan=2><img src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}" width="44px"></td>
-          <td style="text-align: left;" rowspan=2 id="{{teams.away.id}}">{{teams.away.name}}</td>
-          <td width=40 rowspan=2><img width=40 src="images/competitions/{{league.id}}.png"/></td>
+          <td style="text-align: left; width: 30%;" rowspan=2 id="{{teams.away.id}}">{{teams.away.name}}</td>
         </tr>
         <tr>
           {{#if ../showID}}
             <td style="text-align: center;">{{fixture.date}}</td>
           {{/if}}
-          <td style="text-align: center;">({{statistics.[0].statistics.[16].value}})</td>
-          <td style="text-align: center;">({{statistics.[1].statistics.[16].value}})</td>
+          <td style="text-align: center;">
+            {{#if statistics.[0].statistics.[16].value}}
+              ({{statistics.[0].statistics.[16].value}})
+            {{/if}}
+          </td>
+
+          <td style="text-align: center;">
+            {{#if statistics.[1].statistics.[16].value}}
+              ({{statistics.[1].statistics.[16].value}})
+            {{/if}}
+          </td>
         </tr>
       {{/each}}
-    </tbody>
-  </table>
+    {{/each}}
+  </tbody>
+</table>
