@@ -128,7 +128,7 @@ export function standingsToCanvas() {
           img: imgs.clubs[teamId],
           imgHeight: 40,
           startX: 166,
-          startY: yPos + 42 + l * 42,
+          startY: yPos + 50 + l * 42,
         });
       
         l++;
@@ -144,8 +144,6 @@ export function standingsToCanvas() {
       
       allForms.push(thisForm);
     }
-
-
   }
 
   writeStrokedText({
@@ -160,9 +158,10 @@ export function standingsToCanvas() {
   });
   ctx.drawImage(imgs.leagues[leagueID], 90, yPos - 86, 80, 80);
 
-  console.log(allForms);
-  console.log(imgToAdd);
-  console.log(standingsTable.outerHTML);
+  //console.log(allForms);
+  //console.log(imgToAdd);
+  //console.log(standingsTable.outerHTML);
+  //console.log(yPos);
 
   buildTableForTableType(
     removeNewlines(standingsTable.outerHTML),

@@ -33,12 +33,14 @@ document.getElementById('datepicker-input').addEventListener('change', function 
 showMatchesOnDate(new Date(), true);
 
 for (const element of allLeagues) {
-  document.getElementById(
-    `league-list-${element.type}`
-  ).innerHTML += `<img width=30px id="img-${element.id}" class="league-to-select" src="images/competitions/${element.id}.png" alt="${element.name}" title="${element.name}"/>`;
-  document
-    .querySelectorAll(".league-to-select")
-    .forEach((e) => e.addEventListener("click", selectLeague));
+  if (element.Visible == 1) {
+    document.getElementById(
+      `league-list-${element.type}`
+    ).innerHTML += `<img width=30px id="img-${element.id}" class="league-to-select" src="images/competitions/${element.id}.png" alt="${element.name}" title="${element.name}"/>`;
+    document
+      .querySelectorAll(".league-to-select")
+      .forEach((e) => e.addEventListener("click", selectLeague));
+  }
 }
 
 function selectLeague(evt) {

@@ -50,7 +50,7 @@ export function make_base(text, breakingText) {
 export function buildTableForTableType(
   lines,
   imgToAdd,
-  yPos = 100,
+  yPos = 10,
   allForms = []
 ) {
   ctx.drawImage(border_image, 0, 0);
@@ -185,7 +185,7 @@ function drawFormBars(formArrays, yPos) {
 
       ctx.fillStyle = color;
       const x = 824 + index * (barWidth + spacing);
-      ctx.fillRect(x, yPos + 44 + i * (barHeight + 5), barWidth, barHeight);
+      ctx.fillRect(x, yPos + 51 + i * (barHeight + 5), barWidth, barHeight);
     });
   }
 }

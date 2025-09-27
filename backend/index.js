@@ -11,7 +11,7 @@ import {
   writeLeagueToServer,
   buildTeamList,
 } from "./json-reader.js";
-import { allLeagues } from "./data-access.js"; 
+import { allLeagues, insertMatchesToQueue } from "./data-access.js"; 
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -143,21 +143,30 @@ app.get("/update-leagues", async (request, response) => {
 
 //saves match
 app.get("/save-match", async (request, response) => {
-  let matchID = request.query.matchID;
-  let dataToWrite = await getResultFromApi(matchID);
+  try {
+    let matchID = request.query.matchID;
+    let { data, limits } = await getResultFromApi(matchID);
 
-  fs.writeFile(
-    `${matchesDir}/${matchID}.json`,
-    JSON.stringify(dataToWrite.response),
-    { flag: "wx" },
-    function (err) {
-      if (err) {
-        console.log(err);
-        console.log("Already exists");
+    fs.writeFile(
+      `${matchesDir}/${matchID}.json`,
+      JSON.stringify(data.response),
+      { flag: "wx" },
+      function (err) {
+        if (err) {
+          console.log(err);
+          console.log("Already exists");
+        }
+
+        response.json({
+          match: data.response,
+          limits: limits,
+        });
       }
-      response.json(dataToWrite.response);
-    }
-  );
+    );
+  } catch (err) {
+    console.error("Error saving match:", err);
+    response.status(500).json({ error: "Something went wrong" });
+  }
 });
 
 //returns missing matches from given league
@@ -167,24 +176,29 @@ app.get("/missing-matches", async (request, response) => {
 
   if (leagueIDs.length == 0 || !(leagueIDs[0] > 0)) {
     return response.json([]);
-  } else {
-    for (const leagueID of leagueIDs) {
-      let data = await getLeagueFromServer(leagueID);
-
-      for (const element of data) {
-        if (["FT", "AET"].includes(element.fixture.status.short))
-          try {
-            fs.accessSync(
-              `${matchesDir}/${element.fixture.id}.json`,
-              fs.constants.R_OK
-            );
-          } catch (err) {
-            matchArr.push(element);
-          }
-      }
-    }
   }
 
+  for (const leagueID of leagueIDs) {
+    let data = await getLeagueFromServer(leagueID);
+
+    for (const element of data) {
+      if (["FT", "AET"].includes(element.fixture.status.short)) {
+        try {
+          // Check if file exists
+          fs.accessSync(
+            `${matchesDir}/${element.fixture.id}.json`,
+            fs.constants.R_OK
+          );
+        } catch (err) {
+          matchArr.push(element);
+
+          
+        }
+      }
+    }
+    await insertMatchesToQueue(matchArr);
+  }
+  
   response.json(matchArr);
 });
 

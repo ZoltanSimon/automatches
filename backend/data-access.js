@@ -98,4 +98,28 @@ export async function loadLeagues() {
       console.error({ error: 'Error loading players.', details: error.message });
     }
   }
-  
+
+export async function insertMatchesToQueue(matches) {
+  const connection = await mysql.createConnection(dbConfig);
+
+  for (const match of matches) {
+    let matchID = match.id;
+    let leagueID = match.league.id;
+    let matchDate = match.fixture.date;
+    await connection.query(
+      `INSERT IGNORE INTO match_queue (match_id, league_id, match_date) VALUES (?, ?, ?)`,
+      [matchID, leagueID, matchDate]
+    );
+  }
+  await connection.end();
+}
+
+export async function removeMatchesFromQueue(matchIDs) {
+  if (matchIDs.length === 0) return;
+
+  const placeholders = matchIDs.map(() => "?").join(",");
+  await db.query(
+    `DELETE FROM match_queue WHERE match_id IN (${placeholders})`,
+    matchIDs
+  );
+}
