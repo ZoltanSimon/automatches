@@ -15,7 +15,6 @@ import {
   leagueStandings
 } from "../components/league-standings.js";
 import { addText, buildResults } from "../autotext.js";
-import { teamList } from "../components/team-list.js";
 import { playerGoalList, playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
@@ -172,14 +171,6 @@ document.getElementById("insert-all-players").onclick = async function () {
   } catch (error) {
     console.error("Failed to fetch and build player list:", error);
     return [];
-  }
-};
-
-document.getElementById("get-all-matches").onclick = async function () {
-  if (selectedLeagues.length > 0) {
-    teamList(await buildTeamList(selectedLeagues), false);
-  } else {
-    console.error("No league selected");
   }
 };
 
