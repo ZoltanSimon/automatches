@@ -7,11 +7,10 @@ import { getResultsDate, getResultFromApi } from "../webapi-handler.js";
 import {
   getMatchFromServer,
   matchesDir,
-  getLeagueFromServer,
   writeLeagueToServer,
   buildTeamList,
 } from "./json-reader.js";
-import { allLeagues, insertMatchesToQueue } from "./data-access.js"; 
+import { allLeagues, insertMatchesToQueue, getLeagueFromDb } from "./data-access.js"; 
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -52,8 +51,6 @@ app.get("/", async (req, res) => {
     const selectedDate = req.query.date
       ? new Date(req.query.date)
       : new Date();
-
-      console.log(groupByLeague(await matchesOnDay(selectedDate)));
 
     res.render("home", { 
       title: "generationFootball", 
@@ -154,7 +151,6 @@ app.get("/save-match", async (request, response) => {
       function (err) {
         if (err) {
           console.log(err);
-          console.log("Already exists");
         }
 
         response.json({
@@ -179,7 +175,7 @@ app.get("/missing-matches", async (request, response) => {
   }
 
   for (const leagueID of leagueIDs) {
-    let data = await getLeagueFromServer(leagueID);
+    let data = await getLeagueFromDb(leagueID);
 
     for (const element of data) {
       if (["FT", "AET"].includes(element.fixture.status.short)) {
@@ -221,7 +217,7 @@ app.get("/get-teams", async (request, response) => {
 
   for (let i = 0; i < leagues.length; i++) {
     let leagueID = leagues[i];
-    let data = await getLeagueFromServer(leagueID);
+    let data = await getLeagueFromDb(leagueID);
     for (const element of data) {
       let thisFixture = element.fixture;
       let fixtureDate = new Date(thisFixture.date);
@@ -284,7 +280,7 @@ app.get("/find-player-by-id", async (request, response) => {
 app.get("/get-matches-by-round", async (request, response) => {
   let leagueID = request.query.leagueID;
   let round = request.query.roundNo;
-  let data = await getLeagueFromServer(leagueID);
+  let data = await getLeagueFromDb(leagueID);
   let matches = data.filter((element) => element.league.round == round);
 
   for (let i = 0; i < matches.length; i++) {

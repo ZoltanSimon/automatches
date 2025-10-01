@@ -1,10 +1,7 @@
 import {
-  showMatchesOnDate,
   getTopTeams
 } from "../../common-functions.js";
 import { playerGoalList } from "../../components/player-list.js";
-
-//showMatchesOnDate(new Date(), false);
 
 await playerGoalList(false);
 
