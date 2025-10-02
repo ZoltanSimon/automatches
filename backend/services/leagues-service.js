@@ -1,4 +1,4 @@
-import { allLeagues } from "../data-access.js";
+import { allDBLeagues } from "../data-access.js";
 
 export function groupByLeague(matches) {
   const grouped = {};
@@ -9,7 +9,7 @@ export function groupByLeague(matches) {
         league: match.league, // { id, name, logo }
         matches: []
       };
-      grouped[leagueId].league.name = allLeagues.find(lg => lg.id == leagueId).name;
+      grouped[leagueId].league.name = allDBLeagues.find(lg => lg.id == leagueId).name;
     }
     grouped[leagueId].matches.push(match);
   }

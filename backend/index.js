@@ -9,8 +9,9 @@ import {
   matchesDir,
   writeLeagueToServer,
   buildTeamList,
+  getLeagueFromServer,
 } from "./json-reader.js";
-import { allLeagues, insertMatchesToQueue, getLeagueFromDb } from "./data-access.js"; 
+import { allDBLeagues, insertMatchesToQueue, getLeagueFromDb, allDBTeams, insertTeamsToDb } from "./data-access.js"; 
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -295,5 +296,36 @@ app.get("/get-matches-by-round", async (request, response) => {
 });
 
 app.get("/get-all-leagues", (req, res) => {
-  res.json(allLeagues);
+  res.json(allDBLeagues);
+});
+
+app.get("/insert-all-clubs-to-db", async (req, res) => {
+  let teamsNew = [];
+  for (let league of allDBLeagues) {
+    let matches = await getLeagueFromServer(league.id);
+    for (const match of matches) {
+      let homeTeam = {
+        ID: match.teams.home.id,
+        name: match.teams.home.name,
+      };
+      let awayTeam = {
+        ID: match.teams.away.id,
+        name: match.teams.away.name,
+      };
+
+      if (!teamsNew.find((e) => e.ID == homeTeam.ID)) {
+        teamsNew.push(homeTeam);
+      }
+
+      if (!teamsNew.find((e) => e.ID == awayTeam.ID)) {
+        teamsNew.push(awayTeam);
+      }
+    }
+  }
+
+  teamsNew = teamsNew.filter(function (obj) {
+    return !allDBTeams.some((el) => el.ID === obj.ID);
+  });
+  insertTeamsToDb(teamsNew);
+  console.log(teamsNew);
 });

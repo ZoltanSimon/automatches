@@ -1,6 +1,5 @@
-import { readFile } from "fs/promises";
 import * as fs from "fs";
-import { allLeagues, getLeagueFromDb } from "./../data-access.js";
+import { allDBLeagues, getLeagueFromDb } from "./../data-access.js";
 import {
   matchesDir,
   getMatchFromServer,
@@ -11,8 +10,8 @@ export async function matchesOnDay(dateToCheck) {
   let checkDate = new Date(dateToCheck) || new Date();
   console.log("Checking for matches on date:", checkDate.toDateString());
 
-  for (let i = 0; i < allLeagues.length; i++) {
-    let leagueID = allLeagues[i].id;
+  for (let i = 0; i < allDBLeagues.length; i++) {
+    let leagueID = allDBLeagues[i].id;
     let data = await getLeagueFromDb(leagueID);
 
     for (const element of data) {

@@ -1,9 +1,9 @@
 import pool, { networkPath } from "./config.js";
 import fs from "fs";
 
-export let players = [];
-export let teams = [];
-export let allLeagues = [];
+export let allDBPlayers = [];
+export let allDBTeams = [];
+export let allDBLeagues = [];
 
 const leagueCache = new Map();
 const CACHE_TTL = 60 * 10000; // 1 minute
@@ -11,8 +11,8 @@ const CACHE_TTL = 60 * 10000; // 1 minute
 export async function loadPlayers() {
   try {
     const [rows] = await pool.query("SELECT * FROM Player");
-    players = rows;
-    //console.log("Players loaded from the database:", players);
+    allDBPlayers = rows;
+    //console.log("Players loaded from the database:", allDBPlayers);
   } catch (error) {
     console.error("Error loading players from the database:", error);
     throw error;
@@ -22,8 +22,8 @@ export async function loadPlayers() {
 export async function loadTeams() {
   try {
     const [rows] = await pool.query("SELECT * FROM Team");
-    teams = rows;
-    //console.log("Team loaded from the database:", teams);
+    allDBTeams = rows;
+    //console.log("Team loaded from the database:", allTteams);
   } catch (error) {
     console.error("Error loading teams from the database:", error);
     throw error;
@@ -33,9 +33,9 @@ export async function loadTeams() {
 export async function loadLeagues() {
   try {
     const [rows] = await pool.query("SELECT * FROM League");
-    allLeagues = rows;
+    allDBLeagues = rows;
     //remove leagues which are not visible
-    allLeagues = allLeagues.filter((lg) => lg.Visible);
+    allDBLeagues = allDBLeagues.filter((lg) => lg.Visible);
     //console.log("League loaded from the database:", teams);
   } catch (error) {
     console.error("Error loading leagues from the database:", error);
@@ -68,6 +68,24 @@ export async function insertPlayersToDb(allPlayers) {
     console.log({ message: "Players loaded successfully!" });
   } catch (error) {
     console.error({ error: "Error loading players.", details: error.message });
+  }
+}
+
+export async function insertTeamsToDb(teams) {
+  try {
+    for (const team of teams) {
+      const { ID, name } = team;
+      await pool.execute(
+        `INSERT INTO Team (ID, name)
+          VALUES (?, ?)
+          ON DUPLICATE KEY UPDATE
+          name = VALUES(name);`,
+        [ID, name]
+      );
+    }
+    console.log({ message: "Teams loaded successfully!" });
+  } catch (error) {
+    console.error({ error: "Error loading teams.", details: error.message });
   }
 }
 
@@ -150,7 +168,7 @@ export async function importLeague(leagueID) {
 
 export async function getLeagueFromDb(leagueID) {
   const season =
-    allLeagues.find((lg) => lg.id == leagueID)?.season ||
+    allDBLeagues.find((lg) => lg.id == leagueID)?.season ||
     new Date().getFullYear();
   const tableName = `league-${leagueID}-${season}`;
   const cacheKey = `${leagueID}-${season}`;
@@ -184,11 +202,11 @@ export async function getLeagueFromDb(leagueID) {
       teams: {
         home: {
           id: r.home_team_id,
-          name: teams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+          name: allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
         },
         away: {
           id: r.away_team_id,
-          name: teams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+          name: allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
         },
       },
       goals: {

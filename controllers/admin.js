@@ -131,37 +131,13 @@ document.getElementById("get-player-goal-list").onclick = async function () {
   playerGoalList(false, 10);
 };
 
-/*document.getElementById("get-all-clubs").onclick = async function () {
-  let teamsNew = [];
-  let homeTeam, awayTeam;
-  for (let i = 0; i < allLeagues.length; i++) {
-    let response = await fetch(`get-league?leagueID=${allLeagues[i].id}`);
-    let league = await response.json();
-    for (let j = 0; j < league.length; j++) {
-      homeTeam = {
-        id: league[j].teams.home.id,
-        name: league[j].teams.home.name,
-      };
-      awayTeam = {
-        id: league[j].teams.away.id,
-        name: league[j].teams.away.name,
-      };
-
-      if (!teamsNew.find((e) => e.id == homeTeam.id)) {
-        teamsNew.push(homeTeam);
-      }
-
-      if (!teamsNew.find((e) => e.id == awayTeam.id)) {
-        teamsNew.push(awayTeam);
-      }
-    }
-  }
-
-  teamsNew = teamsNew.filter(function (obj) {
-    return !clubs.some((el) => el.id === obj.id);
+document.getElementById("get-all-clubs").onclick = async function () {
+  let response = await fetch("/insert-all-clubs-to-db", {
+    method: "GET",
   });
-  console.log(teamsNew);
-};*/
+  let result = await response.json();
+  console.log("Inserted teams:", result);
+};
 
 document.getElementById("insert-all-players").onclick = async function () {
   try {
