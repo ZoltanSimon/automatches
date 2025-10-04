@@ -6,7 +6,7 @@ export let allDBTeams = [];
 export let allDBLeagues = [];
 
 const leagueCache = new Map();
-const CACHE_TTL = 60 * 10000; // 1 minute
+const CACHE_TTL = 60 * 10000;
 
 export async function loadPlayers() {
   try {

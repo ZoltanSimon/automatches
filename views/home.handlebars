@@ -3,25 +3,27 @@
 <div class="container">
   <div class="rectangle" id="rectangle1">
     <h2>Top Players</h2>
-    <a href="/players" class="more-link">More &gt;&gt;&gt;</a>
+    <a href="/players" class="more-link more-button">More &gt;&gt;&gt;</a>
     <div id="player-list" class="table-container">
       {{> player-list-table big=false}}
     </div>
   </div>
-  <div class="rectangle" id="rectangle2"><h2>Top Teams</h2>
-    <a href="/teams" class="more-link">More &gt;&gt;&gt;</a>
+  <div class="rectangle" id="rectangle2">
+    <h2>Top Teams</h2>
+    <a href="/teams" class="more-link more-button">More &gt;&gt;&gt;</a>
     <div id="top-team-list" class="table-container">
       {{> team-list-table big=false}}
     </div>
   </div>
-  <div class="rectangle" id="rectangle3"><h2>Matches</h2>
+  <div class="rectangle" id="rectangle3">
+    <h2>Matches</h2>
     <span hidden id="league-name"></span>
     <span hidden id="league-id"></span>
     <span hidden id="round-no"></span>
     <div id="fixtures-info" class="table-container"></div>
     {{> match-list-table}}
   </div>
-  <div class="rectangle" id="rectangle4"><h2>Coming Soon</h2>
-
+  <div class="rectangle" id="rectangle4">
+    <h2>Coming Soon</h2>
   </div>
 </div>
