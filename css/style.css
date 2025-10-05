@@ -475,6 +475,7 @@ td .form-indicator:last-child {
   th,
   td {
     padding: 2px;
+    font-size: 14px;
   }
   .list-header {
     padding: 1px;
@@ -503,6 +504,9 @@ td .form-indicator:last-child {
   }
   .logo-picture {
     width: 30px;
+  }
+  #player-list table tr td:first-child {
+    width: 44px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

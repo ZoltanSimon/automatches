@@ -532,6 +532,7 @@ td .form-indicator {
   th,
   td {
     padding: 2px;
+    font-size: 14px;
   }
   
   .list-header {
@@ -568,6 +569,10 @@ td .form-indicator {
   
   .logo-picture {
     width: 30px;
+  }
+
+  #player-list table tr td:first-child {
+    width: 44px;
   }
 }
 
