@@ -109,23 +109,33 @@ footer {
 
 .sortable {
   cursor: pointer;
+  position: relative;
+}
 
-  .sort-indicator::before {
-    content: "↕";
-    font-size: 12px;
-  }
+.sortable .sort-indicator::after {
+  content: "▼";
+  display: block;
+  font-size: 10px;
+  color: #666;
+  margin-top: 0px;
+}
 
-  &.asc .sort-indicator::before {
-    content: "▲";
-  }
+#top-team-list .sortable .sort-indicator::after {
+  margin-top: -4px;
+}
 
-  &.desc .sort-indicator::before {
-    content: "▼";
-  }
+.sortable.asc .sort-indicator::after {
+  content: "▲";
+  color: #f1faee;
+}
 
-  &:hover {
-    background-color: $blue;
-  }
+.sortable.desc .sort-indicator::after {
+  content: "▼";
+  color: #f1faee;
+}
+
+.sortable:hover {
+  background-color: #457B9D;
 }
 
 .header-title,
@@ -222,6 +232,7 @@ footer {
 
 #player-list table tr td:first-child {
   background-color: $lightest-blue;
+  width: 60px;
 }
 
 .main-table-header { 
@@ -236,6 +247,14 @@ footer {
 
 .team-name, .player-country {
   border-left: none;
+}
+
+.player-country {
+  width: 32px;
+}
+
+.player-club {
+  width: 40px;
 }
 
 .small-played {
@@ -279,7 +298,7 @@ td .form-indicator {
 
 .list-header {
   text-align: center;
-  padding: 2px;
+  padding: 1px;
   width: 60px;
   border-right: 1px solid $lightest-blue;
   white-space: nowrap;
@@ -424,29 +443,31 @@ td .form-indicator {
   }
 }
 
-// Media Queries
-@media (max-width: 1820px) {
+// Media Queries - Mobile First Approach with Modern Standards
+
+// Large Desktop (1820px and up) - Base styles
+// Medium Desktop
+@media (width <= 1820px) {
   main {
-    padding-left: 0;
-    padding-right: 0;
+    padding-inline: 0;
   }
   
   .container, #ucl-container {
     width: 100%;
     gap: 10px;
-    padding-left: 0;
-    padding-right: 0;
+    padding-inline: 0;
   }
   
   .rectangle {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-inline: 8px;
   }
 }
 
-@media (max-width: 1670px) {
+// Desktop
+@media (width <= 1670px) {
   main {
-    padding: 2px 0px;
+    padding-block: 2px;
+    padding-inline: 0;
   }
   
   .container {
@@ -454,14 +475,14 @@ td .form-indicator {
   }
 }
 
-@media (max-width: 1400px) {
+// Tablet Landscape
+@media (width <= 1400px) {
   .container {
     gap: 2px;
   }
   
   .rectangle {
-    padding-left: 2px;
-    padding-right: 2px;
+    padding-inline: 2px;
   }
   
   .small-container {
@@ -469,26 +490,25 @@ td .form-indicator {
   }
 }
 
-@media (max-width: 1100px) {
+// Tablet Portrait
+@media (width <= 1100px) {
   .container, #ucl-container {
     grid-template-columns: 1fr;
     width: 100%;
   }
   
   .rectangle, #left, #right {
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-inline: 6px;
+    padding-block: 10px;
   }
 }
 
-@media (max-width: 768px) {
+// Mobile Landscape / Small Tablet
+@media (width <= 768px) {
   #statSelectorContainer {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: auto;
+    inset-inline: 0;
+    inset-block-end: 0;
+    inset-block-start: auto;
     transform: none;
     width: 100%;
     border-radius: 8px 8px 0 0;
@@ -507,10 +527,11 @@ td .form-indicator {
   }
 }
 
-@media (max-width: 645px) {
+// Mobile Portrait
+@media (width < 660px) {
   th,
   td {
-    padding: 4px;
+    padding: 2px;
   }
   
   .list-header {
@@ -521,10 +542,10 @@ td .form-indicator {
     width: 17%;
   }
   
-  .team-name, .player-country, .corners, .sec-stats {
-    display: none;
-  }
-  
+  .team-name, 
+  .player-country, 
+  .corners, 
+  .sec-stats,
   .big-played {
     display: none;
   }
@@ -534,11 +555,10 @@ td .form-indicator {
   }
   
   .rectangle, #left, #right {
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-inline: 0;
 
     h2 {
-      margin-left: 2px;
+      margin-inline-start: 2px;
     }
   }
   
@@ -548,5 +568,16 @@ td .form-indicator {
   
   .logo-picture {
     width: 30px;
+  }
+}
+
+// Preference-based media queries for accessibility
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

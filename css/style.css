@@ -94,17 +94,31 @@ footer p {
 
 .sortable {
   cursor: pointer;
+  position: relative;
 }
-.sortable .sort-indicator::before {
-  content: "↕";
-  font-size: 12px;
-}
-.sortable.asc .sort-indicator::before {
-  content: "▲";
-}
-.sortable.desc .sort-indicator::before {
+
+.sortable .sort-indicator::after {
   content: "▼";
+  display: block;
+  font-size: 10px;
+  color: #666;
+  margin-top: 0px;
 }
+
+#top-team-list .sortable .sort-indicator::after {
+  margin-top: -4px;
+}
+
+.sortable.asc .sort-indicator::after {
+  content: "▲";
+  color: #f1faee;
+}
+
+.sortable.desc .sort-indicator::after {
+  content: "▼";
+  color: #f1faee;
+}
+
 .sortable:hover {
   background-color: #457B9D;
 }
@@ -197,6 +211,7 @@ footer p {
 
 #player-list table tr td:first-child {
   background-color: #f1faee;
+  width: 60px;
 }
 
 .main-table-header {
@@ -211,6 +226,14 @@ footer p {
 
 .team-name, .player-country {
   border-left: none;
+}
+
+.player-country {
+  width: 32px;
+}
+
+.player-club {
+  width: 40px;
 }
 
 .small-played {
@@ -248,7 +271,7 @@ td .form-indicator:last-child {
 
 .list-header {
   text-align: center;
-  padding: 2px;
+  padding: 1px;
   width: 60px;
   border-right: 1px solid #f1faee;
   white-space: nowrap;
@@ -385,60 +408,54 @@ td .form-indicator:last-child {
   background: #2196F3;
 }
 
-@media (max-width: 1820px) {
+@media (width <= 1820px) {
   main {
-    padding-left: 0;
-    padding-right: 0;
+    padding-inline: 0;
   }
   .container, #ucl-container {
     width: 100%;
     gap: 10px;
-    padding-left: 0;
-    padding-right: 0;
+    padding-inline: 0;
   }
   .rectangle {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-inline: 8px;
   }
 }
-@media (max-width: 1670px) {
+@media (width <= 1670px) {
   main {
-    padding: 2px 0px;
+    padding-block: 2px;
+    padding-inline: 0;
   }
   .container {
     gap: 4px;
   }
 }
-@media (max-width: 1400px) {
+@media (width <= 1400px) {
   .container {
     gap: 2px;
   }
   .rectangle {
-    padding-left: 2px;
-    padding-right: 2px;
+    padding-inline: 2px;
   }
   .small-container {
     width: 100%;
   }
 }
-@media (max-width: 1100px) {
+@media (width <= 1100px) {
   .container, #ucl-container {
     grid-template-columns: 1fr;
     width: 100%;
   }
   .rectangle, #left, #right {
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-inline: 6px;
+    padding-block: 10px;
   }
 }
-@media (max-width: 768px) {
+@media (width <= 768px) {
   #statSelectorContainer {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: auto;
+    inset-inline: 0;
+    inset-block-end: 0;
+    inset-block-start: auto;
     transform: none;
     width: 100%;
     border-radius: 8px 8px 0 0;
@@ -454,10 +471,10 @@ td .form-indicator:last-child {
     font-size: 12px;
   }
 }
-@media (max-width: 645px) {
+@media (width < 660px) {
   th,
   td {
-    padding: 4px;
+    padding: 2px;
   }
   .list-header {
     padding: 1px;
@@ -465,9 +482,10 @@ td .form-indicator:last-child {
   .form-indicator {
     width: 17%;
   }
-  .team-name, .player-country, .corners, .sec-stats {
-    display: none;
-  }
+  .team-name,
+  .player-country,
+  .corners,
+  .sec-stats,
   .big-played {
     display: none;
   }
@@ -475,16 +493,24 @@ td .form-indicator:last-child {
     display: inline;
   }
   .rectangle, #left, #right {
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-inline: 0;
   }
   .rectangle h2, #left h2, #right h2 {
-    margin-left: 2px;
+    margin-inline-start: 2px;
   }
   .player-picture {
     width: 44px;
   }
   .logo-picture {
     width: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }/*# sourceMappingURL=style.css.map */

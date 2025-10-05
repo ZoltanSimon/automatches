@@ -3,9 +3,14 @@ import {
   imgs,
   ctx,
   loadPlayerFace,
-  loadClubLogo
+  loadClubLogo,
 } from "../instapics.js";
-import { removeNewlines, hideColumn, showColumn, adjustColspan } from "../common-functions.js";
+import {
+  removeNewlines,
+  hideColumn,
+  showColumn,
+  adjustColspan,
+} from "../common-functions.js";
 
 const tableName = "player-list-table";
 const table = document.getElementById(tableName);
@@ -14,44 +19,64 @@ const checkboxes = document.querySelectorAll("input[name='statSelector']");
 export function playerGoalList(big, noOfDisplayed = 300) {
   const tableBody = table.getElementsByTagName("tbody")[0];
 
-  window.addEventListener("resize", () => adjustColspan(table.rows[0].cells[0], 2));
+  window.addEventListener("resize", () =>
+    adjustColspan(table.rows[0].cells[0], 2)
+  );
   adjustColspan(table.rows[0].cells[0], 2);
 
   if (!tableBody) {
-    console.error("Table body not found! Ensure the table has a <tbody> element.");
+    console.error(
+      "Table body not found! Ensure the table has a <tbody> element."
+    );
     return;
   } else {
-    table.style.visibility = 'visible';
+    table.style.visibility = "visible";
   }
 
   if (big) {
-    document.getElementById("statSelectorContainer").style.visibility = 'visible';
+    document.getElementById("statSelectorContainer").style.visibility =
+      "visible";
   } else {
-    document.getElementById("statSelectorContainer").style.display = 'none';
+    document.getElementById("statSelectorContainer").style.display = "none";
   }
 
-  displayedPlayers.forEach(player => {
+  displayedPlayers.forEach((player) => {
     loadPlayerFace(player.id);
     loadClubLogo(player.club);
     loadClubLogo(player.nation);
   });
 
-  document.querySelectorAll(`#${tableName} th`).forEach(header => {
-    header.addEventListener("click", function () {
-        const stat = this.getAttribute("data-stat"); // Get the column's stat name
-        const currentOrder = this.getAttribute("data-order") || "desc"; // Default order
-        
-        const newOrder = currentOrder === "asc" ? "desc" : "asc"; // Toggle order
-        this.setAttribute("data-order", newOrder);
-        
-        displayedPlayers.sort((a, b) => (a[stat] < b[stat] ? 1 : b[stat] < a[stat] ? -1 : 0));
+document.querySelectorAll(`#${tableName} th`).forEach(header => {
+  header.addEventListener("click", function () {
+    const stat = this.getAttribute("data-stat");
+    const currentOrder = this.getAttribute("data-order") || "desc";
+    const newOrder = currentOrder === "asc" ? "desc" : "asc";
 
-        updateTable(tableName, displayedPlayers.slice(0, noOfDisplayed));
-        updateTableVisibility();
+    this.setAttribute("data-order", newOrder);
+
+    document.querySelectorAll(`#${tableName} th`).forEach(h => h.classList.remove("asc", "desc"));
+
+    this.classList.add(newOrder);
+
+    displayedPlayers.sort((a, b) => {
+      if (a[stat] === b[stat]) return 0;
+      if (newOrder === "asc") {
+        return a[stat] > b[stat] ? 1 : -1;
+      } else {
+        return a[stat] < b[stat] ? 1 : -1;
+      }
     });
-  });
 
-  checkboxes.forEach(checkbox => checkbox.addEventListener("change", updateTableVisibility));
+    updateTable(tableName, displayedPlayers.slice(0, noOfDisplayed));
+    updateTableVisibility();
+  });
+});
+
+
+
+  checkboxes.forEach((checkbox) =>
+    checkbox.addEventListener("change", updateTableVisibility)
+  );
 
   updateTableVisibility();
 
@@ -185,20 +210,18 @@ export function playerListToCanvas() {
   ctx.fillStyle = "#e63946";
 }
 
-document.addEventListener("DOMContentLoaded", function () { 
+document.addEventListener("DOMContentLoaded", function () {});
 
-});
-
-function updateTableVisibility() {   
-  document.querySelectorAll(`#${tableName} th`).forEach((el, index) => {   
+function updateTableVisibility() {
+  document.querySelectorAll(`#${tableName} th`).forEach((el, index) => {
     if (el.dataset.stat) {
-      if(!document.getElementById(el.dataset.stat).checked) {
+      if (!document.getElementById(el.dataset.stat).checked) {
         hideColumn(el.dataset.stat);
       } else {
         showColumn(el.dataset.stat);
       }
     }
-  });    
+  });
 }
 
 export function updateTable(tableName, sortedPlayers) {
@@ -206,10 +229,10 @@ export function updateTable(tableName, sortedPlayers) {
   tbody.innerHTML = "";
 
   sortedPlayers.forEach((player, index) => {
-      const row = document.createElement("tr");
-      row.style.display = index < 100 ? "table-row" : "none"; 
+    const row = document.createElement("tr");
+    row.style.display = index < 100 ? "table-row" : "none";
 
-      row.innerHTML = `
+    row.innerHTML = `
           <td id="${player.id}" class="stat-td" style="padding:0; border-right: none;">
             <img class="player-picture" src="images/player-pictures/${player.id}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
           </td>
@@ -246,6 +269,6 @@ export function updateTable(tableName, sortedPlayers) {
           <td class="stat-td" data-stat="yellowCards">${player.yellowCards}</td>
           <td class="stat-td" data-stat="redCards">${player.redCards}</td>
       `;
-      tbody.appendChild(row);
+    tbody.appendChild(row);
   });
 }

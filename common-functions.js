@@ -118,8 +118,13 @@ export async function getTopTeams(leagues, amount, big) {
 export function sortTable(n, td, table, startingRow = 1, toSwitch = true, secondaryColumn = null, thirdColumn = null) {
   let rows,
     switching = true,
-    dir = "desc",
+    dir = td.getAttribute("data-order") === "asc" ? "desc" : "asc",
     switchcount = 0;
+
+  table.querySelectorAll("th").forEach(th => th.classList.remove("asc", "desc"));
+
+  td.setAttribute("data-order", dir);
+  td.classList.add(dir); 
 
   while (switching) {
     switching = false;
@@ -171,8 +176,6 @@ export function sortTable(n, td, table, startingRow = 1, toSwitch = true, second
       }
     }
   }
-
-  td.classList.add(dir);
 }
 
 export function removeColumn(theTable, columnIndex) {  
