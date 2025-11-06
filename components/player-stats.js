@@ -58,7 +58,6 @@ export function playerStatsToCanvas() {
   let statsTable = document.getElementById("player-stats");
   var tBody = statsTable.getElementsByTagName("tbody")[0];
   let playerIDs = tBody.getAttribute("id").split("|");
-  console.log(playerIDs);
 
   statsTable.rows[0].style.backgroundColor = "#457B9D";
   statsTable.rows[0].style.fontWeight = "bold";
@@ -66,7 +65,7 @@ export function playerStatsToCanvas() {
   statsTable.rows[0].children[0].style.width = "250px";
   statsTable.rows[0].children[1].style.width = "300px";
   statsTable.rows[0].children[2].style.width = "250px";
-  console.log(imgs);
+
   imgToAdd.push({
     img: imgs.players[playerIDs[0]],
     imgHeight: 180,

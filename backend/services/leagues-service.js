@@ -1,5 +1,7 @@
 import { allDBLeagues } from "../data-access.js";
 
+export const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
+
 export function groupByLeague(matches) {
   const grouped = {};
   for (const match of matches) {

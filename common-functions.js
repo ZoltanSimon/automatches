@@ -1,7 +1,6 @@
 import { matchList } from "./components/match-list.js";
-import { loadPlayerFace } from "./instapics.js";
 import { teamList } from "./components/team-list.js";
-import { downloadMatch } from "./local-handler.js";
+import { selectedLeagues } from "./local-handler.js";
 
 export let download = function (canvasName = "my-canvas") {
   var link = document.createElement("a");
@@ -69,7 +68,7 @@ export async function showMatchesOnDate(date, showID) {
   let downloads = 0;
   let allLeaguematches = await fetch(`get-matches-on-day?matchDate=${date}`);
   let matches = await allLeaguematches.json();
-  
+
   /*for (let match of matches) {
     let fixtureDate = new Date(match.fixture.date);
     const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
@@ -99,9 +98,7 @@ function updateOrAddMatch(matchArray, matchData) {
 }
 
 export async function getTopTeams(leagues, amount, big) {
-  const response = await fetch(
-    `/get-teams?leagueID=${leagues.join(",")}`
-  );
+  const response = await fetch(`/get-teams?leagueID=${leagues.join(",")}`);
   const dasTeams = await response.json();
 
   dasTeams.sort((a, b) =>
@@ -115,16 +112,26 @@ export async function getTopTeams(leagues, amount, big) {
   teamList(dasTeams.slice(0, amount), true, false, big);
 }
 
-export function sortTable(n, td, table, startingRow = 1, toSwitch = true, secondaryColumn = null, thirdColumn = null) {
+export function sortTable(
+  n,
+  td,
+  table,
+  startingRow = 1,
+  toSwitch = true,
+  secondaryColumn = null,
+  thirdColumn = null
+) {
   let rows,
     switching = true,
     dir = td.getAttribute("data-order") === "asc" ? "desc" : "asc",
     switchcount = 0;
 
-  table.querySelectorAll("th").forEach(th => th.classList.remove("asc", "desc"));
+  table
+    .querySelectorAll("th")
+    .forEach((th) => th.classList.remove("asc", "desc"));
 
   td.setAttribute("data-order", dir);
-  td.classList.add(dir); 
+  td.classList.add(dir);
 
   while (switching) {
     switching = false;
@@ -141,23 +148,39 @@ export function sortTable(n, td, table, startingRow = 1, toSwitch = true, second
         thirdY = null;
 
       if (secondaryColumn !== null && thirdColumn !== null) {
-        secondaryX = parseFloat(rows[i].getElementsByTagName("TD")[secondaryColumn].innerHTML);
-        secondaryY = parseFloat(rows[i + 1].getElementsByTagName("TD")[secondaryColumn].innerHTML);
-        thirdX = parseFloat(rows[i].getElementsByTagName("TD")[thirdColumn].innerHTML);
-        thirdY = parseFloat(rows[i + 1].getElementsByTagName("TD")[thirdColumn].innerHTML);
+        secondaryX = parseFloat(
+          rows[i].getElementsByTagName("TD")[secondaryColumn].innerHTML
+        );
+        secondaryY = parseFloat(
+          rows[i + 1].getElementsByTagName("TD")[secondaryColumn].innerHTML
+        );
+        thirdX = parseFloat(
+          rows[i].getElementsByTagName("TD")[thirdColumn].innerHTML
+        );
+        thirdY = parseFloat(
+          rows[i + 1].getElementsByTagName("TD")[thirdColumn].innerHTML
+        );
       }
 
       if (dir === "asc") {
         if (x > y) {
           shouldSwitch = true;
-        } else if (x === y && secondaryColumn !== null && thirdColumn !== null) {
-          shouldSwitch = (secondaryX - thirdX) > (secondaryY - thirdY);
+        } else if (
+          x === y &&
+          secondaryColumn !== null &&
+          thirdColumn !== null
+        ) {
+          shouldSwitch = secondaryX - thirdX > secondaryY - thirdY;
         }
       } else if (dir === "desc") {
         if (x < y) {
           shouldSwitch = true;
-        } else if (x === y && secondaryColumn !== null && thirdColumn !== null) {
-          shouldSwitch = (secondaryX - thirdX) < (secondaryY - thirdY);
+        } else if (
+          x === y &&
+          secondaryColumn !== null &&
+          thirdColumn !== null
+        ) {
+          shouldSwitch = secondaryX - thirdX < secondaryY - thirdY;
         }
       }
 
@@ -178,32 +201,38 @@ export function sortTable(n, td, table, startingRow = 1, toSwitch = true, second
   }
 }
 
-export function removeColumn(theTable, columnIndex) {  
+export function removeColumn(theTable, columnIndex) {
   // Remove header cell
-  theTable.querySelectorAll("thead tr").forEach(row => {
-      if (row.cells.length > columnIndex) row.deleteCell(columnIndex);
+  theTable.querySelectorAll("thead tr").forEach((row) => {
+    if (row.cells.length > columnIndex) row.deleteCell(columnIndex);
   });
 
   // Remove each cell in body rows
-  theTable.querySelectorAll("tbody tr").forEach(row => {
-      if (row.cells.length > columnIndex) row.deleteCell(columnIndex);
+  theTable.querySelectorAll("tbody tr").forEach((row) => {
+    if (row.cells.length > columnIndex) row.deleteCell(columnIndex);
   });
 }
 
 export function hideColumn(stat) {
-  document.querySelectorAll(`#player-list-table th[data-stat="${stat}"], 
-                             #player-list-table td[data-stat="${stat}"]`)
-      .forEach(cell => {
-          cell.style.display = "none";
-      });
+  document
+    .querySelectorAll(
+      `#player-list-table th[data-stat="${stat}"], 
+                             #player-list-table td[data-stat="${stat}"]`
+    )
+    .forEach((cell) => {
+      cell.style.display = "none";
+    });
 }
 
 export function showColumn(stat) {
-  document.querySelectorAll(`#player-list-table th[data-stat="${stat}"], 
-                             #player-list-table td[data-stat="${stat}"]`)
-      .forEach(cell => {
-          cell.style.display = "";
-      });
+  document
+    .querySelectorAll(
+      `#player-list-table th[data-stat="${stat}"], 
+                             #player-list-table td[data-stat="${stat}"]`
+    )
+    .forEach((cell) => {
+      cell.style.display = "";
+    });
 }
 
 export function getDate(date) {
@@ -212,7 +241,9 @@ export function getDate(date) {
   let day = d.getDate();
   let year = d.getFullYear();
 
-  return `${day < 10 ? "0" + day : day}.${month < 10 ? "0" + month : month}.${year}`;
+  return `${day < 10 ? "0" + day : day}.${
+    month < 10 ? "0" + month : month
+  }.${year}`;
 }
 
 export function adjustColspan(headerRow, newSpan) {
@@ -222,36 +253,93 @@ export function adjustColspan(headerRow, newSpan) {
   if (screenWidth < threshold) {
     headerRow.colSpan = newSpan; // Reduce colspan when screen is narrow
   } else {
-    headerRow.colSpan = newSpan +1; // Restore colspan when screen is wide
+    headerRow.colSpan = newSpan + 1; // Restore colspan when screen is wide
   }
 }
 
-export function showToast(message, type = 'info', duration = 3000) {
-    // Remove existing toast if any
-    const existingToast = document.querySelector('.toast');
-    if (existingToast) {
-        existingToast.remove();
+export function showToast(message, type = "info", duration = 3000) {
+  // Remove existing toast if any
+  const existingToast = document.querySelector(".toast");
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // Create new toast
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  // Show toast
+  setTimeout(() => {
+    toast.classList.add("show");
+  }, 100);
+
+  // Hide toast after duration
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }, duration);
+}
+
+export function addLeagues(leagues, admin = false) {
+  // Get league from query param or use default
+  const urlParams = new URLSearchParams(window.location.search);
+  const leagueParam = urlParams.get("league");
+  const leagueIDs = decodeURIComponent(leagueParam)
+    .split(",")
+    .map((id) => Number(id.trim()))
+    .filter(Boolean);
+  const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
+
+  // Initialize selectedLeagues based on query param or default
+  if (leagueParam) {
+    selectedLeagues.push(...leagueIDs);
+  } else if (!admin && typeof defaultLeagues !== "undefined") {
+    selectedLeagues.push(
+      ...(Array.isArray(defaultLeagues) ? defaultLeagues : [defaultLeagues])
+    );
+  }
+  
+  for (const element of leagues) {
+    if (element.Visible == 1) {
+      const isSelected = selectedLeagues.includes(element.id);
+      document.getElementById(
+        `league-list-${element.type}`
+      ).innerHTML += `<img width=30px id="img-${
+        element.id
+      }" class="league-to-select ${
+        isSelected ? "selected-league" : ""
+      }" src="images/competitions/${element.id}.png" alt="${
+        element.name
+      }" title="${element.name}"/>`;
+      document
+        .querySelectorAll(".league-to-select")
+        .forEach((e) => e.addEventListener("click", selectLeague));
+    }
+  }
+
+  function selectLeague(evt) {
+    evt.currentTarget.classList.toggle("selected-league");
+    let dasID = parseInt(evt.currentTarget.id.replace("img-", ""));
+    if (!selectedLeagues.includes(dasID)) {
+      selectedLeagues.push(dasID);
+    } else {
+      selectedLeagues.splice(selectedLeagues.indexOf(dasID), 1);
     }
 
-    // Create new toast
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    
-    document.body.appendChild(toast);
-    
-    // Show toast
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 100);
-    
-    // Hide toast after duration
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 300);
-    }, duration);
+    // Update URL and fetch new data (skip if admin mode)
+    if (!admin) {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set("league", selectedLeagues.join(","));
+      window.location.href = `${
+        window.location.pathname
+      }?${urlParams.toString()}`;
+    }
+  }
 }

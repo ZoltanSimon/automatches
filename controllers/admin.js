@@ -1,7 +1,8 @@
 import {
   showMatchesOnDate,
   download,
-  showToast
+  showToast,
+  addLeagues,
 } from "../common-functions.js";
 import {
   selectedLeagues,
@@ -31,26 +32,7 @@ document.getElementById('datepicker-input').addEventListener('change', function 
 
 showMatchesOnDate(new Date(), true);
 
-for (const element of allLeagues) {
-  if (element.Visible == 1) {
-    document.getElementById(
-      `league-list-${element.type}`
-    ).innerHTML += `<img width=30px id="img-${element.id}" class="league-to-select" src="images/competitions/${element.id}.png" alt="${element.name}" title="${element.name}"/>`;
-    document
-      .querySelectorAll(".league-to-select")
-      .forEach((e) => e.addEventListener("click", selectLeague));
-  }
-}
-
-function selectLeague(evt) {
-  evt.currentTarget.classList.toggle("selected-league");
-  let dasID = evt.currentTarget.id.replace("img-", "");
-  if (!selectedLeagues.includes(dasID)) {
-    selectedLeagues.push(dasID);
-  } else {
-    selectedLeagues.splice(selectedLeagues.indexOf(dasID), 1);
-  }
-}
+addLeagues(allLeagues, true);
 
 async function submitRequest_matchList() {
   let leagueID = selectedLeagues[0];
