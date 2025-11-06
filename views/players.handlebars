@@ -1,7 +1,17 @@
 <script type="module" src="./../controllers/players.js"></script>
 
 <div class="small-container">
-  <div id="player-list">
-    {{> player-list-table big=true}}
+  <div class="rectangle">
+    <h2>Top Players</h2>
+    <div class="more-link more-button">
+      <img src="/images/filter-svgrepo-com.svg" alt="Filters" class="filter-icon">
+      <span class="toggle-icon">▼</span>
+    </div>
+    <div id="league-list">
+      <div id="league-list-league"></div>
+    </div>
+    <div id="player-list">
+      {{> player-list-table big=true}}
+    </div>
   </div>
 </div>
