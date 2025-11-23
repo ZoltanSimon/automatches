@@ -232,7 +232,8 @@ footer p {
 }
 
 #player-list,
-#top-team-list {
+#top-team-list,
+#match-list {
   grid-column: 1/4;
   grid-row: 2/3;
   padding-top: 0px;

@@ -30,9 +30,9 @@ document.getElementById('datepicker-input').addEventListener('change', function 
   showMatchesOnDate(selectedDate, true);
 });
 
-showMatchesOnDate(new Date(), true);
-
+await showMatchesOnDate(new Date(), true);
 addLeagues(allLeagues, true);
+document.getElementById("match-list").style.visibility = "visible";
 
 async function submitRequest_matchList() {
   let leagueID = selectedLeagues[0];

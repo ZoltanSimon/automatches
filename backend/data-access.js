@@ -127,7 +127,7 @@ export async function importLeague(leagueID) {
   const season = matches[0].league.season;
   const tableName = `league-${leagueID}-${season}`;
 
-  // Create table if it doesn’t exist
+  // Create table if it doesn't exist
   await pool.query(`
     CREATE TABLE IF NOT EXISTS \`${tableName}\` (
       id INT PRIMARY KEY,
@@ -144,7 +144,6 @@ export async function importLeague(leagueID) {
   `);
 
   // Insert matches
-
   for (const match of matches) {
     await pool.query(
       `REPLACE INTO \`${tableName}\`
@@ -164,6 +163,47 @@ export async function importLeague(leagueID) {
   }
 
   console.log(`✅ Imported ${matches.length} matches into ${tableName}`);
+
+  // Update cache after import
+  const cacheKey = `${leagueID}-${season}`;
+  const now = Date.now();
+  
+  // Fetch the updated data from database and transform it
+  const [rows] = await pool.query(
+    `SELECT id AS fixtureId, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+     FROM \`${tableName}\`
+     ORDER BY match_date ASC`
+  );
+  
+  let leaguematches = rows.map((r) => ({
+    fixture: {
+      id: r.fixtureId,
+      date: r.match_date,
+      status: { short: r.status },
+    },
+    league: {
+      id: leagueID,
+      season: season,
+      round: r.round,
+    },
+    teams: {
+      home: {
+        id: r.home_team_id,
+        name: allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+      },
+      away: {
+        id: r.away_team_id,
+        name: allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+      },
+    },
+    goals: {
+      home: r.home_score,
+      away: r.away_score,
+    },
+  }));
+  
+  leagueCache.set(cacheKey, { data: leaguematches, timestamp: now });
+  console.log(`✅ Cache updated for ${cacheKey}`);
 }
 
 export async function getLeagueFromDb(leagueID) {
