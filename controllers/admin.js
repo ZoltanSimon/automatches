@@ -11,7 +11,6 @@ import {
 import { matchesToCanvas, matchList } from "../components/match-list.js";
 import { make_base, fontY } from "../instapics.js";
 import {
-  standingsFromTeamList,
   standingsToCanvas,
   leagueStandings
 } from "../components/league-standings.js";
@@ -56,13 +55,15 @@ document.getElementById("select-all-leagues").onclick = function () {
 };
 
 document.getElementById("submit-league-info").onclick = async function () {
-  leagueStandings(await standingsFromTeamList(selectedLeagues[0]));
+  await leagueStandings(selectedLeagues[0]);
 };
 
 document.getElementById("get-matches-by-round").onclick = async function () {
   let leagueID = selectedLeagues[0];
   let roundNumber = document.getElementById("roundnr").value;
-  const response = await fetch(`/get-matches-by-round?leagueID=${leagueID}&roundNo=${`Regular Season - ${roundNumber}`}`);
+  let roundLabel = leagueID != 2 ? `Regular Season - ${roundNumber}` : `League Stage - ${roundNumber}`;
+  console.log(roundLabel);
+  const response = await fetch(`/get-matches-by-round?leagueID=${leagueID}&roundNo=${roundLabel}`);
   const matches = await response.json();
   matchList(matches, true);
   addText(matches);

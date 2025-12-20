@@ -73,14 +73,6 @@ footer p {
   margin: 3px;
 }
 
-.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  width: 1800px;
-  margin: 0 auto;
-}
-
 .small-container {
   display: grid;
   place-items: center;
@@ -132,7 +124,26 @@ footer p {
   font-size: 12;
 }
 
-.rectangle, #left, #right {
+.container {
+  width: 1800px;
+  margin: 0 auto;
+  -moz-columns: 2;
+       columns: 2;
+  -moz-column-gap: 20px;
+       column-gap: 20px;
+}
+.container > * {
+  -moz-column-break-inside: avoid;
+       break-inside: avoid;
+  margin-bottom: 20px;
+}
+.container::before {
+  display: none;
+}
+
+.rectangle,
+#left,
+#right {
   display: grid;
   grid-template-columns: auto 1fr auto;
   padding: 10px;
@@ -144,39 +155,53 @@ footer p {
   overflow: visible;
   background-color: #a8dadc;
 }
-.rectangle div, #left div, #right div {
+.rectangle div,
+#left div,
+#right div {
   grid-column: 1/-1;
   align-self: start;
 }
-.rectangle h2, #left h2, #right h2 {
+.rectangle h2,
+#left h2,
+#right h2 {
   grid-column: 1/2;
-  grid-row: 1/2;
+  grid-row: 1;
   margin: 0;
   font-size: 24px;
   color: #1d3557;
 }
-.rectangle #league-list, #left #league-list, #right #league-list {
-  grid-column: 3/3;
-  grid-row: 1/2;
-  margin: 0;
-}
-.rectangle .more-link, #left .more-link, #right .more-link {
+.rectangle .more-link,
+#left .more-link,
+#right .more-link {
   grid-column: 2/3;
-  grid-row: 1/2;
+  grid-row: 1;
   justify-self: start;
   font-size: 18px;
   text-decoration: none;
 }
-.rectangle .more-link:hover, #left .more-link:hover, #right .more-link:hover {
+.rectangle .more-link:hover,
+#left .more-link:hover,
+#right .more-link:hover {
   text-decoration: underline;
 }
-.rectangle #league-list-league, #left #league-list-league, #right #league-list-league {
+.rectangle #league-list,
+#left #league-list,
+#right #league-list {
+  grid-column: 3;
+  grid-row: 1;
+  margin: 0;
+}
+.rectangle #league-list-league,
+#left #league-list-league,
+#right #league-list-league {
   padding: 4px;
   background-color: #457B9D;
   display: flex;
   gap: 2px;
 }
-.rectangle #league-list-league img, #left #league-list-league img, #right #league-list-league img {
+.rectangle #league-list-league img,
+#left #league-list-league img,
+#right #league-list-league img {
   box-sizing: border-box;
   display: block;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
@@ -223,12 +248,53 @@ footer p {
 }
 
 .table-container {
+  position: relative;
   overflow-x: auto;
   width: 100%;
+  max-height: 1000px;
+  overflow-y: hidden;
+}
+.table-container.has-overflow::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, #1d3557);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.table-container.expanded {
+  max-height: none;
+}
+.table-container.expanded::after {
+  opacity: 0;
+}
+.table-container.expanded .show-more-btn {
+  position: static;
+  transform: none;
+  display: block;
+  margin: 10px auto 0;
 }
 
-.container::before {
-  display: none;
+.show-more-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background-color: #457B9D;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 1;
+  pointer-events: auto;
+}
+.show-more-btn:hover {
+  background-color: rgb(53.4292035398, 95.2433628319, 121.5707964602);
 }
 
 #player-list,
@@ -491,6 +557,7 @@ td .form-indicator:last-child {
   .container, #ucl-container {
     grid-template-columns: 1fr;
     width: 100%;
+    display: grid;
   }
   .rectangle, #left, #right {
     padding-inline: 6px;
@@ -498,6 +565,24 @@ td .form-indicator:last-child {
   }
 }
 @media (width <= 768px) {
+  .rectangle, #left, #right {
+    grid-template-columns: 1fr auto;
+  }
+  .rectangle h2, #left h2, #right h2 {
+    grid-column: 1/2;
+    font-size: 20px;
+  }
+  .rectangle .more-link, #left .more-link, #right .more-link {
+    grid-column: 2/3;
+    justify-self: end;
+  }
+  .rectangle #league-list, #left #league-list, #right #league-list {
+    grid-column: 1/-1;
+    grid-row: 2/3;
+  }
+  #player-list {
+    grid-row: 3/4;
+  }
   #statSelectorContainer {
     inset-inline: 0;
     inset-block-end: 0;

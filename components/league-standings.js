@@ -10,18 +10,22 @@ import { imagePath, removeNewlines, truncate } from "./../common-functions.js";
 import { darkColor } from "../common-styles.js";
 import { buildStandings } from "../autotext.js";
 
-export async function standingsFromTeamList(selectedLeague) {
+async function standingsFromTeamList(selectedLeague) {
   if (document.getElementById("league-name")) {
-    document.getElementById("league-name").innerHTML = document.getElementById(`img-${selectedLeague}`).title;
+    //document.getElementById("league-name").innerHTML = document.getElementById(`img-${selectedLeague}`).title;
   }
   
   if (document.getElementById("league-id")) {
     document.getElementById("league-id").innerHTML = selectedLeague;
   }
   
-  const response = await fetch(
-    `/get-teams?leagueID=${selectedLeague}&date=01-08-2024`
-  );
+  let response;
+  if (selectedLeague == 2) {
+    response = await fetch(`/get-teams?leagueID=${selectedLeague}&date=01-09-2025`);
+  } else {
+    response = await fetch(`/get-teams?leagueID=${selectedLeague}`);
+  }
+
   const standingsFromApi = await response.json();
   standingsFromApi.sort((a, b) => (b.total.goals-b.total.goalsAgainst) - (a.total.goals-a.total.goalsAgainst)); 
   standingsFromApi.sort((a, b) => b.total.points - a.total.points); 
@@ -29,7 +33,9 @@ export async function standingsFromTeamList(selectedLeague) {
   return standingsFromApi;
 }
 
-export function leagueStandings(standings) {
+export async function leagueStandings(selectedLeague) {
+
+  let standings = await standingsFromTeamList(selectedLeague);
   let addToPage = ``;
   let tds = `<td style="padding:6px; text-align: center;">`;
 
@@ -45,7 +51,7 @@ export function leagueStandings(standings) {
             <th style="width:45px;" class="list-header"><b>GF</b></th>
             <th style="width:45px;" class="list-header"><b>GA</b></th>
             <th style="width:90px;" class="list-header"><b>xG</b></th>
-            <th style="width:96px; padding: 4px;" class="list-header" colspan=5><b>Form</b></th>
+            <th style="width:96px; padding: 4px;" class="list-header"><b>Form</b></th>
             <th style="width:58px;" class="list-header"><b>Pts</b></th>
           </tr>
         </thead><tbody>`;
@@ -74,13 +80,17 @@ export function leagueStandings(standings) {
       ${tds}${team.total.xG.toFixed(
         0
       )} : ${team.total.xGA.toFixed(0)}</td>`;
-    for (let f of form) {
+    /*for (let f of form) {
       addToPage += `<td style="color:${
         f == "W" ? "green" : f == "L" ? "#E63946" : ""
       }; padding:2px; text-align: center; font-weight: bold;">${f}</td>`;
-    }
+    }*/
+   addToPage += `<td>`;
+      for (const result of form) {
+        addToPage += `<span class="form-indicator ${result}"></span>`;
+      }
 
-    addToPage += `<td style="padding:6px; text-align: center; font-weight: bold">${team.total.points}</td>
+    addToPage += `</td><td style="padding:6px; text-align: center; font-weight: bold">${team.total.points}</td>
       </tr>`;
   }
   addToPage += `</tbody></table>`;

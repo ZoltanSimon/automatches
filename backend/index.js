@@ -26,7 +26,7 @@ import {
   insertAllPlayers,
   getPlayerByID,
 } from "./services/players-service.js";
-import { matchesOnDay } from "./services/matches-service.js";
+import { matchesOnDay, matchesInRound, lastMatchesFromLeague } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, defaultLeagues } from "./services/leagues-service.js";
 import { parseDate, parseLeagueIds, handleError } from "./backend-helper.js";
@@ -123,6 +123,26 @@ app.get("/starting11", (req, res) => {
 
 app.get("/ucl-last-round", (req, res) => {
   res.render("ucl-last-round", { title: "UCL Last Round simulation" });
+});
+
+app.get("/league", async (req, res) => {
+  try {
+    //const selectedLeague = parseLeagueIds("2");
+    const selectedLeague = parseLeagueIds(req.query.league || "2");
+    console.log(selectedLeague);
+    const [players, matches] = await Promise.all([
+      getPlayerList(selectedLeague, 10),
+      lastMatchesFromLeague(selectedLeague, 10)
+    ]);
+
+    res.render("league", {
+      title: "League",
+      players,
+      groupedMatches: groupByLeague(matches),
+    });
+  } catch (error) {
+    handleError(res, error, "Error loading home page");
+  }
 });
 
 app.listen(PORT, () => {
@@ -302,17 +322,9 @@ app.get("/find-player-by-id", async (request, response) => {
 app.get("/get-matches-by-round", async (request, response) => {
   let leagueID = request.query.leagueID;
   let round = request.query.roundNo;
-  let data = await getLeagueFromDb(leagueID);
-  let matches = data.filter((element) => element.league.round == round);
-
-  for (let i = 0; i < matches.length; i++) {
-    let matchID = matches[i].fixture.id;
-    let matchData = await getMatchFromServer(matchID);
-    if (matchData && matchData[0]) {
-      matches[i] = matchData[0];
-    }
-  }
-
+console.log(`Fetching matches for leagueID: ${leagueID}, round: ${round}`);
+  let matches = await matchesInRound(round, leagueID);
+  console.log(`Found ${matches.length} matches for leagueID: ${leagueID}, round: ${round}`);
   response.json(matches);
 });
 

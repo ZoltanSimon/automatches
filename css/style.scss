@@ -88,14 +88,6 @@ footer {
   }
 }
 
-.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  width: 1800px;
-  margin: 0 auto;
-}
-
 .small-container {
   display: grid;
   place-items: center;
@@ -147,7 +139,25 @@ footer {
   font-size: 12;
 }
 
-.rectangle, #left, #right {
+.container {
+  width: 1800px; 
+  margin: 0 auto;
+  columns: 2;
+  column-gap: 20px;
+
+  > * { 
+    break-inside: avoid;
+    margin-bottom: 20px;
+  }
+
+  &::before {
+    display: none;
+  }
+}
+
+.rectangle, 
+#left, 
+#right {
   display: grid;
   grid-template-columns: auto 1fr auto;
   padding: 10px;
@@ -166,21 +176,15 @@ footer {
 
   h2 {
     grid-column: 1 / 2;
-    grid-row: 1 / 2;
+    grid-row: 1;
     margin: 0;
     font-size: 24px;
     color: $dark-blue;
   }
 
-  #league-list {
-    grid-column: 3 / 3;
-    grid-row: 1 / 2;
-    margin: 0;
-  }
-
   .more-link {
     grid-column: 2 / 3;
-    grid-row: 1 / 2;
+    grid-row: 1;
     justify-self: start;
     font-size: 18px;
     text-decoration: none;
@@ -190,17 +194,24 @@ footer {
     }
   }
 
+  #league-list {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0;
+  }
+
   #league-list-league {
     padding: 4px;
     background-color: $blue;
-        display: flex;
+    display: flex;
     gap: 2px;
-  }
-  #league-list-league img {
-    box-sizing: border-box;
-    display: block;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-    cursor: pointer;
+
+    img {
+      box-sizing: border-box;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      cursor: pointer;
+    }
   }
 }
 
@@ -247,12 +258,58 @@ footer {
 }
 
 .table-container {
+  position: relative;
   overflow-x: auto;
   width: 100%;
+  max-height: 1000px;
+  overflow-y: hidden;
+
+  &.has-overflow::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, $dark-blue);
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  &.expanded {
+    max-height: none;
+
+    &::after {
+      opacity: 0;
+    }
+
+    .show-more-btn {
+      position: static;
+      transform: none;
+      display: block;
+      margin: 10px auto 0;
+    }
+  }
 }
 
-.container::before {
-  display: none;
+.show-more-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background-color: $blue;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 1;
+  pointer-events: auto;
+
+  &:hover {
+    background-color: darken($blue, 10%);
+  }
 }
 
 #player-list,
@@ -546,6 +603,7 @@ td .form-indicator {
   .container, #ucl-container {
     grid-template-columns: 1fr;
     width: 100%;
+    display: grid;
   }
   
   .rectangle, #left, #right {
@@ -556,6 +614,29 @@ td .form-indicator {
 
 // Mobile Landscape / Small Tablet
 @media (width <= 768px) {
+    .rectangle, #left, #right {
+    grid-template-columns: 1fr auto;
+    
+    h2 {
+      grid-column: 1 / 2;
+      font-size: 20px;
+    }
+    
+    .more-link {
+      grid-column: 2 / 3;
+      justify-self: end;
+    }
+    
+    #league-list {
+      grid-column: 1 / -1;
+      grid-row: 2 / 3;
+    }
+  }
+
+  #player-list {
+    grid-row: 3/4;
+  }
+
   #statSelectorContainer {
     inset-inline: 0;
     inset-block-end: 0;

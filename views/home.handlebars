@@ -1,32 +1,39 @@
 <script type="module" src="./../controllers/home.js"></script>
 
+
 <div class="container">
+
+  <div class="rectangle" id="rectangle3">
+    <span hidden id="league-name"></span>
+    <span hidden id="league-id"></span>
+    <span hidden id="round-no"></span>
+    <div id="fixtures-info" class="table-container">
+      {{> match-list-table}}
+    </div>
+  </div>
+
+  <div class="rectangle" id="rectangle4">
+    <h2>Standings</h2>
+    <a href="/league" class="more-link more-button">More &gt;&gt;&gt;</a>
+    <div id="standings" class="table-container"></div>
+  </div>
+
   <div class="rectangle" id="rectangle1">
     <h2>Top Players</h2>
     <a href="/players" class="more-link more-button">More &gt;&gt;&gt;</a>
     <div id="league-list">
-          <div id="league-list-league"></div>
+      <div id="league-list-league"></div>
     </div>
     <div id="player-list" class="table-container">
       {{> player-list-table big=false}}
     </div>
   </div>
+
   <div class="rectangle" id="rectangle2">
     <h2>Top Teams</h2>
     <a href="/teams" class="more-link more-button">More &gt;&gt;&gt;</a>
     <div id="top-team-list" class="table-container">
       {{> team-list-table big=false}}
     </div>
-  </div>
-  <div class="rectangle" id="rectangle3">
-    <h2>Matches</h2>
-    <span hidden id="league-name"></span>
-    <span hidden id="league-id"></span>
-    <span hidden id="round-no"></span>
-    <div id="fixtures-info" class="table-container"></div>
-    {{> match-list-table}}
-  </div>
-  <div class="rectangle" id="rectangle4">
-    <h2>Coming Soon</h2>
   </div>
 </div>
