@@ -68,7 +68,7 @@ export async function leagueStandings(selectedLeague) {
       )}" alt="${team.name}" width="40px"/> </td>
       <td style="border-left-style: hidden; padding: 3px;">${truncate(
         team.name,
-        16
+        22
       )}</td>
 
       ${tds}${team.matches}</td>

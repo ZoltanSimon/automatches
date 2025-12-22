@@ -261,8 +261,12 @@ footer {
   position: relative;
   overflow-x: auto;
   width: 100%;
-  max-height: 1000px;
+  max-height: 1018px;
   overflow-y: hidden;
+
+  &.large {
+    max-height: 1800px;
+  }
 
   &.has-overflow::after {
     content: '';
@@ -353,7 +357,7 @@ footer {
 }
 
 .form-column {
-  width: 43px;
+  width: 50px;
   border-right: 1px solid $lightest-blue;
 }
 

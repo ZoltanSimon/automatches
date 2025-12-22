@@ -251,8 +251,11 @@ footer p {
   position: relative;
   overflow-x: auto;
   width: 100%;
-  max-height: 1000px;
+  max-height: 1018px;
   overflow-y: hidden;
+}
+.table-container.large {
+  max-height: 1800px;
 }
 .table-container.has-overflow::after {
   content: "";
@@ -338,7 +341,7 @@ footer p {
 }
 
 .form-column {
-  width: 43px;
+  width: 50px;
   border-right: 1px solid #f1faee;
 }
 
