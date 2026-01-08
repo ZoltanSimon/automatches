@@ -80,11 +80,6 @@ export async function leagueStandings(selectedLeague) {
       ${tds}${team.total.xG.toFixed(
         0
       )} : ${team.total.xGA.toFixed(0)}</td>`;
-    /*for (let f of form) {
-      addToPage += `<td style="color:${
-        f == "W" ? "green" : f == "L" ? "#E63946" : ""
-      }; padding:2px; text-align: center; font-weight: bold;">${f}</td>`;
-    }*/
    addToPage += `<td>`;
       for (const result of form) {
         addToPage += `<span class="form-indicator ${result}"></span>`;

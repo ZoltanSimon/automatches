@@ -16,7 +16,7 @@ export async function getPlayerList(leagues = [39, 140, 135, 78, 61, 88, 94], nr
 
 export async function insertAllPlayers() {
   let allPlayers = await getAllPlayers(
-    allDBLeagues.filter((el) => el.type == "league"),
+    allDBLeagues.filter((el) => el.type == "league").concat(allDBLeagues.filter((el) => el.type == "cup")),
     allDBLeagues.filter((el) => el.type == "nt")
   );
 

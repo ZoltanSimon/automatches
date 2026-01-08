@@ -1,0 +1,139 @@
+<script type="module" src="./../controllers/match.js"></script>
+<div class="container">
+  {{#if matchInfo}}
+  <div class="match-header">
+    <div class="team">
+      <img src="images/logos/{{matchInfo.homeTeamId}}.png" alt="{{matchInfo.homeTeamName}}">
+      <div>{{matchInfo.homeTeamName}}</div>
+    </div>
+    
+    <div class="score-section">
+      <div class="score">{{matchInfo.homeGoals}} - {{matchInfo.awayGoals}}</div>
+      <div>{{matchInfo.date}}</div>
+      <span class="status">{{matchInfo.status}}</span>
+    </div>
+    
+    <div class="team">
+      <img src="images/logos/{{matchInfo.awayTeamId}}.png" alt="{{matchInfo.awayTeamName}}">
+      <div>{{matchInfo.awayTeamName}}</div>
+    </div>
+  </div>
+  {{/if}}
+  
+  {{#if teamList.length}}
+  {{#each teamList}}
+  <div class="team-card">
+    <div class="team-header">
+      <img src="images/logos/{{this.id}}.png" alt="{{this.name}}">
+      <div>
+        <h3>{{this.name}}</h3>
+        <div class="record">
+        <div class="pts-container">
+            <span class="pts">{{this.total.points}} pts</span>
+            <span class="pts-per">{{this.perGame.points}} pts/game</span>
+        </div>
+        <span>{{this.wins}}W</span>
+        <span>{{this.draws}}D</span>
+        <span>{{this.losses}}L</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stats">
+      <div class="stat">
+        <div class="label">Goals</div>
+        <div class="value">{{this.total.goals}}</div>
+        <div class="per-game">{{this.perGame.goals}}/game</div>
+      </div>
+      
+      <div class="stat">
+        <div class="label">Goals Against</div>
+        <div class="value">{{this.total.goalsAgainst}}</div>
+        <div class="per-game">{{this.perGame.goalsAgainst}}/game</div>
+      </div>
+      
+      <div class="stat">
+        <div class="label">xG</div>
+        <div class="value">{{this.total.xG}}</div>
+        <div class="per-game">{{this.perGame.xG}}/game</div>
+      </div>
+      
+      <div class="stat">
+        <div class="label">xGA</div>
+        <div class="value">{{this.total.xGA}}</div>
+        <div class="per-game">{{this.perGame.xGA}}/game</div>
+      </div>
+      
+      <div class="stat">
+        <div class="label">Corners</div>
+        <div class="value">{{this.total.corners}}</div>
+        <div class="per-game">{{this.perGame.corners}}/game</div>
+      </div>
+      
+      <div class="stat">
+        <div class="label">Shots on Goal</div>
+        <div class="value">{{this.total.shotsOnGoal}}</div>
+        <div class="per-game">{{this.perGame.shotsOnGoal}}/game</div>
+      </div>
+    </div>
+    
+    <div class="last5">
+      <h4>Last 5 Matches</h4>
+      <div class="record">
+        <div class="pts-container">
+        <span class="pts">{{this.last5.points}} pts</span>
+        <span class="pts-per">{{this.last5PerGame.points}} pts/game</span>
+        </div>
+        <span>Form: {{this.form}}</span>
+      </div>
+      
+      <div class="stats">
+        <div class="stat">
+          <div class="label">Goals</div>
+          <div class="value">{{this.last5.goals}}</div>
+          <div class="per-game">{{this.last5PerGame.goals}}/game</div>
+        </div>
+        
+        <div class="stat">
+          <div class="label">Goals Against</div>
+          <div class="value">{{this.last5.goalsAgainst}}</div>
+          <div class="per-game">{{this.last5PerGame.goalsAgainst}}/game</div>
+        </div>
+        
+        <div class="stat">
+          <div class="label">xG</div>
+          <div class="value">{{this.last5.xG}}</div>
+          <div class="per-game">{{this.last5PerGame.xG}}/game</div>
+        </div>
+        
+        <div class="stat">
+          <div class="label">xGA</div>
+          <div class="value">{{this.last5.xGA}}</div>
+          <div class="per-game">{{this.last5PerGame.xGA}}/game</div>
+        </div>
+        
+        <div class="stat">
+          <div class="label">Corners</div>
+          <div class="value">{{this.last5.corners}}</div>
+          <div class="per-game">{{this.last5PerGame.corners}}/game</div>
+        </div>
+        
+        <div class="stat">
+          <div class="label">Shots on Goal</div>
+          <div class="value">{{this.last5.shotsOnGoal}}</div>
+          <div class="per-game">{{this.last5PerGame.shotsOnGoal}}/game</div>
+        </div>
+      </div>
+    </div>
+  </div>  
+  {{/each}}
+  {{/if}}
+</div>
+
+<style>
+</style>
+
+<script>
+    console.log(JSON.parse('{{{json teamList}}}'));
+    console.log(JSON.parse('{{{json matchInfo}}}'));
+</script>

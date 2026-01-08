@@ -17,6 +17,7 @@ import {
   getLeagueFromDb,
   allDBTeams,
   insertTeamsToDb,
+  getMatchById,
 } from "./data-access.js";
 import { createRequire } from "module";
 import path from "path";
@@ -143,6 +144,73 @@ app.get("/league", async (req, res) => {
   } catch (error) {
     handleError(res, error, "Error loading home page");
   }
+});
+
+app.get("/match", async (request, response) => {
+  let matchID = request.query.matchID;
+  let allMatches = [];
+  let teamList = [];
+  let matchInfo = {};
+
+  // Get the match details to extract the league ID and match info
+  let currentMatch = await getMatchById(matchID);
+  let leagueID;
+  
+  if (currentMatch) {
+    leagueID = currentMatch.leagueId;
+    
+    // Extract match information
+    matchInfo = {
+      homeTeamId: currentMatch.homeTeamId,
+      homeTeamName: currentMatch.homeTeamName,
+      awayTeamId: currentMatch.awayTeamId,
+      awayTeamName: currentMatch.awayTeamName,
+      date: currentMatch.fixtureDate,
+      status: currentMatch.fixtureStatus,
+      homeGoals: currentMatch.homeGoals,
+      awayGoals: currentMatch.awayGoals
+    };
+    console.log(currentMatch);
+    // Now get all matches from that league
+    let data = await getLeagueFromDb(leagueID);
+    for (const element of data) {
+      let thisFixture = element.fixture;
+      if (["FT", "AET"].includes(thisFixture.status.short)) {
+        let fixtureMatchID = thisFixture.id;
+        try {
+          let matchData = await getMatchFromServer(fixtureMatchID);
+          if (matchData) {
+            allMatches.push(matchData[0]);
+          } else {
+            console.warn(`No data found for matchID: ${fixtureMatchID}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching match with ID ${fixtureMatchID}:`, error);
+        }
+      }
+    }
+    
+    let fullTeamList = buildTeamList(allMatches);
+    
+    // Filter to only show the two teams playing in this match
+    teamList = fullTeamList.filter(team => 
+      team.id === matchInfo.homeTeamId || team.id === matchInfo.awayTeamId
+    );
+
+    //make sure homeTeam is first in teamList
+    teamList.sort((a, b) => {
+      if (a.id === matchInfo.homeTeamId) return -1;
+      if (b.id === matchInfo.homeTeamId) return 1;
+      return 0;
+    });
+  }
+
+  response.render("match", { 
+    title: "Match Details", 
+    matchID, 
+    teamList,
+    matchInfo 
+  });
 });
 
 app.listen(PORT, () => {

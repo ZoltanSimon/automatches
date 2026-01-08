@@ -161,7 +161,7 @@ footer {
   display: grid;
   grid-template-columns: auto 1fr auto;
   padding: 10px;
-  border: 1px solid $gray;
+  border: 1px solid $dark-blue;
   text-align: left;
   box-sizing: border-box;
   gap: 10px;
@@ -554,6 +554,153 @@ td .form-indicator {
     display: block;
   }
 }
+
+.match-header {
+    background: $dark-blue;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid $dark-blue;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+      column-span: all;
+      color: white;
+
+  }
+  
+  .match-header > div {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  .team {
+    width: 30%;
+    text-align: center;
+  }
+  
+  .team img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 8px;
+  }
+  
+  .score-section {
+    width: 40%;
+    text-align: center;
+  }
+  
+  .score {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .status {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #4CAF50;
+    color: $lightest-blue;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  
+  .team-card {
+    background: $blue;
+    border: 1px solid $dark-blue;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .team-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 16px;
+    border-bottom: 1px solid $dark-blue;
+    background-color: $lightest-blue;
+  }
+  
+  .team-header img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .team-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+  }
+  
+  .record {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+  }
+  
+  .record .pts {
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+  }
+  
+  .record .pts-per {
+    color: black;
+  }
+  
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+  }
+  
+  .stat {
+    background: $lightest-blue;
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .stat .label {
+    font-size: 14px;
+    color: $dark-blue;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  
+  .stat .value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  
+  .stat .per-game {
+    font-size: 14px;
+    color: $red;
+  }
+  
+  .last5 {
+    background: $light-blue;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  
+  .last5 h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+  
+  .last5 .record {
+    margin-bottom: 15px;
+  }
+
+  .pts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-right:24px;
+  }
 
 // Media Queries - Mobile First Approach with Modern Standards
 

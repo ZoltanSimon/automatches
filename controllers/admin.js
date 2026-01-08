@@ -31,8 +31,11 @@ document.getElementById('datepicker-input').addEventListener('change', function 
 
 await showMatchesOnDate(new Date(), true);
 addLeagues(allLeagues, true);
-document.getElementById("match-list").style.visibility = "visible";
 
+const matchListDiv = document.getElementById("match-list");
+if (matchListDiv) {
+  matchListDiv.style.visibility = "visible";
+}
 async function submitRequest_matchList() {
   let leagueID = selectedLeagues[0];
   let startDate = document.getElementById("dateStart").value;

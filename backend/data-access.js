@@ -125,12 +125,13 @@ export async function importLeague(leagueID) {
   }
 
   const season = matches[0].league.season;
-  const tableName = `league-${leagueID}-${season}`;
 
-  // Create table if it doesn't exist
+  // Create single table if it doesn't exist
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS \`${tableName}\` (
+    CREATE TABLE IF NOT EXISTS matches (
       id INT PRIMARY KEY,
+      league_id INT NOT NULL,
+      season INT NOT NULL,
       round VARCHAR(100),
       home_team_id INT NOT NULL,
       away_team_id INT NOT NULL,
@@ -139,18 +140,22 @@ export async function importLeague(leagueID) {
       home_score INT,
       away_score INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_league_season (league_id, season),
+      INDEX idx_match_date (match_date)
     )
   `);
 
   // Insert matches
   for (const match of matches) {
     await pool.query(
-      `REPLACE INTO \`${tableName}\`
-    (id, round, home_team_id, away_team_id, match_date, status, home_score, away_score)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `REPLACE INTO matches
+    (id, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         match.fixture.id,
+        leagueID,
+        season,
         match.league.round,
         match.teams.home.id,
         match.teams.away.id,
@@ -162,7 +167,7 @@ export async function importLeague(leagueID) {
     );
   }
 
-  console.log(`✅ Imported ${matches.length} matches into ${tableName}`);
+  console.log(`✅ Imported ${matches.length} matches for league ${leagueID} season ${season}`);
 
   // Update cache after import
   const cacheKey = `${leagueID}-${season}`;
@@ -170,9 +175,11 @@ export async function importLeague(leagueID) {
   
   // Fetch the updated data from database and transform it
   const [rows] = await pool.query(
-    `SELECT id AS fixtureId, round, home_team_id, away_team_id, match_date, status, home_score, away_score
-     FROM \`${tableName}\`
-     ORDER BY match_date ASC`
+    `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+     FROM matches
+     WHERE league_id = ? AND season = ?
+     ORDER BY match_date ASC`,
+    [leagueID, season]
   );
   
   let leaguematches = rows.map((r) => ({
@@ -182,8 +189,8 @@ export async function importLeague(leagueID) {
       status: { short: r.status },
     },
     league: {
-      id: leagueID,
-      season: season,
+      id: r.league_id,
+      season: r.season,
       round: r.round,
     },
     teams: {
@@ -210,7 +217,6 @@ export async function getLeagueFromDb(leagueID) {
   const season =
     allDBLeagues.find((lg) => lg.id == leagueID)?.season ||
     new Date().getFullYear();
-  const tableName = `league-${leagueID}-${season}`;
   const cacheKey = `${leagueID}-${season}`;
   const now = Date.now();
 
@@ -224,10 +230,13 @@ export async function getLeagueFromDb(leagueID) {
 
   try {
     const [rows] = await pool.query(
-      `SELECT id AS fixtureId, round, home_team_id, away_team_id, match_date, status, home_score, away_score
-       FROM \`${tableName}\`
-       ORDER BY match_date ASC`
+      `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+       FROM matches
+       WHERE league_id = ? AND season = ?
+       ORDER BY match_date ASC`,
+      [leagueID, season]
     );
+    
     let leaguematches = rows.map((r) => ({
       fixture: {
         id: r.fixtureId,
@@ -235,8 +244,8 @@ export async function getLeagueFromDb(leagueID) {
         status: { short: r.status },
       },
       league: {
-        id: leagueID,
-        season: season,
+        id: r.league_id,
+        season: r.season,
         round: r.round,
       },
       teams: {
@@ -260,5 +269,56 @@ export async function getLeagueFromDb(leagueID) {
   } catch (e) {
     console.error(`❌ Failed to load league ${leagueID} ${season} from DB:`, e);
     return [];
+  }
+}
+
+export async function getMatchById(fixtureId) {
+  const cacheKey = `match-${fixtureId}`;
+  const now = Date.now();
+
+  // Check cache first
+  if (leagueCache.has(cacheKey)) {
+    console.log("Using cached match data for", cacheKey);
+    const { data, timestamp } = leagueCache.get(cacheKey);
+    if (now - timestamp < CACHE_TTL) {
+      return data;
+    }
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+       FROM matches
+       WHERE id = ?`,
+      [fixtureId]
+    );
+
+    if (rows.length === 0) {
+      console.log(`❌ Match ${fixtureId} not found`);
+      return null;
+    }
+    console.log(rows);
+    const r = rows[0];
+    const match = {
+          fixtureId: r.fixtureId,
+          fixtureDate: r.match_date,
+          fixtureStatus: r.status,
+          leagueId: r.league_id,
+          leagueSeason: r.season,
+          leagueRound: r.round,
+          homeTeamId: r.home_team_id,
+          homeTeamName: allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+          awayTeamId: r.away_team_id,
+          awayTeamName: allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+          homeGoals: r.home_score,
+          awayGoals: r.away_score,
+      };
+
+    // Cache the match
+    leagueCache.set(cacheKey, { data: match, timestamp: now });
+    return match;
+  } catch (e) {
+    console.error(`❌ Failed to load match ${fixtureId} from DB:`, e);
+    return null;
   }
 }

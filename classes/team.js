@@ -82,8 +82,8 @@ export class Stats {
         ? 1
         : 0;
 
-    this.xG += stat.xG || 0;
-    this.xGA += stat.xGA || 0;
+    this.xG = parseFloat((this.xG + (stat.xG || 0)).toFixed(2));
+    this.xGA = parseFloat((this.xGA + (stat.xGA || 0)).toFixed(2));
     this.corners += stat.corners;
     this.cornersAgainst += stat.cornersAgainst;
     this.shotsOnGoal += stat.shotsOnGoal;
@@ -92,17 +92,17 @@ export class Stats {
     this.goalsAgainst += stat.goalsAgainst;
   }
 
-  divideStats(divisor) {
+divideStats(divisor) {
     let dividedStats = new Stats();
-    dividedStats.points = this.points / divisor;
-    dividedStats.xG = this.xG / divisor;
-    dividedStats.xGA = this.xGA / divisor;
-    dividedStats.corners = this.corners / divisor;
-    dividedStats.cornersAgainst = this.cornersAgainst / divisor;
-    dividedStats.shotsOnGoal = this.shotsOnGoal / divisor;
-    dividedStats.shotsOnGoalAgainst = this.shotsOnGoalAgainst / divisor;
-    dividedStats.goals = this.goals / divisor;
-    dividedStats.goalsAgainst = this.goalsAgainst / divisor;
+    dividedStats.points = parseFloat((this.points / divisor).toFixed(2));
+    dividedStats.xG = parseFloat((this.xG / divisor).toFixed(2));
+    dividedStats.xGA = parseFloat((this.xGA / divisor).toFixed(2));
+    dividedStats.corners = parseFloat((this.corners / divisor).toFixed(2));
+    dividedStats.cornersAgainst = parseFloat((this.cornersAgainst / divisor).toFixed(2));
+    dividedStats.shotsOnGoal = parseFloat((this.shotsOnGoal / divisor).toFixed(2));
+    dividedStats.shotsOnGoalAgainst = parseFloat((this.shotsOnGoalAgainst / divisor).toFixed(2));
+    dividedStats.goals = parseFloat((this.goals / divisor).toFixed(2));
+    dividedStats.goalsAgainst = parseFloat((this.goalsAgainst / divisor).toFixed(2));
     return dividedStats;
   }
 }
