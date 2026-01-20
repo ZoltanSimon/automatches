@@ -272,6 +272,25 @@ export async function getLeagueFromDb(leagueID) {
   }
 }
 
+export async function getAllTeamMatchesFromDb(teams) {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+       FROM matches
+       WHERE home_team_id IN (?) 
+          OR away_team_id IN (?)
+       ORDER BY match_date ASC`,
+      [teams, teams] 
+    );
+
+    return rows;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+
 export async function getMatchById(fixtureId) {
   const cacheKey = `match-${fixtureId}`;
   const now = Date.now();

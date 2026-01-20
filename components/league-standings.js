@@ -71,7 +71,7 @@ export async function leagueStandings(selectedLeague) {
         22
       )}</td>
 
-      ${tds}${team.matches}</td>
+      ${tds}${team.played}</td>
       ${tds}${team.wins}</td>
       ${tds}${team.draws}</td>
       ${tds}${team.losses}</td>

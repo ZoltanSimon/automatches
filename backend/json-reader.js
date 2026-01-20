@@ -2,7 +2,7 @@ import { readFile } from "fs/promises";
 import { Player } from "./../classes/player.js";
 import * as fs from "fs";
 import { networkPath } from "./config.js";
-import { findOrCreateTeam, extractStats } from "./backend-helper.js";
+import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
 import { getPlayerByID } from "./services/players-service.js";
 import { importLeague, getLeagueFromDb } from "./data-access.js";
@@ -265,11 +265,8 @@ export function buildTeamList(data) {
         const team2 = findOrCreateTeam(teams, team2Data);
 
         if (match.statistics[0]) {
-          const stats1 = extractStats(match, 0, 1);
-          const stats2 = extractStats(match, 1, 0);
-
-          team1.stats.push(stats1);
-          team2.stats.push(stats2);
+          team1.extractStats(match, 0, 1);
+          team2.extractStats(match, 1, 0);
         }
       }
     });

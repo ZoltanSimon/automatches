@@ -25,3 +25,17 @@ export const currentDate = () => {
     timeZone: "Europe/Berlin"
   });
 };
+
+export const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+export const percentage = (wins, played) => {
+  return ((wins / played) * 100).toFixed(1);
+}

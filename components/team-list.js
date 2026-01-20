@@ -65,10 +65,10 @@ function createTeamsTable(response, onlyTotal, big) {
         addToPage += `<span class="form-indicator ${result}"></span>`;
       }
 
-      addToPage += `</td>${tds}${thisTeam.matches}</td>`;
+      addToPage += `</td>${tds}${thisTeam.played}</td>`;
 
       if (big) {
-        addToPage += `${tds}${((100 * thisTeam.wins) / thisTeam.matches).toFixed(1)}</td>`;
+        addToPage += `${tds}${((100 * thisTeam.wins) / thisTeam.played).toFixed(1)}</td>`;
       }
 
       addToPage += `

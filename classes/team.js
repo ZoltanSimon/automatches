@@ -1,10 +1,12 @@
+import { Match } from "./match.js";
 export class Team {
+  #stats;
   constructor(team) {
     this.id = team.id;
     this.name = team.name;
     this.logo = team.logo;
-    this.stats = [];
-    this.matches = 0;
+    this.#stats = [];
+    this.played = 0;
     this.wins = 0;
     this.draws = 0;
     this.losses = 0;
@@ -14,10 +16,11 @@ export class Team {
     this.last5PerGame = new Stats();
     this.form = "";
     this.points = 0;
+    this.matches = [];
   }
 
   calculateTotals() {
-    for (let stat of this.stats) {
+    for (let stat of this.#stats) {
       this.total.addStats(stat);
 
       if (stat.goalsFor > stat.goalsAgainst) {
@@ -31,11 +34,11 @@ export class Team {
   }
 
   calculatePerGame() {
-    this.perGame = this.total.divideStats(this.matches);
+    this.perGame = this.total.divideStats(this.played);
   }
 
   calculateLast5() {
-    const last5Stats = this.stats.slice(-5);
+    const last5Stats = this.#stats.slice(-5);
     last5Stats.forEach((stat) => {
       this.last5.addStats(stat);
       this.form = this.updateForm(stat, this.form);
@@ -54,10 +57,36 @@ export class Team {
   }
 
   calculateStats() {
-    this.matches = this.stats.length;
+    this.played = this.#stats.length;
     this.calculateTotals();
     this.calculatePerGame();
     this.calculateLast5();
+  }
+
+  extractStats(match, teamIndex, opponentIndex) {
+    this.#stats.push({
+      goalsFor: match.score.fulltime[teamIndex === 0 ? "home" : "away"],
+      goalsAgainst: match.score.fulltime[teamIndex === 0 ? "away" : "home"],
+      corners: match.statistics[teamIndex].statistics[7].value,
+      cornersAgainst: match.statistics[opponentIndex].statistics[7].value,
+      shotsOnGoal: match.statistics[teamIndex].statistics[0].value,
+      shotsOnGoalAgainst: match.statistics[opponentIndex].statistics[0].value,
+      xG: parseFloat(match.statistics[teamIndex].statistics[16].value),
+      xGA: parseFloat(match.statistics[opponentIndex].statistics[16].value),
+    });
+    if (!this.matches.find((m) => m.id === match.fixture.id)) {
+      let thisMatch = new Match(match);
+      let thisStats = {
+        cornersHome: match.statistics[0].statistics[7].value,
+        cornersAway: match.statistics[1].statistics[7].value,
+        shotsOnGoalHome: match.statistics[0].statistics[0].value,
+        shotsOnGoalAway: match.statistics[1].statistics[0].value,
+        xGHome: parseFloat(match.statistics[0].statistics[16].value),
+        xGAway: parseFloat(match.statistics[1].statistics[16].value),
+      }
+      thisMatch.stats = thisStats;
+      this.matches.push(thisMatch);
+    }
   }
 }
 
@@ -92,17 +121,25 @@ export class Stats {
     this.goalsAgainst += stat.goalsAgainst;
   }
 
-divideStats(divisor) {
+  divideStats(divisor) {
     let dividedStats = new Stats();
     dividedStats.points = parseFloat((this.points / divisor).toFixed(2));
     dividedStats.xG = parseFloat((this.xG / divisor).toFixed(2));
     dividedStats.xGA = parseFloat((this.xGA / divisor).toFixed(2));
     dividedStats.corners = parseFloat((this.corners / divisor).toFixed(2));
-    dividedStats.cornersAgainst = parseFloat((this.cornersAgainst / divisor).toFixed(2));
-    dividedStats.shotsOnGoal = parseFloat((this.shotsOnGoal / divisor).toFixed(2));
-    dividedStats.shotsOnGoalAgainst = parseFloat((this.shotsOnGoalAgainst / divisor).toFixed(2));
+    dividedStats.cornersAgainst = parseFloat(
+      (this.cornersAgainst / divisor).toFixed(2)
+    );
+    dividedStats.shotsOnGoal = parseFloat(
+      (this.shotsOnGoal / divisor).toFixed(2)
+    );
+    dividedStats.shotsOnGoalAgainst = parseFloat(
+      (this.shotsOnGoalAgainst / divisor).toFixed(2)
+    );
     dividedStats.goals = parseFloat((this.goals / divisor).toFixed(2));
-    dividedStats.goalsAgainst = parseFloat((this.goalsAgainst / divisor).toFixed(2));
+    dividedStats.goalsAgainst = parseFloat(
+      (this.goalsAgainst / divisor).toFixed(2)
+    );
     return dividedStats;
   }
 }

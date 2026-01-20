@@ -18,6 +18,7 @@ import {
   allDBTeams,
   insertTeamsToDb,
   getMatchById,
+  getAllTeamMatchesFromDb,
 } from "./data-access.js";
 import { createRequire } from "module";
 import path from "path";
@@ -128,9 +129,7 @@ app.get("/ucl-last-round", (req, res) => {
 
 app.get("/league", async (req, res) => {
   try {
-    //const selectedLeague = parseLeagueIds("2");
     const selectedLeague = parseLeagueIds(req.query.league || "2");
-    console.log(selectedLeague);
     const [players, matches] = await Promise.all([
       getPlayerList(selectedLeague, 10),
       lastMatchesFromLeague(selectedLeague, 10)
@@ -154,11 +153,8 @@ app.get("/match", async (request, response) => {
 
   // Get the match details to extract the league ID and match info
   let currentMatch = await getMatchById(matchID);
-  let leagueID;
   
-  if (currentMatch) {
-    leagueID = currentMatch.leagueId;
-    
+  if (currentMatch) { 
     // Extract match information
     matchInfo = {
       homeTeamId: currentMatch.homeTeamId,
@@ -170,13 +166,10 @@ app.get("/match", async (request, response) => {
       homeGoals: currentMatch.homeGoals,
       awayGoals: currentMatch.awayGoals
     };
-    console.log(currentMatch);
-    // Now get all matches from that league
-    let data = await getLeagueFromDb(leagueID);
+    let data = await getAllTeamMatchesFromDb([matchInfo.homeTeamId, matchInfo.awayTeamId]);
     for (const element of data) {
-      let thisFixture = element.fixture;
-      if (["FT", "AET"].includes(thisFixture.status.short)) {
-        let fixtureMatchID = thisFixture.id;
+      if (["FT", "AET"].includes(element.status)) {
+        let fixtureMatchID = element.fixtureId;
         try {
           let matchData = await getMatchFromServer(fixtureMatchID);
           if (matchData) {
@@ -192,7 +185,6 @@ app.get("/match", async (request, response) => {
     
     let fullTeamList = buildTeamList(allMatches);
     
-    // Filter to only show the two teams playing in this match
     teamList = fullTeamList.filter(team => 
       team.id === matchInfo.homeTeamId || team.id === matchInfo.awayTeamId
     );
@@ -203,6 +195,11 @@ app.get("/match", async (request, response) => {
       if (b.id === matchInfo.homeTeamId) return 1;
       return 0;
     });
+
+    for (let team of teamList) {
+      team.matches.sort((a, b) => new Date(b.date) - new Date(a.date));
+      team.matches = team.matches.slice(0, 5);
+    }
   }
 
   response.render("match", { 
@@ -271,9 +268,12 @@ app.get("/save-match", async (request, response) => {
 
 //returns missing matches from given league
 app.get("/missing-matches", async (request, response) => {
-  let leagueIDs = request.query.leagueID.split(",");
-  let matchArr = [];
+  //if the request parameter is empty, get all leagues from the database
+  let leagueIDs = request.query.leagueID
+    ? request.query.leagueID.split(",")
+    : allDBLeagues.map(l => l.id);
 
+  let matchArr = [];
   if (leagueIDs.length == 0 || !(leagueIDs[0] > 0)) {
     return response.json([]);
   }
@@ -284,7 +284,6 @@ app.get("/missing-matches", async (request, response) => {
     for (const element of data) {
       if (["FT", "AET"].includes(element.fixture.status.short)) {
         try {
-          // Check if file exists
           fs.accessSync(
             `${matchesDir}/${element.fixture.id}.json`,
             fs.constants.R_OK
