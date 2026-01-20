@@ -769,6 +769,35 @@ td .form-indicator {
   white-space: nowrap;
 }
 
+.match-list-center-td {
+  text-align: center;   
+  font-weight: bold; 
+  cursor: pointer; 
+  padding: 6px; 
+  font-size: 1.1em;
+  border-left: 0;
+  border-right: 0;
+}
+.match-list-xg {
+  display: block; 
+  font-size: 1em; 
+  font-weight: normal; 
+  color: $blue;
+}
+
+.match-list-logo-td {
+  text-align: center; 
+  cursor: pointer; 
+  padding: 8px;
+}
+
+.match-list-team-name-td {
+  text-align: right; 
+  width: 30%; 
+  cursor: pointer; 
+  padding: 10px 8px;
+}
+
 // Media Queries - Mobile First Approach with Modern Standards
 
 // Large Desktop (1820px and up) - Base styles
@@ -924,8 +953,30 @@ td .form-indicator {
   #player-list table tr td:first-child {
     width: 44px;
   }
+
+.match-list-center-td {
+  padding: 4px; 
+  font-size: 0.9em;
 }
 
+.match-list-xg {
+  font-size: 0.8em;
+}
+
+.match-list-team-logo {
+  width: 30px;
+}
+
+.match-list-logo-td {
+  text-align: center; 
+  cursor: pointer; 
+  padding: 4px;
+}
+.match-list-team-name-td {
+  padding: 4px;
+}
+
+}
 // Preference-based media queries for accessibility
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -936,4 +987,3 @@ td .form-indicator {
     transition-duration: 0.01ms !important;
   }
 }
-

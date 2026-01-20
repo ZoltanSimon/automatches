@@ -28,45 +28,45 @@
         {{formatTime fixture.date}}
       </td>
 
-      <td style="text-align: right; width: 30%; cursor: pointer; padding: 12px 8px;" id="{{teams.home.id}}"
+      <td class="match-list-team-name-td" id="{{teams.home.id}}"
         onclick="window.location.href='players?team={{teams.home.id}}'">
         {{teams.home.name}}
       </td>
 
-      <td style="text-align: center; cursor: pointer; padding: 8px;"
+      <td class="match-list-logo-td"
         onclick="window.location.href='players?team={{teams.home.id}}'">
-        <img src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}" width="44px">
+        <img class="match-list-team-logo" src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}" width="44px">
       </td>
 
-      <td style="text-align: center; font-weight: bold; cursor: pointer; padding: 10px 14px; font-size: 1.1em;"
+      <td class="match-list-center-td"
         onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.home}}
         {{#if statistics.[0].statistics.[16].value}}
         <span
-          style="font-size: 1em; font-weight: normal; color: #666;">({{statistics.[0].statistics.[16].value}})</span>
+          class="match-list-xg">({{statistics.[0].statistics.[16].value}})</span>
         {{/if}}
       </td>
 
-      <td style="text-align: center; cursor: pointer; padding: 12px 8px; color: #999;"
+      <td class="match-list-center-td"
         onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         -
       </td>
 
-      <td style="text-align: center; font-weight: bold; cursor: pointer; padding: 10px 14px; font-size: 1.1em;"
+      <td class="match-list-center-td"
         onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.away}}
         {{#if statistics.[1].statistics.[16].value}}
         <span
-          style="font-size: 1em; font-weight: normal; color: #666;">({{statistics.[1].statistics.[16].value}})</span>
+          class="match-list-xg">({{statistics.[1].statistics.[16].value}})</span>
         {{/if}}
       </td>
 
-      <td style="text-align: center; cursor: pointer; padding: 8px;"
+      <td class="match-list-logo-td"
         onclick="window.location.href='players?team={{teams.away.id}}'">
-        <img src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}" width="44px">
+        <img class="match-list-team-logo" src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}" width="44px">
       </td>
 
-      <td style="text-align: left; width: 30%; cursor: pointer; padding: 12px 8px;" id="{{teams.away.id}}"
+      <td class="match-list-team-name-td" id="{{teams.away.id}}"
         onclick="window.location.href='players?team={{teams.away.id}}'">
         {{teams.away.name}}
       </td>
