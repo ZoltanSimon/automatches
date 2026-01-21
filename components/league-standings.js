@@ -44,7 +44,7 @@ export async function leagueStandings(selectedLeague) {
           <tr style="border-bottom: 2px solid #1D3557" class="main-table-header">
             <th style="width:48px;" class="list-header"><b>#</b></th>
             <th style="width:274px;" class="list-header" colspan="2"><b>Team</b></th>
-            <th style="width:52px;" class="list-header"><b>P</b></th>
+            <th style="width:52px;" class="list-header player-country"><b>P</b></th>
             <th style="width:52px;" class="list-header"><b>W</b></th>
             <th style="width:52px;" class="list-header"><b>D</b></th>
             <th style="width:52px;" class="list-header"><b>L</b></th>
@@ -71,7 +71,7 @@ export async function leagueStandings(selectedLeague) {
         22
       )}</td>
 
-      ${tds}${team.played}</td>
+      <td class="player-country" style="padding:6px; text-align: center;">${team.played}</td>
       ${tds}${team.wins}</td>
       ${tds}${team.draws}</td>
       ${tds}${team.losses}</td>

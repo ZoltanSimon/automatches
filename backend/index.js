@@ -123,6 +123,11 @@ app.get("/starting11", (req, res) => {
   res.render("palya", { title: "Starting 11 Builder" });
 });
 
+app.get("/privacy-policy", (req, res) => {
+  res.render("privacy-policy", { title: "Privacy Policy" });
+});
+
+
 app.get("/ucl-last-round", (req, res) => {
   res.render("ucl-last-round", { title: "UCL Last Round simulation" });
 });

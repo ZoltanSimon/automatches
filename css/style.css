@@ -9,6 +9,7 @@ body {
 a {
   text-decoration: none;
   color: #101d30;
+  font-weight: bold;
 }
 
 main {
