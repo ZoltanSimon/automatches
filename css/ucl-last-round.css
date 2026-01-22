@@ -1,0 +1,251 @@
+#ucl-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  width: 1200px;
+  gap: 10px;
+  margin: 0 auto;
+}
+
+#right {
+  grid-column: 2;
+  grid-row: 1/3;
+  border: 1px solid #1d3557;
+  padding: 10px;
+}
+
+#left,
+#left-bottom {
+  border: 1px solid #1d3557;
+  padding: 10px;
+}
+
+.score-pred {
+  width: 50px;
+}
+
+#left-bottom {
+  background: #a8dadc;
+  padding: 4px;
+}
+
+.path-group {
+  border: 1px solid #1d3557;
+  border-radius: 4px;
+  padding: 4px;
+  margin-bottom: 8px;
+}
+
+.bracket-flex {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.vs-divider {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  margin: 4px 0;
+  color: #1d3557;
+}
+
+.arrow {
+  font-size: 0.9rem;
+  color: #1d3557;
+}
+
+.high-seed-box {
+  border: 2px solid #457B9D;
+  border-radius: 4px;
+  background: #f1faee;
+}
+
+.seed-label {
+  font-size: 0.6rem;
+  background: #457B9D;
+  color: white;
+  text-align: center;
+  padding: 2px 0;
+  text-transform: uppercase;
+}
+
+.prelim-col {
+  width: 50%;
+  flex-shrink: 0;
+}
+
+.seed-col {
+  flex: 1;
+}
+
+.horizontal-pair {
+  display: flex;
+  align-items: center;
+  border: 1px solid #1d3557;
+  border-radius: 4px;
+  background: #f1faee;
+  min-height: 28px;
+}
+
+.no-border {
+  border: none;
+  background: transparent;
+}
+
+.or-badge {
+  background: #f1f1f1;
+  color: #1d3557;
+  font-size: 0.55rem;
+  padding: 0 4px;
+  border: 1px solid #1d3557;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+td {
+  padding: 4px;
+}
+
+@media (max-width: 768px) {
+  .bracket-flex {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .prelim-col,
+  .seed-col {
+    width: 100%;
+  }
+}
+.arrow {
+  font-size: 0.9rem;
+  color: #1d3557;
+  text-align: center;
+}
+
+.path-group {
+  padding: 0px;
+  margin-bottom: 12px;
+}
+
+.horizontal-pair {
+  display: flex;
+  align-items: center;
+  border: 1px solid #1d3557;
+  border-radius: 0px;
+  background: #f1faee;
+  min-height: 28px;
+}
+
+.no-border {
+  border: none;
+  background: transparent;
+}
+
+.team-unit {
+  flex: 1;
+  padding: 2px 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.or-badge {
+  background: #f1f1f1;
+  color: #1d3557;
+  font-size: 0.55rem;
+  padding: 2px;
+  border: 1px solid #1d3557;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+td {
+  padding: 4px;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  #ucl-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    width: 100%;
+    max-width: 100vw;
+    padding: 0;
+    gap: 10px;
+    margin: 0;
+  }
+  #right {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  #left,
+  #left-bottom,
+  #right {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  /* Make table container scrollable */
+  #matches-container {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  #matches {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  table {
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.85rem;
+  }
+  table img {
+    width: 20px !important;
+  }
+  .score-pred {
+    width: 35px;
+    font-size: 0.85rem;
+  }
+  /* Make team names wrap or truncate */
+  td {
+    padding: 3px;
+    white-space: nowrap;
+  }
+  h2 {
+    font-size: 1.1rem;
+  }
+  h3 {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 480px) {
+  #left,
+  #left-bottom,
+  #right {
+    padding: 2px;
+  }
+  .score-pred {
+    width: 30px;
+    font-size: 0.8rem;
+  }
+  table {
+    font-size: 0.75rem;
+  }
+  table img {
+    width: 18px !important;
+  }
+  td {
+    padding: 2px;
+  }
+  .arrow {
+    font-size: 0.6rem;
+  }
+  h3 {
+    font-size: 0.9rem;
+  }
+}/*# sourceMappingURL=ucl-last-round.css.map */

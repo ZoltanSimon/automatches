@@ -158,7 +158,8 @@ footer {
 
 .rectangle, 
 #left, 
-#right {
+#right,
+.left-bottom {
   display: grid;
   grid-template-columns: auto 1fr auto;
   padding: 10px;
@@ -413,24 +414,7 @@ td .form-indicator {
   border-bottom: 1px solid $lightest-blue;
 }
 
-#ucl-container {
-  display: grid;
-  /* Define two columns */
-  grid-template-columns: 1fr 1fr; 
-  width: 1200px;
-  gap: 10px;
-  margin: 0 auto;
-}
 
-#left,
-#right {
-  border: 1px solid $light-gray;
-  padding: 10px;
-}
-
-.score-pred {
-  width: 50px;
-}
 
 #statSelectorContainer {
   position: fixed;

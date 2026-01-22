@@ -1,4 +1,5 @@
 <script type="module" src="./../controllers/ucl-last-round.js"></script>
+<link rel="stylesheet" href="css/ucl-last-round.css" />
 <div id="ucl-container">
     <!-- Left Div -->
     <div id="left">
@@ -17,13 +18,13 @@
                     <tbody>
                         {{#each matches}}
                         <tr>
-                            <td style="border-right: none;">
+
+                            <td style="border-right: none; text-align: right; width: 28%;">{{this.teams.home.name}}</td>
+                            <td style="border-left: none;">
                                 <img src="images/logos/{{this.teams.home.id}}.png" alt="{{this.teams.home.name}} Logo"
                                     width="26px">
                             </td>
-                            <td style="border-left: none;">{{this.teams.home.name}}</td>
-
-                            <td>
+                            <td style="text-align:center">
                                 <input type="number" min="0" name="homeScore_{{this.fixture.id}}" class="score-pred"
                                     data-team="{{this.teams.home.id}}" data-opponent="{{this.teams.away.id}}">
                                 -
@@ -35,7 +36,7 @@
                                 <img src="images/logos/{{this.teams.away.id}}.png" alt="{{this.teams.away.name}} Logo"
                                     width="26px">
                             </td>
-                            <td style="border-left: none;">{{this.teams.away.name}}</td>
+                            <td style="border-left: none; width: 28%;">{{this.teams.away.name}}</td>
                         </tr>
                         {{/each}}
                     </tbody>
@@ -44,8 +45,16 @@
         </div>
     </div>
 
+
     <!-- Right Div -->
     <div id="right">
+        <h2>Live Standings</h2>
         <div id="standings"></div>
+        <span>Predict the scores above to see how the standings and the potential playoff matchups change!</span>
+
     </div>
+<div id="left-bottom">
+    <h3>Upcoming Matchups</h3>
+    <div id="dynamic-matchups"></div>
+</div>
 </div>

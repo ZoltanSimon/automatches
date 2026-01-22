@@ -144,7 +144,8 @@ footer p {
 
 .rectangle,
 #left,
-#right {
+#right,
+.left-bottom {
   display: grid;
   grid-template-columns: auto 1fr auto;
   padding: 10px;
@@ -158,13 +159,15 @@ footer p {
 }
 .rectangle div,
 #left div,
-#right div {
+#right div,
+.left-bottom div {
   grid-column: 1/4;
   align-self: start;
 }
 .rectangle h2,
 #left h2,
-#right h2 {
+#right h2,
+.left-bottom h2 {
   grid-column: 1/2;
   grid-row: 1;
   margin: 0;
@@ -173,7 +176,8 @@ footer p {
 }
 .rectangle .more-link,
 #left .more-link,
-#right .more-link {
+#right .more-link,
+.left-bottom .more-link {
   grid-column: 2/3;
   grid-row: 1;
   justify-self: start;
@@ -182,19 +186,22 @@ footer p {
 }
 .rectangle .more-link:hover,
 #left .more-link:hover,
-#right .more-link:hover {
+#right .more-link:hover,
+.left-bottom .more-link:hover {
   text-decoration: underline;
 }
 .rectangle #league-list,
 #left #league-list,
-#right #league-list {
+#right #league-list,
+.left-bottom #league-list {
   grid-column: 3;
   grid-row: 1;
   margin: 0;
 }
 .rectangle #league-list-league,
 #left #league-list-league,
-#right #league-list-league {
+#right #league-list-league,
+.left-bottom #league-list-league {
   padding: 4px;
   background-color: #457B9D;
   display: flex;
@@ -202,7 +209,8 @@ footer p {
 }
 .rectangle #league-list-league img,
 #left #league-list-league img,
-#right #league-list-league img {
+#right #league-list-league img,
+.left-bottom #league-list-league img {
   box-sizing: border-box;
   display: block;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
@@ -389,25 +397,6 @@ td .form-indicator:last-child {
 
 .top-row {
   border-bottom: 1px solid #f1faee;
-}
-
-#ucl-container {
-  display: grid;
-  /* Define two columns */
-  grid-template-columns: 1fr 1fr;
-  width: 1200px;
-  gap: 10px;
-  margin: 0 auto;
-}
-
-#left,
-#right {
-  border: 1px solid #ccc;
-  padding: 10px;
-}
-
-.score-pred {
-  width: 50px;
 }
 
 #statSelectorContainer {
