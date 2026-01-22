@@ -112,91 +112,52 @@ export async function getTopTeams(leagues, amount, big) {
   teamList(dasTeams.slice(0, amount), true, false, big);
 }
 
-export function sortTable(
-  n,
-  td,
-  table,
-  startingRow = 1,
-  toSwitch = true,
-  secondaryColumn = null,
-  thirdColumn = null
-) {
-  let rows,
-    switching = true,
-    dir = td.getAttribute("data-order") === "asc" ? "desc" : "asc",
-    switchcount = 0;
+export function sortTable(n, td, table, startingRow = 1, secondaryColumn = null, thirdColumn = null) {
+  // 1. Fixed Direction Logic
+  // It checks the header for 'data-default-order'. If missing, it uses 'desc'.
+  const dir = td.getAttribute("data-default-order") || "desc";
 
-  table
-    .querySelectorAll("th")
-    .forEach((th) => th.classList.remove("asc", "desc"));
-
-  td.setAttribute("data-order", dir);
+  // 2. Visual Polish
+  table.querySelectorAll("th").forEach((th) => th.classList.remove("asc", "desc"));
   td.classList.add(dir);
 
-  while (switching) {
-    switching = false;
-    rows = table.rows;
+  // 3. Sort Logic
+  const rowsArray = Array.from(table.rows).slice(startingRow);
+  rowsArray.sort((rowA, rowB) => {
+    const x = parseFloat(rowA.cells[n].innerText) || 0;
+    const y = parseFloat(rowB.cells[n].innerText) || 0;
 
-    for (let i = startingRow; i < rows.length - 1; i++) {
-      const x = parseFloat(rows[i].getElementsByTagName("TD")[n].innerHTML);
-      const y = parseFloat(rows[i + 1].getElementsByTagName("TD")[n].innerHTML);
-      let shouldSwitch = false;
+    // If points are different, sort by points
+    if (x !== y) return dir === "asc" ? x - y : y - x;
 
-      let secondaryX = null,
-        secondaryY = null,
-        thirdX = null,
-        thirdY = null;
-
-      if (secondaryColumn !== null && thirdColumn !== null) {
-        secondaryX = parseFloat(
-          rows[i].getElementsByTagName("TD")[secondaryColumn].innerHTML
-        );
-        secondaryY = parseFloat(
-          rows[i + 1].getElementsByTagName("TD")[secondaryColumn].innerHTML
-        );
-        thirdX = parseFloat(
-          rows[i].getElementsByTagName("TD")[thirdColumn].innerHTML
-        );
-        thirdY = parseFloat(
-          rows[i + 1].getElementsByTagName("TD")[thirdColumn].innerHTML
-        );
-      }
-
-      if (dir === "asc") {
-        if (x > y) {
-          shouldSwitch = true;
-        } else if (
-          x === y &&
-          secondaryColumn !== null &&
-          thirdColumn !== null
-        ) {
-          shouldSwitch = secondaryX - thirdX > secondaryY - thirdY;
-        }
-      } else if (dir === "desc") {
-        if (x < y) {
-          shouldSwitch = true;
-        } else if (
-          x === y &&
-          secondaryColumn !== null &&
-          thirdColumn !== null
-        ) {
-          shouldSwitch = secondaryX - thirdX < secondaryY - thirdY;
-        }
-      }
-
-      if (shouldSwitch) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-        switchcount++;
-        break;
-      }
+    // If points are equal, tie-break with Goal Difference (secondary - third)
+    if (secondaryColumn !== null && thirdColumn !== null) {
+      const gdA = (parseFloat(rowA.cells[secondaryColumn].innerText) || 0) - 
+                  (parseFloat(rowA.cells[thirdColumn].innerText) || 0);
+      const gdB = (parseFloat(rowB.cells[secondaryColumn].innerText) || 0) - 
+                  (parseFloat(rowB.cells[thirdColumn].innerText) || 0);
+      return dir === "asc" ? gdA - gdB : gdB - gdA;
     }
+    return 0;
+  });
 
-    if (toSwitch) {
-      if (!switching && dir === "desc" && switchcount === 0) {
-        dir = "asc";
-        switching = true;
-      }
+  // 4. Update the DOM
+  const tbody = table.querySelector('tbody') || table;
+  rowsArray.forEach(row => tbody.appendChild(row));
+
+  // 5. Apply colors to the new positions
+  recolorRows(table, startingRow);
+}
+
+function recolorRows(table, startingRow) {
+  for (let i = startingRow; i < table.rows.length; i++) {
+    const rank = i - startingRow + 1;
+    if (rank <= 8) {
+      table.rows[i].style.backgroundColor = '#A8DADC'; // Top Zone
+    } else if (rank <= 24) {
+      table.rows[i].style.backgroundColor = '#F1FAEE'; // Mid Zone
+    } else {
+      table.rows[i].style.backgroundColor = '';
     }
   }
 }

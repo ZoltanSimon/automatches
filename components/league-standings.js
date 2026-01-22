@@ -10,7 +10,7 @@ import { imagePath, removeNewlines, truncate } from "./../common-functions.js";
 import { darkColor } from "../common-styles.js";
 import { buildStandings } from "../autotext.js";
 
-async function standingsFromTeamList(selectedLeague) {
+export async function standingsFromTeamList(selectedLeague) {
   if (document.getElementById("league-name")) {
     //document.getElementById("league-name").innerHTML = document.getElementById(`img-${selectedLeague}`).title;
   }
@@ -90,6 +90,8 @@ export async function leagueStandings(selectedLeague) {
   }
   addToPage += `</tbody></table>`;
   document.getElementById("standings").innerHTML += addToPage;
+
+  return standings;
 }
 
 export function standingsToCanvas() {

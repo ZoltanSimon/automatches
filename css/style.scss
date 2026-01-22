@@ -415,18 +415,17 @@ td .form-indicator {
 
 #ucl-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Define two columns */
+  grid-template-columns: 1fr 1fr; 
   width: 1200px;
   gap: 10px;
   margin: 0 auto;
-  place-items: center;
 }
 
 #left,
 #right {
   border: 1px solid $light-gray;
   padding: 10px;
-  height: 100%;
 }
 
 .score-pred {
@@ -476,6 +475,48 @@ td .form-indicator {
 
   input[type="checkbox"] {
     margin-right: 8px;
+    cursor: pointer;
+  }
+}
+
+#pageExplainerContainer {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 220px;
+  background: $background-gray;
+  padding: 0;
+  border-radius: 8px 0 0 8px; // Rounded corners on the left side now
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1); // Shadow on the left
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+
+  &.open {
+    padding: 12px;
+  }
+
+  .stat-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    text-align: center;
+  }
+
+  #statCheckboxes {
+    display: grid;
+    gap: 6px;
+    grid-template-columns: 1fr;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
     cursor: pointer;
   }
 }
@@ -893,6 +934,31 @@ td .form-indicator {
     border-radius: 8px 8px 0 0;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px;
+
+    #statCheckboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 12px;
+    }
+  }
+
+  #pageExplainerContainer {
+position: relative; // Non-sticky, sits below header in document flow
+    top: 0;
+    right: auto;
+    transform: none;
+    width: 100%;
+    inset: auto; // Reset the desktop inset logic
+    border-radius: 0 0 8px 8px; // Rounded at the bottom since it's at the top
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    &.open {
+      padding: 10px;
+    }
 
     #statCheckboxes {
       display: flex;

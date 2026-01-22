@@ -73,6 +73,8 @@ export class Team {
       shotsOnGoalAgainst: match.statistics[opponentIndex].statistics[0].value,
       xG: parseFloat(match.statistics[teamIndex].statistics[16].value),
       xGA: parseFloat(match.statistics[opponentIndex].statistics[16].value),
+      fouls: match.statistics[teamIndex].statistics[4].value,
+      foulsAgainst: match.statistics[opponentIndex].statistics[4].value,
     });
     if (!this.matches.find((m) => m.id === match.fixture.id)) {
       let thisMatch = new Match(match);
@@ -101,6 +103,8 @@ export class Stats {
     this.cornersAgainst = 0;
     this.shotsOnGoal = 0;
     this.shotsOnGoalAgainst = 0;
+    this.fouls = 0;
+    this.foulsAgainst = 0;
   }
 
   addStats(stat) {
@@ -119,6 +123,8 @@ export class Stats {
     this.shotsOnGoalAgainst += stat.shotsOnGoalAgainst;
     this.goals += stat.goalsFor;
     this.goalsAgainst += stat.goalsAgainst;
+    this.fouls += stat.fouls || 0;
+    this.foulsAgainst += stat.foulsAgainst || 0;
   }
 
   divideStats(divisor) {
@@ -139,6 +145,10 @@ export class Stats {
     dividedStats.goals = parseFloat((this.goals / divisor).toFixed(2));
     dividedStats.goalsAgainst = parseFloat(
       (this.goalsAgainst / divisor).toFixed(2)
+    );
+    dividedStats.fouls = parseFloat((this.fouls / divisor).toFixed(2));
+    dividedStats.foulsAgainst = parseFloat(
+      (this.foulsAgainst / divisor).toFixed(2)
     );
     return dividedStats;
   }

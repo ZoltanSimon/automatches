@@ -5,7 +5,8 @@
         <div id="matches-container">
             <h2>UEFA Champions League - Last round scores</h2>
             <div id="matches">
-                <table border="1" cellspacing="0" cellpadding="5" style='border-collapse: collapse; border: 3px solid #1D3557;'>
+                <table border="1" cellspacing="0" cellpadding="5"
+                    style='border-collapse: collapse; border: 3px solid #1D3557;'>
                     <thead>
                         <tr class="main-table-header">
                             <th colspan="2" class="list-header2">Home Team</th>
@@ -14,137 +15,35 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {{#each matches}}
                         <tr>
-                            <td style="border-right: none;"><img src="images/logos/66.png" alt="Aston Villa Logo" width="26px"></td>
-                            <td style="border-left: none;">Aston Villa</td>
-                            <td><input type="number" min="0" name="astonVillaScore" class="score-pred" data-team="66" data-opponent="247"> - <input type="number" min="0" name="celticScore" class="score-pred" data-team="247" data-opponent="66"></td>
-                            <td style="border-right: none;"><img src="images/logos/247.png" alt="Celtic Logo" width="26px"></td>
-                            <td style="border-left: none;">Celtic</td>
+                            <td style="border-right: none;">
+                                <img src="images/logos/{{this.teams.home.id}}.png" alt="{{this.teams.home.name}} Logo"
+                                    width="26px">
+                            </td>
+                            <td style="border-left: none;">{{this.teams.home.name}}</td>
+
+                            <td>
+                                <input type="number" min="0" name="homeScore_{{this.fixture.id}}" class="score-pred"
+                                    data-team="{{this.teams.home.id}}" data-opponent="{{this.teams.away.id}}">
+                                -
+                                <input type="number" min="0" name="awayScore_{{this.fixture.id}}" class="score-pred"
+                                    data-team="{{this.teams.away.id}}" data-opponent="{{this.teams.home.id}}">
+                            </td>
+
+                            <td style="border-right: none;">
+                                <img src="images/logos/{{this.teams.away.id}}.png" alt="{{this.teams.away.name}} Logo"
+                                    width="26px">
+                            </td>
+                            <td style="border-left: none;">{{this.teams.away.name}}</td>
                         </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/529.png" alt="Barcelona Logo" width="26px"></td>
-                            <td style="border-left: none;">Barcelona</td>
-                            <td><input type="number" min="0" name="barcelonaScore" class="score-pred" data-team="529" data-opponent="499"> - <input type="number" min="0" name="atalantaScore" class="score-pred" data-team="499" data-opponent="529"></td>
-                            <td style="border-right: none;"><img src="images/logos/499.png" alt="Atalanta Logo" width="26px"></td>
-                            <td style="border-left: none;">Atalanta</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/168.png" alt="Bayer 04 Leverkusen Logo" width="26px"></td>
-                            <td style="border-left: none;">Bayer 04 Leverkusen</td>
-                            <td><input type="number" min="0" name="leverkusenScore" class="score-pred" data-team="168" data-opponent="628"> - <input type="number" min="0" name="spartaPrahaScore" class="score-pred" data-team="628" data-opponent="168"></td>
-                            <td style="border-right: none;"><img src="images/logos/628.png" alt="AC Sparta Praha Logo" width="26px"></td>
-                            <td style="border-left: none;">AC Sparta Praha</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/165.png" alt="Borussia Dortmund Logo" width="26px"></td>
-                            <td style="border-left: none;">Borussia Dortmund</td>
-                            <td><input type="number" min="0" name="dortmundScore" class="score-pred" data-team="165" data-opponent="550"> - <input type="number" min="0" name="shakhtarScore" class="score-pred" data-team="550" data-opponent="165"></td>
-                            <td style="border-right: none;"><img src="images/logos/550.png" alt="Shakhtar Donetsk Logo" width="26px"></td>
-                            <td style="border-left: none;">Shakhtar Donetsk</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/157.png" alt="FC Bayern München Logo" width="26px"></td>
-                            <td style="border-left: none;">FC Bayern München</td>
-                            <td><input type="number" min="0" name="bayernScore" class="score-pred" data-team="157" data-opponent="656"> - <input type="number" min="0" name="slovanScore" class="score-pred" data-team="656" data-opponent="157"></td>
-                            <td style="border-right: none;"><img src="images/logos/656.png" alt="ŠK Slovan Bratislava Logo" width="26px"></td>
-                            <td style="border-left: none;">ŠK Slovan Bratislava</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/547.png" alt="Girona FC Logo" width="26px"></td>
-                            <td style="border-left: none;">Girona FC</td>
-                            <td><input type="number" min="0" name="gironaScore" class="score-pred" data-team="547" data-opponent="42"> - <input type="number" min="0" name="arsenalScore" class="score-pred" data-team="42" data-opponent="547"></td>
-                            <td style="border-right: none;"><img src="images/logos/42.png" alt="Arsenal Logo" width="26px"></td>
-                            <td style="border-left: none;">Arsenal</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/620.png" alt="GNK Dinamo Zagreb Logo" width="26px"></td>
-                            <td style="border-left: none;">GNK Dinamo Zagreb</td>
-                            <td><input type="number" min="0" name="dinamoScore" class="score-pred" data-team="620" data-opponent="489"> - <input type="number" min="0" name="milanScore" class="score-pred" data-team="489" data-opponent="620"></td>
-                            <td style="border-right: none;"><img src="images/logos/489.png" alt="Milan Logo" width="26px"></td>
-                            <td style="border-left: none;">Milan</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/505.png" alt="Inter Logo" width="26px"></td>
-                            <td style="border-left: none;">Inter</td>
-                            <td><input type="number" min="0" name="interScore" class="score-pred" data-team="505" data-opponent="91"> - <input type="number" min="0" name="monacoScore" class="score-pred" data-team="91" data-opponent="505"></td>
-                            <td style="border-right: none;"><img src="images/logos/91.png" alt="AS Monaco Logo" width="26px"></td>
-                            <td style="border-left: none;">AS Monaco</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/496.png" alt="Juventus Logo" width="26px"></td>
-                            <td style="border-left: none;">Juventus</td>
-                            <td><input type="number" min="0" name="juventusScore" class="score-pred" data-team="496" data-opponent="211"> - <input type="number" min="0" name="benficaScore" class="score-pred" data-team="211" data-opponent="496"></td>
-                            <td style="border-right: none;"><img src="images/logos/211.png" alt="Benfica Logo" width="26px"></td>
-                            <td style="border-left: none;">Benfica</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/79.png" alt="Lille Logo" width="26px"></td>
-                            <td style="border-left: none;">Lille</td>
-                            <td><input type="number" min="0" name="lilleScore" class="score-pred" data-team="79" data-opponent="209"> - <input type="number" min="0" name="feyenoordScore" class="score-pred" data-team="209" data-opponent="79"></td>
-                            <td style="border-right: none;"><img src="images/logos/209.png" alt="Feyenoord Logo" width="26px"></td>
-                            <td style="border-left: none;">Feyenoord</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/50.png" alt="Manchester City Logo" width="26px"></td>
-                            <td style="border-left: none;">Manchester City</td>
-                            <td><input type="number" min="0" name="manCityScore" class="score-pred" data-team="50" data-opponent="569"> - <input type="number" min="0" name="clubBruggeScore" class="score-pred" data-team="569" data-opponent="50"></td>
-                            <td style="border-right: none;"><img src="images/logos/569.png" alt="Club Brugge KV Logo" width="26px"></td>
-                            <td style="border-left: none;">Club Brugge KV</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/197.png" alt="PSV Eindhoven Logo" width="26px"></td>
-                            <td style="border-left: none;">PSV Eindhoven</td>
-                            <td><input type="number" min="0" name="psvScore" class="score-pred" data-team="197" data-opponent="40"> - <input type="number" min="0" name="liverpoolScore" class="score-pred" data-team="40" data-opponent="197"></td>
-                            <td style="border-right: none;"><img src="images/logos/40.png" alt="Liverpool Logo" width="26px"></td>
-                            <td style="border-left: none;">Liverpool</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/571.png" alt="Red Bull Salzburg Logo" width="26px"></td>
-                            <td style="border-left: none;">Red Bull Salzburg</td>
-                            <td><input type="number" min="0" name="rbSalzburgScore" class="score-pred" data-team="571" data-opponent="530"> - <input type="number" min="0" name="atlMadridScore" class="score-pred" data-team="530" data-opponent="571"></td>
-                            <td style="border-right: none;"><img src="images/logos/530.png" alt="Atlético Madrid Logo" width="26px"></td>
-                            <td style="border-left: none;">Atlético Madrid</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/637.png" alt="SK Sturm Graz Logo" width="26px"></td>
-                            <td style="border-left: none;">SK Sturm Graz</td>
-                            <td><input type="number" min="0" name="sturmScore" class="score-pred" data-team="637" data-opponent="173"> - <input type="number" min="0" name="leipzigScore" class="score-pred" data-team="173" data-opponent="637"></td>
-                            <td style="border-right: none;"><img src="images/logos/173.png" alt="RB Leipzig Logo" width="26px"></td>
-                            <td style="border-left: none;">RB Leipzig</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/228.png" alt="Sporting Logo" width="26px"></td>
-                            <td style="border-left: none;">Sporting</td>
-                            <td><input type="number" min="0" name="sportingScore" class="score-pred" data-team="228" data-opponent="500"> - <input type="number" min="0" name="bolognaScore" class="score-pred" data-team="500" data-opponent="228"></td>
-                            <td style="border-right: none;"><img src="images/logos/500.png" alt="Bologna Logo" width="26px"></td>
-                            <td style="border-left: none;">Bologna</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/106.png" alt="Stade Brestois Logo" width="26px"></td>
-                            <td style="border-left: none;">Stade Brestois</td>
-                            <td><input type="number" min="0" name="brestScore" class="score-pred" data-team="106" data-opponent="541"> - <input type="number" min="0" name="realMadridScore" class="score-pred" data-team="541" data-opponent="106"></td>
-                            <td style="border-right: none;"><img src="images/logos/541.png" alt="Real Madrid Logo" width="26px"></td>
-                            <td style="border-left: none;">Real Madrid</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/172.png" alt="VfB Stuttgart Logo" width="26px"></td>
-                            <td style="border-left: none;">VfB Stuttgart</td>
-                            <td><input type="number" min="0" name="stuttgartScore" class="score-pred" data-team="172" data-opponent="85"> - <input type="number" min="0" name="psgScore" class="score-pred" data-team="85" data-opponent="172"></td>
-                            <td style="border-right: none;"><img src="images/logos/85.png" alt="Paris Saint-Germain Logo" width="26px"></td>
-                            <td style="border-left: none;">Paris Saint-Germain</td>
-                        </tr>
-                        <tr>
-                            <td style="border-right: none;"><img src="images/logos/565.png" alt="Young Boys Logo" width="26px"></td>
-                            <td style="border-left: none;">Young Boys</td>
-                            <td><input type="number" min="0" name="youngBoysScore" class="score-pred" data-team="565" data-opponent="598"> - <input type="number" min="0" name="crvenaZvezdaScore" class="score-pred" data-team="598" data-opponent="565"></td>
-                            <td style="border-right: none;"><img src="images/logos/598.png" alt="FK Crvena zvezda Logo" width="26px"></td>
-                            <td style="border-left: none;">FK Crvena zvezda</td>
-                        </tr>
+                        {{/each}}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
     <!-- Right Div -->
     <div id="right">
         <div id="standings"></div>

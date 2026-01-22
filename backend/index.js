@@ -128,8 +128,13 @@ app.get("/privacy-policy", (req, res) => {
 });
 
 
-app.get("/ucl-last-round", (req, res) => {
-  res.render("ucl-last-round", { title: "UCL Last Round simulation" });
+app.get("/ucl-last-round", async (req, res) => {
+  let matches = await matchesInRound(8, 2);
+  console.log(matches);
+  res.render("ucl-last-round", { 
+    title: "UCL Last Round simulation",
+    matches, 
+  });
 });
 
 app.get("/league", async (req, res) => {

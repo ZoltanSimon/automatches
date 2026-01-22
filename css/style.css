@@ -393,18 +393,17 @@ td .form-indicator:last-child {
 
 #ucl-container {
   display: grid;
+  /* Define two columns */
   grid-template-columns: 1fr 1fr;
   width: 1200px;
   gap: 10px;
   margin: 0 auto;
-  place-items: center;
 }
 
 #left,
 #right {
   border: 1px solid #ccc;
   padding: 10px;
-  height: 100%;
 }
 
 .score-pred {
@@ -450,6 +449,44 @@ td .form-indicator:last-child {
 }
 #statSelectorContainer input[type=checkbox] {
   margin-right: 8px;
+  cursor: pointer;
+}
+
+#pageExplainerContainer {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 220px;
+  background: #f8f9fa;
+  padding: 0;
+  border-radius: 8px 0 0 8px;
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+#pageExplainerContainer.open {
+  padding: 12px;
+}
+#pageExplainerContainer .stat-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: block;
+  text-align: center;
+}
+#pageExplainerContainer #statCheckboxes {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr;
+}
+#pageExplainerContainer label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -846,6 +883,27 @@ td .form-indicator:last-child {
     gap: 8px;
   }
   #statSelectorContainer label {
+    font-size: 12px;
+  }
+  #pageExplainerContainer {
+    position: relative;
+    top: 0;
+    right: auto;
+    transform: none;
+    width: 100%;
+    inset: auto;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  #pageExplainerContainer.open {
+    padding: 10px;
+  }
+  #pageExplainerContainer #statCheckboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #pageExplainerContainer label {
     font-size: 12px;
   }
 }

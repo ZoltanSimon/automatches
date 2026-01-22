@@ -47,8 +47,9 @@ export async function matchesOnDay(dateToCheck, selectedLeagues = allDBLeagues) 
 }
 
 export async function matchesInRound(roundNr, leagueID) {
+  const roundName = (leagueID == 2) ? `League Stage - ${roundNr}` : `Group Stage - ${roundNr}`;
   let data = await getLeagueFromDb(leagueID);
-  let matches = data.filter((element) => element.league.round == `League Stage - ${roundNr}`);
+  let matches = data.filter((element) => element.league.round == roundName);
 
   for (let i = 0; i < matches.length; i++) {
     let matchID = matches[i].fixture.id;
