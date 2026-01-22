@@ -159,7 +159,7 @@ footer p {
 .rectangle div,
 #left div,
 #right div {
-  grid-column: 1/-1;
+  grid-column: 1/4;
   align-self: start;
 }
 .rectangle h2,
