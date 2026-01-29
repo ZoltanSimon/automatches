@@ -550,7 +550,7 @@ td .form-indicator:last-child {
   display: block;
 }
 
-.match-header {
+.match-header, .team-page-header {
   background: #1d3557;
   padding: 16px;
   margin-bottom: 16px;
@@ -654,6 +654,7 @@ td .form-indicator:last-child {
   border-radius: 6px;
   padding: 12px;
   text-align: center;
+  color: #1d3557;
 }
 
 .stat .label {
@@ -894,6 +895,16 @@ td .form-indicator:last-child {
   }
   #pageExplainerContainer label {
     font-size: 12px;
+  }
+  .team-page-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .team-page-header > div {
+    display: block;
+  }
+  .team-page-header > div:nth-child(n) {
+    width: 40%;
   }
 }
 @media (width < 660px) {

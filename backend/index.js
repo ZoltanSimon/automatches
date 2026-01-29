@@ -18,7 +18,6 @@ import {
   allDBTeams,
   insertTeamsToDb,
   getMatchById,
-  getAllTeamMatchesFromDb,
 } from "./data-access.js";
 import { createRequire } from "module";
 import path from "path";
@@ -27,11 +26,13 @@ import {
   getPlayerList,
   insertAllPlayers,
   getPlayerByID,
+  getTeamPlayerList,
 } from "./services/players-service.js";
-import { matchesOnDay, matchesInRound, lastMatchesFromLeague } from "./services/matches-service.js";
+import { matchesOnDay, matchesInRound, lastMatchesFromLeague, allTeamMatches } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, defaultLeagues } from "./services/leagues-service.js";
 import { parseDate, parseLeagueIds, handleError } from "./backend-helper.js";
+import { all } from "axios";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -103,8 +104,30 @@ app.get("/compare-players", (req, res) => {
   res.render("compare-players", { title: "Compare Players" });
 });
 
-app.get("/teams", (req, res) => {
-  res.render("teams", { title: "Teams" });
+app.get("/top-teams", (req, res) => {
+  res.render("top-teams", { title: "Teams" });
+});
+
+app.get("/team", async (req, res) => {
+
+  let thisTeam = allDBTeams.find(t => t.ID == req.query.teamID);
+  let allMatches = await allTeamMatches(thisTeam.ID, null, false);
+  let fullTeamList = buildTeamList(allMatches); 
+  let teamStats = fullTeamList.filter(team => 
+    team.id === thisTeam.ID
+  );
+
+  let matchesToShow = allMatches;
+  matchesToShow.sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+  matchesToShow = matchesToShow.slice(0, 15);
+
+  res.render("team", { 
+    title: thisTeam ? thisTeam.name : "Team",
+    thisTeam: thisTeam,
+    players: await getTeamPlayerList(allMatches, thisTeam.ID),
+    matches: (matchesToShow), 
+    teamStats: teamStats,  
+  });
 });
 
 app.get("/admin", async (req, res) => {
@@ -157,7 +180,6 @@ app.get("/league", async (req, res) => {
 
 app.get("/match", async (request, response) => {
   let matchID = request.query.matchID;
-  let allMatches = [];
   let teamList = [];
   let matchInfo = {};
 
@@ -176,25 +198,10 @@ app.get("/match", async (request, response) => {
       homeGoals: currentMatch.homeGoals,
       awayGoals: currentMatch.awayGoals
     };
-    let data = await getAllTeamMatchesFromDb([matchInfo.homeTeamId, matchInfo.awayTeamId]);
-    for (const element of data) {
-      if (["FT", "AET"].includes(element.status)) {
-        let fixtureMatchID = element.fixtureId;
-        try {
-          let matchData = await getMatchFromServer(fixtureMatchID);
-          if (matchData) {
-            allMatches.push(matchData[0]);
-          } else {
-            console.warn(`No data found for matchID: ${fixtureMatchID}`);
-          }
-        } catch (error) {
-          console.error(`Error fetching match with ID ${fixtureMatchID}:`, error);
-        }
-      }
-    }
-    
+    let allMatches = await allTeamMatches(matchInfo.homeTeamId, matchInfo.awayTeamId);
+
     let fullTeamList = buildTeamList(allMatches);
-    
+
     teamList = fullTeamList.filter(team => 
       team.id === matchInfo.homeTeamId || team.id === matchInfo.awayTeamId
     );

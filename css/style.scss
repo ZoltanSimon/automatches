@@ -581,7 +581,7 @@ td .form-indicator {
   }
 }
 
-.match-header {
+.match-header, .team-page-header {
     background: $dark-blue;
     padding: 16px;
     margin-bottom: 16px;
@@ -685,6 +685,7 @@ td .form-indicator {
     border-radius: 6px;
     padding: 12px;
     text-align: center;
+    color: $dark-blue;
   }
   
   .stat .label {
@@ -954,6 +955,20 @@ position: relative; // Non-sticky, sits below header in document flow
       font-size: 12px;
     }
   }
+
+  .team-page-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .team-page-header > div {
+        display: block;
+        
+        &:nth-child(n) {
+            width:40%; // 50% minus half the gap
+        }
+
+}
 }
 
 // Mobile Portrait

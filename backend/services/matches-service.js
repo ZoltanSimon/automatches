@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { allDBLeagues, getLeagueFromDb } from "./../data-access.js";
+import { allDBLeagues, getLeagueFromDb, getAllTeamMatchesFromDb } from "./../data-access.js";
 import {
   matchesDir,
   getMatchFromServer,
@@ -90,4 +90,28 @@ export async function lastMatchesFromLeague(leagueID, count = 10) {
   }
   
   return lastMatches;
+}
+
+export async function allTeamMatches(homeTeamID, awayTeamID = null, checkStatus = true) {
+    let allMatches = [];
+
+    let data = await getAllTeamMatchesFromDb([homeTeamID, awayTeamID]);
+    for (const element of data) {
+      // Only check status if checkStatus is true
+      if (!checkStatus || ["FT", "AET"].includes(element.status)) {
+        let fixtureMatchID = element.fixtureId;
+        try {
+          let matchData = await getMatchFromServer(fixtureMatchID);
+          if (matchData) {
+            allMatches.push(matchData[0]);
+          } else {
+            console.warn(`No data found for matchID: ${fixtureMatchID}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching match with ID ${fixtureMatchID}:`, error);
+        }
+      }
+    }
+
+    return allMatches;
 }

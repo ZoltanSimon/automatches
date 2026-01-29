@@ -10,7 +10,6 @@ export function teamList(
   addMatches = false,
   big = false
 ) {
-  let team1, team2;
   addMatches = true;
   createTeamsTable(response, onlyTotal, big);
 
@@ -57,8 +56,8 @@ function createTeamsTable(response, onlyTotal, big) {
     const thisTeam = response[i];
     if (thisTeam) {
       addToPage += `<tr>
-        <td style="padding:4px; border-right:none; cursor:pointer" onclick="window.location.href='/players?team=${thisTeam.id}'"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
-        <td class="team-name" style="cursor:pointer" onclick="window.location.href='/players?team=${thisTeam.id}'">${thisTeam.name}</td>
+        <td style="padding:4px; border-right:none; cursor:pointer" onclick="window.location.href='/team?teamID=${thisTeam.id}'"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
+        <td class="team-name" style="cursor:pointer" onclick="window.location.href='/team?teamID=${thisTeam.id}'">${thisTeam.name}</td>
         <td>`;
 
       for (const result of thisTeam.form) {

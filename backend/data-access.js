@@ -1,3 +1,4 @@
+import { all } from "axios";
 import pool, { networkPath } from "./config.js";
 import fs from "fs";
 
@@ -50,22 +51,53 @@ export async function loadLeagues() {
 })();
 
 export async function insertPlayersToDb(allPlayers) {
+  // Filter out players without valid IDs
+  const validPlayers = allPlayers.filter(player => player.id != null && player.id !== '');
+  
+  //find the player called Mallen
+  console.log(validPlayers.find(p => p.name === 'Donyell Malen'));
+
+  if (validPlayers.length === 0) {
+    console.log({ message: "No valid players to insert." });
+    return;
+  }
+
+  const BATCH_SIZE = 500; // Reduced to 500 (2500 placeholders per batch)
+  let totalInserted = 0;
+
   try {
-    // Insert or update players
-    for (const player of allPlayers) {
-      const { id, name, club, nation, position } = player;
+    // Process in batches
+    for (let i = 0; i < validPlayers.length; i += BATCH_SIZE) {
+      const batch = validPlayers.slice(i, i + BATCH_SIZE);
+      
+      // Prepare bulk insert values for this batch
+      const values = batch.map(player => [
+        player.id,
+        player.name,
+        player.club,
+        player.nation,
+        player.position[0] || ""
+      ]);
+
+      // Create placeholders and flatten values
+      const placeholders = batch.map(() => '(?, ?, ?, ?, ?)').join(', ');
+      const flatValues = values.flat();
+
       await pool.execute(
         `INSERT INTO Player (id, name, club, nation, position)
-          VALUES (?, ?, ?, ?, ?)
+          VALUES ${placeholders}
           ON DUPLICATE KEY UPDATE
           club = IF(VALUES(club) <> 0 AND club <> VALUES(club), VALUES(club), club),
           nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation),
           position = VALUES(position);`,
-        [id, name, club, nation, position[0] || ""]
+        flatValues
       );
+
+      totalInserted += batch.length;
+      console.log(`Processed ${totalInserted}/${validPlayers.length} players...`);
     }
 
-    console.log({ message: "Players loaded successfully!" });
+    console.log({ message: `${validPlayers.length} players loaded successfully!` });
   } catch (error) {
     console.error({ error: "Error loading players.", details: error.message });
   }
