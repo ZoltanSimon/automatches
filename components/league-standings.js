@@ -37,7 +37,7 @@ export async function leagueStandings(selectedLeague) {
 
   let standings = await standingsFromTeamList(selectedLeague);
   let addToPage = ``;
-  let tds = `<td style="padding:6px; text-align: center;">`;
+  let tds = `<td style="padding:4px; text-align: center;">`;
 
   addToPage += `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="league-standings">
         <thead>    
@@ -48,10 +48,9 @@ export async function leagueStandings(selectedLeague) {
             <th style="width:52px;" class="list-header"><b>W</b></th>
             <th style="width:52px;" class="list-header"><b>D</b></th>
             <th style="width:52px;" class="list-header"><b>L</b></th>
-            <th style="width:45px;" class="list-header"><b>GF</b></th>
-            <th style="width:45px;" class="list-header"><b>GA</b></th>
+            <th style="width:90px;" class="list-header"><b>Goals</b></th>
             <th style="width:90px;" class="list-header"><b>xG</b></th>
-            <th style="width:96px; padding: 4px;" class="list-header"><b>Form</b></th>
+            <th padding: 4px;" class="form-column"><b>Form</b></th>
             <th style="width:58px;" class="list-header"><b>Pts</b></th>
           </tr>
         </thead><tbody>`;
@@ -63,29 +62,28 @@ export async function leagueStandings(selectedLeague) {
     addToPage += `
       <tr data-id=${team.id}>
       <td style="padding:6px; text-align: center; font-weight: bold">${i + 1}</td>
-      <td style="width:36px; padding: 4px; text-align: center;"><img src="${imagePath(
+      <td style="width:36px; padding: 2px; text-align: center;"><img src="${imagePath(
         team.id
-      )}" alt="${team.name}" width="40px"/> </td>
-      <td style="border-left-style: hidden; padding: 3px;">${truncate(
+      )}" alt="${team.name}" width="40px" class="logo-picture"/> </td>
+      <td style="border-left-style: hidden; padding: 2px;">${truncate(
         team.name,
         22
       )}</td>
 
-      <td class="player-country" style="padding:6px; text-align: center;">${team.played}</td>
+      <td class="player-country" style="padding:4px; text-align: center;">${team.played}</td>
       ${tds}${team.wins}</td>
       ${tds}${team.draws}</td>
       ${tds}${team.losses}</td>
-      ${tds}${team.total.goals}</td>
-      ${tds}${team.total.goalsAgainst}</td>
+      ${tds}${team.total.goals} : ${team.total.goalsAgainst}</td>
       ${tds}${team.total.xG.toFixed(
         0
       )} : ${team.total.xGA.toFixed(0)}</td>`;
-   addToPage += `<td>`;
+   addToPage += `<td style="padding:0px;">`;
       for (const result of form) {
         addToPage += `<span class="form-indicator ${result}"></span>`;
       }
 
-    addToPage += `</td><td style="padding:6px; text-align: center; font-weight: bold">${team.total.points}</td>
+    addToPage += `</td><td style="padding:4px; text-align: center; font-weight: bold">${team.total.points}</td>
       </tr>`;
   }
   addToPage += `</tbody></table>`;

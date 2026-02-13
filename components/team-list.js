@@ -2,7 +2,10 @@ import { tds } from "../common-styles.js";
 
 let addToPage;
 let ths = `<th title="Click to sort" class="list-header sortable">`;
-import { sortTable, adjustColspan } from "../common-functions.js";
+import { sortTable, adjustColspan, showColumn, hideColumn } from "../common-functions.js";
+
+const tableName = "team-list-table";
+
 
 export function teamList(
   response,
@@ -56,29 +59,43 @@ function createTeamsTable(response, onlyTotal, big) {
     const thisTeam = response[i];
     if (thisTeam) {
       addToPage += `<tr>
-        <td style="padding:4px; border-right:none; cursor:pointer" onclick="window.location.href='/team?teamID=${thisTeam.id}'"><img height=50 src="images/logos/${thisTeam.id}.png" /></td>
+        <td style="padding:4px; border-right:none; cursor:pointer" onclick="window.location.href='/team?teamID=${thisTeam.id}'"><img src="images/logos/${thisTeam.id}.png" class="logo-picture"/></td>
         <td class="team-name" style="cursor:pointer" onclick="window.location.href='/team?teamID=${thisTeam.id}'">${thisTeam.name}</td>
-        <td>`;
+        <td style="padding: 0px" data-stat="form">`;
 
       for (const result of thisTeam.form) {
         addToPage += `<span class="form-indicator ${result}"></span>`;
       }
 
-      addToPage += `</td>${tds}${thisTeam.played}</td>`;
+      addToPage += `</td><td style="text-align: center;" data-stat="played">${thisTeam.played}</td>`;
 
       if (big) {
-        addToPage += `${tds}${((100 * thisTeam.wins) / thisTeam.played).toFixed(1)}</td>`;
+        addToPage += `<td style="text-align: center;" data-stat="winPercentage">${((100 * thisTeam.wins) / thisTeam.played).toFixed(1)}</td>
+                      <td style="text-align: center;" data-stat="possession">${thisTeam.perGame.possession.toFixed(1)}</td>`;
       }
 
       addToPage += `
-        ${tds}${thisTeam.total.goals}</td>
-        ${tds}${thisTeam.total.goalsAgainst}</td>
-        ${tds}${thisTeam.total.xG.toFixed(toFixed)}</td>
-        ${tds}${thisTeam.total.xGA.toFixed(toFixed)}</td>
-        <td style="text-align: center;" class="corners">${thisTeam.total.corners}</td>
-        <td style="text-align: center;" class="corners">${thisTeam.total.cornersAgainst}</td>
-        ${tds}${thisTeam.total.shotsOnGoal}</td>
-        ${tds}${thisTeam.total.shotsOnGoalAgainst}</td>`;
+        
+        <td style="text-align: center;" data-stat="goals">${thisTeam.total.goals}</td>
+        <td style="text-align: center;" data-stat="goals">${thisTeam.total.goalsAgainst}</td>
+        <td style="text-align: center;" data-stat="xG">${thisTeam.total.xG.toFixed(toFixed)}</td>
+        <td style="text-align: center;" data-stat="xG">${thisTeam.total.xGA.toFixed(toFixed)}</td>
+        <td style="text-align: center;" data-stat="corners">${thisTeam.total.corners}</td>
+        <td style="text-align: center;" data-stat="corners">${thisTeam.total.cornersAgainst}</td>
+        <td style="text-align: center;" data-stat="shotsOnGoal">${thisTeam.total.shotsOnGoal}</td>
+        <td style="text-align: center;" data-stat="shotsOnGoal">${thisTeam.total.shotsOnGoalAgainst}</td>`;
+        
+        if (big) {
+          addToPage += `
+            <td style="text-align: center;" data-stat="fouls">${thisTeam.total.fouls}</td>
+            <td style="text-align: center;" data-stat="fouls">${thisTeam.total.foulsAgainst}</td>
+            <td style="text-align: center;" data-stat="yellowCards">${thisTeam.total.yellowCards}</td>
+            <td style="text-align: center;" data-stat="yellowCards">${thisTeam.total.yellowCardsAgainst}</td>
+            <td style="text-align: center;" data-stat="redCards">${thisTeam.total.redCards}</td>
+            <td style="text-align: center;" data-stat="redCards">${thisTeam.total.redCardsAgainst}</td>
+            <td style="text-align: center;" data-stat="offsides">${thisTeam.total.offsides}</td>
+            <td style="text-align: center;" data-stat="offsides">${thisTeam.total.offsidesAgainst}</td>`;
+        }
 
       if (!onlyTotal) {
         addToPage += `
@@ -105,7 +122,7 @@ function createTeamsTable(response, onlyTotal, big) {
           ${tds}${thisTeam.last5PerGame.corners.toFixed(2)}</td>
           ${tds}${thisTeam.last5PerGame.cornersAgainst.toFixed(2)}</td>
           ${tds}${thisTeam.last5PerGame.shotsOnGoal.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.shotsOnGoalAgainst.toFixed(2)}</td>`;
+          ${tds}${thisTeam.last5PerGame.shotsOnGoalAgainst.toFixed(2)}</td>`   ;
       }
 
       addToPage += "</tr>";
@@ -114,10 +131,20 @@ function createTeamsTable(response, onlyTotal, big) {
   
   tableBody.innerHTML = addToPage;
 
+  // Add checkbox event listeners for show/hide columns
+const checkboxes = document.querySelectorAll("input[name='statSelector']");
+  checkboxes.forEach((checkbox) =>
+    checkbox.addEventListener("change", updateTableVisibility)
+  );
+
+  // Initial visibility update
+  updateTableVisibility();
+
+  // Add sorting functionality to subheader cells
   let subHeaderLength = table.rows[1].cells.length;
   let lastRowLength = table.rows[table.rows.length - 1].cells.length;
 
-  for (let i = subHeaderLength -1; i >= 0; i--) {
+  for (let i = subHeaderLength - 1; i >= 0; i--) {
     let subheaderCell = table.rows[1].cells[i];
 
     subheaderCell.addEventListener("click", function () {
@@ -125,6 +152,21 @@ function createTeamsTable(response, onlyTotal, big) {
       sortTable(index, subheaderCell, table, 2); 
     });
   }
+}
+
+function updateTableVisibility() {
+  console.log("Updating table visibility...");
+  document.querySelectorAll(`#${tableName} th`).forEach((el, index) => {
+    if (el.dataset.stat) {
+      const checkbox = document.getElementById(el.dataset.stat);
+      if (checkbox && !checkbox.checked) {
+        console.log(`Hiding column: ${el.dataset.stat}`);
+        hideColumn(el.dataset.stat, tableName);
+      } else if (checkbox && checkbox.checked) {
+        showColumn(el.dataset.stat, tableName);
+      }
+    }
+  });
 }
 
 function predictions(homeTeam, awayTeam) {

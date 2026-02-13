@@ -9,9 +9,11 @@ allLeagues = allLeagues.filter((league) => league.type === "league");
 addLeagues(allLeagues);
 
 document.querySelector(".more-button").addEventListener("click", function () {
+  console.log("More button clicked");
   const container = document.getElementById("statSelectorContainer");
   const button = this;
-
+  container.style.display = "block";
+  
   if (container.style.maxHeight) {
     container.style.maxHeight = null;
     container.classList.remove("open");

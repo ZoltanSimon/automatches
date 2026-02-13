@@ -15,5 +15,10 @@ export function groupByLeague(matches) {
     }
     grouped[leagueId].matches.push(match);
   }
-  return Object.values(grouped);
+
+  return Object.values(grouped).sort((a, b) => {
+    const leagueA = allDBLeagues.find(lg => lg.id == a.league.id);
+    const leagueB = allDBLeagues.find(lg => lg.id == b.league.id);
+    return (leagueA?.sort_order ?? Infinity) - (leagueB?.sort_order ?? Infinity);
+  });
 }

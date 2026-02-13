@@ -75,6 +75,13 @@ export class Team {
       xGA: parseFloat(match.statistics[opponentIndex].statistics[16].value),
       fouls: match.statistics[teamIndex].statistics[4].value,
       foulsAgainst: match.statistics[opponentIndex].statistics[4].value,
+      possession: parseInt(match.statistics[teamIndex].statistics[9].value),
+      yellowCards: match.statistics[teamIndex].statistics[10].value,
+      redCards: match.statistics[teamIndex].statistics[11].value,
+      yellowCardsAgainst: match.statistics[opponentIndex].statistics[10].value,
+      redCardsAgainst: match.statistics[opponentIndex].statistics[11].value,
+      offsides: match.statistics[teamIndex].statistics[6].value,
+      offsidesAgainst: match.statistics[opponentIndex].statistics[6].value,
     });
     if (!this.matches.find((m) => m.id === match.fixture.id)) {
       let thisMatch = new Match(match);
@@ -105,6 +112,13 @@ export class Stats {
     this.shotsOnGoalAgainst = 0;
     this.fouls = 0;
     this.foulsAgainst = 0;
+    this.possession = 0;
+    this.yellowCards = 0;
+    this.redCards = 0;
+    this.yellowCardsAgainst = 0;
+    this.redCardsAgainst = 0;
+    this.offsides = 0;
+    this.offsidesAgainst = 0;
   }
 
   addStats(stat) {
@@ -125,6 +139,13 @@ export class Stats {
     this.goalsAgainst += stat.goalsAgainst;
     this.fouls += stat.fouls || 0;
     this.foulsAgainst += stat.foulsAgainst || 0;
+    this.possession += parseInt(stat.possession) || 0;
+    this.yellowCards += stat.yellowCards || 0;
+    this.redCards += stat.redCards || 0;
+    this.yellowCardsAgainst += stat.yellowCardsAgainst || 0;
+    this.redCardsAgainst += stat.redCardsAgainst || 0;
+    this.offsides += stat.offsides || 0;
+    this.offsidesAgainst += stat.offsidesAgainst || 0;
   }
 
   divideStats(divisor) {
@@ -149,6 +170,25 @@ export class Stats {
     dividedStats.fouls = parseFloat((this.fouls / divisor).toFixed(2));
     dividedStats.foulsAgainst = parseFloat(
       (this.foulsAgainst / divisor).toFixed(2)
+    );
+    dividedStats.possession = parseFloat(
+      (this.possession / divisor).toFixed(2)
+    );
+    dividedStats.yellowCards = parseFloat(
+      (this.yellowCards / divisor).toFixed(2)
+    );
+    dividedStats.redCards = parseFloat((this.redCards / divisor).toFixed(2));
+    dividedStats.yellowCardsAgainst = parseFloat(
+      (this.yellowCardsAgainst / divisor).toFixed(2)
+    );
+    dividedStats.redCardsAgainst = parseFloat(
+      (this.redCardsAgainst / divisor).toFixed(2)
+    );
+    dividedStats.offsides = parseFloat(
+      (this.offsides / divisor).toFixed(2)
+    );
+    dividedStats.offsidesAgainst = parseFloat(
+      (this.offsidesAgainst / divisor).toFixed(2)
     );
     return dividedStats;
   }

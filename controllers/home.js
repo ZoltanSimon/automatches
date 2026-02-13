@@ -16,7 +16,7 @@ let allLeagues = await response.json();
 allLeagues = allLeagues.filter(league => league.type === 'league');
 addLeagues(allLeagues);
 
-await leagueStandings(2);
+await leagueStandings(39);
 
 document.querySelectorAll('.table-container').forEach(container => {
   // Check if content actually overflows

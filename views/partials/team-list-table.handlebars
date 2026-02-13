@@ -1,26 +1,61 @@
+<div id="statSelectorContainer">
+  <div id="statCheckboxes">
+    <label><input type="checkbox" id="form" name="statSelector" value="form" checked>Form</label>
+    <label><input type="checkbox" id="played" name="statSelector" value="played" checked>Played </label>
+    <label><input type="checkbox" id="winPercentage" name="statSelector" value="winPercentage" checked>Win %</label>
+    <label><input type="checkbox" id="goals" name="statSelector" value="goals" checked>Goals </label>
+    <label><input type="checkbox" id="xG" name="statSelector" value="xG" checked>xG</label>
+    <label><input type="checkbox" id="corners" name="statSelector" value="corners" checked>Corners</label>
+    <label><input type="checkbox" id="shotsOnGoal" name="statSelector" value="shotsOnGoal" checked>Shots On Goal</label>
+    <label><input type="checkbox" id="fouls" name="statSelector" value="fouls" checked>Fouls</label>
+    <label><input type="checkbox" id="possession" name="statSelector" value="possession" checked>Possession</label>
+    <label><input type="checkbox" id="yellowCards" name="statSelector" value="yellowCards">Yellow Cards</label>
+    <label><input type="checkbox" id="redCards" name="statSelector" value="redCards">Red Cards</label>
+    <label><input type="checkbox" id="offsides" name="statSelector" value="offsides">Offsides</label>
+  </div>
+</div>
 <table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
     <thead>
         <tr class="main-table-header">
         <th style="border-right:1px solid #F1FAEE" rowspan=2 colspan=2>Teams</th>
-        <th rowspan=2 class="form-column">Form</td>
-        <th rowspan=2 title="Played" class="list-header"><span class="big-played">Played</span><span class="small-played">P</span></th>
+        <th rowspan=2 class="form-column" data-stat="form">Form</td>
+        <th rowspan=2 title="Played" class="list-header" data-stat="played"><span class="big-played">Played</span><span class="small-played">P</span></th>
         {{#if big}}
-            <th rowspan=2 class="list-header top-row">Win %</th>
+            <th rowspan=2 class="list-header" data-stat="winPercentage">Win %</th>
+            <th rowspan=2 class="list-header" data-stat="possession"><span class="big-played">Possession</span><span class="small=played">Poss</span></th>
         {{/if}}
-        <th colspan=2 title="Goals" class="list-header top-row">Goals</th>
-        <th colspan=2 title="xG" class="list-header top-row">xG</th>
-        <th colspan=2 title="Corners" class="list-header top-row corners">Corners</th>   
-        <th colspan=2 title="Shots" class="list-header top-row">Shots</th>
+        <th colspan=2 title="Goals" class="list-header top-row" data-stat="goals">Goals</th>
+        <th colspan=2 title="xG" class="list-header top-row" data-stat="xG">xG</th>
+        <th colspan=2 title="Corners" class="list-header top-row" data-stat="corners">Corners</th>   
+        <th colspan=2 title="Shots" class="list-header top-row" data-stat="shotsOnGoal">Shots</th>
+        {{#if big}}
+        <th colspan=2 title="Fouls" class="list-header top-row" data-stat="fouls">Fouls</th>
+        <th colspan=2 title="Yellow Cards" class="list-header top-row" data-stat="yellowCards"><span class="big-played">Yellow Cards</span><span class="small=played">Yell</span></th>
+        <th colspan=2 title="Red Cards" class="list-header top-row" data-stat="redCards"><span class="big-played">Red Cards</span><span class="small=played">Reds</span></th>
+        <th colspan=2 title="Offsides" class="list-header top-row" data-stat="offsides">Offsides</th>
+        {{/if}}
+
         </tr>
         <tr class="main-table-header" style="border-top:0">
-        <th title="Click to sort" class="list-header sortable sub-header">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header corners">For<span class="sort-indicator "></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header corners">Ag<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="goals">For<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="goals">Ag<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="xG">For<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="xG">Ag<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="corners">For<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="corners">Ag<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="shotsOnGoal">For<span class="sort-indicator "></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="shotsOnGoal">Ag<span class="sort-indicator"></span></th>
+        {{#if big}}
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="fouls">For<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="fouls">Ag<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="yellowCards">For<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="yellowCards">Ag<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="redCards">For<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="redCards">Ag<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="offsides">For<span class="sort-indicator"></span></th>
+        <th title="Click to sort" class="list-header sortable sub-header" data-stat="offsides">Ag<span class="sort-indicator"></span></th>
+        {{/if}}
+
         </tr>
     </thead>
     <tbody>

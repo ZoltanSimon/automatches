@@ -414,26 +414,26 @@ td .form-indicator {
   border-bottom: 1px solid $lightest-blue;
 }
 
-
-
 #statSelectorContainer {
   position: fixed;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 50%; // Start at middle of screen
+  top: 480px;
+  transform: translate(-50%, -50%);
   width: 220px;
   background: $background-gray;
-  padding: 0; // Start with no padding
-  border-radius: 0 8px 8px 0;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
-  z-index: 1000;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+  z-index: 0;
+  opacity: 0; // Hidden initially
+  visibility: hidden;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s;
 
   &.open {
-    padding: 12px; // Add padding when open
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) translateX(-622px); // Slide far to the left
   }
 
   .stat-title {
@@ -822,6 +822,7 @@ td .form-indicator {
   text-align: right; 
   cursor: pointer; 
   padding: 10px 8px;
+  width: 33%;
 }
 
 // Media Queries - Mobile First Approach with Modern Standards
@@ -914,11 +915,21 @@ td .form-indicator {
     inset-inline: 0;
     inset-block-end: 0;
     inset-block-start: auto;
-    transform: none;
+    transform: translateY(100%) !important; // Hide below screen
     width: 100%;
     border-radius: 8px 8px 0 0;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px;
+    position: fixed;
+    left: auto;
+    top: auto;
+    opacity: 1;
+    visibility: visible;
+    transition: transform 0.3s ease-in-out; // Slide up animation
+
+    &.open {
+      transform: translateY(0) !important; // Slide up into view
+    }
 
     #statCheckboxes {
       display: flex;
@@ -978,6 +989,10 @@ position: relative; // Non-sticky, sits below header in document flow
     padding: 2px;
     font-size: 14px;
   }
+
+table {
+  border-width: 1px !important;
+}
   
   .list-header {
     padding: 1px;

@@ -401,22 +401,24 @@ td .form-indicator:last-child {
 
 #statSelectorContainer {
   position: fixed;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  top: 480px;
+  transform: translate(-50%, -50%);
   width: 220px;
   background: #f8f9fa;
-  padding: 0;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
-  z-index: 1000;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s;
 }
 #statSelectorContainer.open {
-  padding: 12px;
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) translateX(-622px);
 }
 #statSelectorContainer .stat-title {
   font-size: 16px;
@@ -792,6 +794,7 @@ td .form-indicator:last-child {
   text-align: right;
   cursor: pointer;
   padding: 10px 8px;
+  width: 33%;
 }
 
 @media (width <= 1820px) {
@@ -861,11 +864,20 @@ td .form-indicator:last-child {
     inset-inline: 0;
     inset-block-end: 0;
     inset-block-start: auto;
-    transform: none;
+    transform: translateY(100%) !important;
     width: 100%;
     border-radius: 8px 8px 0 0;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px;
+    position: fixed;
+    left: auto;
+    top: auto;
+    opacity: 1;
+    visibility: visible;
+    transition: transform 0.3s ease-in-out;
+  }
+  #statSelectorContainer.open {
+    transform: translateY(0) !important;
   }
   #statSelectorContainer #statCheckboxes {
     display: flex;
@@ -912,6 +924,9 @@ td .form-indicator:last-child {
   td {
     padding: 2px;
     font-size: 14px;
+  }
+  table {
+    border-width: 1px !important;
   }
   .list-header {
     padding: 1px;

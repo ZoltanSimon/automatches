@@ -36,6 +36,8 @@ export async function loadLeagues() {
     const [rows] = await pool.query("SELECT * FROM League");
     allDBLeagues = rows;
     //remove leagues which are not visible
+    //order allDBLeagues by sort_order
+    allDBLeagues = allDBLeagues.sort((a, b) => a.sort_order - b.sort_order);
     allDBLeagues = allDBLeagues.filter((lg) => lg.Visible);
     //console.log("League loaded from the database:", teams);
   } catch (error) {

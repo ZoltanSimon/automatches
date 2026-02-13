@@ -174,22 +174,22 @@ export function removeColumn(theTable, columnIndex) {
   });
 }
 
-export function hideColumn(stat) {
+export function hideColumn(stat, tableID = "player-list-table") {
   document
     .querySelectorAll(
-      `#player-list-table th[data-stat="${stat}"], 
-                             #player-list-table td[data-stat="${stat}"]`
+      `#${tableID} th[data-stat="${stat}"], 
+        #${tableID} td[data-stat="${stat}"]`
     )
     .forEach((cell) => {
       cell.style.display = "none";
     });
 }
 
-export function showColumn(stat) {
+export function showColumn(stat, tableID = "player-list-table") {
   document
     .querySelectorAll(
-      `#player-list-table th[data-stat="${stat}"], 
-                             #player-list-table td[data-stat="${stat}"]`
+      `#${tableID} th[data-stat="${stat}"], 
+        #${tableID} td[data-stat="${stat}"]`
     )
     .forEach((cell) => {
       cell.style.display = "";

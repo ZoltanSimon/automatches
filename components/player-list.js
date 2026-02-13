@@ -33,12 +33,7 @@ export function playerGoalList(big, noOfDisplayed = 300) {
     table.style.visibility = "visible";
   }
 
-  if (big) {
-    document.getElementById("statSelectorContainer").style.visibility =
-      "visible";
-  } else {
     document.getElementById("statSelectorContainer").style.display = "none";
-  }
 
   displayedPlayers.forEach((player) => {
     loadPlayerFace(player.id);
@@ -48,6 +43,7 @@ export function playerGoalList(big, noOfDisplayed = 300) {
 
 document.querySelectorAll(`#${tableName} th`).forEach(header => {
   header.addEventListener("click", function () {
+    console.log(`Header ${this.innerText} clicked`);
     const stat = this.getAttribute("data-stat");
     const currentOrder = this.getAttribute("data-order") || "desc";
     const newOrder = currentOrder === "asc" ? "desc" : "asc";
@@ -105,6 +101,7 @@ document.querySelectorAll(`#${tableName} th`).forEach(header => {
     loadMoreBtn.style.visibility = "visible";
 
     loadMoreBtn.addEventListener("click", function () {
+      console.log("Load More clicked");
       let newVisible = currentVisible + rowsPerPage;
 
       rows.forEach((row, index) => {
@@ -239,7 +236,10 @@ export function updateTable(tableName, sortedPlayers) {
           <td id="${player.nation}" class="player-country">
             <img height="30" src="images/logos/${player.nation}.png" />
           </td>
-          <td class="sec-stats">${player.name}</td>
+          <td class="sec-stats">
+            <div class="player-name">${player.name}</div>
+            <div class="player-position">${player.position}</div>
+          </td>
           <td id="${player.club}" class="stat-td">
             <img class="logo-picture" src="images/logos/${player.club}.png" />
           </td>
