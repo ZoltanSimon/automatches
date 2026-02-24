@@ -2,14 +2,7 @@
 
 <div class="small-container">
   <div class="rectangle">
-    <h2>Top Players</h2>
-    <div class="more-link more-button">
-      <img src="/images/filter-svgrepo-com.svg" alt="Filters" class="filter-icon">
-      <span class="toggle-icon">▼</span>
-    </div>
-    <div id="league-list">
-      <div id="league-list-league"></div>
-    </div>
+    {{> rect-header title="Top Players" link="" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" }}
     <div id="player-list">
       {{> player-list-table big=true}}
     </div>

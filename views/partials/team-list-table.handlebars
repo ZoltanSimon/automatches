@@ -15,50 +15,114 @@
   </div>
 </div>
 <table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="team-list-table">
-    <thead>
-        <tr class="main-table-header">
-        <th style="border-right:1px solid #F1FAEE" rowspan=2 colspan=2>Teams</th>
-        <th rowspan=2 class="form-column" data-stat="form">Form</td>
-        <th rowspan=2 title="Played" class="list-header" data-stat="played"><span class="big-played">Played</span><span class="small-played">P</span></th>
-        {{#if big}}
-            <th rowspan=2 class="list-header" data-stat="winPercentage">Win %</th>
-            <th rowspan=2 class="list-header" data-stat="possession"><span class="big-played">Possession</span><span class="small=played">Poss</span></th>
-        {{/if}}
-        <th colspan=2 title="Goals" class="list-header top-row" data-stat="goals">Goals</th>
-        <th colspan=2 title="xG" class="list-header top-row" data-stat="xG">xG</th>
-        <th colspan=2 title="Corners" class="list-header top-row" data-stat="corners">Corners</th>   
-        <th colspan=2 title="Shots" class="list-header top-row" data-stat="shotsOnGoal">Shots</th>
-        {{#if big}}
-        <th colspan=2 title="Fouls" class="list-header top-row" data-stat="fouls">Fouls</th>
-        <th colspan=2 title="Yellow Cards" class="list-header top-row" data-stat="yellowCards"><span class="big-played">Yellow Cards</span><span class="small=played">Yell</span></th>
-        <th colspan=2 title="Red Cards" class="list-header top-row" data-stat="redCards"><span class="big-played">Red Cards</span><span class="small=played">Reds</span></th>
-        <th colspan=2 title="Offsides" class="list-header top-row" data-stat="offsides">Offsides</th>
-        {{/if}}
+  <thead>
+    <tr class="main-table-header">
+      <th style="border-right:1px solid #F1FAEE" rowspan=2 colspan=2>Teams</th>
+      <th rowspan=2 class="form-column" data-stat="form">Form</td>
+      <th rowspan=2 title="Played" class="list-header" data-stat="played"><span class="big-played">Played</span><span
+          class="small-played">P</span></th>
+      {{#if big}}
+      <th rowspan=2 class="list-header" data-stat="winPercentage">Win %</th>
+      <th rowspan=2 class="list-header" data-stat="possession"><span class="big-played">Possession</span><span
+          class="small=played">Poss</span></th>
+      {{/if}}
+      <th colspan=2 title="Goals" class="list-header top-row" data-stat="goals">Goals</th>
+      <th colspan=2 title="xG" class="list-header top-row" data-stat="xG">xG</th>
+      <th colspan=2 title="Corners" class="list-header top-row" data-stat="corners">Corners</th>
+      <th colspan=2 title="Shots" class="list-header top-row" data-stat="shotsOnGoal">Shots</th>
+      {{#if big}}
+      <th colspan=2 title="Fouls" class="list-header top-row" data-stat="fouls">Fouls</th>
+      <th colspan=2 title="Yellow Cards" class="list-header top-row" data-stat="yellowCards"><span
+          class="big-played">Yellow Cards</span><span class="small=played">Yell</span></th>
+      <th colspan=2 title="Red Cards" class="list-header top-row" data-stat="redCards"><span class="big-played">Red
+          Cards</span><span class="small=played">Reds</span></th>
+      <th colspan=2 title="Offsides" class="list-header top-row" data-stat="offsides">Offsides</th>
+      {{/if}}
 
-        </tr>
-        <tr class="main-table-header" style="border-top:0">
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="goals">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="goals">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="xG">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="xG">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="corners">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="corners">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="shotsOnGoal">For<span class="sort-indicator "></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="shotsOnGoal">Ag<span class="sort-indicator"></span></th>
-        {{#if big}}
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="fouls">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="fouls">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="yellowCards">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="yellowCards">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="redCards">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="redCards">Ag<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="offsides">For<span class="sort-indicator"></span></th>
-        <th title="Click to sort" class="list-header sortable sub-header" data-stat="offsides">Ag<span class="sort-indicator"></span></th>
-        {{/if}}
+    </tr>
+    <tr class="main-table-header" style="border-top:0">
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="goals">For<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="goals">Ag<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="xG">For<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="xG">Ag<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="corners">For<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="corners">Ag<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="shotsOnGoal">For<span
+          class="sort-indicator "></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="shotsOnGoal">Ag<span
+          class="sort-indicator"></span></th>
+      {{#if big}}
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="fouls">For<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="fouls">Ag<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="yellowCards">For<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="yellowCards">Ag<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="redCards">For<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="redCards">Ag<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="offsides">For<span
+          class="sort-indicator"></span></th>
+      <th title="Click to sort" class="list-header sortable sub-header" data-stat="offsides">Ag<span
+          class="sort-indicator"></span></th>
+      {{/if}}
 
-        </tr>
-    </thead>
-    <tbody>
+    </tr>
+  </thead>
+  <tbody>
 
-    </tbody>
+    {{#each teams as |thisTeam|}}
+    <tr>
+      <td style="padding:4px; border-right:none; cursor:pointer"
+        onclick="window.location.href='/team?teamID={{thisTeam.id}}'">
+        <img src="images/logos/{{thisTeam.id}}.png" class="logo-picture" />
+      </td>
+      <td class="team-name" style="cursor:pointer" onclick="window.location.href='/team?teamID={{thisTeam.id}}'">
+        {{thisTeam.name}}</td>
+      <td style="padding: 0px;" data-stat="form">
+        <div style="display: flex; align-items: center; height: 100%;">
+            {{#each thisTeam.formArray as |form|}}
+            <span class="form-indicator {{form}}"></span>
+            {{/each}}
+        </div>
+      </td>
+      
+      <td style="text-align: center;" data-stat="played">{{thisTeam.played}}</td>
+
+      {{#if ../big}}
+      <td style="text-align: center;" data-stat="winPercentage">{{ thisTeam.total.winPercentage }}</td>
+      <td style="text-align: center;" data-stat="possession">{{ thisTeam.perGame.possession}}</td>
+      {{/if}}
+
+      <td style="text-align: center;" data-stat="goals">{{thisTeam.total.goals}}</td>
+      <td style="text-align: center;" data-stat="goals">{{thisTeam.total.goalsAgainst}}</td>
+      <td style="text-align: center;" data-stat="xG">{{ thisTeam.total.xG }}</td>
+      <td style="text-align: center;" data-stat="xG">{{ thisTeam.total.xGA }}</td>
+      <td style="text-align: center;" data-stat="corners">{{thisTeam.total.corners}}</td>
+      <td style="text-align: center;" data-stat="corners">{{thisTeam.total.cornersAgainst}}</td>
+      <td style="text-align: center;" data-stat="shotsOnGoal">{{thisTeam.total.shotsOnGoal}}</td>
+      <td style="text-align: center;" data-stat="shotsOnGoal">{{thisTeam.total.shotsOnGoalAgainst}}</td>
+
+      {{#if ../big}}
+      <td style="text-align: center;" data-stat="fouls">{{thisTeam.total.fouls}}</td>
+      <td style="text-align: center;" data-stat="fouls">{{thisTeam.total.foulsAgainst}}</td>
+      <td style="text-align: center;" data-stat="yellowCards">{{thisTeam.total.yellowCards}}</td>
+      <td style="text-align: center;" data-stat="yellowCards">{{thisTeam.total.yellowCardsAgainst}}</td>
+      <td style="text-align: center;" data-stat="redCards">{{thisTeam.total.redCards}}</td>
+      <td style="text-align: center;" data-stat="redCards">{{thisTeam.total.redCardsAgainst}}</td>
+      <td style="text-align: center;" data-stat="offsides">{{thisTeam.total.offsides}}</td>
+      <td style="text-align: center;" data-stat="offsides">{{thisTeam.total.offsidesAgainst}}</td>
+      {{/if}}
+    </tr>
+    {{/each}}
+  </tbody>
 </table>

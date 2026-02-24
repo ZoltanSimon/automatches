@@ -2,13 +2,11 @@
 
 <div class="small-container">
   <div class="rectangle">
-    <h2>Top Teams</h2>
-        <div class="more-link more-button">
-      <img src="/images/filter-svgrepo-com.svg" alt="Filters" class="filter-icon">
-      <span class="toggle-icon">▼</span>
-    </div>
+    {{> rect-header title="Top Teams" link="" leagues=leagues selectedLeagues=selectedTLeagues leaguepar="tleague" }}
+
     <div id="top-team-list">
       {{> team-list-table big=true}}
     </div>
 
   </div>
+  

@@ -30,7 +30,7 @@ document.getElementById('datepicker-input').addEventListener('change', function 
 });
 
 await showMatchesOnDate(new Date(), true);
-addLeagues(allLeagues, true);
+addLeagues("admin", true);
 
 const matchListDiv = document.getElementById("match-list");
 if (matchListDiv) {

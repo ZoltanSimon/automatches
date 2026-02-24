@@ -46,3 +46,8 @@ export const formatDateOnly = (date) => {
 export const percentage = (wins, played) => {
   return ((wins / played) * 100).toFixed(1);
 }
+
+export const includesID = (array, id) => {
+  const arrayToCheck = Array.isArray(array) ? array : [array];
+  return arrayToCheck && arrayToCheck.includes(id);
+}

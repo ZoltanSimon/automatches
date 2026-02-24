@@ -1,0 +1,19 @@
+<div class="rect-header">
+  <div class="rect-title"><h2>{{title}}</h2></div>
+  <div class="rect-expand">
+    {{#if link}}
+      <a href="{{link}}" class="more-link more-button">More &gt;&gt;&gt;</a>
+    {{ else }}
+      <div class="more-link more-button">
+        <img src="/images/filter-svgrepo-com.svg" alt="Filters" class="filter-icon">
+        <span class="toggle-icon">▼</span>
+      </div>
+    {{/if}}
+  </div>
+  <div class="rect-league-list" id="league-list-league">
+    {{#each leagues}}
+    <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" class="{{../leaguepar}}-league-to-select{{#if (includesID ../selectedLeagues this.id)}} selected-league{{/if}}" />
+    {{/each}}
+  </div>
+  <div class="rect-expand-league-list"><a href="#" class="more-link more-button">Leagues</a></div>
+</div>

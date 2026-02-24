@@ -3,21 +3,23 @@ import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
-import { getResultsDate, getResultFromApi } from "../webapi-handler.js";
+import { getResultsDate } from "../webapi-handler.js";
 import {
   getMatchFromServer,
   matchesDir,
   writeLeagueToServer,
   buildTeamList,
   getLeagueFromServer,
+  saveMatchToServer
 } from "./json-reader.js";
 import {
   allDBLeagues,
-  insertMatchesToQueue,
   getLeagueFromDb,
   allDBTeams,
   insertTeamsToDb,
   getMatchById,
+  getAllMatchesFromDbUntilDate,
+  insertMatchesToQueue
 } from "./data-access.js";
 import { createRequire } from "module";
 import path from "path";
@@ -32,7 +34,7 @@ import { matchesOnDay, matchesInRound, lastMatchesFromLeague, allTeamMatches } f
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, defaultLeagues } from "./services/leagues-service.js";
 import { parseDate, parseLeagueIds, handleError } from "./backend-helper.js";
-import { all } from "axios";
+import { extractTeams } from "./services/teams-service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -64,18 +66,31 @@ app.use(cors(corsOptions));
 app.get("/", async (req, res) => {
   try {
     const selectedDate = parseDate(req.query.date);
-    const selectedLeague = parseLeagueIds(req.query.league);
+    const selectedPlayerLeague = parseLeagueIds(req.query.pleague);
+    const selectedTeamLeague = parseLeagueIds(req.query.tleague);
+    const selectedStandingsLeague = parseFloat(req.query.sleague) ?? 2;
 
-    const [players, matches] = await Promise.all([
-      getPlayerList(selectedLeague, 10),
-      matchesOnDay(selectedDate)
+    const [players, matches, teams] = await Promise.all([
+      getPlayerList(selectedPlayerLeague, 10),
+      matchesOnDay(selectedDate),
+      extractTeams(selectedTeamLeague),
+      extractTeams(selectedStandingsLeague)
     ]);
+    
+    teams.sort((a, b) => a.last5PerGame.points < b.last5PerGame.points ? 1 : b.last5PerGame.points < a.last5PerGame.points ? -1 : 0);
+    let selectedSLeague = selectedStandingsLeague;
 
     res.render("home", {
       title: "generationFootball",
       players,
       groupedMatches: groupByLeague(matches),
       selectedDate: selectedDate.toISOString().split("T")[0],
+      leagues: allDBLeagues.filter(league => league.type === 'league'),
+      selectedPLeagues: selectedPlayerLeague.length > 0 ? selectedPlayerLeague : defaultLeagues,
+      selectedTLeagues: selectedTeamLeague.length > 0 ? selectedTeamLeague : defaultLeagues,
+      selectedSLeague: selectedSLeague,
+      teams: teams.slice(0, 10),
+      standingsLink: `/league?league=${selectedSLeague}` 
     });
   } catch (error) {
     handleError(res, error, "Error loading home page");
@@ -84,12 +99,14 @@ app.get("/", async (req, res) => {
 
 app.get("/players", async (req, res) => {
   try {
-    const selectedLeague = parseLeagueIds(req.query.league);
+    const selectedLeague = parseLeagueIds(req.query.pleague);
     const players = await getPlayerList(selectedLeague, 300, req.query.team);
 
     res.render("players", {
       title: "Players",
       players,
+      leagues: allDBLeagues.filter(league => league.type === 'league'),
+      selectedPLeagues: selectedLeague.length > 0 ? selectedLeague : defaultLeagues,
     });
   } catch (error) {
     handleError(res, error, "Error fetching players");
@@ -104,8 +121,16 @@ app.get("/compare-players", (req, res) => {
   res.render("compare-players", { title: "Compare Players" });
 });
 
-app.get("/top-teams", (req, res) => {
-  res.render("top-teams", { title: "Teams" });
+app.get("/top-teams", async (req, res) => {
+  let selectedTeamLeague = parseLeagueIds(req.query.tleague);
+  let teams = await extractTeams(selectedTeamLeague);
+  teams.sort((a, b) => a.last5PerGame.points < b.last5PerGame.points ? 1 : b.last5PerGame.points < a.last5PerGame.points ? -1 : 0);
+  res.render("top-teams", { 
+    title: "Teams",
+    teams: teams.slice(0,150),
+    leagues: allDBLeagues.filter(league => league.type === 'league'),
+     selectedTLeagues: selectedTeamLeague.length > 0 ? selectedTeamLeague : defaultLeagues,
+  });
 });
 
 app.get("/team", async (req, res) => {
@@ -120,6 +145,7 @@ app.get("/team", async (req, res) => {
   let matchesToShow = allMatches;
   matchesToShow.sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
   matchesToShow = matchesToShow.slice(0, 15);
+  teamStats[0].leagues = [...teamStats[0].leagues.values()];
 
   res.render("team", { 
     title: thisTeam ? thisTeam.name : "Team",
@@ -135,6 +161,7 @@ app.get("/admin", async (req, res) => {
     res.render("admin", {
       title: "Automatches",
       players: await getPlayerList(defaultLeagues, 300, req.query.team),
+      leagues: allDBLeagues,
     });
   } catch (error) {
     console.error("Error fetching players:", error);
@@ -258,29 +285,10 @@ app.get("/update-leagues", async (request, response) => {
 
 //saves match
 app.get("/save-match", async (request, response) => {
-  try {
-    let matchID = request.query.matchID;
-    let { data, limits } = await getResultFromApi(matchID);
-
-    fs.writeFile(
-      `${matchesDir}/${matchID}.json`,
-      JSON.stringify(data.response),
-      { flag: "wx" },
-      function (err) {
-        if (err) {
-          console.log(err);
-        }
-
-        response.json({
-          match: data.response,
-          limits: limits,
-        });
-      }
-    );
-  } catch (err) {
-    console.error("Error saving match:", err);
-    response.status(500).json({ error: "Something went wrong" });
-  }
+  let matchID = request.query.matchID;
+  let savedMatch = await saveMatchToServer(matchID);
+  console.log(`Saved match with ID: ${matchID}`);
+  response.json(savedMatch);
 });
 
 //returns missing matches from given league
@@ -298,6 +306,7 @@ app.get("/missing-matches", async (request, response) => {
   for (const leagueID of leagueIDs) {
     let data = await getLeagueFromDb(leagueID);
 
+    console.log(`Checking league ${leagueID} with ${data.length} matches for missing match files...`);
     for (const element of data) {
       if (["FT", "AET"].includes(element.fixture.status.short)) {
         try {
@@ -312,57 +321,56 @@ app.get("/missing-matches", async (request, response) => {
     }
     await insertMatchesToQueue(matchArr);
   }
+console.log(`Total missing matches across leagues ${leagueIDs.join(", ")}: ${matchArr.length}`);
+  response.json(matchArr);
+});
+
+app.get("/all-missing-matches", async (request, response) => {
+  let matchArr = [];
+  const today = new Date().toISOString().split('T')[0];
+  getAllMatchesFromDbUntilDate(today);
+  let data = await getAllMatchesFromDbUntilDate(today);
+  for (const element of data) {
+    try {
+      fs.accessSync(
+        `${matchesDir}/${element.fixtureId}.json`,
+        fs.constants.R_OK,
+      );
+    } catch (err) {
+      matchArr.push(element);
+    }
+  }
+  console.log(`Total missing matches: ${matchArr.length}`);
+
+  //download the last 50 matches from matchArr and save them to the server, wait 7 seconds after one download to avoid hitting the API rate limit
+  const matchesToDownload = Math.min(50, matchArr.length);
+  for (let i = 0; i < matchesToDownload; i++) {
+    const match = matchArr[i];
+    const remaining = matchArr.length - (i + 1);
+    try {
+      await saveMatchToServer(match.fixtureId);
+      console.log(`Saved match with ID: ${match.fixtureId} (${remaining} left)`);
+    } catch (err) {
+      console.error(`Error saving match with ID: ${match.fixtureId}`, err);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 7000));
+  }
+
+  console.log(`✅ Finished downloading ${matchesToDownload} matches. ${matchArr.length - matchesToDownload} matches still missing.`);
 
   response.json(matchArr);
 });
 
 app.get("/get-teams", async (request, response) => {
-  let leagues = request.query.leagueID.split(",");
-  let date = request.query.date;
-  let allMatches = [];
-  let matchID;
-  let filterDate;
+  const leagues = request.query.leagueID.split(",");
+  const date = request.query.date;
 
-  if (date) {
-    const [day, month, year] = date.split("-").map(Number);
-    filterDate = new Date(year, month - 1, day);
-    if (isNaN(filterDate.getTime())) {
-      return response
-        .status(400)
-        .json({
-          success: false,
-          message: "Invalid date format. Use 'DD-MM-YYYY'.",
-        });
-    }
-  } else {
-    filterDate = new Date(2000, 0, 1); // January 1, 2000
+  try {
+    const result = await extractTeams(leagues, date);
+    response.json(result);
+  } catch (error) {
+    response.status(400).json({ success: false, message: error.message });
   }
-
-  for (let i = 0; i < leagues.length; i++) {
-    let leagueID = leagues[i];
-    let data = await getLeagueFromDb(leagueID);
-    for (const element of data) {
-      let thisFixture = element.fixture;
-      let fixtureDate = new Date(thisFixture.date);
-      if (
-        ["FT", "AET"].includes(thisFixture.status.short) &&
-        fixtureDate > filterDate
-      ) {
-        matchID = thisFixture.id;
-        try {
-          let data2 = await getMatchFromServer(matchID);
-          if (data2 && data2[0]) {
-            allMatches.push(data2[0]);
-          } else {
-            console.warn(`No data found for matchID: ${matchID}`);
-          }
-        } catch (error) {
-          console.error(`Error fetching match with ID ${matchID}:`, error);
-        }
-      }
-    }
-  }
-  response.json(buildTeamList(allMatches));
 });
 
 app.get("/get-all-matches", async (request, response) => {

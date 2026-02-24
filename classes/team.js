@@ -17,6 +17,7 @@ export class Team {
     this.form = "";
     this.points = 0;
     this.matches = [];
+    this.leagues = new Map();
   }
 
   calculateTotals() {
@@ -39,10 +40,15 @@ export class Team {
 
   calculateLast5() {
     const last5Stats = this.#stats.slice(-5);
+    let last5Wins = 0;
     last5Stats.forEach((stat) => {
       this.last5.addStats(stat);
       this.form = this.updateForm(stat, this.form);
+      if (stat.goalsFor > stat.goalsAgainst) {
+        last5Wins++;
+      }
     });
+    this.last5.winPercentage = parseFloat(((last5Wins / last5Stats.length) * 100).toFixed(2));
     this.last5PerGame = this.last5.divideStats(5);
   }
 
@@ -59,8 +65,11 @@ export class Team {
   calculateStats() {
     this.played = this.#stats.length;
     this.calculateTotals();
+    //win percentage
+    this.total.winPercentage = parseFloat(((this.wins / this.played) * 100).toFixed(2));
     this.calculatePerGame();
     this.calculateLast5();
+    this.formArray = this.form.split('');
   }
 
   extractStats(match, teamIndex, opponentIndex) {
@@ -96,6 +105,13 @@ export class Team {
       thisMatch.stats = thisStats;
       this.matches.push(thisMatch);
     }
+
+    this.leagues.set(match.league.id, {
+      id: match.league.id,
+      name: match.league.name,
+      country: match.league.country
+    });
+
   }
 }
 

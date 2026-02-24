@@ -36,7 +36,6 @@ export async function loadLeagues() {
     const [rows] = await pool.query("SELECT * FROM League");
     allDBLeagues = rows;
     //remove leagues which are not visible
-    //order allDBLeagues by sort_order
     allDBLeagues = allDBLeagues.sort((a, b) => a.sort_order - b.sort_order);
     allDBLeagues = allDBLeagues.filter((lg) => lg.Visible);
     //console.log("League loaded from the database:", teams);
@@ -54,10 +53,12 @@ export async function loadLeagues() {
 
 export async function insertPlayersToDb(allPlayers) {
   // Filter out players without valid IDs
-  const validPlayers = allPlayers.filter(player => player.id != null && player.id !== '');
-  
+  const validPlayers = allPlayers.filter(
+    (player) => player.id != null && player.id !== "",
+  );
+
   //find the player called Mallen
-  console.log(validPlayers.find(p => p.name === 'Donyell Malen'));
+  console.log(validPlayers.find((p) => p.name === "Donyell Malen"));
 
   if (validPlayers.length === 0) {
     console.log({ message: "No valid players to insert." });
@@ -71,18 +72,18 @@ export async function insertPlayersToDb(allPlayers) {
     // Process in batches
     for (let i = 0; i < validPlayers.length; i += BATCH_SIZE) {
       const batch = validPlayers.slice(i, i + BATCH_SIZE);
-      
+
       // Prepare bulk insert values for this batch
-      const values = batch.map(player => [
+      const values = batch.map((player) => [
         player.id,
         player.name,
         player.club,
         player.nation,
-        player.position[0] || ""
+        player.position[0] || "",
       ]);
 
       // Create placeholders and flatten values
-      const placeholders = batch.map(() => '(?, ?, ?, ?, ?)').join(', ');
+      const placeholders = batch.map(() => "(?, ?, ?, ?, ?)").join(", ");
       const flatValues = values.flat();
 
       await pool.execute(
@@ -92,14 +93,18 @@ export async function insertPlayersToDb(allPlayers) {
           club = IF(VALUES(club) <> 0 AND club <> VALUES(club), VALUES(club), club),
           nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation),
           position = VALUES(position);`,
-        flatValues
+        flatValues,
       );
 
       totalInserted += batch.length;
-      console.log(`Processed ${totalInserted}/${validPlayers.length} players...`);
+      console.log(
+        `Processed ${totalInserted}/${validPlayers.length} players...`,
+      );
     }
 
-    console.log({ message: `${validPlayers.length} players loaded successfully!` });
+    console.log({
+      message: `${validPlayers.length} players loaded successfully!`,
+    });
   } catch (error) {
     console.error({ error: "Error loading players.", details: error.message });
   }
@@ -114,7 +119,7 @@ export async function insertTeamsToDb(teams) {
           VALUES (?, ?)
           ON DUPLICATE KEY UPDATE
           name = VALUES(name);`,
-        [ID, name]
+        [ID, name],
       );
     }
     console.log({ message: "Teams loaded successfully!" });
@@ -130,7 +135,7 @@ export async function insertMatchesToQueue(matches) {
     let matchDate = match.fixture.date;
     await pool.query(
       `INSERT IGNORE INTO match_queue (match_id, league_id, match_date) VALUES (?, ?, ?)`,
-      [matchID, leagueID, matchDate]
+      [matchID, leagueID, matchDate],
     );
   }
 }
@@ -141,7 +146,7 @@ export async function removeMatchesFromQueue(matchIDs) {
   const placeholders = matchIDs.map(() => "?").join(",");
   await pool.query(
     `DELETE FROM match_queue WHERE match_id IN (${placeholders})`,
-    matchIDs
+    matchIDs,
   );
 }
 
@@ -180,6 +185,9 @@ export async function importLeague(leagueID) {
     )
   `);
 
+  console.log(
+    `✅ Table 'matches' ensured for league ${leagueID} season ${season}`,
+  );
   // Insert matches
   for (const match of matches) {
     await pool.query(
@@ -197,25 +205,27 @@ export async function importLeague(leagueID) {
         match.fixture.status.short,
         match.goals.home,
         match.goals.away,
-      ]
+      ],
     );
   }
 
-  console.log(`✅ Imported ${matches.length} matches for league ${leagueID} season ${season}`);
+  console.log(
+    `✅ Imported ${matches.length} matches for league ${leagueID} season ${season}`,
+  );
 
   // Update cache after import
   const cacheKey = `${leagueID}-${season}`;
   const now = Date.now();
-  
+
   // Fetch the updated data from database and transform it
   const [rows] = await pool.query(
     `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
      FROM matches
      WHERE league_id = ? AND season = ?
      ORDER BY match_date ASC`,
-    [leagueID, season]
+    [leagueID, season],
   );
-  
+
   let leaguematches = rows.map((r) => ({
     fixture: {
       id: r.fixtureId,
@@ -230,11 +240,13 @@ export async function importLeague(leagueID) {
     teams: {
       home: {
         id: r.home_team_id,
-        name: allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+        name:
+          allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
       },
       away: {
         id: r.away_team_id,
-        name: allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+        name:
+          allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
       },
     },
     goals: {
@@ -242,36 +254,38 @@ export async function importLeague(leagueID) {
       away: r.away_score,
     },
   }));
-  
+
   leagueCache.set(cacheKey, { data: leaguematches, timestamp: now });
   console.log(`✅ Cache updated for ${cacheKey}`);
 }
 
-export async function getLeagueFromDb(leagueID) {
-  const season =
-    allDBLeagues.find((lg) => lg.id == leagueID)?.season ||
-    new Date().getFullYear();
-  const cacheKey = `${leagueID}-${season}`;
-  const now = Date.now();
-
-  if (leagueCache.has(cacheKey)) {
-    console.log("Using cached league data for", cacheKey);
-    const { data, timestamp } = leagueCache.get(cacheKey);
-    if (now - timestamp < CACHE_TTL) {
-      return data;
-    }
-  }
+export async function getLeagueFromDb(leagueIDs) {
+  leagueIDs = Array.isArray(leagueIDs) ? leagueIDs : [leagueIDs];
+  const leagueConfigs = leagueIDs.map((leagueID) => ({
+    leagueID,
+    season:
+      allDBLeagues.find((lg) => lg.id == leagueID)?.season ||
+      new Date().getFullYear(),
+  }));
 
   try {
+    const placeholders = leagueConfigs
+      .map(() => "(league_id = ? AND season = ?)")
+      .join(" OR ");
+    const params = leagueConfigs.flatMap(({ leagueID, season }) => [
+      leagueID,
+      season,
+    ]);
+
     const [rows] = await pool.query(
       `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
        FROM matches
-       WHERE league_id = ? AND season = ?
+       WHERE ${placeholders}
        ORDER BY match_date ASC`,
-      [leagueID, season]
+      params,
     );
-    
-    let leaguematches = rows.map((r) => ({
+
+    return rows.map((r) => ({
       fixture: {
         id: r.fixtureId,
         date: r.match_date,
@@ -285,11 +299,13 @@ export async function getLeagueFromDb(leagueID) {
       teams: {
         home: {
           id: r.home_team_id,
-          name: allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+          name:
+            allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
         },
         away: {
           id: r.away_team_id,
-          name: allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+          name:
+            allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
         },
       },
       goals: {
@@ -297,11 +313,11 @@ export async function getLeagueFromDb(leagueID) {
         away: r.away_score,
       },
     }));
-
-    leagueCache.set(cacheKey, { data: leaguematches, timestamp: now });
-    return leaguematches;
   } catch (e) {
-    console.error(`❌ Failed to load league ${leagueID} ${season} from DB:`, e);
+    console.error(
+      `❌ Failed to load leagues ${leagueIDs.join(", ")} from DB:`,
+      e,
+    );
     return [];
   }
 }
@@ -314,7 +330,7 @@ export async function getAllTeamMatchesFromDb(teams) {
        WHERE home_team_id IN (?) 
           OR away_team_id IN (?)
        ORDER BY match_date ASC`,
-      [teams, teams] 
+      [teams, teams],
     );
 
     return rows;
@@ -323,7 +339,6 @@ export async function getAllTeamMatchesFromDb(teams) {
     throw err;
   }
 }
-
 
 export async function getMatchById(fixtureId) {
   const cacheKey = `match-${fixtureId}`;
@@ -343,7 +358,7 @@ export async function getMatchById(fixtureId) {
       `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
        FROM matches
        WHERE id = ?`,
-      [fixtureId]
+      [fixtureId],
     );
 
     if (rows.length === 0) {
@@ -353,19 +368,21 @@ export async function getMatchById(fixtureId) {
     console.log(rows);
     const r = rows[0];
     const match = {
-          fixtureId: r.fixtureId,
-          fixtureDate: r.match_date,
-          fixtureStatus: r.status,
-          leagueId: r.league_id,
-          leagueSeason: r.season,
-          leagueRound: r.round,
-          homeTeamId: r.home_team_id,
-          homeTeamName: allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
-          awayTeamId: r.away_team_id,
-          awayTeamName: allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
-          homeGoals: r.home_score,
-          awayGoals: r.away_score,
-      };
+      fixtureId: r.fixtureId,
+      fixtureDate: r.match_date,
+      fixtureStatus: r.status,
+      leagueId: r.league_id,
+      leagueSeason: r.season,
+      leagueRound: r.round,
+      homeTeamId: r.home_team_id,
+      homeTeamName:
+        allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+      awayTeamId: r.away_team_id,
+      awayTeamName:
+        allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+      homeGoals: r.home_score,
+      awayGoals: r.away_score,
+    };
 
     // Cache the match
     leagueCache.set(cacheKey, { data: match, timestamp: now });
@@ -373,5 +390,36 @@ export async function getMatchById(fixtureId) {
   } catch (e) {
     console.error(`❌ Failed to load match ${fixtureId} from DB:`, e);
     return null;
+  }
+}
+
+export async function getAllMatchesFromDbUntilDate(givenDate) {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+       FROM matches
+        WHERE match_date < ?
+       ORDER BY match_date ASC`,
+      [givenDate],
+    );
+    return rows.map((r) => ({
+      fixtureId: r.fixtureId,
+      fixtureDate: r.match_date,
+      fixtureStatus: r.status,
+      leagueId: r.league_id,
+      leagueSeason: r.season,
+      leagueRound: r.round,
+      homeTeamId: r.home_team_id,
+      homeTeamName:
+        allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+      awayTeamId: r.away_team_id,
+      awayTeamName:
+        allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+      homeGoals: r.home_score,
+      awayGoals: r.away_score,
+    }));
+  } catch (e) {
+    console.error(`❌ Failed to load all matches from DB:`, e);
+    return [];
   }
 }

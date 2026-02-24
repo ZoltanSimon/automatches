@@ -1,11 +1,13 @@
 import { readFile } from "fs/promises";
 import { Player } from "./../classes/player.js";
-import * as fs from "fs";
 import { networkPath } from "./config.js";
 import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
 import { getPlayerByID } from "./services/players-service.js";
 import { importLeague, getLeagueFromDb } from "./data-access.js";
+import { getResultFromApi } from "../webapi-handler.js";
+import * as fsSync from 'fs';  // For synchronous/callback operations
+import fs from 'fs/promises';   // For async/await operations
 
 const cache = new Map();
 
@@ -100,7 +102,7 @@ export async function writeLeagueToServer(leagueID, dataToWrite) {
   let file = `${leaguesDir}/${leagueID}.json`;
   let responseToSend = "";
 
-  fs.writeFile(file, JSON.stringify(dataToWrite), function (err) {
+  fsSync.writeFile(file, JSON.stringify(dataToWrite), function (err) {
     if (err) {
       return console.log(err);
     }
@@ -276,5 +278,31 @@ export function buildTeamList(data) {
   } catch (error) {
     console.error("Failed to fetch and build team list:", error);
     return [];
+  }
+}
+
+export async function saveMatchToServer(fixtureID) {   
+  console.log(`Saving match with fixture ID: ${fixtureID}`);
+  
+  try {
+    let { data, limits } = await getResultFromApi(fixtureID);
+
+    await fs.writeFile(
+      `${matchesDir}/${fixtureID}.json`,
+      JSON.stringify(data.response),
+      { flag: "wx" }
+    );
+
+    const resp = {
+      match: data.response,
+      limits: limits,
+    };
+    
+    console.log(resp);
+    return resp;
+    
+  } catch (err) {
+    console.error("Error saving match:", err);
+    throw err;
   }
 }

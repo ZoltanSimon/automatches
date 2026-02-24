@@ -147,40 +147,98 @@ footer p {
 #right,
 .left-bottom {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #1d3557;
   text-align: left;
   box-sizing: border-box;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   overflow: visible;
   background-color: #a8dadc;
 }
-.rectangle div,
-#left div,
-#right div,
-.left-bottom div {
+.rectangle .rect-header,
+#left .rect-header,
+#right .rect-header,
+.left-bottom .rect-header {
+  display: grid;
   grid-column: 1/4;
-  align-self: start;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.rectangle .rect-title,
+#left .rect-title,
+#right .rect-title,
+.left-bottom .rect-title {
+  grid-column: 1/2;
+  grid-row: 1;
+  margin: 0;
+}
+.rectangle .rect-expand,
+#left .rect-expand,
+#right .rect-expand,
+.left-bottom .rect-expand {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: start;
+}
+.rectangle .rect-league-list,
+#left .rect-league-list,
+#right .rect-league-list,
+.left-bottom .rect-league-list {
+  grid-column: 3;
+  grid-row: 1;
+  margin: 0;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.3s ease, opacity 0.3s ease;
+  gap: 2px;
+}
+.rectangle .rect-league-list.visible,
+#left .rect-league-list.visible,
+#right .rect-league-list.visible,
+.left-bottom .rect-league-list.visible {
+  max-width: 500px;
+  opacity: 1;
+}
+.rectangle .rect-expand-league-list,
+#left .rect-expand-league-list,
+#right .rect-expand-league-list,
+.left-bottom .rect-expand-league-list {
+  grid-column: 4;
+  grid-row: 1;
+  justify-self: end;
+}
+.rectangle .rect-expand-league-list a::before,
+#left .rect-expand-league-list a::before,
+#right .rect-expand-league-list a::before,
+.left-bottom .rect-expand-league-list a::before {
+  content: "◄ ";
+}
+.rectangle .rect-expand-league-list.active a::before,
+#left .rect-expand-league-list.active a::before,
+#right .rect-expand-league-list.active a::before,
+.left-bottom .rect-expand-league-list.active a::before {
+  content: "► ";
 }
 .rectangle h2,
 #left h2,
 #right h2,
 .left-bottom h2 {
-  grid-column: 1/2;
-  grid-row: 1;
-  margin: 0;
   font-size: 24px;
   color: #1d3557;
+  margin: 0;
 }
 .rectangle .more-link,
 #left .more-link,
 #right .more-link,
 .left-bottom .more-link {
-  grid-column: 2/3;
-  grid-row: 1;
-  justify-self: start;
   font-size: 18px;
   text-decoration: none;
 }
@@ -190,13 +248,11 @@ footer p {
 .left-bottom .more-link:hover {
   text-decoration: underline;
 }
-.rectangle #league-list,
-#left #league-list,
-#right #league-list,
-.left-bottom #league-list {
-  grid-column: 3;
-  grid-row: 1;
-  margin: 0;
+.rectangle #fixtures-info,
+#left #fixtures-info,
+#right #fixtures-info,
+.left-bottom #fixtures-info {
+  grid-column: 1/4;
 }
 .rectangle #league-list-league,
 #left #league-list-league,
@@ -205,7 +261,7 @@ footer p {
   padding: 4px;
   background-color: #457B9D;
   display: flex;
-  gap: 2px;
+  align-self: center;
 }
 .rectangle #league-list-league img,
 #left #league-list-league img,
@@ -311,11 +367,16 @@ footer p {
 
 #player-list,
 #top-team-list,
-#match-list {
+#match-list,
+#standings {
   grid-column: 1/4;
   grid-row: 2/3;
   padding-top: 0px;
   visibility: hidden;
+}
+
+#standings {
+  visibility: visible;
 }
 
 #player-list table tr td:first-child {
@@ -333,7 +394,8 @@ footer p {
   padding: 8px;
 }
 
-.team-name, .player-country {
+.team-name,
+.player-country {
   border-left: none;
 }
 
@@ -386,7 +448,7 @@ td .form-indicator:last-child {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 80px;
+  max-width: 70px;
 }
 
 .list-header2 {
@@ -481,7 +543,8 @@ td .form-indicator:last-child {
   cursor: pointer;
 }
 
-.yellow-card, .red-card {
+.yellow-card,
+.red-card {
   display: inline-block;
   width: 16px;
   height: 24px;
@@ -552,7 +615,8 @@ td .form-indicator:last-child {
   display: block;
 }
 
-.match-header, .team-page-header {
+.match-header,
+.team-page-header {
   background: #1d3557;
   padding: 16px;
   margin-bottom: 16px;
@@ -572,7 +636,7 @@ td .form-indicator:last-child {
 }
 
 .team {
-  width: 30%;
+  width: 20%;
   text-align: center;
 }
 
@@ -771,7 +835,7 @@ td .form-indicator:last-child {
   text-align: center;
   font-weight: bold;
   cursor: pointer;
-  padding: 6px;
+  padding: 4px;
   font-size: 1.1em;
   border-left: 0;
   border-right: 0;
@@ -794,14 +858,15 @@ td .form-indicator:last-child {
   text-align: right;
   cursor: pointer;
   padding: 10px 8px;
-  width: 33%;
+  width: 30%;
 }
 
 @media (width <= 1820px) {
   main {
     padding-inline: 0;
   }
-  .container, #ucl-container {
+  .container,
+  #ucl-container {
     width: 100%;
     gap: 10px;
     padding-inline: 0;
@@ -831,34 +896,79 @@ td .form-indicator:last-child {
   }
 }
 @media (width <= 1100px) {
-  .container, #ucl-container {
+  .container,
+  #ucl-container {
     grid-template-columns: 1fr;
     width: 100%;
     display: grid;
   }
-  .rectangle, #left, #right {
+  .rectangle,
+  #left,
+  #right {
     padding-inline: 6px;
     padding-block: 6px;
   }
 }
 @media (width <= 768px) {
-  .rectangle, #left, #right {
+  .rectangle,
+  #left,
+  #right {
     grid-template-columns: 1fr auto;
   }
-  .rectangle h2, #left h2, #right h2 {
+  .rectangle .rect-header,
+  #left .rect-header,
+  #right .rect-header {
+    gap: 4px;
+  }
+  .rectangle .rect-title,
+  #left .rect-title,
+  #right .rect-title {
     grid-column: 1/2;
+  }
+  .rectangle .rect-league-list,
+  #left .rect-league-list,
+  #right .rect-league-list {
+    grid-column: 1/5;
+    grid-row: 2;
+    justify-self: end;
+    gap: 1px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    padding: 2px;
+  }
+  .rectangle .rect-league-list.visible,
+  #left .rect-league-list.visible,
+  #right .rect-league-list.visible {
+    max-height: 100px;
+    opacity: 1;
+  }
+  .rectangle h2,
+  #left h2,
+  #right h2 {
     font-size: 20px;
   }
-  .rectangle .more-link, #left .more-link, #right .more-link {
+  .rectangle .more-link,
+  #left .more-link,
+  #right .more-link {
     grid-column: 2/3;
     justify-self: end;
   }
-  .rectangle #league-list, #left #league-list, #right #league-list {
+  .rectangle #league-list,
+  #left #league-list,
+  #right #league-list {
     grid-column: 1/-1;
     grid-row: 2/3;
   }
+  .rectangle #league-list-league,
+  #left #league-list-league,
+  #right #league-list-league {
+    padding-bottom: 0px;
+    padding-top: 0px;
+  }
   #player-list {
-    grid-row: 3/4;
+    grid-row: 2;
   }
   #statSelectorContainer {
     inset-inline: 0;
@@ -944,10 +1054,14 @@ td .form-indicator:last-child {
   .small-played {
     display: inline;
   }
-  .rectangle, #left, #right {
+  .rectangle,
+  #left,
+  #right {
     padding-inline: 0;
   }
-  .rectangle h2, #left h2, #right h2 {
+  .rectangle h2,
+  #left h2,
+  #right h2 {
     margin-inline-start: 2px;
   }
   .player-picture {

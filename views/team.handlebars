@@ -5,37 +5,44 @@
         <div class="team">
             <img src="images/logos/{{thisTeam.ID}}.png" alt="{{thisTeam.Name}}">
             <div>{{thisTeam.name}}</div>
-
+        </div>
+        <div class="team-info">
+            {{#each teamStats.[0].leagues}}
+            <div onclick="window.location.href='/league?league={{this.id}}'" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                <img src="images/competitions/{{this.id}}.png" class="logo-picture" />
+                <span>{{this.name}}</span>
+            </div>
+            {{/each}}
 
         </div>
-        <div class="team-stats">
-        <span>{{teamStats.[0].wins}}W {{teamStats.[0].draws}}D {{teamStats.[0].losses}}L<br/></span>
-        <span class="pts">{{percentage teamStats.[0].wins teamStats.[0].played}} % win<br/></span>
-        <span class="pts-per">{{teamStats.[0].perGame.points}} pts/game</span>
+        <div class="stat team-stats">
+            <span>{{teamStats.[0].wins}}W {{teamStats.[0].draws}}D {{teamStats.[0].losses}}L<br/></span>
+            <span class="pts value">{{percentage teamStats.[0].wins teamStats.[0].played}}% win<br/></span>
+            <span class="per-game pts-per">{{teamStats.[0].perGame.points}} pts/game</span>
         </div>
-            <div class="stat">
-                <div class="label">Goals</div>
-                <div class="value">{{teamStats.[0].total.goals}} - {{teamStats.[0].total.goalsAgainst}}</div>
-                <div class="per-game">{{teamStats.[0].perGame.goals}} - {{teamStats.[0].perGame.goalsAgainst}}/game</div>
-            </div>
+        <div class="stat">
+            <div class="label">Goals</div>
+            <div class="value">{{teamStats.[0].total.goals}} - {{teamStats.[0].total.goalsAgainst}}</div>
+            <div class="per-game">{{teamStats.[0].perGame.goals}} - {{teamStats.[0].perGame.goalsAgainst}}/game</div>
+        </div>
 
-            <div class="stat">
-                <div class="label">xG</div>
-                <div class="value">{{teamStats.[0].total.xG}} - {{teamStats.[0].total.xGA}}</div>
-                <div class="per-game">{{teamStats.[0].perGame.xG}} - {{teamStats.[0].perGame.xGA}}/game</div>
-            </div>
+        <div class="stat">
+            <div class="label">xG</div>
+            <div class="value">{{teamStats.[0].total.xG}} - {{teamStats.[0].total.xGA}}</div>
+            <div class="per-game">{{teamStats.[0].perGame.xG}} - {{teamStats.[0].perGame.xGA}}/game</div>
+        </div>
 
-            <div class="stat">
-                <div class="label">Corners</div>
-                <div class="value">{{teamStats.[0].total.corners}} - {{teamStats.[0].total.cornersAgainst}}</div>
-                <div class="per-game">{{teamStats.[0].perGame.corners}} - {{teamStats.[0].perGame.cornersAgainst}}/game</div>
-            </div>
+        <div class="stat">
+            <div class="label">Corners</div>
+            <div class="value">{{teamStats.[0].total.corners}} - {{teamStats.[0].total.cornersAgainst}}</div>
+            <div class="per-game">{{teamStats.[0].perGame.corners}} - {{teamStats.[0].perGame.cornersAgainst}}/game</div>
+        </div>
 
-            <div class="stat">
-                <div class="label">Shots on Goal</div>
-                <div class="value">{{teamStats.[0].total.shotsOnGoal}} - {{teamStats.[0].total.shotsOnGoalAgainst}}</div>
-                <div class="per-game">{{teamStats.[0].perGame.shotsOnGoal}} - {{teamStats.[0].perGame.shotsOnGoalAgainst}}/game</div>
-            </div>
+        <div class="stat">
+            <div class="label">Shots on Goal</div>
+            <div class="value">{{teamStats.[0].total.shotsOnGoal}} - {{teamStats.[0].total.shotsOnGoalAgainst}}</div>
+            <div class="per-game">{{teamStats.[0].perGame.shotsOnGoal}} - {{teamStats.[0].perGame.shotsOnGoalAgainst}}/game</div>
+        </div>
     </div>
     <div class="rectangle">
         <span hidden id="league-name"></span>

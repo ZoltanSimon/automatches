@@ -2,16 +2,20 @@ import { tds } from "../common-styles.js";
 
 let addToPage;
 let ths = `<th title="Click to sort" class="list-header sortable">`;
-import { sortTable, adjustColspan, showColumn, hideColumn } from "../common-functions.js";
+import {
+  sortTable,
+  adjustColspan,
+  showColumn,
+  hideColumn,
+} from "../common-functions.js";
 
 const tableName = "team-list-table";
-
 
 export function teamList(
   response,
   onlyTotal = true,
   addMatches = false,
-  big = false
+  big = false,
 ) {
   addMatches = true;
   createTeamsTable(response, onlyTotal, big);
@@ -33,29 +37,29 @@ export function teamList(
   }*/
 }
 
-function createTeamsTable(response, onlyTotal, big) {
+export function createTeamsTable(response, onlyTotal, big) {
   let toFixed = 1;
   if (big) {
-    toFixed = 2
+    toFixed = 2;
     ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:7%; border-right:1px solid #F1FAEE" class="sortable"><span class="header-title">`;
   }
-
   addToPage = ""; // Initialize the string to build the table rows
   let table = document.getElementById("team-list-table");
   const tableBody = document.querySelector("#team-list-table tbody"); // Target the table body
-  
-  window.addEventListener("resize", () => adjustColspan(table.rows[0], 1));
 
+  window.addEventListener("resize", () => adjustColspan(table.rows[0], 1));
   adjustColspan(table.rows[0].cells[0], 1);
 
   if (!tableBody) {
-    console.error("Table body not found! Ensure the table has a <tbody> element.");
+    console.error(
+      "Table body not found! Ensure the table has a <tbody> element.",
+    );
     return;
   } else {
-    table.style.visibility = 'visible';
+    table.style.visibility = "visible";
   }
 
-  for (let i = 0; i < response.length; i++) {
+  /*for (let i = 0; i < response.length; i++) {
     const thisTeam = response[i];
     if (thisTeam) {
       addToPage += `<tr>
@@ -129,12 +133,12 @@ function createTeamsTable(response, onlyTotal, big) {
     }
   }
   
-  tableBody.innerHTML = addToPage;
+  tableBody.innerHTML = addToPage;*/
 
   // Add checkbox event listeners for show/hide columns
-const checkboxes = document.querySelectorAll("input[name='statSelector']");
+  const checkboxes = document.querySelectorAll("input[name='statSelector']");
   checkboxes.forEach((checkbox) =>
-    checkbox.addEventListener("change", updateTableVisibility)
+    checkbox.addEventListener("change", updateTableVisibility),
   );
 
   // Initial visibility update
@@ -149,13 +153,12 @@ const checkboxes = document.querySelectorAll("input[name='statSelector']");
 
     subheaderCell.addEventListener("click", function () {
       let index = lastRowLength - subHeaderLength + i;
-      sortTable(index, subheaderCell, table, 2); 
+      sortTable(index, subheaderCell, table, 2);
     });
   }
 }
 
 function updateTableVisibility() {
-  console.log("Updating table visibility...");
   document.querySelectorAll(`#${tableName} th`).forEach((el, index) => {
     if (el.dataset.stat) {
       const checkbox = document.getElementById(el.dataset.stat);
@@ -199,8 +202,4 @@ function getGoal(stat1, stat2) {
     plus -
     minus
   ).toFixed(1);
-}
-
-function findTeamById(response, thisId) {
-  return response.find((element) => element.id == thisId);
 }

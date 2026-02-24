@@ -1,6 +1,4 @@
 import { matchList } from "./components/match-list.js";
-import { teamList } from "./components/team-list.js";
-import { selectedLeagues } from "./local-handler.js";
 
 export let download = function (canvasName = "my-canvas") {
   var link = document.createElement("a");
@@ -95,21 +93,6 @@ function updateOrAddMatch(matchArray, matchData) {
   } else {
     matchArray.push(matchData);
   }
-}
-
-export async function getTopTeams(leagues, amount, big) {
-  const response = await fetch(`/get-teams?leagueID=${leagues.join(",")}`);
-  const dasTeams = await response.json();
-
-  dasTeams.sort((a, b) =>
-    a.last5PerGame.points < b.last5PerGame.points
-      ? 1
-      : b.last5PerGame.points < a.last5PerGame.points
-      ? -1
-      : 0
-  );
-
-  teamList(dasTeams.slice(0, amount), true, false, big);
 }
 
 export function sortTable(n, td, table, startingRow = 1, secondaryColumn = null, thirdColumn = null) {
@@ -248,15 +231,16 @@ export function showToast(message, type = "info", duration = 3000) {
   }, duration);
 }
 
-export function addLeagues(leagues, admin = false) {
+export function addLeagues(lp, admin = false) {
   // Get league from query param or use default
   const urlParams = new URLSearchParams(window.location.search);
-  const leagueParam = urlParams.get("league");
+  const leagueParam = urlParams.get(lp || "pleague");
   const leagueIDs = decodeURIComponent(leagueParam)
     .split(",")
     .map((id) => Number(id.trim()))
     .filter(Boolean);
   const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
+  let selectedLeagues = [];
 
   // Initialize selectedLeagues based on query param or default
   if (leagueParam) {
@@ -266,26 +250,37 @@ export function addLeagues(leagues, admin = false) {
       ...(Array.isArray(defaultLeagues) ? defaultLeagues : [defaultLeagues])
     );
   }
+
+  if (lp === "sleague") {
+    document.querySelectorAll(`.${lp}-league-to-select`).forEach((e) =>
+      e.addEventListener("click", (evt) => selectOneLeague(evt, lp))
+    );
+  } else {
+    document.querySelectorAll(`.${lp}-league-to-select`).forEach((e) =>
+      e.addEventListener("click", (evt) => selectLeague(evt, lp))
+    );
+  }
   
-  for (const element of leagues) {
-    if (element.Visible == 1) {
-      const isSelected = selectedLeagues.includes(element.id);
-      document.getElementById(
-        `league-list-${element.type}`
-      ).innerHTML += `<img width=30px id="img-${
-        element.id
-      }" class="league-to-select ${
-        isSelected ? "selected-league" : ""
-      }" src="images/competitions/${element.id}.png" alt="${
-        element.name
-      }" title="${element.name}"/>`;
-      document
-        .querySelectorAll(".league-to-select")
-        .forEach((e) => e.addEventListener("click", selectLeague));
+  function selectOneLeague(evt, param = "pleague") {
+    // Remove selected class from all siblings
+    document.querySelectorAll(`.${lp}-league-to-select`).forEach((el) =>
+      el.classList.remove("selected-league")
+    );
+
+    // Set only the clicked league as selected
+    evt.currentTarget.classList.add("selected-league");
+    let dasID = parseInt(evt.currentTarget.id.replace("img-", ""));
+    selectedLeagues.length = 0;
+    if (!isNaN(dasID)) selectedLeagues.push(dasID);
+
+    // Update URL and fetch new data (skip if admin mode)
+    if (!admin) {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set(param, selectedLeagues.join(","));
+      window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
   }
-
-  function selectLeague(evt) {
+  function selectLeague(evt, param = "pleague") {
     evt.currentTarget.classList.toggle("selected-league");
     let dasID = parseInt(evt.currentTarget.id.replace("img-", ""));
     if (!selectedLeagues.includes(dasID)) {
@@ -297,10 +292,8 @@ export function addLeagues(leagues, admin = false) {
     // Update URL and fetch new data (skip if admin mode)
     if (!admin) {
       const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set("league", selectedLeagues.join(","));
-      window.location.href = `${
-        window.location.pathname
-      }?${urlParams.toString()}`;
+      urlParams.set(param, selectedLeagues.join(","));
+      window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
   }
 }

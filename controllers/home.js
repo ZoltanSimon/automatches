@@ -1,22 +1,21 @@
-import {
-  getTopTeams
-} from "../../common-functions.js";
 import { playerGoalList } from "../../components/player-list.js";
 import { addLeagues } from "../common-functions.js";
 import { leagueStandings } from "../components/league-standings.js";
+import { createTeamsTable } from "../components/team-list.js";
 
 await playerGoalList(false);
 
-await getTopTeams([39, 140, 135, 78, 61, 88, 94], 10, false);
-
 document.getElementById("match-list").style.visibility = "visible";
 
-const response = await fetch(`/get-all-leagues`);
-let allLeagues = await response.json();
-allLeagues = allLeagues.filter(league => league.type === 'league');
-addLeagues(allLeagues);
+createTeamsTable(null, null, true);
+addLeagues("pleague");
+addLeagues("tleague");
+addLeagues("sleague");
 
-await leagueStandings(39);
+const params = new URLSearchParams(window.location.search);
+const sleague = params.get("sleague") ?? 39;
+
+await leagueStandings(sleague);
 
 document.querySelectorAll('.table-container').forEach(container => {
   // Check if content actually overflows
@@ -38,4 +37,12 @@ document.querySelectorAll('.table-container').forEach(container => {
       btn.textContent = container.classList.contains('expanded') ? 'Show Less' : 'Show More';
     });
   }
+});
+
+document.querySelectorAll('.rect-expand-league-list a').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.target.closest('.rect-header').querySelector('.rect-league-list').classList.toggle('visible');
+    e.target.closest('.rect-expand-league-list').classList.toggle('active');
+  });
 });

@@ -13,8 +13,7 @@
   </div>
 
   <div class="rectangle" id="rectangle4">
-    <h2>Standings</h2>
-    <a href="/league?league=39" class="more-link more-button">More &gt;&gt;&gt;</a>
+    {{> rect-header title="Standings" link=standingsLink leagues=leagues selectedLeagues=selectedSLeague leaguepar="sleague" }}
     <div id="standings" class="table-container"></div>
     <span style="grid-column: 1/4; padding-left: 4px; padding-right: 4px">Current Premier League standings,
       showing points, goal difference and recent form to help track qualification and elimination positions. Click on <a
@@ -22,11 +21,7 @@
   </div>
 
   <div class="rectangle" id="rectangle1">
-    <h2>Top Players</h2>
-    <a href="/players" class="more-link more-button">More &gt;&gt;&gt;</a>
-    <div id="league-list">
-      <div id="league-list-league"></div>
-    </div>
+    {{> rect-header title="Top Players" link="/players" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" }}
     <div id="player-list" class="table-container">
       {{> player-list-table big=false}}
     </div>
@@ -37,8 +32,7 @@
   </div>
 
   <div class="rectangle" id="rectangle2">
-    <h2>Top Teams</h2>
-    <a href="/top-teams" class="more-link more-button">More &gt;&gt;&gt;</a>
+    {{> rect-header title="Top Teams" link="/top-teams" leaguepar="tleague" leagues=leagues selectedLeagues=selectedTLeagues }}
     <div id="top-team-list" class="table-container">
       {{> team-list-table big=false}}
     </div>
