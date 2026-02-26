@@ -68,18 +68,17 @@ app.get("/", async (req, res) => {
     const selectedDate = parseDate(req.query.date);
     const selectedPlayerLeague = parseLeagueIds(req.query.pleague);
     const selectedTeamLeague = parseLeagueIds(req.query.tleague);
-    const selectedStandingsLeague = parseFloat(req.query.sleague) ?? 2;
-
+    const parsed = parseFloat(req.query.sleague);
+    const selectedStandingsLeague = isNaN(parsed) ? 39 : parsed;
+    
     const [players, matches, teams] = await Promise.all([
       getPlayerList(selectedPlayerLeague, 10),
       matchesOnDay(selectedDate),
-      extractTeams(selectedTeamLeague),
-      extractTeams(selectedStandingsLeague)
+      extractTeams(selectedTeamLeague)
     ]);
     
     teams.sort((a, b) => a.last5PerGame.points < b.last5PerGame.points ? 1 : b.last5PerGame.points < a.last5PerGame.points ? -1 : 0);
-    let selectedSLeague = selectedStandingsLeague;
-
+    
     res.render("home", {
       title: "generationFootball",
       players,
@@ -88,9 +87,9 @@ app.get("/", async (req, res) => {
       leagues: allDBLeagues.filter(league => league.type === 'league'),
       selectedPLeagues: selectedPlayerLeague.length > 0 ? selectedPlayerLeague : defaultLeagues,
       selectedTLeagues: selectedTeamLeague.length > 0 ? selectedTeamLeague : defaultLeagues,
-      selectedSLeague: selectedSLeague,
+      selectedSLeague: selectedStandingsLeague,
       teams: teams.slice(0, 10),
-      standingsLink: `/league?league=${selectedSLeague}` 
+      standingsLink: `/league?league=${selectedStandingsLeague}` 
     });
   } catch (error) {
     handleError(res, error, "Error loading home page");
@@ -252,6 +251,10 @@ app.get("/match", async (request, response) => {
     teamList,
     matchInfo 
   });
+});
+
+app.get("/player", async (request, response) => {
+
 });
 
 app.listen(PORT, () => {
