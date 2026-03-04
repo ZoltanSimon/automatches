@@ -1,4 +1,5 @@
 import { matchList } from "./components/match-list.js";
+import { selectedLeagues } from "./local-handler.js";
 
 export let download = function (canvasName = "my-canvas") {
   var link = document.createElement("a");
@@ -240,13 +241,13 @@ export function addLeagues(lp, admin = false) {
     .map((id) => Number(id.trim()))
     .filter(Boolean);
   const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
-  let selectedLeagues = [];
+  let pickedLeagues = [];
 
-  // Initialize selectedLeagues based on query param or default
+  // Initialize pickedLeagues based on query param or default
   if (leagueParam) {
-    selectedLeagues.push(...leagueIDs);
+    pickedLeagues.push(...leagueIDs);
   } else if (!admin && typeof defaultLeagues !== "undefined") {
-    selectedLeagues.push(
+    pickedLeagues.push(
       ...(Array.isArray(defaultLeagues) ? defaultLeagues : [defaultLeagues])
     );
   }
@@ -270,29 +271,39 @@ export function addLeagues(lp, admin = false) {
     // Set only the clicked league as selected
     evt.currentTarget.classList.add("selected-league");
     let dasID = parseInt(evt.currentTarget.id.replace("img-", ""));
-    selectedLeagues.length = 0;
-    if (!isNaN(dasID)) selectedLeagues.push(dasID);
+    pickedLeagues.length = 0;
+    if (!isNaN(dasID)) pickedLeagues.push(dasID);
 
     // Update URL and fetch new data (skip if admin mode)
     if (!admin) {
       const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set(param, selectedLeagues.join(","));
+      urlParams.set(param, pickedLeagues.join(","));
       window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
   }
+
   function selectLeague(evt, param = "pleague") {
+    console.log("ide");
     evt.currentTarget.classList.toggle("selected-league");
     let dasID = parseInt(evt.currentTarget.id.replace("img-", ""));
-    if (!selectedLeagues.includes(dasID)) {
-      selectedLeagues.push(dasID);
+    if (!pickedLeagues.includes(dasID)) {
+      pickedLeagues.push(dasID);
     } else {
-      selectedLeagues.splice(selectedLeagues.indexOf(dasID), 1);
+      pickedLeagues.splice(pickedLeagues.indexOf(dasID), 1);
+    }
+
+    if (admin) {
+      if (!selectedLeagues.includes(dasID)) {
+        selectedLeagues.push(dasID);
+      } else {
+        selectedLeagues.splice(selectedLeagues.indexOf(dasID), 1);
+      }
     }
 
     // Update URL and fetch new data (skip if admin mode)
     if (!admin) {
       const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set(param, selectedLeagues.join(","));
+      urlParams.set(param, pickedLeagues.join(","));
       window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
     }
   }

@@ -19,22 +19,6 @@ export function teamList(
 ) {
   addMatches = true;
   createTeamsTable(response, onlyTotal, big);
-
-  /*let matchesTable = document.getElementById("match-list");
-  let allPlayingTeams = [];
-
-  if (matchesTable && addMatches) {
-    for (let i = 0; i < matchesTable.rows.length; i++) {
-      if (i % 2 == 0) {
-        thisTr = matchesTable.rows[i];
-        team1 = findTeamById(response, thisTr.children[1].id);
-        team2 = findTeamById(response, thisTr.children[7].id);
-        allPlayingTeams.push(team1, team2);
-        predictions(team1, team2);
-      }
-    }
-    createTeamsTable(allPlayingTeams, onlyTotal);
-  }*/
 }
 
 export function createTeamsTable(response, onlyTotal, big) {
@@ -58,82 +42,6 @@ export function createTeamsTable(response, onlyTotal, big) {
   } else {
     table.style.visibility = "visible";
   }
-
-  /*for (let i = 0; i < response.length; i++) {
-    const thisTeam = response[i];
-    if (thisTeam) {
-      addToPage += `<tr>
-        <td style="padding:4px; border-right:none; cursor:pointer" onclick="window.location.href='/team?teamID=${thisTeam.id}'"><img src="images/logos/${thisTeam.id}.png" class="logo-picture"/></td>
-        <td class="team-name" style="cursor:pointer" onclick="window.location.href='/team?teamID=${thisTeam.id}'">${thisTeam.name}</td>
-        <td style="padding: 0px" data-stat="form">`;
-
-      for (const result of thisTeam.form) {
-        addToPage += `<span class="form-indicator ${result}"></span>`;
-      }
-
-      addToPage += `</td><td style="text-align: center;" data-stat="played">${thisTeam.played}</td>`;
-
-      if (big) {
-        addToPage += `<td style="text-align: center;" data-stat="winPercentage">${((100 * thisTeam.wins) / thisTeam.played).toFixed(1)}</td>
-                      <td style="text-align: center;" data-stat="possession">${thisTeam.perGame.possession.toFixed(1)}</td>`;
-      }
-
-      addToPage += `
-        
-        <td style="text-align: center;" data-stat="goals">${thisTeam.total.goals}</td>
-        <td style="text-align: center;" data-stat="goals">${thisTeam.total.goalsAgainst}</td>
-        <td style="text-align: center;" data-stat="xG">${thisTeam.total.xG.toFixed(toFixed)}</td>
-        <td style="text-align: center;" data-stat="xG">${thisTeam.total.xGA.toFixed(toFixed)}</td>
-        <td style="text-align: center;" data-stat="corners">${thisTeam.total.corners}</td>
-        <td style="text-align: center;" data-stat="corners">${thisTeam.total.cornersAgainst}</td>
-        <td style="text-align: center;" data-stat="shotsOnGoal">${thisTeam.total.shotsOnGoal}</td>
-        <td style="text-align: center;" data-stat="shotsOnGoal">${thisTeam.total.shotsOnGoalAgainst}</td>`;
-        
-        if (big) {
-          addToPage += `
-            <td style="text-align: center;" data-stat="fouls">${thisTeam.total.fouls}</td>
-            <td style="text-align: center;" data-stat="fouls">${thisTeam.total.foulsAgainst}</td>
-            <td style="text-align: center;" data-stat="yellowCards">${thisTeam.total.yellowCards}</td>
-            <td style="text-align: center;" data-stat="yellowCards">${thisTeam.total.yellowCardsAgainst}</td>
-            <td style="text-align: center;" data-stat="redCards">${thisTeam.total.redCards}</td>
-            <td style="text-align: center;" data-stat="redCards">${thisTeam.total.redCardsAgainst}</td>
-            <td style="text-align: center;" data-stat="offsides">${thisTeam.total.offsides}</td>
-            <td style="text-align: center;" data-stat="offsides">${thisTeam.total.offsidesAgainst}</td>`;
-        }
-
-      if (!onlyTotal) {
-        addToPage += `
-          ${tds}${thisTeam.perGame.goals.toFixed(2)}</td>
-          ${tds}${thisTeam.perGame.goalsAgainst.toFixed(2)}</td>
-          ${tds}${thisTeam.perGame.xG.toFixed(2)}</td>
-          ${tds}${thisTeam.perGame.xGA.toFixed(2)}</td>
-          ${tds}${thisTeam.perGame.corners.toFixed(2)}</td>
-          ${tds}${thisTeam.perGame.cornersAgainst.toFixed(2)}</td>
-          ${tds}${thisTeam.perGame.shotsOnGoal.toFixed(2)}</td>
-          ${tds}${thisTeam.perGame.shotsOnGoalAgainst.toFixed(2)}</td>
-          ${tds}${thisTeam.last5.goals}</td>
-          ${tds}${thisTeam.last5.goalsAgainst}</td>
-          ${tds}${thisTeam.last5.xG.toFixed(2)}</td>
-          ${tds}${thisTeam.last5.xGA.toFixed(2)}</td>
-          ${tds}${thisTeam.last5.corners}</td>
-          ${tds}${thisTeam.last5.cornersAgainst}</td>
-          ${tds}${thisTeam.last5.shotsOnGoal}</td>
-          ${tds}${thisTeam.last5.shotsOnGoalAgainst}</td>
-          ${tds}${thisTeam.last5PerGame.goals.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.goalsAgainst.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.xG.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.xGA.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.corners.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.cornersAgainst.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.shotsOnGoal.toFixed(2)}</td>
-          ${tds}${thisTeam.last5PerGame.shotsOnGoalAgainst.toFixed(2)}</td>`   ;
-      }
-
-      addToPage += "</tr>";
-    }
-  }
-  
-  tableBody.innerHTML = addToPage;*/
 
   // Add checkbox event listeners for show/hide columns
   const checkboxes = document.querySelectorAll("input[name='statSelector']");
@@ -163,7 +71,6 @@ function updateTableVisibility() {
     if (el.dataset.stat) {
       const checkbox = document.getElementById(el.dataset.stat);
       if (checkbox && !checkbox.checked) {
-        console.log(`Hiding column: ${el.dataset.stat}`);
         hideColumn(el.dataset.stat, tableName);
       } else if (checkbox && checkbox.checked) {
         showColumn(el.dataset.stat, tableName);

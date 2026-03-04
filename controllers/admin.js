@@ -55,6 +55,7 @@ document.getElementById("select-all-leagues").onclick = function () {
     league.classList.add("selected-league");
     selectedLeagues.push(league.id.split("img-")[1]);
   }
+  console.log(selectedLeagues);
 };
 
 document.getElementById("submit-league-info").onclick = async function () {
@@ -80,6 +81,7 @@ document.getElementById("submit-match-list").onclick = async function () {
 document.getElementById("update-leagues").onclick = async function () {
   let leagueID = selectedLeagues.join(",");
   let seasonsArr = [];
+  console.log(selectedLeagues);
   for (let id of selectedLeagues) {
     seasonsArr.push(allLeagues.find((element) => element.id == id).season);
   }

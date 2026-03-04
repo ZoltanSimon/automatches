@@ -471,5 +471,21 @@ export class LineupParser {
         "Left Winger",
       ],
     },
+        {
+      formation: "3-3-1-3",
+      positions: [
+        "Goalkeeper",
+        "Center Back",
+        "Center Back",
+        "Center Back",
+        "Right Midfielder",
+        "Central Midfielder",
+        "Left Midfielder",
+        "Attacking Midfielder",
+        "Right Winger",
+        "Striker",
+        "Left Winger",
+      ],
+    },
   ];
 }

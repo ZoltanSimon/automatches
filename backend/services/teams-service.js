@@ -1,45 +1,33 @@
-import { getLeagueFromDb } from "./../data-access.js";
-import { getMatchFromServer, buildTeamList } from "./../json-reader.js";
+import { buildTeamList } from "./../json-reader.js";
 
-export async function extractTeams(leagueIDs, date) {
-  let filterDate;
+export function extractTeams(registry, date, leagueIDs = [], teamID = null) {
+  const filterDate = date ? new Date(date) : new Date(2000, 0, 1);
 
-  if (date) {
-    const [day, month, year] = date.split("-").map(Number);
-    filterDate = new Date(year, month - 1, day);
-    if (isNaN(filterDate.getTime())) {
-      throw new Error("Invalid date format. Use 'DD-MM-YYYY'.");
-    }
-  } else {
-    filterDate = new Date(2000, 0, 1);
-  }
+  const matches = registry.matches.filter((m) => {
+    const inLeague = leagueIDs.length === 0 || leagueIDs.includes(m.league.id);
+    const afterDate = new Date(m.fixture.date) > filterDate;
+    // only include matches involving the specified team, if provided
+    const hasTeam =
+      teamID === null ||
+      m.teams.home.id === teamID ||
+      m.teams.away.id === teamID;
 
-  const data = await getLeagueFromDb(leagueIDs);
+    return inLeague && afterDate && hasTeam;
+  });
 
-  const matchIDs = data
-    .filter(({ fixture }) => {
-      const fixtureDate = new Date(fixture.date);
-      return (
-        ["FT", "AET"].includes(fixture.status.short) && fixtureDate > filterDate
-      );
-    })
-    .map(({ fixture }) => fixture.id);
+  return buildTeamList(matches);
+}
 
-  const allMatches = (
-    await Promise.allSettled(matchIDs.map((id) => getMatchFromServer(id)))
-  )
-    .filter(({ status, value }, i) => {
-      if (status === "rejected") {
-        console.error(`Error fetching match with ID ${matchIDs[i]}:`, value);
-        return false;
-      }
-      if (!value?.[0]) {
-        console.warn(`No data found for matchID: ${matchIDs[i]}`);
-        return false;
-      }
-      return true;
-    })
-    .map(({ value }) => value[0]);
+export function getTopTeams(registry, leagues) {
+  let thisToPTeams = extractTeams(registry, null, leagues);
 
-  return buildTeamList(allMatches);
+  thisToPTeams.sort((a, b) =>
+    a.last5PerGame.points < b.last5PerGame.points
+      ? 1
+      : b.last5PerGame.points < a.last5PerGame.points
+        ? -1
+        : 0,
+  );
+
+  return thisToPTeams;
 }

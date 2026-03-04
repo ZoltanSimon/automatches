@@ -32,10 +32,14 @@ export class Team {
         this.draws++;
       }
     }
+    this.total.winPercentage = parseFloat(((this.wins / this.played) * 100).toFixed(1));
+    this.total.xG = parseFloat(this.total.xG.toFixed(1));
+    this.total.xGA = parseFloat(this.total.xGA.toFixed(1));
   }
 
   calculatePerGame() {
     this.perGame = this.total.divideStats(this.played);
+    this.perGame.possession = this.perGame.possession.toFixed(1);
   }
 
   calculateLast5() {
@@ -65,8 +69,6 @@ export class Team {
   calculateStats() {
     this.played = this.#stats.length;
     this.calculateTotals();
-    //win percentage
-    this.total.winPercentage = parseFloat(((this.wins / this.played) * 100).toFixed(2));
     this.calculatePerGame();
     this.calculateLast5();
     this.formArray = this.form.split('');

@@ -1,49 +1,39 @@
-import * as fs from "fs";
-import { allDBLeagues, getLeagueFromDb, getAllTeamMatchesFromDb } from "./../data-access.js";
+import { getLeagueFromDb } from "./../data-access.js";
 import {
   matchesDir,
   getMatchFromServer,
 } from "./../json-reader.js";
 
-export async function matchesOnDay(dateToCheck, selectedLeagues = allDBLeagues) {
-  let daysMatches = [];
-  let checkDate = new Date(dateToCheck) || new Date();
-  console.log("Checking for matches on date:", checkDate.toDateString());
+export async function matchesOnDay(registry, dateToCheck) {
+  const checkDate = new Date(dateToCheck) || new Date();
+  const daysMatches = registry.fixtures.filter(({ fixture }) => (fixture.date.toDateString()) === checkDate.toDateString());
 
-  for (let i = 0; i < selectedLeagues.length; i++) {
-    let leagueID = selectedLeagues[i].id;
-    let data = await getLeagueFromDb(leagueID);
+  // Enrich finished matches from registry cache, fallback to server
+  const enriched = await Promise.all(
+    daysMatches.map(async (element) => {
+      const { id, date } = element.fixture;
+      const matchEnd = new Date(new Date(date).getTime() + 150 * 60000);
 
-    for (const element of data) {
-      let fixtureDate = new Date(element.fixture.date);
-      if (fixtureDate.toDateString() === checkDate.toDateString()) {
-        daysMatches.push(element);
-      }
-    }
-  }
-
-  for (let i = 0; i < daysMatches.length; i++) {
-    let matchID = daysMatches[i].fixture.id;
-    let fixtureDate = new Date(daysMatches[i].fixture.date);
-    const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000); // 150 min after KO
-
-    // only check local file if the match should be finished
-    if (new Date() > matchEnd) {
-      try {
-        fs.accessSync(`${matchesDir}/${matchID}.json`, fs.constants.R_OK);
-
-        let matchData = await getMatchFromServer(matchID);
-        if (matchData && matchData[0]) {
-          daysMatches[i] = matchData[0];
+      if (new Date() > matchEnd) {
+        // Use registry first
+        if (registry.matchByID.has(id)) {
+          return registry.matchByID.get(id);
         }
-      } catch (err) {
-        // file not found or error
-        console.warn(`No data found for matchID: ${matchID}`);
+        // Fallback to server if not in registry
+        try {
+          const matchData = await getMatchFromServer(id);
+          return matchData?.[0] ?? element;
+        } catch (err) {
+          console.warn(`No data found for matchID: ${id}`);
+          return element;
+        }
       }
-    }
-  }
 
-  return daysMatches;
+      return element;
+    })
+  );
+
+  return enriched;
 }
 
 export async function matchesInRound(roundNr, leagueID) {
@@ -92,26 +82,27 @@ export async function lastMatchesFromLeague(leagueID, count = 10) {
   return lastMatches;
 }
 
-export async function allTeamMatches(homeTeamID, awayTeamID = null, checkStatus = true) {
-    let allMatches = [];
+export function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkStatus = true) {
+  const fixturesForTeam = registry.fixtures.filter(({ fixture, teams }) => {
+    const { home, away } = teams;
+    const teamMatch = awayTeamID
+      ? (home.id === homeTeamID && away.id === awayTeamID) ||
+        (home.id === awayTeamID && away.id === homeTeamID)
+      : home.id === homeTeamID || away.id === homeTeamID;
 
-    let data = await getAllTeamMatchesFromDb([homeTeamID, awayTeamID]);
-    for (const element of data) {
-      // Only check status if checkStatus is true
-      if (!checkStatus || ["FT", "AET"].includes(element.status)) {
-        let fixtureMatchID = element.fixtureId;
-        try {
-          let matchData = await getMatchFromServer(fixtureMatchID);
-          if (matchData) {
-            allMatches.push(matchData[0]);
-          } else {
-            console.warn(`No data found for matchID: ${fixtureMatchID}`);
-          }
-        } catch (error) {
-          console.error(`Error fetching match with ID ${fixtureMatchID}:`, error);
-        }
-      }
-    }
+    if (!teamMatch) return false;
+    if (checkStatus) return ["FT", "AET"].includes(fixture.status.short);
+    return true;
+  });
 
-    return allMatches;
+
+  const enriched = fixturesForTeam
+    .map(({ fixture }) => {
+      const match = registry.matchByID.get(fixture.id);
+      if (!match) console.warn(`Match not found in registry for fixtureID: ${fixture.id}`);
+      return match ?? null;
+    })
+    .filter(Boolean);
+
+  return enriched;
 }

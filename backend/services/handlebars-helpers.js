@@ -51,3 +51,7 @@ export const includesID = (array, id) => {
   const arrayToCheck = Array.isArray(array) ? array : [array];
   return arrayToCheck && arrayToCheck.includes(id);
 }
+
+export const increment = (nr) => {
+  return parseInt(nr) + 1;
+}

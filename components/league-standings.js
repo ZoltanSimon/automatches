@@ -33,9 +33,16 @@ export async function standingsFromTeamList(selectedLeague) {
   return standingsFromApi;
 }
 
-export async function leagueStandings(selectedLeague) {
+export async function leagueStandings(selectedLeague, preloaded = null) {
+  // if the caller already has standings (e.g. injected by server) use them,
+  // otherwise fetch from the backend route
+  let standings;
+  if (preloaded && Array.isArray(preloaded)) {
+    standings = preloaded;
+  } else {
+    standings = await standingsFromTeamList(selectedLeague);
+  }
 
-  let standings = await standingsFromTeamList(selectedLeague);
   let addToPage = ``;
   let tds = `<td style="padding:4px; text-align: center;">`;
 

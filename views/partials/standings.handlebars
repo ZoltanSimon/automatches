@@ -1,0 +1,41 @@
+<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="league-standings">
+  <thead>
+    <tr style="border-bottom: 2px solid #1D3557" class="main-table-header">
+      <th style="width:48px;" class="list-header"><b>#</b></th>
+      <th style="width:274px;" class="list-header" colspan="2"><b>Team</b></th>
+      <th style="width:52px;" class="list-header player-country"><b>P</b></th>
+      <th style="width:52px;" class="list-header"><b>W</b></th>
+      <th style="width:52px;" class="list-header"><b>D</b></th>
+      <th style="width:52px;" class="list-header"><b>L</b></th>
+      <th style="width:90px;" class="list-header"><b>Goals</b></th>
+      <th style="width:90px;" class="list-header"><b>xG</b></th>
+      <th style="padding:4px;" class="form-column"><b>Form</b></th>
+      <th style="width:58px;" class="list-header"><b>Pts</b></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each standings as |thisTeam|}}
+    <tr data-id="{{thisTeam.id}}">
+      <td style="padding:6px; text-align: center; font-weight: bold">{{increment @index}}</td>
+      <td style="width:36px; padding: 2px; text-align: center;">
+        <img src="images/logos/{{thisTeam.id}}.png" class="logo-picture" alt="{{thisTeam.name}}" width="40px" style="cursor:pointer" onclick="window.location.href='/team?teamID={{thisTeam.id}}'"/>
+      </td>
+      <td style="border-left-style: hidden; padding: 2px; cursor:pointer;" onclick="window.location.href='/team?teamID={{thisTeam.id}}'">{{thisTeam.name}}</td>
+      <td class="player-country" style="padding:4px; text-align: center;">{{thisTeam.played}}</td>
+      <td style="padding:4px; text-align: center;">{{thisTeam.wins}}</td>
+      <td style="padding:4px; text-align: center;">{{thisTeam.draws}}</td>
+      <td style="padding:4px; text-align: center;">{{thisTeam.losses}}</td>
+      <td style="padding:4px; text-align: center;">{{thisTeam.total.goals}} : {{thisTeam.total.goalsAgainst}}</td>
+      <td style="padding:2px; text-align: center;"><i>{{thisTeam.total.xG}} : {{thisTeam.total.xGA}}</i></td>
+      <td style="padding: 0px;" data-stat="form">
+        <div style="display: flex; align-items: center; height: 100%;">
+          {{#each thisTeam.formArray as |form|}}
+          <span class="form-indicator {{form}}"></span>
+          {{/each}}
+        </div>
+      </td>
+      <td style="padding:4px; text-align: center; font-weight: bold">{{thisTeam.total.points}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

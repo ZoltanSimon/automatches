@@ -14,7 +14,10 @@
 
   <div class="rectangle" id="rectangle4">
     {{> rect-header title="Standings" link=standingsLink leagues=leagues selectedLeagues=selectedSLeague leaguepar="sleague" }}
-    <div id="standings" class="table-container"></div>
+    <div id="standings" class="table-container">
+      {{> standings }}
+    </div>
+    
     <span style="grid-column: 1/4; padding-left: 4px; padding-right: 4px">Current Premier League standings,
       showing points, goal difference and recent form to help track qualification and elimination positions. Click on <a
         href="./league">MORE</a> for full league details, fixtures and historical performance. <br/></span>

@@ -1,10 +1,8 @@
 import { readFile } from "fs/promises";
-import { Player } from "./../classes/player.js";
 import { networkPath } from "./config.js";
 import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
-import { getPlayerByID } from "./services/players-service.js";
-import { importLeague, getLeagueFromDb } from "./data-access.js";
+import { importLeague } from "./data-access.js";
 import { getResultFromApi } from "../webapi-handler.js";
 import * as fsSync from 'fs';  // For synchronous/callback operations
 import fs from 'fs/promises';   // For async/await operations
@@ -14,57 +12,6 @@ const cache = new Map();
 export const matchesDir = `${networkPath}matches`;
 export const leaguesDir = `${networkPath}leagues`;
 export const dataDir = `${networkPath}`;
-
-export async function getPlayerGoalList(leagues) {
-  const allPlayers = [];
-
-  for (let leagueIndex = 0; leagueIndex < leagues.length; leagueIndex++) {
-    const league = await getLeagueFromDb(leagues[leagueIndex]);
-
-    for (let matchIndex = 0; matchIndex < league.length; matchIndex++) {
-      const leagueMatch = league[matchIndex];
-
-      if (leagueMatch.fixture.status.short !== "FT") continue;
-
-      const match = await getMatchFromServer(leagueMatch.fixture.id);
-
-      if (!match || !match[0]) continue;
-
-      for (let { players } of match) {
-        if (!Array.isArray(players) || players.length < 2) continue;
-
-        for (let teamIndex = 0; teamIndex <= 1; teamIndex++) {
-          const teamPlayers = players[teamIndex].players;
-
-          for (let player of teamPlayers) {
-            const playerID = player.player.id;
-            let playerFound = allPlayers.find((x) => x.id === playerID);
-
-            if (playerFound) {
-              playerFound.getPlayerStats(player);
-            } else {
-              const inputPlayer = getPlayerByID(playerID);
-
-              if (!inputPlayer) {
-                console.error(`Player with ID ${playerID} not found.`);
-                continue;
-              }
-
-              const thisPlayer = new Player(inputPlayer);
-              thisPlayer.getPlayerStats(player);
-              allPlayers.push(thisPlayer);
-            }
-          }
-        }
-      }
-    }
-  }
-  allPlayers.sort((a, b) =>
-    a.goals < b.goals ? 1 : b.goals < a.goals ? -1 : 0
-  );
-
-  return allPlayers.filter((player) => player.apps >= 1);
-}
 
 export async function getMatchFromServer(fixtureID) {
   let file = `${matchesDir}/${fixtureID}.json`;

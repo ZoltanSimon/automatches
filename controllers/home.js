@@ -12,11 +12,6 @@ addLeagues("pleague");
 addLeagues("tleague");
 addLeagues("sleague");
 
-const params = new URLSearchParams(window.location.search);
-const sleague = params.get("sleague") ?? 39;
-
-await leagueStandings(sleague);
-
 document.querySelectorAll('.table-container').forEach(container => {
   // Check if content actually overflows
   const needsExpansion = container.scrollHeight > container.clientHeight;

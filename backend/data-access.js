@@ -1,10 +1,6 @@
-import { all } from "axios";
 import pool, { networkPath } from "./config.js";
 import fs from "fs";
-
-export let allDBPlayers = [];
-export let allDBTeams = [];
-export let allDBLeagues = [];
+import { allDBLeagues, allDBTeams, allDBPlayers } from "./index.js";
 
 const leagueCache = new Map();
 const CACHE_TTL = 60 * 10000;
@@ -12,8 +8,7 @@ const CACHE_TTL = 60 * 10000;
 export async function loadPlayers() {
   try {
     const [rows] = await pool.query("SELECT * FROM Player");
-    allDBPlayers = rows;
-    //console.log("Players loaded from the database:", allDBPlayers);
+    return rows;
   } catch (error) {
     console.error("Error loading players from the database:", error);
     throw error;
@@ -23,8 +18,7 @@ export async function loadPlayers() {
 export async function loadTeams() {
   try {
     const [rows] = await pool.query("SELECT * FROM Team");
-    allDBTeams = rows;
-    //console.log("Team loaded from the database:", allTteams);
+    return rows;
   } catch (error) {
     console.error("Error loading teams from the database:", error);
     throw error;
@@ -34,31 +28,21 @@ export async function loadTeams() {
 export async function loadLeagues() {
   try {
     const [rows] = await pool.query("SELECT * FROM League");
-    allDBLeagues = rows;
-    //remove leagues which are not visible
-    allDBLeagues = allDBLeagues.sort((a, b) => a.sort_order - b.sort_order);
-    allDBLeagues = allDBLeagues.filter((lg) => lg.Visible);
-    //console.log("League loaded from the database:", teams);
+    let leagues = rows;
+    leagues = leagues.sort((a, b) => a.sort_order - b.sort_order);
+    leagues = leagues.filter((lg) => lg.Visible);
+    return leagues;
   } catch (error) {
     console.error("Error loading leagues from the database:", error);
     throw error;
   }
 }
 
-(async () => {
-  await loadPlayers();
-  await loadTeams();
-  await loadLeagues();
-})();
-
 export async function insertPlayersToDb(allPlayers) {
   // Filter out players without valid IDs
   const validPlayers = allPlayers.filter(
     (player) => player.id != null && player.id !== "",
   );
-
-  //find the player called Mallen
-  console.log(validPlayers.find((p) => p.name === "Donyell Malen"));
 
   if (validPlayers.length === 0) {
     console.log({ message: "No valid players to insert." });
@@ -365,7 +349,6 @@ export async function getMatchById(fixtureId) {
       console.log(`❌ Match ${fixtureId} not found`);
       return null;
     }
-    console.log(rows);
     const r = rows[0];
     const match = {
       fixtureId: r.fixtureId,

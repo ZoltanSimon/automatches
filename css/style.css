@@ -448,7 +448,7 @@ td .form-indicator:last-child {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 70px;
+  max-width: 64px;
 }
 
 .list-header2 {
@@ -1086,7 +1086,7 @@ td .form-indicator:last-child {
   .match-list-logo-td {
     text-align: center;
     cursor: pointer;
-    width: 30px;
+    width: 10%;
   }
   .match-list-team-name-td {
     padding: 4px;
