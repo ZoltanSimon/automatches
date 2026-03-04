@@ -2,8 +2,6 @@ import {
   buildTableForTableType,
   imgs,
   ctx,
-  loadPlayerFace,
-  loadClubLogo,
 } from "../instapics.js";
 import {
   removeNewlines,
@@ -36,9 +34,9 @@ export function playerGoalList(big, noOfDisplayed = 300) {
     document.getElementById("statSelectorContainer").style.display = "none";
 
   displayedPlayers.forEach((player) => {
-    loadPlayerFace(player.id);
-    loadClubLogo(player.club);
-    loadClubLogo(player.nation);
+    //loadPlayerFace(player.id);
+    //loadClubLogo(player.club);
+    //loadClubLogo(player.nation);
   });
 
 document.querySelectorAll(`#${tableName} th`).forEach(header => {
