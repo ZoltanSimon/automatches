@@ -1,6 +1,7 @@
 <table style="border-collapse: collapse; border: 3px solid #1D3557;" border="1" id="match-list">
   <thead>
     <tr class="main-table-header">
+
       {{#if groupedMatches}}
       <th colspan="6">{{currentDate}}</th>
       <th colspan="3">
@@ -10,7 +11,15 @@
         </form>
       </th>
       {{else}}
-      <th colspan="9">Matches</th>
+      <th colspan="7">Matches</th>
+      <th colspan="2">
+        <select name="round" id="round-filter" onchange="filterByRound(this.value)">
+          <option value="">All Rounds</option>
+          {{#each rounds}}
+            <option value="{{this}}" {{#if (eq this ../currentRound)}}selected{{/if}}>{{this}}</option>
+          {{/each}}
+        </select>
+      </th>
       {{/if}}
     </tr>
   </thead>
@@ -21,7 +30,7 @@
       <td colspan="8" style="text-align:left; font-weight:bold; background:#457B9D;"><a
           href="/league?league={{this.league.id}}" style="color: white; text-decoration: none;">
           <img src="images/competitions/{{this.league.id}}.png" alt="{{this.league.name}}" width="24"
-            style="vertical-align:middle; margin-right:6px;"/>
+            style="vertical-align:middle; margin-right:6px;" />
           {{this.league.name}}</a>
       </td>
     </tr>
@@ -38,37 +47,32 @@
         {{teams.home.name}}
       </td>
 
-      <td class="match-list-logo-td"
-        onclick="window.location.href='team?teamID={{teams.home.id}}'">
-        <img class="match-list-team-logo logo-picture" src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}" width="44px">
+      <td class="match-list-logo-td" onclick="window.location.href='team?teamID={{teams.home.id}}'">
+        <img class="match-list-team-logo logo-picture" src="images/logos/{{teams.home.id}}.png"
+          alt="{{teams.home.name}}" width="44px">
       </td>
 
-      <td class="match-list-center-td"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.home}}
         {{#if statistics.[0].statistics.[16].value}}
-        <span
-          class="match-list-xg">({{statistics.[0].statistics.[16].value}})</span>
+        <span class="match-list-xg">({{statistics.[0].statistics.[16].value}})</span>
         {{/if}}
       </td>
 
-      <td class="match-list-center-td"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         -
       </td>
 
-      <td class="match-list-center-td"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.away}}
         {{#if statistics.[1].statistics.[16].value}}
-        <span
-          class="match-list-xg">({{statistics.[1].statistics.[16].value}})</span>
+        <span class="match-list-xg">({{statistics.[1].statistics.[16].value}})</span>
         {{/if}}
       </td>
 
-      <td class="match-list-logo-td"
-        onclick="window.location.href='team?teamID={{teams.away.id}}'">
-        <img class="match-list-team-logo logo-picture" src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}" width="44px">
+      <td class="match-list-logo-td" onclick="window.location.href='team?teamID={{teams.away.id}}'">
+        <img class="match-list-team-logo logo-picture" src="images/logos/{{teams.away.id}}.png"
+          alt="{{teams.away.name}}" width="44px">
       </td>
 
       <td class="match-list-team-name-td" style="text-align:left" id="{{teams.away.id}}"
@@ -80,7 +84,7 @@
     {{/each}}
     {{else}}
     {{#each matches}}
-    <tr>
+    <tr data-round="{{this.league.round}}">
       <td style="text-align: center; cursor: pointer; padding: 12px 8px;"
         onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{formatDateOnly fixture.date}}<br>{{formatTime fixture.date}}
@@ -91,37 +95,32 @@
         {{teams.home.name}}
       </td>
 
-      <td class="match-list-logo-td"
-        onclick="window.location.href='team?teamID={{teams.home.id}}'">
-        <img class="match-list-team-logo" src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}" width="44px">
+      <td class="match-list-logo-td" onclick="window.location.href='team?teamID={{teams.home.id}}'">
+        <img class="match-list-team-logo" src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}"
+          width="44px">
       </td>
 
-      <td class="match-list-center-td"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.home}}
         {{#if statistics.[0].statistics.[16].value}}
-        <span
-          class="match-list-xg">({{statistics.[0].statistics.[16].value}})</span>
+        <span class="match-list-xg">({{statistics.[0].statistics.[16].value}})</span>
         {{/if}}
       </td>
 
-      <td class="match-list-center-td"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         -
       </td>
 
-      <td class="match-list-center-td"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.away}}
         {{#if statistics.[1].statistics.[16].value}}
-        <span
-          class="match-list-xg">({{statistics.[1].statistics.[16].value}})</span>
+        <span class="match-list-xg">({{statistics.[1].statistics.[16].value}})</span>
         {{/if}}
       </td>
 
-      <td class="match-list-logo-td"
-        onclick="window.location.href='team?teamID={{teams.away.id}}'">
-        <img class="match-list-team-logo" src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}" width="44px">
+      <td class="match-list-logo-td" onclick="window.location.href='team?teamID={{teams.away.id}}'">
+        <img class="match-list-team-logo" src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}"
+          width="44px">
       </td>
 
       <td class="match-list-team-name-td" style="text-align:left" id="{{teams.away.id}}"
@@ -133,3 +132,18 @@
     {{/if}}
   </tbody>
 </table>
+
+<script>
+  function filterByRound(round) {
+    const rows = document.querySelectorAll('#match-list tbody tr');
+    rows.forEach(row => {
+      if (!round || row.dataset.round === round) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  filterByRound('{{currentRound}}');
+</script>

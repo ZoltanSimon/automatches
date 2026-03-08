@@ -324,58 +324,6 @@ export async function getAllTeamMatchesFromDb(teams) {
   }
 }
 
-export async function getMatchById(fixtureId) {
-  const cacheKey = `match-${fixtureId}`;
-  const now = Date.now();
-
-  // Check cache first
-  if (leagueCache.has(cacheKey)) {
-    console.log("Using cached match data for", cacheKey);
-    const { data, timestamp } = leagueCache.get(cacheKey);
-    if (now - timestamp < CACHE_TTL) {
-      return data;
-    }
-  }
-
-  try {
-    const [rows] = await pool.query(
-      `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
-       FROM matches
-       WHERE id = ?`,
-      [fixtureId],
-    );
-
-    if (rows.length === 0) {
-      console.log(`❌ Match ${fixtureId} not found`);
-      return null;
-    }
-    const r = rows[0];
-    const match = {
-      fixtureId: r.fixtureId,
-      fixtureDate: r.match_date,
-      fixtureStatus: r.status,
-      leagueId: r.league_id,
-      leagueSeason: r.season,
-      leagueRound: r.round,
-      homeTeamId: r.home_team_id,
-      homeTeamName:
-        allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
-      awayTeamId: r.away_team_id,
-      awayTeamName:
-        allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
-      homeGoals: r.home_score,
-      awayGoals: r.away_score,
-    };
-
-    // Cache the match
-    leagueCache.set(cacheKey, { data: match, timestamp: now });
-    return match;
-  } catch (e) {
-    console.error(`❌ Failed to load match ${fixtureId} from DB:`, e);
-    return null;
-  }
-}
-
 export async function getAllMatchesFromDbUntilDate(givenDate) {
   try {
     const [rows] = await pool.query(

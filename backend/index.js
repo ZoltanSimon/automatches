@@ -15,7 +15,6 @@ import {
 import {
   getLeagueFromDb,
   insertTeamsToDb,
-  getMatchById,
   getAllMatchesFromDbUntilDate,
   insertMatchesToQueue,
   loadLeagues,
@@ -187,52 +186,46 @@ app.get("/league", async (req, res) => {
     const registry = await getRegistry();
 
     const players = getPlayerList(registry, 10, null, [selectedLeague]);
-    const matches = await lastMatchesFromLeague(selectedLeague, 10);
+    const { matches, rounds, currentRound } = lastMatchesFromLeague(registry, selectedLeague);
     const standings = getLeagueStandings(registry, selectedLeague);
+
+    const leagueInfo = allDBLeagues.find(league => league.id === selectedLeague);
 
     res.render("league", {
       title: "League",
       players,
-      groupedMatches: groupByLeague(matches),
-      standings: standings
+      matches: (matches),
+      standings: standings,
+      rounds: rounds,
+      currentRound: currentRound,
+      leagueID: selectedLeague,
+      leagueName: leagueInfo ? leagueInfo.name : "Unknown League"
     });
   } catch (error) {
-    handleError(res, error, "Error loading home page");
+    handleError(res, error, "Error loading league page");
   }
 });
 
 app.get("/match", async (request, response) => {
   let matchID = request.query.matchID;
   let teamList = [];
-  let matchInfo = {};
 
-  // Get the match details to extract the league ID and match info
-  let currentMatch = await getMatchById(matchID);
+  const registry = await getRegistry();
+
+  // Get the match details from the registry - try completed matches first, fall back to fixtures
+  let currentMatch = registry.matchByID.get(matchID) || registry.fixtures.find(f => f.fixture.id == matchID);
   
   if (currentMatch) { 
-    // Extract match information
-    matchInfo = {
-      homeTeamId: currentMatch.homeTeamId,
-      homeTeamName: currentMatch.homeTeamName,
-      awayTeamId: currentMatch.awayTeamId,
-      awayTeamName: currentMatch.awayTeamName,
-      date: currentMatch.fixtureDate,
-      status: currentMatch.fixtureStatus,
-      homeGoals: currentMatch.homeGoals,
-      awayGoals: currentMatch.awayGoals
-    };
-    let allMatches = await allTeamMatches(matchInfo.homeTeamId, matchInfo.awayTeamId);
-
+    let allMatches = await allTeamMatches(registry, currentMatch.teams.home.id, currentMatch.teams.away.id);
     let fullTeamList = buildTeamList(allMatches);
 
     teamList = fullTeamList.filter(team => 
-      team.id === matchInfo.homeTeamId || team.id === matchInfo.awayTeamId
+      team.id === currentMatch.teams.home.id || team.id === currentMatch.teams.away.id
     );
-
     //make sure homeTeam is first in teamList
     teamList.sort((a, b) => {
-      if (a.id === matchInfo.homeTeamId) return -1;
-      if (b.id === matchInfo.homeTeamId) return 1;
+      if (a.id === currentMatch.teams.home.id) return -1;
+      if (b.id === currentMatch.teams.home.id) return 1;
       return 0;
     });
 
@@ -241,12 +234,11 @@ app.get("/match", async (request, response) => {
       team.matches = team.matches.slice(0, 5);
     }
   }
-
   response.render("match", { 
     title: "Match Details", 
     matchID, 
     teamList,
-    matchInfo 
+    matchInfo: currentMatch 
   });
 });
 

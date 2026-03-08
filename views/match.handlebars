@@ -3,19 +3,19 @@
   {{#if matchInfo}}
   <div class="match-header">
     <div class="team">
-      <img src="images/logos/{{matchInfo.homeTeamId}}.png" alt="{{matchInfo.homeTeamName}}">
-      <div>{{matchInfo.homeTeamName}}</div>
+      <img src="images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}">
+      <div>{{matchInfo.teams.home.name}}</div>
     </div>
 
     <div class="score-section">
-      <div class="score">{{matchInfo.homeGoals}} - {{matchInfo.awayGoals}}</div>
-      <div>{{formatDate matchInfo.date}}</div>
-      <span class="status">{{matchInfo.status}}</span>
+      <div class="score">{{matchInfo.goals.home}} - {{matchInfo.goals.away}}</div>
+      <div>{{formatDate matchInfo.fixture.date}}</div>
+      <span class="status">{{matchInfo.fixture.status.short}}</span>
     </div>
 
     <div class="team">
-      <img src="images/logos/{{matchInfo.awayTeamId}}.png" alt="{{matchInfo.awayTeamName}}">
-      <div>{{matchInfo.awayTeamName}}</div>
+      <img src="images/logos/{{matchInfo.teams.away.id}}.png" alt="{{matchInfo.teams.away.name}}">
+      <div>{{matchInfo.teams.away.name}}</div>
     </div>
   </div>
   {{/if}}

@@ -51,43 +51,42 @@ export async function matchesInRound(roundNr, leagueID) {
   return matches;
 }
 
-export async function lastMatchesFromLeague(leagueID, count = 10) {
-  let data = await getLeagueFromDb(leagueID);
-  
-  // Filter to only include finished matches (past matches)
-  let finishedMatches = data.filter((element) => {
-    let fixtureDate = new Date(element.fixture.date);
-    return fixtureDate < new Date();
-  });
-  
-  // Sort by date descending (most recent first)
-  finishedMatches.sort((a, b) => {
-    let dateA = new Date(a.fixture.date);
-    let dateB = new Date(b.fixture.date);
-    return dateB - dateA; // descending order
-  });
-  
-  // Take only the requested number of matches
-  let lastMatches = finishedMatches.slice(0, count);
-  
-  // Update each match with fresh data from server
-  for (let i = 0; i < lastMatches.length; i++) {
-    let matchID = lastMatches[i].fixture.id;
-    let matchData = await getMatchFromServer(matchID);
-    if (matchData && matchData[0]) {
-      lastMatches[i] = matchData[0];
+export function lastMatchesFromLeague(registry, leagueID) {
+
+  const leagueFixtures = registry.fixtures
+    .filter(({ fixture, league }) => 
+      league.id === leagueID
+    )
+    .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+
+  const matches = leagueFixtures
+    .map((item) => registry.matchByID.get(item.fixture.id) ?? item)
+    .filter(Boolean);
+
+  const rounds = [...new Set(leagueFixtures.map(({ league }) => league.round))].sort();
+
+  const now = new Date();
+  let currentRound = null;
+  let minDiff = Infinity;
+  for (const round of rounds) {
+    const roundFixtures = leagueFixtures.filter(item => item.league.round === round);
+    for (const item of roundFixtures) {
+      const diff = Math.abs(new Date(item.fixture.date) - now);
+      if (diff < minDiff) {
+        minDiff = diff;
+        currentRound = round;
+      }
     }
   }
-  
-  return lastMatches;
+
+  return { matches, rounds, currentRound };
 }
 
 export function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkStatus = true) {
   const fixturesForTeam = registry.fixtures.filter(({ fixture, teams }) => {
     const { home, away } = teams;
     const teamMatch = awayTeamID
-      ? (home.id === homeTeamID && away.id === awayTeamID) ||
-        (home.id === awayTeamID && away.id === homeTeamID)
+      ? home.id === homeTeamID || away.id === homeTeamID || home.id === awayTeamID || away.id === awayTeamID
       : home.id === homeTeamID || away.id === homeTeamID;
 
     if (!teamMatch) return false;
