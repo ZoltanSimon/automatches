@@ -374,6 +374,7 @@ footer {
 #standings {
   visibility: visible;
 }
+
 #player-list table tr td:first-child {
   background-color: $lightest-blue;
   width: 60px;
@@ -846,6 +847,13 @@ td .form-indicator {
   white-space: nowrap;
 }
 
+.match-list-date {
+  text-align: center;
+  cursor: pointer;
+  padding: 12px 8px;
+  width: 12%;
+}
+
 .match-list-center-td {
   text-align: center;
   font-weight: bold;
@@ -866,7 +874,7 @@ td .form-indicator {
 .match-list-logo-td {
   text-align: center;
   cursor: pointer;
-  width: 44px
+  width: 10%;
 }
 
 .match-list-team-name-td {
@@ -874,6 +882,22 @@ td .form-indicator {
   cursor: pointer;
   padding: 10px 8px;
   width: 30%;
+}
+
+.gf-input {
+  background-color: #457b9d;
+  color: #f1faee;
+  border: none;
+  padding: 2px 8px;
+  font-weight: bold;
+  cursor: pointer;
+  height: 24px;
+  appearance: none;
+  -webkit-appearance: none;
+
+  &::-webkit-calendar-picker-indicator {
+    filter: invert(1); 
+  }
 }
 
 // Media Queries - Mobile First Approach with Modern Standards
@@ -894,6 +918,24 @@ td .form-indicator {
 
   .rectangle {
     padding-inline: 8px;
+  }
+}
+
+.input-change-arrow {
+  background-color: $blue;
+
+  &.right {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+
+  &.left {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  &:hover {
+    background-color: darken($color: $blue, $amount: 10);
   }
 }
 
@@ -1141,7 +1183,6 @@ td .form-indicator {
   .match-list-logo-td {
     text-align: center;
     cursor: pointer;
-    width: 10%;
   }
 
   .match-list-team-name-td {

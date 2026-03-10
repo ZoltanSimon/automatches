@@ -146,7 +146,7 @@ app.get("/team", async (req, res) => {
   );
 
   teamStats[0].leagues = [...teamStats[0].leagues.values()];
-  let matchesToShow = allTeamMatches(registry, thisTeam.ID).sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+  let matchesToShow = allTeamMatches(registry, thisTeam.ID, null, false).sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
   res.render("team", { 
     title: thisTeam ? thisTeam.name : "Team",
     thisTeam: thisTeam,
@@ -188,7 +188,6 @@ app.get("/league", async (req, res) => {
     const players = getPlayerList(registry, 10, null, [selectedLeague]);
     const { matches, rounds, currentRound } = lastMatchesFromLeague(registry, selectedLeague);
     const standings = getLeagueStandings(registry, selectedLeague);
-
     const leagueInfo = allDBLeagues.find(league => league.id === selectedLeague);
 
     res.render("league", {
@@ -199,7 +198,11 @@ app.get("/league", async (req, res) => {
       rounds: rounds,
       currentRound: currentRound,
       leagueID: selectedLeague,
-      leagueName: leagueInfo ? leagueInfo.name : "Unknown League"
+      leagueName: leagueInfo ? leagueInfo.name : "Unknown League",
+      leagueNation: {
+        ID: leagueInfo ? leagueInfo.nation : 0,
+        name: allDBTeams.find(nation => nation.ID == leagueInfo.nation).name 
+      },
     });
   } catch (error) {
     handleError(res, error, "Error loading league page");

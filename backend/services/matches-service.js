@@ -63,7 +63,7 @@ export function lastMatchesFromLeague(registry, leagueID) {
     .map((item) => registry.matchByID.get(item.fixture.id) ?? item)
     .filter(Boolean);
 
-  const rounds = [...new Set(leagueFixtures.map(({ league }) => league.round))].sort();
+  const rounds = [...new Set(leagueFixtures.map(({ league }) => league.round))].reverse();
 
   const now = new Date();
   let currentRound = null;
@@ -94,14 +94,14 @@ export function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkSta
     return true;
   });
 
+  const results = fixturesForTeam.map((fixtureData) => {
+    const match = registry.matchByID.get(fixtureData.fixture.id);
+    if (match) {
+      return match;
+    } else {
+      return fixtureData;
+    }
+  });
 
-  const enriched = fixturesForTeam
-    .map(({ fixture }) => {
-      const match = registry.matchByID.get(fixture.id);
-      if (!match) console.warn(`Match not found in registry for fixtureID: ${fixture.id}`);
-      return match ?? null;
-    })
-    .filter(Boolean);
-
-  return enriched;
+  return results;
 }

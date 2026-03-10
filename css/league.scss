@@ -1,0 +1,54 @@
+.league {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.league-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  flex-shrink: 0;
+}
+
+.league-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.league-info h2 {
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: #f0f4f8;
+  margin: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.league-nation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nation-flag {
+  width: 20px;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.league-nation span {
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+}
+
+@media (width <=768px) {
+    .league {
+        width: 100% !important;
+    }
+}

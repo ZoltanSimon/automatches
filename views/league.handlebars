@@ -1,44 +1,20 @@
 <script type="module" src="./../controllers/league.js"></script>
-<style>
-  .team-page-header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .league {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-  }
-
-  .league img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
-    flex-shrink: 0;
-  }
-
-  .league h2 {
-    font-size: 2rem;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    color: #f0f4f8;
-    margin: 0;
-    line-height: 1;
-    text-transform: uppercase;
-  }
-</style>
+<link rel="stylesheet" href="css/league.css" />
 
 <div class="container">
-  <div class="team-page-header">
-    <div class="league">
-      <img src="images/competitions/{{leagueID}}.png" alt="{{leagueName}}">
+<div class="team-page-header">
+  <div class="league">
+    <img class="league-logo" src="images/competitions/{{leagueID}}.png" alt="{{leagueName}}">
+    <div class="league-info">
       <h2>{{leagueName}}</h2>
+      <div class="league-nation">
+        <img class="nation-flag" src="images/logos/{{leagueNation.ID}}.png" alt="{{leagueNation.name}}">
+        <span>{{leagueNation.name}}</span>
+      </div>
     </div>
   </div>
+</div>
   <div class="rectangle" id="rectangle4">
-    <h2>Standings</h2>
     <div id="standings" class="table-container large">
       {{> standings }}
     </div>

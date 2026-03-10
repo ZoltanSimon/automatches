@@ -7,19 +7,27 @@
       <th colspan="3">
         <form method="get" action="/"
           style="display: flex; justify-content: flex-end; align-items: center; height: 100%; margin: 0; padding: 0;">
-          <input type="date" id="matchDate" name="date" value="{{selectedDate}}" onchange="this.form.submit()" />
+          <button onclick="navigateDate(-1)" class="more-button input-change-arrow left">&#9668;</button>
+          <input type="date" id="matchDate" class="gf-input" name="date" value="{{selectedDate}}" onchange="this.form.submit()" />
+          <button onclick="navigateDate(1)" class="more-button input-change-arrow right">&#9658;</button>
         </form>
       </th>
       {{else}}
-      <th colspan="7">Matches</th>
-      <th colspan="2">
-        <select name="round" id="round-filter" onchange="filterByRound(this.value)">
-          <option value="">All Rounds</option>
-          {{#each rounds}}
-            <option value="{{this}}" {{#if (eq this ../currentRound)}}selected{{/if}}>{{this}}</option>
-          {{/each}}
-        </select>
+      <th colspan="3">Matches</th>   
+      <th colspan="5">
+        {{#if currentRound}}
+        <div style="display: flex; align-items: center; justify-content: flex-end;">
+          <button onclick="navigateRound(-1)" class="more-button input-change-arrow left">&#9668;</button>
+          <select name="round" id="round-filter" class="gf-input" onchange="filterByRound(this.value)">
+            <option value="">All Rounds</option>
+            {{#each rounds}}
+              <option value="{{this}}" {{#if (eq this ../currentRound)}}selected{{/if}}>{{this}}</option>
+            {{/each}}
+          </select>
+          <button onclick="navigateRound(1)" class="more-button input-change-arrow right">&#9658;</button>
+        </div>
       </th>
+      {{/if}}
       {{/if}}
     </tr>
   </thead>
@@ -37,8 +45,7 @@
 
     {{#each this.matches}}
     <tr>
-      <td style="text-align: center; cursor: pointer; padding: 12px 8px;"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{formatTime fixture.date}}
       </td>
 
@@ -85,8 +92,7 @@
     {{else}}
     {{#each matches}}
     <tr data-round="{{this.league.round}}">
-      <td style="text-align: center; cursor: pointer; padding: 12px 8px;"
-        onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{formatDateOnly fixture.date}}<br>{{formatTime fixture.date}}
       </td>
 
@@ -143,6 +149,34 @@
         row.style.display = 'none';
       }
     });
+  }
+
+  function navigateRound(direction) {
+    const select = document.getElementById('round-filter');
+    const rounds = Array.from(select.options).slice(1).map(opt => opt.value); // skip "All Rounds"
+    let currentValue = select.value;
+    if (!currentValue) {
+      // If "All Rounds" selected, go to first round
+      select.value = rounds[0];
+      filterByRound(rounds[0]);
+      return;
+    }
+    const currentIndex = rounds.indexOf(currentValue);
+    if (currentIndex === -1) return;
+    const newIndex = currentIndex + direction;
+    if (newIndex >= 0 && newIndex < rounds.length) {
+      select.value = rounds[newIndex];
+      filterByRound(rounds[newIndex]);
+    }
+  }
+
+  function navigateDate(direction) {
+    const input = document.getElementById('matchDate');
+    const currentDate = new Date(input.value);
+    currentDate.setDate(currentDate.getDate() + direction);
+    const newDateStr = currentDate.toISOString().split('T')[0];
+    input.value = newDateStr;
+    input.form.submit();
   }
 
   filterByRound('{{currentRound}}');

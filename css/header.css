@@ -103,6 +103,7 @@ nav ul li a:hover {
 @media (max-width: 400px) {
   header {
     padding: 2px;
+    width: 100%;
   }
 
   .logo-title img {

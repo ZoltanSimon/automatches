@@ -831,6 +831,13 @@ td .form-indicator:last-child {
   white-space: nowrap;
 }
 
+.match-list-date {
+  text-align: center;
+  cursor: pointer;
+  padding: 12px 8px;
+  width: 12%;
+}
+
 .match-list-center-td {
   text-align: center;
   font-weight: bold;
@@ -851,7 +858,7 @@ td .form-indicator:last-child {
 .match-list-logo-td {
   text-align: center;
   cursor: pointer;
-  width: 44px;
+  width: 10%;
 }
 
 .match-list-team-name-td {
@@ -859,6 +866,22 @@ td .form-indicator:last-child {
   cursor: pointer;
   padding: 10px 8px;
   width: 30%;
+}
+
+.gf-input {
+  background-color: #457b9d;
+  color: #f1faee;
+  border: none;
+  padding: 2px 8px;
+  font-weight: bold;
+  cursor: pointer;
+  height: 24px;
+  -moz-appearance: none;
+       appearance: none;
+  -webkit-appearance: none;
+}
+.gf-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 
 @media (width <= 1820px) {
@@ -875,6 +898,21 @@ td .form-indicator:last-child {
     padding-inline: 8px;
   }
 }
+.input-change-arrow {
+  background-color: #457B9D;
+}
+.input-change-arrow.right {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+.input-change-arrow.left {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.input-change-arrow:hover {
+  background-color: rgb(53.4292035398, 95.2433628319, 121.5707964602);
+}
+
 @media (width <= 1670px) {
   main {
     padding-block: 2px;
@@ -1086,7 +1124,6 @@ td .form-indicator:last-child {
   .match-list-logo-td {
     text-align: center;
     cursor: pointer;
-    width: 10%;
   }
   .match-list-team-name-td {
     padding: 4px;

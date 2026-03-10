@@ -2,7 +2,7 @@ import { Team } from "../classes/team.js";
 import { defaultLeagues } from "./services/leagues-service.js";
 
 export function findOrCreateTeam(teams, teamData) {
-    let team = teams.find((t) => t.name === teamData.name);
+    let team = teams.find((t) => t.id === teamData.id);
     if (!team) {
       team = new Team(teamData);
       teams.push(team);
