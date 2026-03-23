@@ -55,3 +55,26 @@ export const includesID = (array, id) => {
 export const increment = (nr) => {
   return parseInt(nr) + 1;
 }
+
+export const perGame = (total, games) => {
+  const g = Number(games);
+  if (!g || g === 0) return 0;
+  const t = Number(total);
+  if (Number.isNaN(t)) return 0;
+  return (t / g).toFixed(2);
+}
+
+export const zeroDefault = (value) => {
+  const n = Number(value);
+  return isNaN(n) ? 0 : n;
+}
+
+export const ratingClass = (rating) => {
+  const r = parseFloat(rating);
+  if (isNaN(r)) return '';
+  if (r >= 8) return 'rating-dark-green';
+  if (r >= 7) return 'rating-green';
+  if (r >= 6) return 'rating-yellow';
+  if (r >= 5) return 'rating-orange';
+  return 'rating-red';
+}

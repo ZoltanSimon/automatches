@@ -12,18 +12,20 @@
   </div>
 
   <div class="rectangle" id="rectangle4">
-    {{> rect-header title="Standings" link=standingsLink leagues=leagues selectedLeagues=selectedSLeague leaguepar="sleague" }}
+    {{> rect-header title="Standings" link=standingsLink leagues=leagues selectedLeagues=selectedSLeague
+    leaguepar="sleague" }}
     <div id="standings" class="table-container">
       {{> standings }}
     </div>
-    
+
     <span style="grid-column: 1/4; padding-left: 4px; padding-right: 4px">Current Premier League standings,
       showing points, goal difference and recent form to help track qualification and elimination positions. Click on <a
-        href="./league">MORE</a> for full league details, fixtures and historical performance. <br/></span>
+        href="./league">MORE</a> for full league details, fixtures and historical performance. <br /></span>
   </div>
 
   <div class="rectangle" id="rectangle1">
-    {{> rect-header title="Top Players" link="/players" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" }}
+    {{> rect-header title="Top Players" link="/players" leagues=leagues selectedLeagues=selectedPLeagues
+    leaguepar="pleague" }}
     <div id="player-list" class="table-container">
       {{> player-list-table big=false}}
     </div>
@@ -34,7 +36,8 @@
   </div>
 
   <div class="rectangle" id="rectangle2">
-    {{> rect-header title="Top Teams" link="/top-teams" leaguepar="tleague" leagues=leagues selectedLeagues=selectedTLeagues }}
+    {{> rect-header title="Top Teams" link="/top-teams" leaguepar="tleague" leagues=leagues
+    selectedLeagues=selectedTLeagues }}
     <div id="top-team-list" class="table-container">
       {{> team-list-table big=false}}
     </div>
@@ -44,16 +47,14 @@
       squad.</span>
   </div>
 
-  <div class="rectangle" id="rectangle5" style="height: 300px; padding: 0px;">
-    <div class="ads-container">
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5722075030849203"
-        crossorigin="anonymous"></script>
-      <!-- ads-container -->
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5722075030849203" data-ad-slot="5412168143"
-        data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </div>
+  <div class="ads-container">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5722075030849203"
+      crossorigin="anonymous"></script>
+    <!-- ads-container -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5722075030849203" data-ad-slot="5412168143"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
   </div>
 </div>

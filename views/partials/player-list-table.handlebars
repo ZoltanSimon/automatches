@@ -150,18 +150,20 @@
     {{#if (lt @index 299)}}
     <tr {{#if (gt @index 99)}}style="display:none;" {{/if}}>
       <td id={{this.id}} style="text-align:center;padding:0; border-right: none;">
-        <img class="player-picture" src="images/player-pictures/{{this.id}}.png"
-          onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
+        <a href="/player?id={{this.id}}">
+          <img class="player-picture" src="images/player-pictures/{{this.id}}.png"
+            onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
+        </a>
       </td>
       <td id={{this.nation}} class="player-country">
         <img height="30" src="images/logos/{{this.nation}}.png" />
       </td>
       <td class="sec-stats">
-        <div class="player-name">{{this.name}}</div>
+        <div class="player-name"><a href="/player?id={{this.id}}">{{this.name}}</a></div>
         <div class="player-position">{{this.position}}</div>
       </td>
       <td class="stat-td player-club" id={{this.club}}>
-        <a href="/team?teamID={{this.club}}"><img class="logo-picture" src="images/logos/{{this.club}}.png" /></a>
+        <a href="/team?ID={{this.club}}"><img class="logo-picture" src="images/logos/{{this.club}}.png" /></a>
       </td>
       <td class="stat-td" data-stat="apps">{{this.apps}}</td>
       <td class="stat-td" data-stat="goals">{{this.goals}}</td>
@@ -169,7 +171,7 @@
       <td class="stat-td" data-stat="assists">{{this.assists}}</td>
       <td class="stat-td corners" data-stat="ga">{{this.ga}}</td>
       <td class="stat-td" data-stat="gap90">{{this.gap90}}</td>
-      <td class="stat-td" data-stat="avRating">{{this.avRating}}</td>
+      <td class="stat-td {{ratingClass this.avRating}}" data-stat="avRating">{{this.avRating}}</td>
       <td class="stat-td" data-stat="minutes">{{this.minutes}}</td>
       <td class="stat-td" data-stat="pens">{{this.penalties}}</td>
       <td class="stat-td" data-stat="penaltiesMissed">{{this.penaltiesMissed}}</td>

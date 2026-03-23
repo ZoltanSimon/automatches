@@ -241,13 +241,13 @@ footer {
     }
   }
 
-  #fixtures-info {
+  #fixtures-info,
+  #player-matches {
     grid-column: 1 / 4;
   }
 
   #league-list-league {
     padding: 4px;
-    background-color: $blue;
     display: flex;
     align-self: center;
 
@@ -632,7 +632,8 @@ td .form-indicator {
 }
 
 .match-header,
-.team-page-header {
+.team-page-header,
+.player-page-header {
   background: $dark-blue;
   padding: 16px;
   margin-bottom: 16px;
@@ -899,6 +900,16 @@ td .form-indicator {
     filter: invert(1); 
   }
 }
+
+.center-td {
+  text-align: center;
+}
+
+.rating-dark-green { background-color: #1a7a3c; color: #fff; font-weight: bold;}
+.rating-green      { background-color: #4caf50; color: #fff; font-weight: bold;}
+.rating-yellow     { background-color: #ffeb3b; color: #000; font-weight: bold;}
+.rating-orange     { background-color: #ff9800; color: #fff; font-weight: bold;}
+.rating-red        { background-color: #f44336; color: #fff; font-weight: bold;}
 
 // Media Queries - Mobile First Approach with Modern Standards
 
@@ -1176,7 +1187,8 @@ td .form-indicator {
     font-size: 0.8em;
   }
 
-  .match-list-team-logo {
+  .match-list-team-logo,
+  .match-list-comp-logo {
     width: 30px;
   }
 
@@ -1189,6 +1201,9 @@ td .form-indicator {
     padding: 4px;
   }
 
+  .stat {
+    padding: 8px;
+  }
 }
 
 // Preference-based media queries for accessibility

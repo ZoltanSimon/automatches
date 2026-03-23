@@ -1,0 +1,153 @@
+<script type="module" src="./../controllers/player.js"></script>
+<link rel="stylesheet" href="css/league.css" />
+
+<div class="container">
+    <div class="player-page-header">
+        <div class="league">
+            <img class="player-face" src="images/player-pictures/{{player.id}}.png" alt="{{player.name}}">
+            <div class="league-info">
+                <h2>{{player.name}}</h2>
+                <div class="league-nation">
+                    <div class="row">
+                        <img class="club-logo" src="images/logos/{{player.club}}.png" alt="{{player.clubName}}"
+                            onclick="window.location.href='team?ID={{player.club}}'">
+                        <span onclick="window.location.href='team?ID={{player.club}}'">{{player.clubName}}</span>
+                    </div>
+                    <div class="row">
+                        <span style="color: white;">{{player.position}}</span> -
+                        <img class="nation-flag" src="images/logos/{{player.nation}}.png" alt="{{player.nationName}}">
+                        <span>{{player.nationName}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rectangle">
+
+        {{#if error}}
+        <div class="error-message">{{error}}</div>
+        {{else}}
+        <div class="rect-header" style="grid-template-columns: auto 1fr;">
+            <div class="rect-title"><h2>Stats</h2></div>
+            <div class="rect-league-list" style="display: flex; position: static; opacity: 1; pointer-events: auto; margin-left: auto; grid-column: 2; justify-self: end; flex-wrap: nowrap; white-space: nowrap; gap: 8px; max-width: none; width: max-content; overflow: visible;">
+                {{#each leagues}}
+                <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}" class="pleague-league-to-select{{#if (includesID ../selectedPLeagues this.id)}} selected-league{{/if}}" />
+                {{/each}}
+            </div>
+        </div>
+        <div class="stats" style="grid-column: 1 / 4; width: 100%; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+            <div class="stat">
+                <div class="label">Appearances</div>
+                <div class="value">{{player.apps}}</div>
+            </div>
+            <div class="stat">
+                <div class="label">Goals</div>
+                <div class="value">{{player.goals}}</div>
+                <div class="per-game">{{perGame player.goals player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Assists</div>
+                <div class="value">{{player.assists}}</div>
+                <div class="per-game">{{perGame player.assists player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Goals + Assists</div>
+                <div class="value">{{player.ga}}</div>
+                <div class="per-game">{{perGame player.ga player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">GA / 90</div>
+                <div class="value">{{player.gap90}}</div>
+            </div>
+            <div class="stat">
+                <div class="label">Rating</div>
+                <div class="value">{{player.avRating}}</div>
+            </div>
+            <div class="stat">
+                <div class="label">Minutes</div>
+                <div class="value">{{player.minutes}}</div>
+                <div class="per-game">{{perGame player.minutes player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Penalties</div>
+                <div class="value">{{player.penalties}}</div>
+                <div class="per-game">{{perGame player.penalties player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Pens Missed</div>
+                <div class="value">{{player.penaltiesMissed}}</div>
+                <div class="per-game">{{perGame player.penaltiesMissed player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Shots (On / Total)</div>
+                <div class="value">{{player.shots}}</div>
+                <div class="per-game">{{perGame player.shotsOn player.apps}} / {{perGame player.shotsTotal player.apps}}
+                    per game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Dribbles (Succ / Att)</div>
+                <div class="value">{{player.dribbles}}</div>
+                <div class="per-game">{{perGame player.dribblesSucc player.apps}} / {{perGame player.dribblesAttempts
+                    player.apps}} per game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Duels (Won/Total)</div>
+                <div class="value">{{player.duels}}</div>
+                <div class="per-game">{{perGame player.duelsWon player.apps}} / {{perGame player.duelsTotal
+                    player.apps}} per game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Key Passes</div>
+                <div class="value">{{player.keyPasses}}</div>
+                <div class="per-game">{{perGame player.keyPasses player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Tackles</div>
+                <div class="value">{{player.tackles}}</div>
+                <div class="per-game">{{perGame player.tackles player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Interceptions</div>
+                <div class="value">{{player.interceptions}}</div>
+                <div class="per-game">{{perGame player.interceptions player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Blocks</div>
+                <div class="value">{{player.blocks}}</div>
+                <div class="per-game">{{perGame player.blocks player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Fouls Committed</div>
+                <div class="value">{{player.foulsCommited}}</div>
+                <div class="per-game">{{perGame player.foulsCommited player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Fouls Against</div>
+                <div class="value">{{player.foulsAgainst}}</div>
+                <div class="per-game">{{perGame player.foulsAgainst player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Yellow Cards</div>
+                <div class="value">{{player.yellowCards}}</div>
+                <div class="per-game">{{perGame player.yellowCards player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Red Cards</div>
+                <div class="value">{{player.redCards}}</div>
+                <div class="per-game">{{perGame player.redCards player.apps}}/game</div>
+            </div>
+        </div>
+        {{/if}}
+
+    </div>
+    <div class="rectangle" style="padding: 8px;">
+        <span>{{player.name}} is a football player, representing the country of {{player.nationName}}. He plays for <a href="team?ID={{player.club}}">{{player.clubName}}</a>, mainly as a {{player.position}}. He has made {{player.apps}} appearances and has scored {{player.goals}} goals, providing {{player.assists}} assists in all competitions this season, for club and country.<br/><br/>
+        If you are interested in his statistics in specific leagues, click on the league icons above to filter the match list below. You can also click on the matches to see more details about them, or on the teams to see their respective pages.   </span>
+    </div>
+    <div class="rectangle">
+        <div id="player-matches" class="table-container">
+            {{> mini-match-list matches=matches}}
+        </div>
+    </div>
+</div>

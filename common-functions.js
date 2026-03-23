@@ -130,7 +130,7 @@ export function sortTable(n, td, table, startingRow = 1, secondaryColumn = null,
   rowsArray.forEach(row => tbody.appendChild(row));
 
   // 5. Apply colors to the new positions
-  recolorRows(table, startingRow);
+  //recolorRows(table, startingRow);
 }
 
 function recolorRows(table, startingRow) {
@@ -236,19 +236,33 @@ export function addLeagues(lp, admin = false) {
   // Get league from query param or use default
   const urlParams = new URLSearchParams(window.location.search);
   const leagueParam = urlParams.get(lp || "pleague");
-  const leagueIDs = decodeURIComponent(leagueParam)
-    .split(",")
-    .map((id) => Number(id.trim()))
-    .filter(Boolean);
+  const parseUniqueLeagueIds = (value) => {
+    if (!value) return [];
+    return [...new Set(
+      decodeURIComponent(value)
+        .split(",")
+        .map((id) => Number(id.trim()))
+        .filter(Boolean)
+    )];
+  };
+
+  const leagueIDs = parseUniqueLeagueIds(leagueParam);
   const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
+  const preselectedLeagueIds = Array.from(
+    document.querySelectorAll(`.${lp}-league-to-select.selected-league`)
+  )
+    .map((element) => Number(element.id.replace("img-", "")))
+    .filter(Boolean);
   let pickedLeagues = [];
 
   // Initialize pickedLeagues based on query param or default
   if (leagueParam) {
     pickedLeagues.push(...leagueIDs);
+  } else if (preselectedLeagueIds.length > 0) {
+    pickedLeagues.push(...new Set(preselectedLeagueIds));
   } else if (!admin && typeof defaultLeagues !== "undefined") {
     pickedLeagues.push(
-      ...(Array.isArray(defaultLeagues) ? defaultLeagues : [defaultLeagues])
+      ...new Set(Array.isArray(defaultLeagues) ? defaultLeagues : [defaultLeagues])
     );
   }
 
@@ -283,7 +297,6 @@ export function addLeagues(lp, admin = false) {
   }
 
   function selectLeague(evt, param = "pleague") {
-    console.log("ide");
     evt.currentTarget.classList.toggle("selected-league");
     let dasID = parseInt(evt.currentTarget.id.replace("img-", ""));
     if (!pickedLeagues.includes(dasID)) {
@@ -291,6 +304,7 @@ export function addLeagues(lp, admin = false) {
     } else {
       pickedLeagues.splice(pickedLeagues.indexOf(dasID), 1);
     }
+    pickedLeagues = [...new Set(pickedLeagues)];
 
     if (admin) {
       if (!selectedLeagues.includes(dasID)) {

@@ -1,0 +1,65 @@
+<table style="border-collapse: collapse; border: 3px solid #1D3557;" border="1" id="match-list">
+    <thead>
+        <tr class="main-table-header">
+            <th colspan="9">Matches</th>
+            <th>&#x23F2;</th>
+            <th>&#9917;</th>
+            <th>&#x1F45F;</th>
+            <th>&#x2605;</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each matches}}
+        <tr data-round="{{this.league.round}}">
+            <td>
+                <img width=40 class="match-list-comp-logo" src="images/competitions/{{this.league.id}}.png" />
+            </td>
+            <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+                {{formatDateOnly fixture.date}}
+            </td>
+            <td class="match-list-team-name-td" style="border-right: 0; padding-right: 0px;" id="{{teams.home.id}}"
+                onclick="window.location.href='team?ID={{teams.home.id}}'">
+                {{teams.home.name}}
+            </td>
+
+            <td class="match-list-logo-td" style="border-left: 0;"
+                onclick="window.location.href='team?ID={{teams.home.id}}'">
+                <img class="match-list-team-logo" src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}"
+                    width="44px">
+            </td>
+
+            <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+                {{goals.home}}
+            </td>
+
+            <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+                -
+            </td>
+
+            <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+                {{goals.away}}
+            </td>
+
+            <td class="match-list-logo-td" style="border-right: 0;"
+                onclick="window.location.href='team?ID={{teams.away.id}}'">
+                <img class="match-list-team-logo" src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}"
+                    width="44px">
+            </td>
+
+            <td class="match-list-team-name-td" style="text-align:left; border-left: 0; padding-left: 0px;"
+                id="{{teams.away.id}}" onclick="window.location.href='team?ID={{teams.away.id}}'">
+                {{teams.away.name}}
+            </td>
+            <td class="center-td">{{this.statistics.games.minutes}}</td>
+            <td class="center-td">{{zeroDefault this.statistics.goals.total}}</td>
+            <td class="center-td">{{zeroDefault this.statistics.goals.assists}}</td>
+            <td class="center-td {{ratingClass this.statistics.games.rating}}">
+                {{this.statistics.games.rating}}
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<script>
+</script>

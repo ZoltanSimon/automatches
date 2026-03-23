@@ -329,7 +329,7 @@ export async function getAllMatchesFromDbUntilDate(givenDate) {
     const [rows] = await pool.query(
       `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
        FROM matches
-        WHERE match_date < ?
+        WHERE match_date < ? AND status <> 'PST'
        ORDER BY match_date ASC`,
       [givenDate],
     );

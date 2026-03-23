@@ -42,7 +42,7 @@ export class Player {
     this.exactPositions = [];
   }
 
-  getPlayerStats(playerFound) {
+  getPlayerStats(playerFound, league) {
     let stats = playerFound.statistics[0];
 
     if (stats.goals.total) {
@@ -78,6 +78,15 @@ export class Player {
     if (stats.cards.red) this.redCards += stats.cards.red;
     if (stats.penalty.missed) this.penaltiesMissed += stats.penalty.missed;
 
+    // Add competition (id + name) to competitionList if not already present
+    if (league && league.id && league.name) {
+      const leagueId = Number(league.id);
+      const exists = this.competitionList.some((comp) => Number(comp.id) === leagueId);
+      if (!exists) {
+        this.competitionList.push({ id: leagueId, name: league.name });
+      }
+    }
+
     this.getGAper90();
   }
 
@@ -86,7 +95,7 @@ export class Player {
     this.shots = `${this.shotsOn} / ${this.shotsTotal}`;
     this.dribbles = `${this.dribblesSucc} / ${this.dribblesAttempts}`;
     this.duels = `${this.duelsWon} / ${this.duelsTotal}`;
-    this.competitions = this.competitionList.join(", ");
+    this.competitions = this.competitionList.map((comp) => comp.name).join(", ");
     this.avRating = (this.rating / this.apps).toFixed(2);
     this.npg = this.goals - this.penalties;
   }

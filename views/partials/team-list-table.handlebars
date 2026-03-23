@@ -83,10 +83,10 @@
     {{#each teams as |thisTeam|}}
     <tr>
       <td style="padding:4px; border-right:none; cursor:pointer"
-        onclick="window.location.href='/team?teamID={{thisTeam.id}}'">
+        onclick="window.location.href='/team?ID={{thisTeam.id}}'">
         <img src="images/logos/{{thisTeam.id}}.png" class="logo-picture" />
       </td>
-      <td class="team-name" style="cursor:pointer" onclick="window.location.href='/team?teamID={{thisTeam.id}}'">
+      <td class="team-name" style="cursor:pointer" onclick="window.location.href='/team?ID={{thisTeam.id}}'">
         {{thisTeam.name}}</td>
       <td style="padding: 0px;" data-stat="form">
         <div style="display: flex; align-items: center; height: 100%;">

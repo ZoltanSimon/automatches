@@ -28,6 +28,7 @@ import {
   getPlayerList,
   insertAllPlayers,
   getPlayerByID,
+  getPlayerDetails,
 } from "./services/players-service.js";
 import { matchesOnDay, matchesInRound, lastMatchesFromLeague, allTeamMatches } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
@@ -98,7 +99,7 @@ app.get("/", async (req, res) => {
       selectedTLeagues: selectedTeamLeague,
       selectedSLeague: selectedStandingsLeague,
       teams: teams.slice(0, 10),
-      standingsLink: `/league?league=${selectedStandingsLeague}`,
+      standingsLink: `/league?id=${selectedStandingsLeague}`,
       standings: standings 
     });
   } catch (error) {
@@ -138,7 +139,7 @@ app.get("/top-teams", async (req, res) => {
 });
 
 app.get("/team", async (req, res) => {
-  let thisTeam = allDBTeams.find(t => t.ID == req.query.teamID);
+  let thisTeam = allDBTeams.find(t => t.ID == req.query.ID);
   const registry = await getRegistry();
   let fullTeamList = extractTeams(registry, null, [], thisTeam.ID);
   let teamStats = fullTeamList.filter(team => 
@@ -180,7 +181,7 @@ app.get("/ucl-last-round", async (req, res) => {
 
 app.get("/league", async (req, res) => {
   try {
-    const parsed = parseFloat(req.query.league);
+    const parsed = parseFloat(req.query.id);
     const selectedLeague = isNaN(parsed) ? 39 : parsed;
 
     const registry = await getRegistry();
@@ -245,6 +246,53 @@ app.get("/match", async (request, response) => {
   });
 });
 
+app.get("/player", async (request, response) => {
+  try {
+    const playerID = request.query.id;
+    if (!playerID) {
+      return response.status(400).render("player", {
+        title: "Player",
+        error: "id query parameter required",
+      });
+    }
+
+    const registry = await getRegistry(); // reuse cached registry
+    const allDetails = getPlayerDetails(registry, playerID, []);
+
+    if (!allDetails) {
+      return response.status(404).render("player", {
+        title: "Player Not Found",
+        error: "Player not found",
+      });
+    }
+
+    const availableLeagueIds = allDetails.player.competitionList.map((competition) => competition.id);
+    const hasLeagueQuery = Object.prototype.hasOwnProperty.call(request.query, "pleague");
+    const requestedLeagueIds = hasLeagueQuery
+      ? [...new Set(
+        String(request.query.pleague)
+        .split(",")
+        .map((id) => Number(id.trim()))
+        .filter(Boolean)
+      )]
+      : availableLeagueIds;
+    const filteredLeagueIds = requestedLeagueIds.filter((leagueId) => availableLeagueIds.includes(leagueId));
+    const selectedLeague = filteredLeagueIds.length > 0 ? filteredLeagueIds : availableLeagueIds;
+
+    const details = getPlayerDetails(registry, playerID, selectedLeague);
+
+    response.render("player", {
+      title: details.player.name,
+      player: details.player,
+      matches: details.matches,
+      leagues: allDetails.player.competitionList || [],
+      selectedPLeagues: selectedLeague,
+    });
+  } catch (error) {
+    handleError(response, error, "Error loading player page");
+  }
+});
+
 app.get("/starting11", (req, res) => {
   res.render("palya", { title: "Starting 11 Builder" });
 });
@@ -259,9 +307,6 @@ app.get("/about", (req, res) => {
 
 app.get("/compare-players", (req, res) => {
   res.render("compare-players", { title: "Compare Players" });
-});
-
-app.get("/player", async (request, response) => {
 });
 
 app.get("/status", (request, response) => {
@@ -334,7 +379,6 @@ console.log(`Total missing matches across leagues ${leagueIDs.join(", ")}: ${mat
 app.get("/all-missing-matches", async (request, response) => {
   let matchArr = [];
   const today = new Date().toISOString().split('T')[0];
-  getAllMatchesFromDbUntilDate(today);
   let data = await getAllMatchesFromDbUntilDate(today);
   for (const element of data) {
     try {

@@ -8,6 +8,7 @@ import {
   hideColumn,
   showColumn,
   adjustColspan,
+  sortTable,
 } from "../common-functions.js";
 
 const tableName = "player-list-table";
@@ -39,29 +40,24 @@ export function playerGoalList(big, noOfDisplayed = 300) {
     //loadClubLogo(player.nation);
   });
 
-document.querySelectorAll(`#${tableName} th`).forEach(header => {
+document.querySelectorAll(`#${tableName} th.sortable`).forEach(header => {
   header.addEventListener("click", function () {
-    console.log(`Header ${this.innerText} clicked`);
-    const stat = this.getAttribute("data-stat");
-    const currentOrder = this.getAttribute("data-order") || "desc";
+    const currentOrder = this.getAttribute("data-default-order") || "desc";
     const newOrder = currentOrder === "asc" ? "desc" : "asc";
 
-    this.setAttribute("data-order", newOrder);
-
-    document.querySelectorAll(`#${tableName} th`).forEach(h => h.classList.remove("asc", "desc"));
-
+    this.setAttribute("data-default-order", newOrder);
+    document.querySelectorAll(`#${tableName} th.sortable`).forEach(h => h.classList.remove("asc", "desc"));
     this.classList.add(newOrder);
 
-    displayedPlayers.sort((a, b) => {
-      if (a[stat] === b[stat]) return 0;
-      if (newOrder === "asc") {
-        return a[stat] > b[stat] ? 1 : -1;
-      } else {
-        return a[stat] < b[stat] ? 1 : -1;
-      }
-    });
+    // Convert header index to actual table cell index accounting for colspan
+    const headerCells = Array.from(this.parentElement.children);
+    const headerIndex = headerCells.indexOf(this);
+    const columnIndex = headerCells
+      .slice(0, headerIndex)
+      .reduce((sum, th) => sum + (Number(th.colSpan) || 1), 0);
 
-    updateTable(tableName, displayedPlayers.slice(0, noOfDisplayed));
+    sortTable(columnIndex, this, table, 1);
+
     updateTableVisibility();
   });
 });
@@ -216,57 +212,5 @@ function updateTableVisibility() {
         showColumn(el.dataset.stat);
       }
     }
-  });
-}
-
-export function updateTable(tableName, sortedPlayers) {
-  const tbody = document.querySelector(`#${tableName} tbody`);
-  tbody.innerHTML = "";
-
-  sortedPlayers.forEach((player, index) => {
-    const row = document.createElement("tr");
-    row.style.display = index < 100 ? "table-row" : "none";
-
-    row.innerHTML = `
-          <td id="${player.id}" class="stat-td" style="padding:0; border-right: none;">
-            <img class="player-picture" src="images/player-pictures/${player.id}.png" onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
-          </td>
-          <td id="${player.nation}" class="player-country">
-            <img height="30" src="images/logos/${player.nation}.png" />
-          </td>
-          <td class="sec-stats">
-            <div class="player-name">${player.name}</div>
-            <div class="player-position">${player.position}</div>
-          </td>
-          <td id="${player.club}" class="stat-td">
-            <img class="logo-picture" src="images/logos/${player.club}.png" />
-          </td>
-          <td class="stat-td" data-stat="apps">${player.apps}</td>
-          <td class="stat-td" data-stat="goals">${player.goals}</td>
-          <td class="stat-td" data-stat="npg">${player.npg}</td>
-          <td class="stat-td" data-stat="assists">${player.assists}</td>
-          <td class="stat-td" data-stat="ga">${player.ga}</td>
-          <td class="stat-td" data-stat="gap90">${player.gap90}</td>
-          <td class="stat-td" data-stat="avRating">${player.avRating}</td>
-          <td class="stat-td" data-stat="minutes">${player.minutes}</td>
-          <td class="stat-td" data-stat="pens">${player.penalties}</td>
-          <td class="stat-td" data-stat="penaltiesMissed">${player.penaltiesMissed}</td>
-          <td class="stat-td" data-stat="shotsTotal">${player.shotsTotal}</td>
-          <td class="stat-td" data-stat="shotsOn">${player.shotsOn}</td>
-          <td class="stat-td" data-stat="dribblesAttempts">${player.dribblesAttempts}</td>
-          <td class="stat-td" data-stat="dribblesSucc">${player.dribblesSucc}</td>
-          <td class="stat-td" data-stat="dribblesPast">${player.dribblesPast}</td>
-          <td class="stat-td" data-stat="duelsTotal">${player.duelsTotal}</td>
-          <td class="stat-td" data-stat="duelsWon">${player.duelsWon}</td>
-          <td class="stat-td" data-stat="keyPasses">${player.keyPasses}</td>
-          <td class="stat-td" data-stat="foulsAgainst">${player.foulsAgainst}</td>
-          <td class="stat-td" data-stat="foulsCommited">${player.foulsCommited}</td>
-          <td class="stat-td" data-stat="blocks">${player.blocks}</td>
-          <td class="stat-td" data-stat="interceptions">${player.interceptions}</td>
-          <td class="stat-td" data-stat="tackles">${player.tackles}</td>
-          <td class="stat-td" data-stat="yellowCards">${player.yellowCards}</td>
-          <td class="stat-td" data-stat="redCards">${player.redCards}</td>
-      `;
-    tbody.appendChild(row);
   });
 }
