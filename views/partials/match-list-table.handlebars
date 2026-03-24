@@ -3,7 +3,7 @@
     <tr class="main-table-header">
 
       {{#if groupedMatches}}
-      <th colspan="6">{{currentDate}}</th>
+      <th colspan="6">Today's Matches</th>
       <th colspan="3">
         <form method="get" action="/"
           style="display: flex; justify-content: flex-end; align-items: center; height: 100%; margin: 0; padding: 0;">
@@ -13,7 +13,8 @@
         </form>
       </th>
       {{else}}
-      <th colspan="3">Matches</th>   
+      {{#if matches}}
+      <th colspan="3">Matches</th>
       <th colspan="5">
         {{#if currentRound}}
         <div style="display: flex; align-items: center; justify-content: flex-end;">
@@ -26,6 +27,17 @@
           </select>
           <button onclick="navigateRound(1)" class="more-button input-change-arrow right">&#9658;</button>
         </div>
+        {{/if}}
+      </th>
+      {{else}}
+      <th colspan="6">Today's Matches</th>
+      <th colspan="3">
+        <form method="get" action="/"
+          style="display: flex; justify-content: flex-end; align-items: center; height: 100%; margin: 0; padding: 0;">
+          <button onclick="navigateDate(-1)" class="more-button input-change-arrow left">&#9668;</button>
+          <input type="date" id="matchDate" class="gf-input" name="date" value="{{selectedDate}}" onchange="this.form.submit()" />
+          <button onclick="navigateDate(1)" class="more-button input-change-arrow right">&#9658;</button>
+        </form>
       </th>
       {{/if}}
       {{/if}}
@@ -88,7 +100,13 @@
       </td>
     </tr>
     {{/each}}
-    {{/each}}
+    {{else}}
+    <tr>
+      <td colspan="8" style="text-align:center; font-weight:bold; padding: 16px;">
+        No matches to display for the day
+      </td>
+    </tr>
+      {{/each}}
     {{else}}
     {{#each matches}}
     <tr data-round="{{this.league.round}}">
@@ -132,6 +150,12 @@
       <td class="match-list-team-name-td" style="text-align:left" id="{{teams.away.id}}"
         onclick="window.location.href='team?ID={{teams.away.id}}'">
         {{teams.away.name}}
+      </td>
+    </tr>
+    {{else}}
+    <tr>
+      <td colspan="8" style="text-align:center; font-weight:bold; padding: 16px;">
+        No matches to display for the day
       </td>
     </tr>
     {{/each}}

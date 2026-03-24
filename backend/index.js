@@ -90,7 +90,8 @@ app.get("/", async (req, res) => {
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
 
     res.render("home", {
-      title: "generationFootball",
+      title: "Generation Football - Football Stats, Players & Teams",
+      description: "Explore live football standings, detailed team stats and league tables across Europe on Generation Football.",
       players,
       groupedMatches: groupByLeague(matches),
       selectedDate: selectedDate.toISOString().split("T")[0],
@@ -115,6 +116,7 @@ app.get("/players", async (req, res) => {
 
     res.render("players", {
       title: "Players",
+      description: "Discover detailed football player stats, performance metrics and league comparisons on Generation Football's Players page.",
       players,
       leagues: allDBLeagues.filter(league => league.type === 'league'),
       selectedPLeagues: selectedLeague,
@@ -132,6 +134,7 @@ app.get("/top-teams", async (req, res) => {
 
   res.render("top-teams", { 
     title: "Teams",
+    description: "Explore detailed football team stats, performance metrics and league comparisons on Generation Football's Teams page.",
     teams: teams.slice(0,150),
     leagues: allDBLeagues.filter(league => league.type === 'league'),
      selectedTLeagues: selectedTeamLeague,
@@ -150,6 +153,7 @@ app.get("/team", async (req, res) => {
   let matchesToShow = allTeamMatches(registry, thisTeam.ID, null, false).sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
   res.render("team", { 
     title: thisTeam ? thisTeam.name : "Team",
+    description: `Explore detailed stats, recent matches and league performance for ${thisTeam ? thisTeam.name : "this team"} on Generation Football's Team page.`,
     thisTeam: thisTeam,
     players: getPlayerList(registry, 100, thisTeam.ID),
     matches: matchesToShow, 
@@ -162,6 +166,8 @@ app.get("/admin", async (req, res) => {
   try {
     res.render("admin", {
       title: "Automatches",
+      description: "Manage automated match simulations and player data on Generation Football's Admin page.",
+
       players: getPlayerList(registry, 300, req.query.team),
       leagues: allDBLeagues,
     });
@@ -175,6 +181,7 @@ app.get("/ucl-last-round", async (req, res) => {
   let matches = await matchesInRound(8, 2);
   res.render("ucl-last-round", { 
     title: "UCL Last Round simulation",
+    description: "Simulate the last round of the UEFA Champions League and explore match outcomes on Generation Football's UCL Last Round page.",
     matches, 
   });
 });
@@ -193,6 +200,8 @@ app.get("/league", async (req, res) => {
 
     res.render("league", {
       title: "League",
+      description: `Explore detailed stats, recent matches and league performance for ${leagueInfo ? leagueInfo.name : "this league"} on Generation Football's League page.`,
+
       players,
       matches: (matches),
       standings: standings,
@@ -240,6 +249,7 @@ app.get("/match", async (request, response) => {
   }
   response.render("match", { 
     title: "Match Details", 
+    description: `Explore detailed stats, player performances and match events for this football match on Generation Football's Match page.`,
     matchID, 
     teamList,
     matchInfo: currentMatch 
@@ -283,6 +293,7 @@ app.get("/player", async (request, response) => {
 
     response.render("player", {
       title: details.player.name,
+      description: `Explore detailed stats, recent matches and league performance for ${details.player.name} on Generation Football's Player page.`,
       player: details.player,
       matches: details.matches,
       leagues: allDetails.player.competitionList || [],
@@ -294,19 +305,19 @@ app.get("/player", async (request, response) => {
 });
 
 app.get("/starting11", (req, res) => {
-  res.render("palya", { title: "Starting 11 Builder" });
+  res.render("starting11", { title: "Starting 11 Builder", description: "Build and explore the best starting 11 lineups for your favorite football teams on Generation Football's Starting 11 page." });
 });
 
 app.get("/privacy-policy", (req, res) => {
-  res.render("privacy-policy", { title: "Privacy Policy" });
+  res.render("privacy-policy", { title: "Privacy Policy", description: "Read Generation Football's Privacy Policy to understand how we handle your data and protect your privacy." });
 });
 
 app.get("/about", (req, res) => {
-  res.render("about", { title: "About Page" });
+  res.render("about", { title: "About Page", description: "Learn more about Generation Football, our mission, and the team behind the platform." });
 });
 
 app.get("/compare-players", (req, res) => {
-  res.render("compare-players", { title: "Compare Players" });
+  res.render("compare-players", { title: "Compare Players", description: "Compare detailed stats, performance metrics, and league performance for multiple football players on Generation Football's Compare Players page." });
 });
 
 app.get("/status", (request, response) => {
