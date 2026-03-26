@@ -36,13 +36,15 @@ export const formatDate = (date) => {
     hour12: true
   });
 };
+
 export const formatDateOnly = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
+  return new Date(date).toLocaleDateString('en-GB', {
     year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
+    month: '2-digit',
+    day: '2-digit'
+  }).replace(/\//g, '.');
 }
+
 export const percentage = (wins, played) => {
   return ((wins / played) * 100).toFixed(1);
 }

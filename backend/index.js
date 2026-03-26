@@ -3,14 +3,15 @@ import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
-import { getResultsDate } from "../webapi-handler.js";
+import { getResultsDate, getPlayers } from "../webapi-handler.js";
 import {
   getMatchFromServer,
   matchesDir,
   writeLeagueToServer,
   buildTeamList,
   getLeagueFromServer,
-  saveMatchToServer
+  saveMatchToServer,
+  dataDir
 } from "./json-reader.js";
 import {
   getLeagueFromDb,
@@ -49,6 +50,10 @@ const corsOptions = {
 };
 const partialsPath = path.join(__dirname, "../views/partials");
 export let allDBPlayers, allDBTeams, allDBLeagues;
+let playersFetchJob = {
+  running: false,
+  nextPage: 46,
+};
 
 app.engine(
   "handlebars",
@@ -112,7 +117,7 @@ app.get("/players", async (req, res) => {
   try {
     const selectedLeague = parseLeagueIds(req.query.pleague);
     const registry = await buildMatchRegistry(selectedLeague);
-    const players = getPlayerList(registry, 300, req.query.team);
+    const players = getPlayerList(registry, 500, req.query.team);
 
     res.render("players", {
       title: "Players",
@@ -188,7 +193,7 @@ app.get("/ucl-last-round", async (req, res) => {
 
 app.get("/league", async (req, res) => {
   try {
-    const parsed = parseFloat(req.query.id);
+    const parsed = parseFloat(req.query.ID);
     const selectedLeague = isNaN(parsed) ? 39 : parsed;
 
     const registry = await getRegistry();
@@ -453,6 +458,97 @@ app.get("/get-player-list", async (request, response) => {
   const playerList = getPlayerList(registry, 300);
   response.json(playerList);
 });
+
+/*app.get("/get-players", async (request, response) => {
+  if (request.query.stop === "true") {
+    playersFetchJob.running = false;
+    console.log("[get-players] Stop requested. Background fetch loop will halt after current iteration.");
+    return response.json({
+      success: true,
+      message: "Stop requested for get-players background loop.",
+      nextPage: playersFetchJob.nextPage,
+    });
+  }
+
+  if (playersFetchJob.running) {
+    return response.json({
+      success: true,
+      message: "get-players background loop is already running.",
+      nextPage: playersFetchJob.nextPage,
+    });
+  }
+
+  try {
+    playersFetchJob.running = true;
+    if (request.query.startPage) {
+      const parsedStart = Number(request.query.startPage);
+      if (!Number.isNaN(parsedStart) && parsedStart > 0) {
+        playersFetchJob.nextPage = parsedStart;
+      }
+    }
+
+    const playersDir = `${dataDir}players`;
+    if (!fs.existsSync(playersDir)) {
+      fs.mkdirSync(playersDir, { recursive: true });
+    }
+
+    const baseQuery = { ...request.query };
+    delete baseQuery.page;
+    delete baseQuery.stop;
+    delete baseQuery.startPage;
+
+    console.log(
+      `[get-players] Starting background fetch loop at page ${playersFetchJob.nextPage}. Interval: 10s.`
+    );
+
+    (async function runLoop() {
+      while (playersFetchJob.running) {
+        const page = playersFetchJob.nextPage;
+        const startedAt = new Date().toISOString();
+
+        try {
+          console.log(`[get-players] Fetching page ${page} at ${startedAt}`);
+          const players = await getPlayers({ ...baseQuery, page });
+          const filename = `${playersDir}/players${page}.json`;
+          fs.writeFileSync(filename, JSON.stringify(players, null, 2));
+
+          const resultCount = typeof players?.results === "number"
+            ? players.results
+            : Array.isArray(players?.response)
+              ? players.response.length
+              : "unknown";
+
+          console.log(
+            `[get-players] Saved page ${page} -> ${filename} (results: ${resultCount})`
+          );
+
+          playersFetchJob.nextPage += 1;
+        } catch (error) {
+          console.error(`[get-players] Error on page ${page}:`, error);
+          playersFetchJob.running = false;
+          break;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+      }
+
+      console.log(
+        `[get-players] Background loop stopped. Next page is ${playersFetchJob.nextPage}.`
+      );
+    })();
+
+    response.json({
+      success: true,
+      message: "Started get-players background loop.",
+      intervalSeconds: 10,
+      startPage: playersFetchJob.nextPage,
+    });
+  } catch (error) {
+    playersFetchJob.running = false;
+    console.error("Error fetching players profiles:", error);
+    response.status(500).json({ success: false, message: "Failed to fetch players profiles" });
+  }
+});*/
 
 app.get("/match-exists", async (request, response) => {
   let matchID = request.query.matchID;

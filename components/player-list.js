@@ -1,8 +1,4 @@
-import {
-  buildTableForTableType,
-  imgs,
-  ctx,
-} from "../instapics.js";
+import { buildTableForTableType, imgs, ctx } from "../instapics.js";
 import {
   removeNewlines,
   hideColumn,
@@ -15,24 +11,24 @@ const tableName = "player-list-table";
 const table = document.getElementById(tableName);
 const checkboxes = document.querySelectorAll("input[name='statSelector']");
 
-export function playerGoalList(big, noOfDisplayed = 300) {
+export function playerGoalList(big) {
   const tableBody = table.getElementsByTagName("tbody")[0];
 
   window.addEventListener("resize", () =>
-    adjustColspan(table.rows[0].cells[0], 2)
+    adjustColspan(table.rows[0].cells[0], 2),
   );
   adjustColspan(table.rows[0].cells[0], 2);
 
   if (!tableBody) {
     console.error(
-      "Table body not found! Ensure the table has a <tbody> element."
+      "Table body not found! Ensure the table has a <tbody> element.",
     );
     return;
   } else {
     table.style.visibility = "visible";
   }
 
-    document.getElementById("statSelectorContainer").style.display = "none";
+  document.getElementById("statSelectorContainer").style.display = "none";
 
   displayedPlayers.forEach((player) => {
     //loadPlayerFace(player.id);
@@ -40,32 +36,32 @@ export function playerGoalList(big, noOfDisplayed = 300) {
     //loadClubLogo(player.nation);
   });
 
-document.querySelectorAll(`#${tableName} th.sortable`).forEach(header => {
-  header.addEventListener("click", function () {
-    const currentOrder = this.getAttribute("data-default-order") || "desc";
-    const newOrder = currentOrder === "asc" ? "desc" : "asc";
+  document.querySelectorAll(`#${tableName} th.sortable`).forEach((header) => {
+    header.addEventListener("click", function () {
+      const currentOrder = this.getAttribute("data-default-order") || "desc";
+      const newOrder = currentOrder === "asc" ? "desc" : "asc";
 
-    this.setAttribute("data-default-order", newOrder);
-    document.querySelectorAll(`#${tableName} th.sortable`).forEach(h => h.classList.remove("asc", "desc"));
-    this.classList.add(newOrder);
+      this.setAttribute("data-default-order", newOrder);
+      document
+        .querySelectorAll(`#${tableName} th.sortable`)
+        .forEach((h) => h.classList.remove("asc", "desc"));
+      this.classList.add(newOrder);
 
-    // Convert header index to actual table cell index accounting for colspan
-    const headerCells = Array.from(this.parentElement.children);
-    const headerIndex = headerCells.indexOf(this);
-    const columnIndex = headerCells
-      .slice(0, headerIndex)
-      .reduce((sum, th) => sum + (Number(th.colSpan) || 1), 0);
+      // Convert header index to actual table cell index accounting for colspan
+      const headerCells = Array.from(this.parentElement.children);
+      const headerIndex = headerCells.indexOf(this);
+      const columnIndex = headerCells
+        .slice(0, headerIndex)
+        .reduce((sum, th) => sum + (Number(th.colSpan) || 1), 0);
 
-    sortTable(columnIndex, this, table, 1);
+      sortTable(columnIndex, this, table, 1);
 
-    updateTableVisibility();
+      updateTableVisibility();
+    });
   });
-});
-
-
 
   checkboxes.forEach((checkbox) =>
-    checkbox.addEventListener("change", updateTableVisibility)
+    checkbox.addEventListener("change", updateTableVisibility),
   );
 
   updateTableVisibility();
@@ -95,9 +91,7 @@ document.querySelectorAll(`#${tableName} th.sortable`).forEach(header => {
     loadMoreBtn.style.visibility = "visible";
 
     loadMoreBtn.addEventListener("click", function () {
-      console.log("Load More clicked");
       let newVisible = currentVisible + rowsPerPage;
-
       rows.forEach((row, index) => {
         if (index < newVisible) {
           row.style.display = "";
@@ -196,7 +190,7 @@ export function playerListToCanvas() {
   buildTableForTableType(
     removeNewlines(playerListTable.outerHTML),
     imgToAdd,
-    110
+    110,
   );
   ctx.fillStyle = "#e63946";
 }
@@ -212,5 +206,9 @@ function updateTableVisibility() {
         showColumn(el.dataset.stat);
       }
     }
+  });
+
+  document.querySelectorAll(`#${tableName} tbody tr`).forEach((row, index) => {
+    row.style.display = index < 200 ? "" : "none";
   });
 }

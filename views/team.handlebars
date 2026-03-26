@@ -8,7 +8,7 @@
         </div>
         <div class="team-info">
             {{#each teamStats.[0].leagues}}
-            <div onclick="window.location.href='/league?league={{this.id}}'" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <div onclick="window.location.href='/league?ID={{this.id}}'" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
                 <img src="images/competitions/{{this.id}}.png" class="logo-picture" />
                 <span>{{this.name}}</span>
             </div>
@@ -48,8 +48,14 @@
         <span hidden id="league-name"></span>
         <span hidden id="league-id"></span>
         <span hidden id="round-no"></span>
-        <div id="fixtures-info" class="table-container"></div>
-        {{> match-list-table}}
+        <div id="fixtures-info" class="table-container">
+            {{> match-list-table}}
+        </div>
+    </div>
+    <div class="rectangle" style="padding: 8px;">
+        <span>{{thisTeam.name}} is a football club which featured in the following competitions this season: {{#each teamStats.[0].leagues}} {{this.name}},
+            {{/each}} having {{teamStats.[0].wins}} wins, {{teamStats.[0].draws}} draws, and {{teamStats.[0].losses}} losses. They've scored a total of {{teamStats.[0].total.goals}}, from {{teamStats.[0].total.xG}} expected goals, conceding {{teamStats.[0].total.goalsAgainst}} goals from {{teamStats.[0].total.xGA}} expected goals. <br/><br/>
+        If you are interested in the featured competitions, click on the competition icons next to the team's logo and name. You can also click on the matches to see more details about them, or on the players to see their respective pages.   </span>
     </div>
     <div class="rectangle">
         <h2>Top Players</h2>

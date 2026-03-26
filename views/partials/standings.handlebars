@@ -18,7 +18,7 @@
     <tr data-id="{{thisTeam.id}}">
       <td style="padding:6px; text-align: center; font-weight: bold">{{increment @index}}</td>
       <td style="width:36px; padding: 2px; text-align: center;">
-        <img src="images/logos/{{thisTeam.id}}.png" class="logo-picture" alt="{{thisTeam.name}}" width="40px" style="cursor:pointer" onclick="window.location.href='/team?ID={{thisTeam.id}}'"/>
+        <img src="images/logos/{{thisTeam.id}}.png" class="logo-picture" alt="{{thisTeam.name}}" title="{{thisTeam.name}}" width="40px" style="cursor:pointer" onclick="window.location.href='/team?ID={{thisTeam.id}}'" />
       </td>
       <td style="border-left-style: hidden; padding: 2px; cursor:pointer;" onclick="window.location.href='/team?ID={{thisTeam.id}}'">{{thisTeam.name}}</td>
       <td class="player-country" style="padding:4px; text-align: center;">{{thisTeam.played}}</td>

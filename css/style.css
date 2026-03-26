@@ -1104,6 +1104,10 @@ td .form-indicator:last-child {
   .team-page-header > div:nth-child(n) {
     width: 40%;
   }
+  .input-change-arrow {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
 }
 @media (width < 660px) {
   th,

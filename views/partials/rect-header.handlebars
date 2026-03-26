@@ -12,7 +12,7 @@
   </div>
   <div class="rect-league-list" id="league-list-league">
     {{#each leagues}}
-    <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" class="{{../leaguepar}}-league-to-select{{#if (includesID ../selectedLeagues this.id)}} selected-league{{/if}}" />
+    <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}" class="{{../leaguepar}}-league-to-select{{#if (includesID ../selectedLeagues this.id)}} selected-league{{/if}}" />
     {{/each}}
   </div>
   <div class="rect-expand-league-list"><a href="#" class="more-link more-button">Leagues</a></div>

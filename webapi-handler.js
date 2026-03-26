@@ -151,3 +151,35 @@ export async function getSquad(teamID) {
   console.log(data);
   return data;
 }
+
+export async function getPlayers(params = {}) {
+  let url = "https://v3.football.api-sports.io/players/profiles";
+
+  // Build query string from params object
+  const queryParams = new URLSearchParams();
+  if (params.playerID) {
+    queryParams.append('player', params.playerID);
+  }
+  // Add any other params (like page, season, etc.)
+  for (const [key, value] of Object.entries(params)) {
+    if (key !== 'playerID' && value) {
+      queryParams.append(key, value);
+    }
+  }
+
+  const queryString = queryParams.toString();
+  if (queryString) {
+    url = `${url}?${queryString}`;
+  } 
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "x-rapidapi-host": rapidApiHost,
+      "x-rapidapi-key": rapidApiKey,
+    },
+  });
+  const data = await response.json();
+  return data;
+}
+
