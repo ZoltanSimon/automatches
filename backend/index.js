@@ -11,7 +11,7 @@ import {
   buildTeamList,
   getLeagueFromServer,
   saveMatchToServer,
-  dataDir
+  saveMatchesToServer
 } from "./json-reader.js";
 import {
   getLeagueFromDb,
@@ -31,7 +31,7 @@ import {
   getPlayerByID,
   getPlayerDetails,
 } from "./services/players-service.js";
-import { matchesOnDay, matchesInRound, lastMatchesFromLeague, allTeamMatches } from "./services/matches-service.js";
+import { matchesOnDay, matchesInRound, lastMatchesFromLeague, allTeamMatches, buildMatchStatistics } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, defaultLeagues, getLeagueStandings } from "./services/leagues-service.js";
 import { parseDate, parseLeagueIds, handleError } from "./backend-helper.js";
@@ -225,39 +225,39 @@ app.get("/league", async (req, res) => {
 });
 
 app.get("/match", async (request, response) => {
-  let matchID = request.query.matchID;
-  let teamList = [];
+  const { matchID } = request.query;
+  const matchKey = Number.isNaN(Number(matchID)) ? matchID : Number(matchID);
 
   const registry = await getRegistry();
+  const currentMatch = registry.matchByID.get(matchKey) ?? registry.fixtures.find(f => f.fixture.id == matchID);
 
-  // Get the match details from the registry - try completed matches first, fall back to fixtures
-  let currentMatch = registry.matchByID.get(matchID) || registry.fixtures.find(f => f.fixture.id == matchID);
-  
-  if (currentMatch) { 
-    let allMatches = await allTeamMatches(registry, currentMatch.teams.home.id, currentMatch.teams.away.id);
-    let fullTeamList = buildTeamList(allMatches);
+  let teamList = [];
+  let matchStatistics = [];
 
-    teamList = fullTeamList.filter(team => 
-      team.id === currentMatch.teams.home.id || team.id === currentMatch.teams.away.id
-    );
-    //make sure homeTeam is first in teamList
-    teamList.sort((a, b) => {
-      if (a.id === currentMatch.teams.home.id) return -1;
-      if (b.id === currentMatch.teams.home.id) return 1;
-      return 0;
-    });
+  if (currentMatch) {
+    const { home, away } = currentMatch.teams;
 
-    for (let team of teamList) {
-      team.matches.sort((a, b) => new Date(b.date) - new Date(a.date));
-      team.matches = team.matches.slice(0, 5);
-    }
+    const allMatches = await allTeamMatches(registry, home.id, away.id);
+    teamList = buildTeamList(allMatches)
+      .filter(team => team.id === home.id || team.id === away.id)
+      .sort((a, b) => (a.id === home.id ? -1 : b.id === home.id ? 1 : 0))
+      .map(team => ({
+        ...team,
+        matches: team.matches
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5),
+      }));
+
+    matchStatistics = buildMatchStatistics(currentMatch);
   }
-  response.render("match", { 
-    title: "Match Details", 
-    description: `Explore detailed stats, player performances and match events for this football match on Generation Football's Match page.`,
-    matchID, 
+
+  response.render("match", {
+    title: "Match Details",
+    description: "Explore detailed stats, player performances and match events for this football match on Generation Football's Match page.",
+    matchID,
     teamList,
-    matchInfo: currentMatch 
+    matchInfo: currentMatch,
+    matchStatistics,
   });
 });
 
@@ -408,18 +408,30 @@ app.get("/all-missing-matches", async (request, response) => {
   }
   console.log(`Total missing matches: ${matchArr.length}`);
 
-  //download the last 50 matches from matchArr and save them to the server, wait 7 seconds after one download to avoid hitting the API rate limit
-  const matchesToDownload = Math.min(50, matchArr.length);
-  for (let i = 0; i < matchesToDownload; i++) {
-    const match = matchArr[i];
-    const remaining = matchArr.length - (i + 1);
+  // Download the last 100 missing matches in batches of 20 fixture IDs per API request.
+  const matchesToDownload = Math.min(100, matchArr.length);
+  const batchSize = 20;
+  for (let i = 0; i < matchesToDownload; i += batchSize) {
+    const batch = matchArr.slice(i, i + batchSize);
+    const batchIds = batch.map((match) => String(match.fixtureId));
+    const remaining = matchesToDownload - (i + batch.length);
+
     try {
-      await saveMatchToServer(match.fixtureId);
-      console.log(`Saved match with ID: ${match.fixtureId} (${remaining} left)`);
+      const result = await saveMatchesToServer(batchIds);
+      console.log(
+        `Saved ${result.savedCount}/${batch.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`
+      );
+
+      if (result.failed.length > 0) {
+        console.warn("Failed matches in batch:", result.failed);
+      }
     } catch (err) {
-      console.error(`Error saving match with ID: ${match.fixtureId}`, err);
+      console.error(`Error saving match batch [${batchIds.join(",")}]`, err);
     }
-    await new Promise((resolve) => setTimeout(resolve, 7000));
+
+    if (remaining > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 7000));
+    }
   }
 
   console.log(`✅ Finished downloading ${matchesToDownload} matches. ${matchArr.length - matchesToDownload} matches still missing.`);

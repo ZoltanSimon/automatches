@@ -80,3 +80,47 @@ export const ratingClass = (rating) => {
   if (r >= 5) return 'rating-orange';
   return 'rating-red';
 }
+
+export const lineupPlayerRating = (matchPlayers, teamID, playerID) => {
+  if (!Array.isArray(matchPlayers)) return "";
+
+  const targetTeamID = Number(teamID);
+  const targetPlayerID = Number(playerID);
+
+  const teamData = matchPlayers.find(
+    (entry) => Number(entry?.team?.id) === targetTeamID
+  );
+  if (!teamData?.players) return "";
+
+  const playerData = teamData.players.find(
+    (entry) => Number(entry?.player?.id) === targetPlayerID
+  );
+  const rating = playerData?.statistics?.[0]?.games?.rating;
+  if (rating === null || rating === undefined || rating === "") return "";
+
+  const parsed = Number.parseFloat(rating);
+  return Number.isNaN(parsed) ? "" : parsed.toFixed(1);
+}
+
+export const teamAverageRating = (matchPlayers, teamID) => {
+  if (!Array.isArray(matchPlayers)) return "";
+
+  const targetTeamID = Number(teamID);
+  const teamData = matchPlayers.find(
+    (entry) => Number(entry?.team?.id) === targetTeamID
+  );
+  if (!teamData?.players) return "";
+
+  const ratings = teamData.players
+    .map((entry) => Number.parseFloat(entry?.statistics?.[0]?.games?.rating))
+    .filter((value) => !Number.isNaN(value));
+
+  if (ratings.length === 0) return "";
+
+  const sum = ratings.reduce((acc, value) => acc + value, 0);
+  return (sum / ratings.length).toFixed(1);
+}
+
+export const isFinishedStatus = (statusShort) => {
+  return ["FT", "AET", "PEN", "CANC", "PST"].includes(statusShort);
+}

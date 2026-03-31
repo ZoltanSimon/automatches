@@ -105,3 +105,23 @@ export function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkSta
 
   return results;
 }
+
+export function buildMatchStatistics(currentMatch) {
+  const { home, away } = currentMatch.teams;
+  const [rawA, rawB] = currentMatch.statistics ?? [];
+
+  const homeStats = rawA?.team?.id === home.id ? rawA : rawB;
+  const awayStats = rawB?.team?.id === away.id ? rawB : rawA;
+
+  const homeByType = new Map((homeStats?.statistics ?? []).map(s => [s.type, s.value]));
+  const awayByType = new Map((awayStats?.statistics ?? []).map(s => [s.type, s.value]));
+
+  const statDisplayNames = { expected_goals: "Expected Goals", goals_prevented: "Goals Prevented" };
+  const formatStat = v => (v === null || v === undefined || v === "" ? "-" : v);
+
+  return [...new Set([...homeByType.keys(), ...awayByType.keys()])].map(type => ({
+    type: statDisplayNames[type] ?? type,
+    homeValue: formatStat(homeByType.get(type)),
+    awayValue: formatStat(awayByType.get(type)),
+  }));
+}

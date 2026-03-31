@@ -245,6 +245,7 @@ export async function importLeague(leagueID) {
 
 export async function getLeagueFromDb(leagueIDs) {
   leagueIDs = Array.isArray(leagueIDs) ? leagueIDs : [leagueIDs];
+  const minMatchDate = "2025-08-01";
   const leagueConfigs = leagueIDs.map((leagueID) => ({
     leagueID,
     season:
@@ -260,11 +261,12 @@ export async function getLeagueFromDb(leagueIDs) {
       leagueID,
       season,
     ]);
+    params.push(minMatchDate);
 
     const [rows] = await pool.query(
       `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
        FROM matches
-       WHERE ${placeholders}
+       WHERE (${placeholders}) AND match_date >= ?
        ORDER BY match_date ASC`,
       params,
     );

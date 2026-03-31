@@ -3,7 +3,7 @@ import { networkPath } from "./config.js";
 import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
 import { importLeague } from "./data-access.js";
-import { getResultFromApi } from "../webapi-handler.js";
+import { getResultFromApi, getResultsFromApiByIds } from "../webapi-handler.js";
 import * as fsSync from 'fs';  // For synchronous/callback operations
 import fs from 'fs/promises';   // For async/await operations
 
@@ -252,4 +252,61 @@ export async function saveMatchToServer(fixtureID) {
     console.error("Error saving match:", err);
     throw err;
   }
+}
+
+export async function saveMatchesToServer(fixtureIDs) {
+  const ids = Array.isArray(fixtureIDs)
+    ? fixtureIDs.map((id) => String(id).trim()).filter(Boolean)
+    : String(fixtureIDs || "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+  if (ids.length === 0) {
+    return {
+      savedCount: 0,
+      saved: [],
+      failed: [],
+      limits: null,
+      matches: [],
+    };
+  }
+
+  if (ids.length > 20) {
+    throw new Error("A maximum of 20 fixture IDs can be saved in one batch.");
+  }
+
+  const { data, limits } = await getResultsFromApiByIds(ids);
+  const matches = Array.isArray(data?.response) ? data.response : [];
+  const byId = new Map(matches.map((match) => [String(match?.fixture?.id), match]));
+
+  const saved = [];
+  const failed = [];
+
+  for (const id of ids) {
+    const match = byId.get(String(id));
+    if (!match) {
+      failed.push({ fixtureID: id, error: "No match returned by API" });
+      continue;
+    }
+
+    try {
+      await fs.writeFile(
+        `${matchesDir}/${id}.json`,
+        JSON.stringify([match]),
+        { flag: "wx" }
+      );
+      saved.push(id);
+    } catch (error) {
+      failed.push({ fixtureID: id, error: error.message });
+    }
+  }
+
+  return {
+    savedCount: saved.length,
+    saved,
+    failed,
+    limits,
+    matches,
+  };
 }

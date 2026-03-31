@@ -3,30 +3,211 @@
   {{#if matchInfo}}
   <div class="match-header">
     <div class="team">
-      <img src="images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}">
-      <div>{{matchInfo.teams.home.name}}</div>
+      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}" title="{{matchInfo.teams.home.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'"/>
+      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'">{{matchInfo.teams.home.name}}</div>
     </div>
 
     <div class="score-section">
       <div class="score">{{matchInfo.goals.home}} - {{matchInfo.goals.away}}</div>
-      <div>{{formatDate matchInfo.fixture.date}}</div>
+      <div><a class="cursor-pointer" style="color: white;" href="/league?ID={{matchInfo.league.id}}">{{matchInfo.league.name}}</a> - {{matchInfo.league.round}} - {{formatDate matchInfo.fixture.date}}</div>
       <span class="status">{{matchInfo.fixture.status.short}}</span>
     </div>
 
     <div class="team">
-      <img src="images/logos/{{matchInfo.teams.away.id}}.png" alt="{{matchInfo.teams.away.name}}">
-      <div>{{matchInfo.teams.away.name}}</div>
+      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.away.id}}.png" alt="{{matchInfo.teams.away.name}}" title="{{matchInfo.teams.away.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'"/>
+      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'">{{matchInfo.teams.away.name}}</div>
     </div>
   </div>
   {{/if}}
 
+  {{#if (isFinishedStatus matchInfo.fixture.status.short)}}
   {{#if teamList.length}}
+  <div class="match-tabs" role="tablist" aria-label="Match view tabs">
+    <button id="match-summary-tab" class="match-tab-btn is-active" type="button" role="tab" aria-selected="true" aria-controls="match-summary-panel">Match Summary</button>
+    <button id="match-preview-tab" class="match-tab-btn" type="button" role="tab" aria-selected="false" aria-controls="match-preview-panel">Match Preview</button>
+  </div>
+  {{/if}}
+  {{/if}}
+
+  {{#if (eq matchInfo.fixture.status.short "NS")}}
+  {{else}}
+  <div id="match-summary-panel" class="match-content-panel is-active">
+  <div class="match-center-layout">
+    <div class="lineup-panel lineup-home">
+      {{#if matchInfo.lineups}}
+      {{#each matchInfo.lineups}}
+      {{#if (eq this.team.id ../matchInfo.teams.home.id)}}
+      <table class="lineup-table">
+        <thead>
+          <tr class="lineup-title-row"><th colspan="3">Home Lineup</th></tr>
+          <tr class="lineup-section-row"><th colspan="3">Starting 11</th></tr>
+        </thead>
+        <tbody>
+          {{#each this.startXI}}
+          <tr class="lineup-player-row">
+            <td class="lineup-number-td">{{this.player.number}}</td>
+            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
+          </tr>
+          {{/each}}
+          {{#if this.substitutes.length}}
+          <tr class="lineup-section-row"><th colspan="3">Substitutes</th></tr>
+          {{#each this.substitutes}}
+          <tr class="lineup-player-row lineup-sub-row">
+            <td class="lineup-number-td">{{this.player.number}}</td>
+            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
+          </tr>
+          {{/each}}
+          {{/if}}
+          {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
+          <tr class="lineup-footer-row lineup-avg-row">
+            <td colspan="2">Team Avg Rating</td>
+            <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
+          </tr>
+          {{/with}}
+          {{#if this.formation}}
+          <tr class="lineup-footer-row lineup-meta-row">
+            <td colspan="3">Formation: {{this.formation}}</td>
+          </tr>
+          {{/if}}
+          {{#if this.coach.name}}
+          <tr class="lineup-footer-row lineup-meta-row">
+            <td colspan="3">Manager: {{this.coach.name}}</td>
+          </tr>
+          {{/if}}
+        </tbody>
+      </table>
+      {{/if}}
+      {{/each}}
+      {{else}}
+      <div class="lineup-empty">No lineup data available.</div>
+      {{/if}}
+    </div>
+
+    <div class="match-center-column">
+      <div class="match-events-panel goals-only">
+        <div class="match-events-header">
+          <h3>Match Events</h3>
+          {{#if matchInfo.events}}
+          <button type="button" id="events-toggle-btn" class="more-button match-events-toggle" aria-pressed="false">Show All Events</button>
+          {{/if}}
+        </div>
+        {{#if matchInfo.events}}
+        <div class="match-events-grid">
+          {{#each matchInfo.events}}
+          <div class="event-row {{#if (eq this.type "Goal")}}event-goal{{else}}event-other{{/if}}">
+            <div class="event-side event-side-home">
+              {{#if (eq this.team.id ../matchInfo.teams.home.id)}}
+              <span class="event-text"><a class="event-player-link cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}} ({{this.detail}}){{/if}}</span>
+              {{/if}}
+            </div>
+
+            <span class="event-minute">{{this.time.elapsed}}'</span>
+
+            <div class="event-side event-side-away">
+              {{#if (eq this.team.id ../matchInfo.teams.away.id)}}
+              <span class="event-text"><a class="event-player-link cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}} ({{this.detail}}){{/if}}</span>
+              {{/if}}
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        {{else}}
+        <div class="lineup-empty">No events available.</div>
+        {{/if}}
+      </div>
+
+      <div class="match-stats-panel">
+        {{#if matchStatistics.length}}
+        <table class="match-stats-table">
+          <thead>
+            <tr>
+              <th colspan="3">
+            Match Statistics
+            </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each matchStatistics}}
+            <tr>
+              <td class="match-stats-home">{{this.homeValue}}</td>
+              <td class="match-stats-type">{{this.type}}</td>
+              <td class="match-stats-away">{{this.awayValue}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{else}}
+        <div class="lineup-empty">No statistics available.</div>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="lineup-panel lineup-away">
+      {{#if matchInfo.lineups}}
+      {{#each matchInfo.lineups}}
+      {{#if (eq this.team.id ../matchInfo.teams.away.id)}}
+      <table class="lineup-table">
+        <thead>
+          <tr class="lineup-title-row"><th colspan="3">Away Lineup</th></tr>
+          <tr class="lineup-section-row"><th colspan="3">Starting 11</th></tr>
+        </thead>
+        <tbody>
+          {{#each this.startXI}}
+          <tr class="lineup-player-row">
+            <td class="lineup-number-td">{{this.player.number}}</td>
+            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
+          </tr>
+          {{/each}}
+          {{#if this.substitutes.length}}
+          <tr class="lineup-section-row"><th colspan="3">Substitutes</th></tr>
+          {{#each this.substitutes}}
+          <tr class="lineup-player-row lineup-sub-row">
+            <td class="lineup-number-td">{{this.player.number}}</td>
+            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
+          </tr>
+          {{/each}}
+          {{/if}}
+          {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
+          <tr class="lineup-footer-row lineup-avg-row">
+            <td colspan="2">Team Avg Rating</td>
+            <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
+          </tr>
+          {{/with}}
+          {{#if this.formation}}
+          <tr class="lineup-footer-row lineup-meta-row">
+            <td colspan="3">Formation: {{this.formation}}</td>
+          </tr>
+          {{/if}}
+          {{#if this.coach.name}}
+          <tr class="lineup-footer-row lineup-meta-row">
+            <td colspan="3">Manager: {{this.coach.name}}</td>
+          </tr>
+          {{/if}}
+        </tbody>
+      </table>
+      {{/if}}
+      {{/each}}
+      {{else}}
+      <div class="lineup-empty">No lineup data available.</div>
+      {{/if}}
+    </div>
+  </div>
+  </div>
+
+  {{/if}}
+
+  {{#if teamList.length}}
+  <div id="match-preview-panel" class="match-content-panel {{#if (isFinishedStatus matchInfo.fixture.status.short)}}{{else}}is-active{{/if}}">
   {{#each teamList}}
   <div class="team-card">
     <div class="team-header">
-      <img src="images/logos/{{this.id}}.png" alt="{{this.name}}">
+      <img class="cursor-pointer" src="images/logos/{{this.id}}.png" alt="{{this.name}}" title="{{this.name}}" onclick="window.location.href='team?ID={{this.id}}'"/>
       <div>
-        <h3>{{this.name}}</h3>
+        <h3 class="cursor-pointer" onclick="window.location.href='team?ID={{this.id}}'">{{this.name}}</h3>
         <div class="record">
           <div class="pts-container">
             <span class="pts">{{percentage this.wins this.played}} % win</span>
@@ -154,6 +335,7 @@
     </div>
   </div>
   {{/each}}
+  </div>
   {{/if}}
 
 </div>
