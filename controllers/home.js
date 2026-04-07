@@ -1,6 +1,5 @@
 import { playerGoalList } from "../../components/player-list.js";
 import { addLeagues } from "../common-functions.js";
-import { leagueStandings } from "../components/league-standings.js";
 import { createTeamsTable } from "../components/team-list.js";
 
 await playerGoalList(false);

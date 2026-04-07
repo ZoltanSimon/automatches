@@ -1,4 +1,5 @@
 import { Match } from "./match.js";
+import { calculateXPts } from "../backend/services/poisson-model.js";
 export class Team {
   #stats;
   constructor(team) {
@@ -120,6 +121,7 @@ export class Team {
 export class Stats {
   constructor() {
     this.points = 0;
+    this.xPoints = 0;
     this.goals = 0;
     this.goalsAgainst = 0;
     this.xG = 0;
@@ -147,6 +149,12 @@ export class Stats {
         ? 1
         : 0;
 
+    const xgFor = Number(stat.xG) || 0;
+    const xgAgainst = Number(stat.xGA) || 0;
+    this.xPoints = parseFloat(
+      (this.xPoints + calculateXPts(xgFor, xgAgainst).xPts).toFixed(2)
+    );
+
     this.xG = parseFloat((this.xG + (stat.xG || 0)).toFixed(2));
     this.xGA = parseFloat((this.xGA + (stat.xGA || 0)).toFixed(2));
     this.corners += stat.corners;
@@ -169,6 +177,7 @@ export class Stats {
   divideStats(divisor) {
     let dividedStats = new Stats();
     dividedStats.points = parseFloat((this.points / divisor).toFixed(2));
+    dividedStats.xPoints = parseFloat((this.xPoints / divisor).toFixed(2));
     dividedStats.xG = parseFloat((this.xG / divisor).toFixed(2));
     dividedStats.xGA = parseFloat((this.xGA / divisor).toFixed(2));
     dividedStats.corners = parseFloat((this.corners / divisor).toFixed(2));

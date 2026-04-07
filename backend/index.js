@@ -3,7 +3,7 @@ import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
-import { getResultsDate, getPlayers } from "../webapi-handler.js";
+import { getResultsDate, getPlayers, getLeaguesByType } from "../webapi-handler.js";
 import {
   getMatchFromServer,
   matchesDir,
@@ -11,7 +11,8 @@ import {
   buildTeamList,
   getLeagueFromServer,
   saveMatchToServer,
-  saveMatchesToServer
+  saveMatchesToServer,
+  dataDir
 } from "./json-reader.js";
 import {
   getLeagueFromDb,
@@ -147,22 +148,34 @@ app.get("/top-teams", async (req, res) => {
 });
 
 app.get("/team", async (req, res) => {
+  if (!req.query.ID) {
+    return res.redirect("/");
+  }
+
   let thisTeam = allDBTeams.find(t => t.ID == req.query.ID);
+  if (!thisTeam) {
+    return res.redirect("/");
+  }
+
   const registry = await getRegistry();
   let fullTeamList = extractTeams(registry, null, [], thisTeam.ID);
-  let teamStats = fullTeamList.filter(team => 
-    team.id === thisTeam.ID
-  );
+  let teamStats = fullTeamList.filter(team => team.id === thisTeam.ID);
+
+  if (!teamStats.length) {
+    return res.redirect("/");
+  }
 
   teamStats[0].leagues = [...teamStats[0].leagues.values()];
-  let matchesToShow = allTeamMatches(registry, thisTeam.ID, null, false).sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+  let matchesToShow = allTeamMatches(registry, thisTeam.ID, null, false)
+    .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+
   res.render("team", { 
-    title: thisTeam ? thisTeam.name : "Team",
-    description: `Explore detailed stats, recent matches and league performance for ${thisTeam ? thisTeam.name : "this team"} on Generation Football's Team page.`,
-    thisTeam: thisTeam,
+    title: thisTeam.name,
+    description: `Explore detailed stats, recent matches and league performance for ${thisTeam.name} on Generation Football's Team page.`,
+    thisTeam,
     players: getPlayerList(registry, 100, thisTeam.ID),
     matches: matchesToShow, 
-    teamStats: teamStats,  
+    teamStats,  
   });
 });
 
@@ -471,7 +484,7 @@ app.get("/get-player-list", async (request, response) => {
   response.json(playerList);
 });
 
-/*app.get("/get-players", async (request, response) => {
+app.get("/get-players", async (request, response) => {
   if (request.query.stop === "true") {
     playersFetchJob.running = false;
     console.log("[get-players] Stop requested. Background fetch loop will halt after current iteration.");
@@ -560,7 +573,7 @@ app.get("/get-player-list", async (request, response) => {
     console.error("Error fetching players profiles:", error);
     response.status(500).json({ success: false, message: "Failed to fetch players profiles" });
   }
-});*/
+});
 
 app.get("/match-exists", async (request, response) => {
   let matchID = request.query.matchID;
@@ -592,6 +605,20 @@ app.get("/get-matches-by-round", async (request, response) => {
 
 app.get("/get-all-leagues", (req, res) => {
   res.json(allDBLeagues);
+});
+
+app.get("/get-leagues-from-api", async (req, res) => {
+  try {
+    const type = req.query.type || "league";
+    const result = await getLeaguesByType(type);
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching leagues from external API:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch leagues from API",
+    });
+  }
 });
 
 app.get("/insert-all-clubs-to-db", async (req, res) => {

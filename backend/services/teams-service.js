@@ -1,18 +1,27 @@
 import { buildTeamList } from "./../json-reader.js";
 
-export function extractTeams(registry, date, leagueIDs = [], teamID = null) {
+export function extractTeams(
+  registry,
+  date,
+  leagueIDs = [],
+  teamID = null,
+  includeGroupStageOnly = false,
+) {
   const filterDate = date ? new Date(date) : new Date(2000, 0, 1);
 
   const matches = registry.matches.filter((m) => {
     const inLeague = leagueIDs.length === 0 || leagueIDs.includes(m.league.id);
     const afterDate = new Date(m.fixture.date) > filterDate;
+    const isGroupStageMatch =
+      !includeGroupStageOnly ||
+      (m.league?.round || "").toLowerCase().includes("league stage");
     // only include matches involving the specified team, if provided
     const hasTeam =
       teamID === null ||
       m.teams.home.id === teamID ||
       m.teams.away.id === teamID;
 
-    return inLeague && afterDate && hasTeam;
+    return inLeague && afterDate && isGroupStageMatch && hasTeam;
   });
 
   return buildTeamList(matches);

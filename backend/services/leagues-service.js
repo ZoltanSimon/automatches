@@ -28,7 +28,16 @@ export function groupByLeague(matches) {
 }
 
 export function getLeagueStandings(registry, league) {
-  let thisStandings = extractTeams(registry, null, [league]);
+  const leagueType = allDBLeagues.find((lg) => lg.id == league)?.type;
+  const includeGroupStageOnly = leagueType === "cup" || leagueType === "nt";
+  console.log(includeGroupStageOnly);
+  let thisStandings = extractTeams(
+    registry,
+    null,
+    [league],
+    null,
+    includeGroupStageOnly,
+  );
 
   thisStandings.sort((a, b) =>
     a.total.points < b.total.points

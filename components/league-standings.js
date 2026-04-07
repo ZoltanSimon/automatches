@@ -33,16 +33,9 @@ export async function standingsFromTeamList(selectedLeague) {
   return standingsFromApi;
 }
 
-export async function leagueStandings(selectedLeague, preloaded = null) {
-  // if the caller already has standings (e.g. injected by server) use them,
-  // otherwise fetch from the backend route
-  let standings;
-  if (preloaded && Array.isArray(preloaded)) {
-    standings = preloaded;
-  } else {
-    standings = await standingsFromTeamList(selectedLeague);
-  }
+export async function leagueStandings(selectedLeague) {
 
+  let standings = await standingsFromTeamList(selectedLeague);
   let addToPage = ``;
   let tds = `<td style="padding:4px; text-align: center;">`;
 
@@ -57,8 +50,9 @@ export async function leagueStandings(selectedLeague, preloaded = null) {
             <th style="width:52px;" class="list-header"><b>L</b></th>
             <th style="width:90px;" class="list-header"><b>Goals</b></th>
             <th style="width:90px;" class="list-header"><b>xG</b></th>
-            <th padding: 4px;" class="form-column"><b>Form</b></th>
+            <th style="padding:4px;" class="form-column"><b>Form</b></th>
             <th style="width:58px;" class="list-header"><b>Pts</b></th>
+            <th style="width:58px;" class="list-header"><b>xP</b></th>
           </tr>
         </thead><tbody>`;
 
@@ -91,6 +85,7 @@ export async function leagueStandings(selectedLeague, preloaded = null) {
       }
 
     addToPage += `</td><td style="padding:4px; text-align: center; font-weight: bold">${team.total.points}</td>
+      <td style="padding:4px; text-align: center; font-weight: bold">${team.total.xPoints}</td>
       </tr>`;
   }
   addToPage += `</tbody></table>`;
