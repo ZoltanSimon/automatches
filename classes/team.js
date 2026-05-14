@@ -76,34 +76,38 @@ export class Team {
   }
 
   extractStats(match, teamIndex, opponentIndex) {
+    const tStats = match.statistics[teamIndex].statistics;
+    const oStats = match.statistics[opponentIndex].statistics;
     this.#stats.push({
       goalsFor: match.score.fulltime[teamIndex === 0 ? "home" : "away"],
       goalsAgainst: match.score.fulltime[teamIndex === 0 ? "away" : "home"],
-      corners: match.statistics[teamIndex].statistics[7].value,
-      cornersAgainst: match.statistics[opponentIndex].statistics[7].value,
-      shotsOnGoal: match.statistics[teamIndex].statistics[0].value,
-      shotsOnGoalAgainst: match.statistics[opponentIndex].statistics[0].value,
-      xG: parseFloat(match.statistics[teamIndex].statistics[16].value),
-      xGA: parseFloat(match.statistics[opponentIndex].statistics[16].value),
-      fouls: match.statistics[teamIndex].statistics[4].value,
-      foulsAgainst: match.statistics[opponentIndex].statistics[4].value,
-      possession: parseInt(match.statistics[teamIndex].statistics[9].value),
-      yellowCards: match.statistics[teamIndex].statistics[10].value,
-      redCards: match.statistics[teamIndex].statistics[11].value,
-      yellowCardsAgainst: match.statistics[opponentIndex].statistics[10].value,
-      redCardsAgainst: match.statistics[opponentIndex].statistics[11].value,
-      offsides: match.statistics[teamIndex].statistics[6].value,
-      offsidesAgainst: match.statistics[opponentIndex].statistics[6].value,
+      corners: tStats[7]?.value ?? 0,
+      cornersAgainst: oStats[7]?.value ?? 0,
+      shotsOnGoal: tStats[0]?.value ?? 0,
+      shotsOnGoalAgainst: oStats[0]?.value ?? 0,
+      xG: parseFloat(tStats[16]?.value ?? 0),
+      xGA: parseFloat(oStats[16]?.value ?? 0),
+      fouls: tStats[4]?.value ?? 0,
+      foulsAgainst: oStats[4]?.value ?? 0,
+      possession: parseInt(tStats[9]?.value ?? 0),
+      yellowCards: tStats[10]?.value ?? 0,
+      redCards: tStats[11]?.value ?? 0,
+      yellowCardsAgainst: oStats[10]?.value ?? 0,
+      redCardsAgainst: oStats[11]?.value ?? 0,
+      offsides: tStats[6]?.value ?? 0,
+      offsidesAgainst: oStats[6]?.value ?? 0,
     });
     if (!this.matches.find((m) => m.id === match.fixture.id)) {
       let thisMatch = new Match(match);
+      const hStats = match.statistics[0].statistics;
+      const aStats = match.statistics[1].statistics;
       let thisStats = {
-        cornersHome: match.statistics[0].statistics[7].value,
-        cornersAway: match.statistics[1].statistics[7].value,
-        shotsOnGoalHome: match.statistics[0].statistics[0].value,
-        shotsOnGoalAway: match.statistics[1].statistics[0].value,
-        xGHome: parseFloat(match.statistics[0].statistics[16].value),
-        xGAway: parseFloat(match.statistics[1].statistics[16].value),
+        cornersHome: hStats[7]?.value ?? 0,
+        cornersAway: aStats[7]?.value ?? 0,
+        shotsOnGoalHome: hStats[0]?.value ?? 0,
+        shotsOnGoalAway: aStats[0]?.value ?? 0,
+        xGHome: parseFloat(hStats[16]?.value ?? 0),
+        xGAway: parseFloat(aStats[16]?.value ?? 0),
       }
       thisMatch.stats = thisStats;
       this.matches.push(thisMatch);

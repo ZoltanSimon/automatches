@@ -30,7 +30,7 @@
           <div id="league-list-league">
             {{#each leagues}}
             {{#if (eq this.type "league")}}
-            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}"
+            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
               class="admin-league-to-select" />
             {{/if}}
             {{/each}}
@@ -38,7 +38,7 @@
           <div id="league-list-cup">
             {{#each leagues}}
             {{#if (eq this.type "cup")}}
-            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}"
+            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
               class="admin-league-to-select" />
             {{/if}}
             {{/each}}
@@ -46,7 +46,7 @@
           <div id="league-list-nt">
             {{#each leagues}}
             {{#if (eq this.type "nt")}}
-            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}"
+            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
               class="admin-league-to-select" />
             {{/if}}
             {{/each}}
