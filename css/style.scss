@@ -65,6 +65,10 @@ th {
   font-size: 16px;
 }
 
+table tbody tr:nth-child(even) {
+  background-color: lighten($light-blue, 10%);
+}
+
 table tbody tr:hover {
   background-color: $lightest-blue;
 }

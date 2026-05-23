@@ -51,6 +51,10 @@ th {
   font-size: 16px;
 }
 
+table tbody tr:nth-child(even) {
+  background-color: #c1e5e2;
+}
+
 table tbody tr:hover {
   background-color: #f1faee;
 }
