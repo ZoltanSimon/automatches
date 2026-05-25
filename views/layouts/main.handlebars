@@ -38,8 +38,9 @@
     <div class="logo-title">
       <img src="/images/logo.png" alt="Generation Football Logo" />
       <h1>generationFOOTBALL</h1>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
     </div>
-    <nav>
+    <nav id="mainNav">
       <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/players">Players</a></li>
@@ -49,6 +50,17 @@
       </ul>
     </nav>
   </header>
+  <script>
+    (function () {
+      var btn = document.getElementById('navToggle');
+      var nav = document.getElementById('mainNav');
+      btn.addEventListener('click', function () {
+        var open = nav.classList.toggle('nav-open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.classList.toggle('nav-toggle--open', open);
+      });
+    })();
+  </script>
   <main>
     {{{body}}}
   </main>

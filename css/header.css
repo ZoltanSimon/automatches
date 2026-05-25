@@ -3,25 +3,27 @@ header {
   color: #fff;
   text-align: center;
   align-items: center;
-  padding: 10px;
+  padding: 10px 10px 4px 10px;
   font-family: "Source Sans 3", sans-serif;
   font-weight: bold; /* Make the text bold */
 }
 
 .logo-title {
-  display: inline-flex;
+  position: relative;
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 5px;
+  width: 100%;
+  margin-bottom: 0px;
 }
 
 .logo-title img {
-  height: 50px; /* Adjust this size as needed */
+  height: 60px; /* Adjust this size as needed */
   margin-right: 10px; /* Space between the logo and the text */
 }
 
 .logo-title h1 {
-  font-size: 50px;
+  font-size: 60px;
   font-weight: 900;
   margin: 0;
   color: #1D3557;
@@ -31,10 +33,43 @@ header {
     /* Bottom-left shadow */ 1px 1px 0 #A8DADC; /* Bottom-right shadow */
 }
 
+.nav-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 5px;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 10px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: background-color 0.2s ease;
+}
+
+.nav-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.nav-toggle--open {
+  background-color: rgba(230, 57, 70, 0.8);
+}
+
 nav {
-  margin-top: 0px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.35s ease;
   margin-bottom: 4px;
   text-align: center;
+}
+
+nav.nav-open {
+  max-height: 400px;
 }
 
 nav ul {
@@ -73,25 +108,30 @@ nav ul li a:hover {
 
 @media (max-width: 600px) {
   header {
-    padding: 4px;
+    padding: 4px 4px 2px 4px;
   }
 
   .logo-title {
     justify-content: space-between;
-    width: 100%; /* Ensures the items stretch to the edges */
+  }
+
+  .nav-toggle {
+    position: static;
+    transform: none;
   }
 
   .logo-title img {
-    height: 40px; /* Adjust this size as needed */
-    margin-right: 2px; /* Space between the logo and the text */
+    height: 32px;
+    margin-right: 6px;
   }
 
   .logo-title h1 {
-    font-size: 37px;
+    font-size: 24px;
+    white-space: nowrap;
   }
 
   nav ul li {
-    flex: 1 1 30%; /* Change to 30% width to show 3 per row */
+    flex: 1 1 30%;
     margin-bottom: 10px;
   }
 
@@ -107,12 +147,13 @@ nav ul li a:hover {
   }
 
   .logo-title img {
-    height: 36px; /* Adjust this size as needed */
-    margin-right: 1px; /* Space between the logo and the text */
+    height: 26px; /* Adjust this size as needed */
+    margin-right: 4px; /* Space between the logo and the text */
   }
 
   .logo-title h1 {
-    font-size: 30px;
+    font-size: 19px;
+    white-space: nowrap;
   }
 
   nav ul li {
