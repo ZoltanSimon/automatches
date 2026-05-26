@@ -18,7 +18,7 @@ import { addText, buildResults } from "../autotext.js";
 import { playerGoalList, playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
-import { getPlayerStatsFromApi } from "../webapi-handler.js";
+import { getPlayerStatsFromApi, getStandingsFromApi } from "../webapi-handler.js";
 
 const response = await fetch(`/get-all-leagues`);
 const allLeagues = await response.json();
@@ -237,4 +237,9 @@ document.getElementById("copy-player-list").onclick = function () {
 
 document.getElementById("download-image").onclick = function () {
   download();
+};
+
+document.getElementById("test-standings").onclick = async function () {
+  const result = await getStandingsFromApi(1);
+  console.log(result);
 };
