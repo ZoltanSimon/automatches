@@ -207,7 +207,7 @@ app.get("/ucl-last-round", async (req, res) => {
 
 app.get("/league", async (req, res) => {
   try {
-    const parsed = parseFloat(req.query.ID);
+    const parsed = parseFloat(req.query.id);
     const selectedLeague = isNaN(parsed) ? 39 : parsed;
 
     const registry = await getRegistry();
@@ -434,6 +434,19 @@ app.get("/all-missing-matches", async (request, response) => {
         `${matchesDir}/${element.fixtureId}.json`,
         fs.constants.R_OK,
       );
+
+      const savedMatchData = await getMatchFromServer(element.fixtureId);
+      const savedMatch = Array.isArray(savedMatchData)
+        ? savedMatchData[0]
+        : savedMatchData;
+      const savedStatus = String(savedMatch?.fixture?.status?.short || "").trim().toUpperCase();
+      const dbStatus = String(element.fixtureStatus || "").trim().toUpperCase();
+
+      if (savedStatus && dbStatus && savedStatus !== dbStatus) {
+        console.log(
+          `[all-missing-matches] Status mismatch for fixture ${element.fixtureId}: json=${savedStatus}, db=${dbStatus}`,
+        );
+      }
     } catch (err) {
       matchArr.push(element);
     }
