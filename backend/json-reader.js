@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises";
+import { readFile, stat } from "fs/promises";
 import { networkPath } from "./config.js";
 import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
@@ -16,13 +16,16 @@ export const dataDir = `${networkPath}`;
 export async function getMatchFromServer(fixtureID) {
   let file = `${matchesDir}/${fixtureID}.json`;
   try {
-    if (cache.has(file)) {
-      return cache.get(file);
-    } else {
-      let response = JSON.parse(await readFile(file));
-      cache.set(file, response);
-      return response;
+    const fileStat = await stat(file);
+    const cached = cache.get(file);
+
+    if (cached?.mtimeMs === fileStat.mtimeMs) {
+      return cached.value;
     }
+
+    let response = JSON.parse(await readFile(file));
+    cache.set(file, { mtimeMs: fileStat.mtimeMs, value: response });
+    return response;
   } catch (e) {
     //console.error(e);
     return null;
@@ -32,13 +35,16 @@ export async function getMatchFromServer(fixtureID) {
 export async function getLeagueFromServer(leagueID) {
   let file = `${leaguesDir}/${leagueID}.json`;
   try {
-    if (cache.has(file)) {
-      return cache.get(file);
-    } else {
-      let response = JSON.parse(await readFile(file));
-      cache.set(file, response);
-      return response;
+    const fileStat = await stat(file);
+    const cached = cache.get(file);
+
+    if (cached?.mtimeMs === fileStat.mtimeMs) {
+      return cached.value;
     }
+
+    let response = JSON.parse(await readFile(file));
+    cache.set(file, { mtimeMs: fileStat.mtimeMs, value: response });
+    return response;
   } catch (e) {
     console.error(e);
     return null;
@@ -205,17 +211,37 @@ export async function getAllPlayers(compList, nationList) {
 export function buildTeamList(data) {
   let teams = [];
   try {
-    data.forEach((match) => {
-      if (match != null) {
-        const team1Data = match.teams.home;
-        const team2Data = match.teams.away;
+    data.forEach((rawMatch) => {
+      if (rawMatch != null) {
+        if (!rawMatch.teams?.home || !rawMatch.teams?.away) {
+          return;
+        }
+
+        const team1Data = rawMatch.teams.home;
+        const team2Data = rawMatch.teams.away;
 
         const team1 = findOrCreateTeam(teams, team1Data);
         const team2 = findOrCreateTeam(teams, team2Data);
 
-        if (match.statistics[0]) {
-          team1.extractStats(match, 0, 1);
-          team2.extractStats(match, 1, 0);
+        const hasStatistics =
+          Array.isArray(rawMatch.statistics) && rawMatch.statistics.length >= 2;
+
+        const normalizedMatch = hasStatistics
+          ? rawMatch
+          : {
+              ...rawMatch,
+              score: {
+                fulltime: {
+                  home: rawMatch?.score?.fulltime?.home ?? rawMatch?.goals?.home ?? 0,
+                  away: rawMatch?.score?.fulltime?.away ?? rawMatch?.goals?.away ?? 0,
+                },
+              },
+              statistics: [{ statistics: [] }, { statistics: [] }],
+            };
+
+        if (normalizedMatch.statistics[0]) {
+          team1.extractStats(normalizedMatch, 0, 1);
+          team2.extractStats(normalizedMatch, 1, 0);
         }
       }
     });

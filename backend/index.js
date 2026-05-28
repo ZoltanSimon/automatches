@@ -18,7 +18,6 @@ import {
   getLeagueFromDb,
   insertTeamsToDb,
   getAllMatchesFromDbUntilDate,
-  insertMatchesToQueue,
   loadLeagues,
   loadPlayers,
   loadTeams
@@ -167,7 +166,7 @@ app.get("/team", async (req, res) => {
   }
 
   teamStats[0].leagues = [...teamStats[0].leagues.values()];
-  let matchesToShow = allTeamMatches(registry, thisTeam.ID, null, false)
+  let matchesToShow = (await allTeamMatches(registry, thisTeam.ID, null, false))
     .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
 
   res.render("team", { 
@@ -213,7 +212,7 @@ app.get("/league", async (req, res) => {
     const registry = await getRegistry();
 
     const players = getPlayerList(registry, 10, null, [selectedLeague]);
-    const { matches, rounds, currentRound } = lastMatchesFromLeague(registry, selectedLeague);
+    const { matches, rounds, currentRound } = await lastMatchesFromLeague(registry, selectedLeague);
     const standings = getLeagueStandings(registry, selectedLeague);
     const leagueInfo = allDBLeagues.find(league => league.id === selectedLeague);
 
@@ -243,7 +242,12 @@ app.get("/match", async (request, response) => {
   const matchKey = Number.isNaN(Number(matchID)) ? matchID : Number(matchID);
 
   const registry = await getRegistry();
-  const currentMatch = registry.matchByID.get(matchKey) ?? registry.fixtures.find(f => f.fixture.id == matchID);
+  const savedMatch = await getMatchFromServer(matchID);
+  const currentMatch =
+    registry.matchByID.get(matchKey) ??
+    savedMatch?.[0] ??
+    savedMatch ??
+    registry.fixtures.find(f => f.fixture.id == matchID);
 
   let teamList = [];
   let matchStatistics = [];
@@ -418,7 +422,6 @@ app.get("/missing-matches", async (request, response) => {
         }
       }
     }
-    await insertMatchesToQueue(matchArr);
   }
 console.log(`Total missing matches across leagues ${leagueIDs.join(", ")}: ${matchArr.length}`);
   response.json(matchArr);

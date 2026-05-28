@@ -51,7 +51,7 @@ export async function matchesInRound(roundNr, leagueID) {
   return matches;
 }
 
-export function lastMatchesFromLeague(registry, leagueID) {
+export async function lastMatchesFromLeague(registry, leagueID) {
 
   const leagueFixtures = registry.fixtures
     .filter(({ fixture, league }) => 
@@ -59,9 +59,17 @@ export function lastMatchesFromLeague(registry, leagueID) {
     )
     .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
 
-  const matches = leagueFixtures
-    .map((item) => registry.matchByID.get(item.fixture.id) ?? item)
-    .filter(Boolean);
+  const matches = (await Promise.all(
+    leagueFixtures.map(async (item) => {
+      const match = registry.matchByID.get(item.fixture.id);
+      if (match) {
+        return match;
+      }
+
+      const savedMatch = await getMatchFromServer(item.fixture.id);
+      return savedMatch?.[0] ?? savedMatch ?? item;
+    }),
+  )).filter(Boolean);
 
   const rounds = [...new Set(leagueFixtures.map(({ league }) => league.round))].reverse();
 
@@ -82,7 +90,7 @@ export function lastMatchesFromLeague(registry, leagueID) {
   return { matches, rounds, currentRound };
 }
 
-export function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkStatus = true) {
+export async function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkStatus = true) {
   const fixturesForTeam = registry.fixtures.filter(({ fixture, teams }) => {
     const { home, away } = teams;
     const teamMatch = awayTeamID
@@ -94,14 +102,15 @@ export function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkSta
     return true;
   });
 
-  const results = fixturesForTeam.map((fixtureData) => {
+  const results = await Promise.all(fixturesForTeam.map(async (fixtureData) => {
     const match = registry.matchByID.get(fixtureData.fixture.id);
     if (match) {
       return match;
-    } else {
-      return fixtureData;
     }
-  });
+
+    const savedMatch = await getMatchFromServer(fixtureData.fixture.id);
+    return savedMatch?.[0] ?? savedMatch ?? fixtureData;
+  }));
 
   return results;
 }

@@ -1,5 +1,22 @@
 import { buildTeamList } from "./../json-reader.js";
 
+function toStatsMatch(matchOrFixture) {
+  if (matchOrFixture?.statistics?.length >= 2) {
+    return matchOrFixture;
+  }
+
+  return {
+    ...matchOrFixture,
+    score: {
+      fulltime: {
+        home: matchOrFixture?.goals?.home ?? 0,
+        away: matchOrFixture?.goals?.away ?? 0,
+      },
+    },
+    statistics: [{ statistics: [] }, { statistics: [] }],
+  };
+}
+
 export function extractTeams(
   registry,
   date,
@@ -9,19 +26,25 @@ export function extractTeams(
 ) {
   const filterDate = date ? new Date(date) : new Date(2000, 0, 1);
 
-  const matches = registry.matches.filter((m) => {
+  const completedMatches = registry.fixtures
+    .filter(({ fixture }) => ["FT", "AET", "PEN"].includes(fixture.status.short))
+    .map((fixture) => registry.matchByID.get(fixture.fixture.id) ?? fixture)
+    .map(toStatsMatch);
+
+  const matches = completedMatches.filter((m) => {
     const inLeague = leagueIDs.length === 0 || leagueIDs.includes(m.league.id);
     const afterDate = new Date(m.fixture.date) > filterDate;
-    const isGroupStageMatch =
-      !includeGroupStageOnly ||
-      (m.league?.round || "").toLowerCase().includes("league stage");
+    const roundName = (m.league?.round || "").toLowerCase();
+    const isIncludedRound = includeGroupStageOnly
+      ? roundName.includes("league stage")
+      : roundName.includes("regular season");
     // only include matches involving the specified team, if provided
     const hasTeam =
       teamID === null ||
       m.teams.home.id === teamID ||
       m.teams.away.id === teamID;
 
-    return inLeague && afterDate && isGroupStageMatch && hasTeam;
+    return inLeague && afterDate && isIncludedRound && hasTeam;
   });
 
   return buildTeamList(matches);

@@ -8,7 +8,7 @@
         </div>
         <div class="team-info">
             {{#each teamStats.[0].leagues}}
-            <div onclick="window.location.href='/league?ID={{this.id}}'" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <div onclick="window.location.href='/league?id={{this.id}}'" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
                 <img src="images/competitions/{{this.id}}.png" class="logo-picture" />
                 <span>{{this.name}}</span>
             </div>

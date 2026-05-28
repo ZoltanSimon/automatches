@@ -112,28 +112,6 @@ export async function insertTeamsToDb(teams) {
   }
 }
 
-export async function insertMatchesToQueue(matches) {
-  for (const match of matches) {
-    let matchID = match.id;
-    let leagueID = match.league.id;
-    let matchDate = match.fixture.date;
-    await pool.query(
-      `INSERT IGNORE INTO match_queue (match_id, league_id, match_date) VALUES (?, ?, ?)`,
-      [matchID, leagueID, matchDate],
-    );
-  }
-}
-
-export async function removeMatchesFromQueue(matchIDs) {
-  if (matchIDs.length === 0) return;
-
-  const placeholders = matchIDs.map(() => "?").join(",");
-  await pool.query(
-    `DELETE FROM match_queue WHERE match_id IN (${placeholders})`,
-    matchIDs,
-  );
-}
-
 export async function importLeague(leagueID) {
   const filePath = `${networkPath}leagues\\${leagueID}.json`;
 
@@ -245,7 +223,6 @@ export async function importLeague(leagueID) {
 
 export async function getLeagueFromDb(leagueIDs) {
   leagueIDs = Array.isArray(leagueIDs) ? leagueIDs : [leagueIDs];
-  const minMatchDate = "2025-08-01";
   const leagueConfigs = leagueIDs.map((leagueID) => ({
     leagueID,
     season:
@@ -261,12 +238,11 @@ export async function getLeagueFromDb(leagueIDs) {
       leagueID,
       season,
     ]);
-    params.push(minMatchDate);
 
     const [rows] = await pool.query(
       `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
        FROM matches
-       WHERE (${placeholders}) AND match_date >= ?
+       WHERE (${placeholders})
        ORDER BY match_date ASC`,
       params,
     );
