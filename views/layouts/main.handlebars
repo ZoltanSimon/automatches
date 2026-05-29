@@ -40,6 +40,9 @@
       <a href="/"><h1>generationFOOTBALL</h1></a>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
     </div>
+    <div class="header-league-search-wrapper">
+      {{> league-search leagues=headerLeagues}}
+    </div>
     <nav id="mainNav">
       <ul>
         <li><a href="/">Home</a></li>
@@ -54,10 +57,92 @@
     (function () {
       var btn = document.getElementById('navToggle');
       var nav = document.getElementById('mainNav');
-      btn.addEventListener('click', function () {
-        var open = nav.classList.toggle('nav-open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.classList.toggle('nav-toggle--open', open);
+      if (btn && nav) {
+        btn.addEventListener('click', function () {
+          var open = nav.classList.toggle('nav-open');
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          btn.classList.toggle('nav-toggle--open', open);
+        });
+      }
+
+      var searchBlocks = document.querySelectorAll('.js-league-search');
+      if (searchBlocks.length === 0) {
+        return;
+      }
+
+      var closeAllSearches = function () {
+        searchBlocks.forEach(function (search) {
+          var trigger = search.querySelector('.league-search-trigger');
+          var dropdown = search.querySelector('.league-search-dropdown');
+          if (!trigger || !dropdown) return;
+          dropdown.hidden = true;
+          trigger.setAttribute('aria-expanded', 'false');
+          search.classList.remove('open');
+        });
+      };
+
+      searchBlocks.forEach(function (search) {
+        var trigger = search.querySelector('.league-search-trigger');
+        var dropdown = search.querySelector('.league-search-dropdown');
+        var input = search.querySelector('.league-search-input');
+        var items = Array.prototype.slice.call(search.querySelectorAll('.league-search-item'));
+        var emptyState = search.querySelector('.league-search-empty');
+
+        if (!trigger || !dropdown || !input) {
+          return;
+        }
+
+        trigger.addEventListener('click', function () {
+          var isOpen = !dropdown.hidden;
+          closeAllSearches();
+
+          if (!isOpen) {
+            dropdown.hidden = false;
+            search.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+            input.focus();
+          }
+        });
+
+        input.addEventListener('input', function () {
+          var query = input.value.trim().toLowerCase();
+          var visibleCount = 0;
+
+          items.forEach(function (item) {
+            var nameElement = item.querySelector('.league-search-name');
+            var leagueName = (nameElement ? nameElement.textContent : '').toLowerCase();
+            var show = leagueName.indexOf(query) !== -1;
+            item.hidden = !show;
+            if (show) visibleCount += 1;
+          });
+
+          if (emptyState) {
+            emptyState.hidden = visibleCount !== 0;
+          }
+        });
+
+        search.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') {
+            closeAllSearches();
+            trigger.focus();
+          }
+        });
+
+        dropdown.addEventListener('click', function (event) {
+          if (event.target.closest('.league-search-link')) {
+            closeAllSearches();
+          }
+        });
+      });
+
+      document.addEventListener('click', function (event) {
+        var clickedInsideAnySearch = Array.prototype.some.call(searchBlocks, function (search) {
+          return search.contains(event.target);
+        });
+
+        if (!clickedInsideAnySearch) {
+          closeAllSearches();
+        }
       });
     })();
   </script>

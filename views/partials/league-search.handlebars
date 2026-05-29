@@ -1,0 +1,24 @@
+<div class="league-search js-league-search">
+  <button type="button" class="league-search-trigger" aria-expanded="false" aria-haspopup="listbox">
+    <span class="league-search-trigger-text">Search leagues</span>
+  </button>
+  <div class="league-search-dropdown" hidden>
+    <input
+      class="league-search-input"
+      type="text"
+      placeholder="Type to filter leagues"
+      aria-label="Filter leagues"
+    />
+    <ul class="league-search-list" role="listbox">
+      {{#each leagues}}
+      <li class="league-search-item">
+        <a class="league-search-link" href="/league?id={{this.id}}" role="option" aria-label="{{this.name}}">
+          <img class="league-search-logo" src="/images/competitions/{{this.id}}.png" alt="{{this.name}}" />
+          <span class="league-search-name">{{this.name}}</span>
+        </a>
+      </li>
+      {{/each}}
+    </ul>
+    <div class="league-search-empty" hidden>No leagues match your search.</div>
+  </div>
+</div>

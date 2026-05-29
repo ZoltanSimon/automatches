@@ -35,14 +35,20 @@ export function extractTeams(
     const inLeague = leagueIDs.length === 0 || leagueIDs.includes(m.league.id);
     const afterDate = new Date(m.fixture.date) > filterDate;
     const roundName = (m.league?.round || "").toLowerCase();
-    const isIncludedRound = includeGroupStageOnly
-      ? roundName.includes("league stage")
-      : roundName.includes("regular season");
+    const isIncludedRound =
+      teamID !== null
+        ? true
+        : includeGroupStageOnly
+          ? roundName.includes("league stage")
+          : roundName.includes("regular season");
     // only include matches involving the specified team, if provided
+    const normalizedTeamID = teamID === null ? null : Number(teamID);
+    const homeID = Number(m.teams.home.id);
+    const awayID = Number(m.teams.away.id);
     const hasTeam =
-      teamID === null ||
-      m.teams.home.id === teamID ||
-      m.teams.away.id === teamID;
+      normalizedTeamID === null ||
+      homeID === normalizedTeamID ||
+      awayID === normalizedTeamID;
 
     return inLeague && afterDate && isIncludedRound && hasTeam;
   });

@@ -69,6 +69,10 @@ app.set("views", __dirname + "./../views");
 app.set("view engine", "handlebars");
 app.use(express.static("./"));
 app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  res.locals.headerLeagues = allDBLeagues || [];
+  next();
+});
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}, loading registry...`);
@@ -159,15 +163,22 @@ app.get("/team", async (req, res) => {
 
   const registry = await getRegistry();
   let fullTeamList = extractTeams(registry, null, [], thisTeam.ID);
-  let teamStats = fullTeamList.filter(team => team.id === thisTeam.ID);
+  const selectedTeamID = Number(thisTeam.ID);
+  let teamStats = fullTeamList.filter(team => Number(team.id) === selectedTeamID);
+  let matchesToShow = (await allTeamMatches(registry, thisTeam.ID, null, false))
+    .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+
+  if (!teamStats.length && matchesToShow.length) {
+    const fallbackTeamList = buildTeamList(matchesToShow);
+    teamStats = fallbackTeamList.filter(team => Number(team.id) === selectedTeamID);
+    console.log(`team stats fallback used for team ${selectedTeamID}, matches: ${matchesToShow.length}`);
+  }
 
   if (!teamStats.length) {
     return res.redirect("/");
   }
 
   teamStats[0].leagues = [...teamStats[0].leagues.values()];
-  let matchesToShow = (await allTeamMatches(registry, thisTeam.ID, null, false))
-    .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
 
   res.render("team", { 
     title: thisTeam.name,

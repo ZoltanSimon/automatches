@@ -52,7 +52,7 @@ th {
 }
 
 table tbody tr:nth-child(even) {
-  background-color: #c1e5e2;
+  background-color: rgb(204.368852459, 233.4672131148, 234.631147541);
 }
 
 table tbody tr:hover {

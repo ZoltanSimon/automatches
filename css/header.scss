@@ -5,7 +5,7 @@ header {
   color: $white;
   text-align: center;
   align-items: center;
-  padding: 10px 10px 4px 10px;
+  padding: 8px 10px 4px 10px;
   font-family: "Source Sans 3", sans-serif;
   font-weight: bold;
 }
@@ -24,7 +24,7 @@ header {
   }
 
   h1 {
-    font-size: 60px;
+    font-size: 56px;
     font-weight: 900;
     margin: 0;
     color: $dark-blue;
@@ -34,6 +34,129 @@ header {
       -1px  1px 0 $light-blue,
        1px  1px 0 $light-blue;
   }
+}
+
+.header-league-search-wrapper {
+  width: min(700px, 100%);
+  margin: 8px auto 6px;
+}
+
+.league-search {
+  position: relative;
+  width: 100%;
+
+  &.open .league-search-trigger {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.league-search-trigger {
+  width: 100%;
+  height: 42px;
+  border: 2px solid rgba($light-blue, 0.85);
+  border-radius: 8px;
+  background-color: $lightest-blue;
+  color: rgba($dark-blue, 0.75);
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+  text-align: left;
+  padding: 0 18px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $red;
+    box-shadow: 0 0 0 3px rgba($red, 0.18);
+    outline: none;
+  }
+
+  &::after {
+    content: "▼";
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: rgba($dark-blue, 0.9);
+    transition: transform 0.2s ease;
+    pointer-events: none;
+  }
+}
+
+.league-search.open .league-search-trigger::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.league-search-dropdown {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 0;
+  right: 0;
+  background-color: $lightest-blue;
+  border: 2px solid rgba($light-blue, 0.85);
+  border-top: 0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  box-shadow: 0 14px 28px rgba($dark-blue, 0.28);
+  z-index: 30;
+  padding: 8px;
+}
+
+.league-search-input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid rgba($blue, 0.4);
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 15px;
+  font-family: "Source Sans 3", sans-serif;
+  margin-bottom: 8px;
+
+  &:focus {
+    outline: none;
+    border-color: $red;
+    box-shadow: 0 0 0 2px rgba($red, 0.15);
+  }
+}
+
+.league-search-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.league-search-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  color: $dark-blue;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 700;
+
+  &:hover {
+    background-color: rgba($light-blue, 0.45);
+  }
+}
+
+.league-search-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.league-search-empty {
+  padding: 10px 8px;
+  color: rgba($dark-blue, 0.8);
+  font-weight: 700;
+  font-size: 18px;
 }
 
 .nav-toggle {
@@ -119,6 +242,32 @@ nav {
     justify-content: space-between;
   }
 
+  .header-league-search-wrapper {
+    margin: 6px auto 4px;
+  }
+
+  .league-search-trigger {
+    height: 37px;
+    font-size: 16px;
+    padding: 0 12px;
+  }
+
+  .league-search-input {
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .league-search-link {
+    font-size: 14px;
+    gap: 8px;
+    padding: 6px;
+  }
+
+  .league-search-logo {
+    width: 20px;
+    height: 20px;
+  }
+
   .nav-toggle {
     position: static;
     transform: none;
@@ -162,6 +311,19 @@ nav {
       font-size: 19px;
       white-space: nowrap;
     }
+  }
+
+  .league-search-trigger {
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .league-search-input {
+    font-size: 13px;
+  }
+
+  .league-search-link {
+    font-size: 13px;
   }
 
   nav ul li {
