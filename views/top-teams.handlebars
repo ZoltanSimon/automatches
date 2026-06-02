@@ -1,12 +1,31 @@
 <script type="module" src="./../controllers/top-teams.js"></script>
 
 <div class="small-container">
-  <div class="rectangle">
-    {{> rect-header title="Top Teams" link="" leagues=leagues selectedLeagues=selectedTLeagues leaguepar="tleague" }}
+  <div class="teams-page-layout">
+    <div class="rectangle">
+      {{> rect-header title="Top Teams" link="" leagues=leagues selectedLeagues=selectedTLeagues leaguepar="tleague" }}
 
-    <div id="top-team-list">
-      {{> team-list-table big=true}}
+      <div id="top-team-list">
+        {{> team-list-table big=true}}
+      </div>
     </div>
 
+    <aside id="team-stats-filter-side" class="side-filter-panel">
+      <h3>Statistics</h3>
+      <div id="teamStatFilters">
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="form">Form</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="played">Played</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="winPercentage">Win %</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="goals">Goals</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="xG">xG</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="corners">Corners</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="shotsOnGoal">Shots On Goal</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="fouls">Fouls</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn active" data-stat="possession">Possession</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn" data-stat="yellowCards">Yellow Cards</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn" data-stat="redCards">Red Cards</button>
+        <button type="button" class="position-filter-btn stat-filter-btn team-stat-filter-btn" data-stat="offsides">Offsides</button>
+      </div>
+    </aside>
   </div>
   

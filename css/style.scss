@@ -1,17 +1,11 @@
-$red: #E63946;
-$blue: #457B9D;
-$dark-blue: #1d3557;
-$light-blue: #a8dadc;
-$lightest-blue: #f1faee;
+@use 'tokens' as *;
 
 // Additional helper variables
 $gray: #333;
 $light-gray: #ccc;
 $background-gray: #f8f9fa;
-$white: #fff;
 $green: green;
 $gray-neutral: gray;
-$text-color: #101d30;
 
 body {
   font-family: "Source Sans 3", Arial, sans-serif;
@@ -268,6 +262,170 @@ footer {
   }
 }
 
+.players-page-layout {
+  width: fit-content;
+  max-width: none;
+  display: block;
+  position: relative;
+  --side-filter-gap: 8px;
+}
+
+.players-page-layout .rectangle {
+  margin: 0;
+}
+
+.teams-page-layout {
+  width: fit-content;
+  max-width: none;
+  display: block;
+  position: relative;
+  --side-filter-gap: 8px;
+}
+
+.teams-page-layout .rectangle {
+  margin: 0;
+}
+
+.side-filter-panel {
+  border: 1px solid rgba(29, 53, 87, 0.2);
+  border-radius: 6px;
+  padding: 8px;
+  background: rgba(241, 250, 238, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  top: 0;
+  transform: none;
+
+    h3 {
+    margin: 0 0 6px;
+    color: $dark-blue;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+}
+
+.position-filter-side {
+  display: block;
+  width: 180px;
+  position: absolute;
+  left: calc(100% + var(--side-filter-gap));
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+
+
+}
+
+.players-page-layout.filters-open .position-filter-side,
+.position-filter-side.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.position-filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 65vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.position-filter-btn {
+  text-decoration: none;
+  color: $dark-blue;
+  border: 1px solid $dark-blue;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  transition: all 0.2s ease;
+  text-align: center;
+  cursor: pointer;
+  background: transparent;
+
+  &:hover {
+    background: $lightest-blue;
+  }
+
+  &.active {
+    background: $red;
+    color: $lightest-blue;
+    border-color: $red;
+  }
+}
+
+@media (max-width: 980px) {
+  .players-page-layout {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .players-page-layout .rectangle {
+    order: 3;
+    width: 100%;
+  }
+
+  #stats-filter-side {
+    order: 1;
+    position: static;
+    width: 100%;
+    left: auto;
+    right: auto;
+    top: auto;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
+    display: none !important;
+
+    &.open {
+      display: block !important;
+    }
+
+    #statCheckboxes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat-filter-btn {
+      font-size: 12px;
+      flex: 1 1 auto;
+    }
+  }
+
+  .position-filter-side {
+    order: 2;
+    display: none;
+    position: static;
+    grid-column: 1;
+    width: 100%;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .players-page-layout.filters-open .position-filter-side,
+  .position-filter-side.open {
+    display: block;
+  }
+
+  .position-filter-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+}
+
 .more-button {
   background-color: $red;
   color: $lightest-blue;
@@ -471,26 +629,19 @@ td .form-indicator {
   border-bottom: 1px solid $lightest-blue;
 }
 
-#statSelectorContainer {
-  position: fixed;
-  left: 50%; // Start at middle of screen
-  top: 480px;
-  transform: translate(-50%, -50%);
+#stats-filter-side {
+  position: absolute;
+  right: calc(100% + var(--side-filter-gap));
   width: 220px;
-  background: $background-gray;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
   z-index: 0;
   opacity: 0; // Hidden initially
   visibility: hidden;
-  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
 
   &.open {
     opacity: 1;
     visibility: visible;
-    transform: translate(-50%, -50%) translateX(-622px); // Slide far to the left
+    transform: none;
   }
 
   .stat-title {
@@ -503,20 +654,53 @@ td .form-indicator {
 
   #statCheckboxes {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
-    grid-template-columns: 1fr;
   }
 
-  label {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    cursor: pointer;
+  .stat-filter-btn {
+    width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+    font-size: 11px;
+    padding: 4px 6px;
   }
 
-  input[type="checkbox"] {
-    margin-right: 8px;
-    cursor: pointer;
+  .stat-filter-btn.stat-filter-btn-wide {
+    grid-column: span 2;
+  }
+}
+
+#team-stats-filter-side {
+  position: absolute;
+  right: calc(100% + var(--side-filter-gap));
+  width: 220px;
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
+  display: none;
+
+  &.open,
+  .teams-page-layout.filters-open & {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: block;
+  }
+
+  #teamStatFilters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .team-stat-filter-btn {
+    width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+    font-size: 11px;
+    padding: 4px 6px;
   }
 }
 
@@ -1410,35 +1594,92 @@ a.event-player-link {
     grid-row: 2;
   }
 
-  #statSelectorContainer {
-    inset-inline: 0;
-    inset-block-end: 0;
-    inset-block-start: auto;
-    transform: translateY(100%) !important; // Hide below screen
+  #stats-filter-side {
+    order: 1;
+    position: static;
     width: 100%;
-    border-radius: 8px 8px 0 0;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 10px;
-    position: fixed;
     left: auto;
+    right: auto;
     top: auto;
+    inset: auto;
     opacity: 1;
     visibility: visible;
-    transition: transform 0.3s ease-in-out; // Slide up animation
+    transform: none !important;
+    transition: none;
+    display: none !important;
 
     &.open {
-      transform: translateY(0) !important; // Slide up into view
+      display: block !important;
     }
 
     #statCheckboxes {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
 
-    label {
+    .stat-filter-btn {
       font-size: 12px;
+      flex: 1 1 auto;
     }
+  }
+
+  .teams-page-layout {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .teams-page-layout .rectangle {
+    order: 2;
+    width: 100%;
+  }
+
+  #team-stats-filter-side {
+    order: 1;
+    position: static;
+    width: 100%;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    left: auto;
+    right: auto;
+    top: auto;
+    inset: auto;
+    opacity: 1;
+    visibility: visible;
+    transform: none !important;
+    transition: none;
+    display: none !important;
+
+    &.open {
+      display: block !important;
+    }
+
+    #teamStatFilters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .team-stat-filter-btn {
+      font-size: 12px;
+      flex: 1 1 auto;
+    }
+  }
+
+  .position-filter-side {
+    order: 2;
+    width: 100%;
+  }
+
+  .rectangle {
+    order: 3;
   }
 
   #pageExplainerContainer {

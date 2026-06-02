@@ -1,16 +1,60 @@
 <script type="module" src="./../controllers/players.js"></script>
 
 <div class="small-container">
-  <div class="rectangle">
-    {{> rect-header title="Top Players" link="" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" }}
-    <div id="player-list">
-      {{> player-list-table big=true}}
-    </div>
-    <div id="pageExplainerContainer" class="page-explainer-container hidden">
-      <div id="pageExplainer" class="page-explainer">
-        <span id="closePageExplainer" class="close-page-explainer">×</span>
-        <h3>Players Page Explainer</h3>
-        <p>This page displays the top players based on various statistics. Use the filters to customize the view according to your preferences.</p>
+  <div class="players-page-layout">
+    <div class="rectangle">
+      {{> rect-header title="Top Players" link="" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" }}
+      <div id="player-list">
+        {{> player-list-table big=true}}
       </div>
+      <div id="pageExplainerContainer" class="page-explainer-container hidden">
+        <div id="pageExplainer" class="page-explainer">
+          <span id="closePageExplainer" class="close-page-explainer">×</span>
+          <h3>Players Page Explainer</h3>
+          <p>This page displays the top players based on various statistics. Use the filters to customize the view according to your preferences.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="stats-filter-side" class="side-filter-panel">
+      <h3>Statistics</h3>
+      <div id="statCheckboxes">
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="apps">Appearances</button>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="goals">Goals</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide active" data-stat="npg">Non-Penalty Goals</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide active" data-stat="ga">Goals + Assists</button>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="assists">Assists</button>
+        
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="gap90">GA / 90</button>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="avRating">Rating</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="minutes">Minutes</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="pens">Penalties</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="penaltiesMissed">Pens Missed</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="shotsTotal">Total Shots</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="shotsOn">Shots On Target</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="dribblesAttempts">Dribble Attempts</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="dribblesSucc">Dribbles Success</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="dribblesPast">Dribbled Past</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="duelsTotal">Duels Total</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="duelsWon">Duels Won</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="keyPasses">Key Passes</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="foulsAgainst">Fouls Against</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="foulsCommited">Fouls Committed</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="blocks">Blocks</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="interceptions">Interceptions</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="tackles">Tackles</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="yellowCards">Yellow Cards</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="redCards">Red Cards</button>
+      </div>
+    </div>
+
+    <aside class="position-filter-side side-filter-panel">
+      <h3>Position</h3>
+      <div class="position-filter-list">
+        {{#each positionOptions}}
+        <a href="#" class="position-filter-btn{{#if (includesID ../selectedPPositions this.value)}} active{{/if}}" data-position="{{this.value}}">{{this.label}}</a>
+        {{/each}}
+      </div>
+    </aside>
   </div>
 </div>

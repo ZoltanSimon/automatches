@@ -9,7 +9,26 @@ function getTeamName(id) {
   return allDBTeams?.find((team) => team.ID == id)?.name || "";
 }
 
-export function getPlayerList(registry, nr = 10, teamFilter = "", leagueFilter = []) {
+function toPositionList(positionValue = "") {
+  if (Array.isArray(positionValue)) {
+    return positionValue
+      .map((position) => String(position).trim().toLowerCase())
+      .filter(Boolean);
+  }
+
+  return String(positionValue)
+    .split(",")
+    .map((position) => position.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function getPlayerList(
+  registry,
+  nr = 10,
+  teamFilter = "",
+  leagueFilter = [],
+  positionFilter = [],
+) {
   const playerMap = new Map();
 
   const matches = leagueFilter.length > 0
@@ -48,6 +67,14 @@ export function getPlayerList(registry, nr = 10, teamFilter = "", leagueFilter =
 
   if (teamFilter) {
     players = players.filter(p => p.club === teamFilter);
+  }
+
+  if (positionFilter.length) {
+    const selectedPositions = positionFilter.map((position) => String(position).trim().toLowerCase());
+    players = players.filter((player) => {
+      const playerPositions = toPositionList(player.position);
+      return playerPositions.some((position) => selectedPositions.includes(position));
+    });
   }
 
   return players.slice(0, nr);

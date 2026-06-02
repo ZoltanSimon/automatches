@@ -10,6 +10,63 @@ import {
 } from "../common-functions.js";
 
 const tableName = "team-list-table";
+const teamStatFilterButtons = document.querySelectorAll(".team-stat-filter-btn");
+const teamStatFiltersStorageKey = "teams.activeStatFilters";
+const hasTeamStatFilters = teamStatFilterButtons.length > 0;
+const defaultVisibleTeamStats = [
+  "form",
+  "played",
+  "winPercentage",
+  "goals",
+  "xG",
+  "corners",
+  "shotsOnGoal",
+  "fouls",
+  "possession",
+];
+
+function saveActiveTeamStats() {
+  if (!hasTeamStatFilters) {
+    return;
+  }
+
+  try {
+    const activeStats = Array.from(teamStatFilterButtons)
+      .filter((button) => button.classList.contains("active"))
+      .map((button) => button.dataset.stat)
+      .filter(Boolean);
+
+    window.localStorage.setItem(
+      teamStatFiltersStorageKey,
+      JSON.stringify(activeStats),
+    );
+  } catch (error) {
+    console.error("Unable to save team stat filters", error);
+  }
+}
+
+function restoreActiveTeamStats() {
+  if (!hasTeamStatFilters) {
+    return;
+  }
+
+  try {
+    const savedValue = window.localStorage.getItem(teamStatFiltersStorageKey);
+    const savedStats = savedValue ? JSON.parse(savedValue) : null;
+    const activeStats =
+      Array.isArray(savedStats) && savedStats.length
+        ? new Set(savedStats)
+        : new Set(defaultVisibleTeamStats);
+
+    teamStatFilterButtons.forEach((button) => {
+      button.classList.toggle("active", activeStats.has(button.dataset.stat));
+    });
+
+    saveActiveTeamStats();
+  } catch (error) {
+    console.error("Unable to restore team stat filters", error);
+  }
+}
 
 export function teamList(
   response,
@@ -43,11 +100,28 @@ export function createTeamsTable(response, onlyTotal, big) {
     table.style.visibility = "visible";
   }
 
-  // Add checkbox event listeners for show/hide columns
+  if (hasTeamStatFilters) {
+    const statsFilterSide = document.getElementById("team-stats-filter-side");
+    if (statsFilterSide) {
+      statsFilterSide.style.display = "none";
+    }
+
+    restoreActiveTeamStats();
+
+    teamStatFilterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        button.classList.toggle("active");
+        saveActiveTeamStats();
+        updateTableVisibility();
+      });
+    });
+  }
+
+  // Fallback for legacy checkbox markup if present
   const checkboxes = document.querySelectorAll("input[name='statSelector']");
-  checkboxes.forEach((checkbox) =>
-    checkbox.addEventListener("change", updateTableVisibility),
-  );
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", updateTableVisibility);
+  });
 
   // Initial visibility update
   updateTableVisibility();
@@ -67,8 +141,21 @@ export function createTeamsTable(response, onlyTotal, big) {
 }
 
 function updateTableVisibility() {
-  document.querySelectorAll(`#${tableName} th`).forEach((el, index) => {
+  document.querySelectorAll(`#${tableName} th`).forEach((el) => {
     if (el.dataset.stat) {
+      const button = document.querySelector(
+        `.team-stat-filter-btn[data-stat="${el.dataset.stat}"]`,
+      );
+      if (button) {
+        const isVisible = button.classList.contains("active");
+        if (!isVisible) {
+          hideColumn(el.dataset.stat, tableName);
+        } else {
+          showColumn(el.dataset.stat, tableName);
+        }
+        return;
+      }
+
       const checkbox = document.getElementById(el.dataset.stat);
       if (checkbox && !checkbox.checked) {
         hideColumn(el.dataset.stat, tableName);

@@ -38,6 +38,8 @@ import { parseDate, parseLeagueIds, handleError } from "./backend-helper.js";
 import { extractTeams, getTopTeams } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry } from "./services/registry-service.js";
 import { getPredictionForMatch } from "./services/prediction-service.js";
+import { LineupParser } from "../classes/lineupparser.js";
+import { comparePositionsByDisplayOrder } from "./backend-helper.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -121,8 +123,22 @@ app.get("/", async (req, res) => {
 app.get("/players", async (req, res) => {
   try {
     const selectedLeague = parseLeagueIds(req.query.pleague);
-    const registry = await buildMatchRegistry(selectedLeague);
-    const players = getPlayerList(registry, 500, req.query.team);
+    const selectedPositions = req.query.pposition
+      ? [...new Set(
+        String(req.query.pposition)
+          .split(",")
+          .map((position) => position.trim().toLowerCase())
+          .filter(Boolean)
+      )]
+      : [];
+    const positionOptions = [...new Set(LineupParser.formations.flatMap((formation) => formation.positions))]
+      .sort(comparePositionsByDisplayOrder)
+      .map((position) => ({
+        value: position.toLowerCase(),
+        label: position,
+      }));
+    const registry = await getRegistry();
+    const players = getPlayerList(registry, 500, req.query.team, selectedLeague, selectedPositions);
 
     res.render("players", {
       title: "Players",
@@ -130,6 +146,8 @@ app.get("/players", async (req, res) => {
       players,
       leagues: allDBLeagues.filter(league => league.type === 'league'),
       selectedPLeagues: selectedLeague,
+      selectedPPositions: selectedPositions,
+      positionOptions,
     });
   } catch (error) {
     handleError(res, error, "Error fetching players");
