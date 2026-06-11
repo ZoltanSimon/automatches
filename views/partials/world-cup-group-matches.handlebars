@@ -1,0 +1,40 @@
+{{#if groupedMatches.length}}
+  <table style='border-collapse: collapse; border: 3px solid #1D3557; margin-bottom: 10px;' border='1' class="world-cup-group-matches-table">
+  
+
+    <thead>
+      <tr style="border-bottom: 1px solid #1D3557" class="main-table-header">
+        <th style="width:90px;" class="list-header"><b>Date</b></th>
+        <th class="list-header"><b>Home</b></th>
+        <th style="width:56px;" class="list-header"><b>Score</b></th>
+        <th class="list-header"><b>Away</b></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each groupedMatches as |groupRound|}}
+      {{#each groupRound.matches as |match|}}
+      <tr>
+        <td style="text-align: center; white-space: nowrap;">{{formatDateOnly match.fixture.date}}</td>
+        <td style="cursor:pointer;" onclick="window.location.href='/team?ID={{match.teams.home.id}}'">
+          <span style="display: inline-flex; align-items: center; gap: 6px;">
+            <img src="images/logos/{{match.teams.home.id}}.png" alt="{{match.teams.home.name}}" title="{{match.teams.home.name}}" width="20" height="20" />
+            <span>{{match.teams.home.name}}</span>
+          </span>
+        </td>
+        <td style="text-align: center; font-weight: bold;">{{match.scoreDisplay}}</td>
+        <td style="cursor:pointer;" onclick="window.location.href='/team?ID={{match.teams.away.id}}'">
+          <span style="display: inline-flex; align-items: center; gap: 6px;">
+            <img src="images/logos/{{match.teams.away.id}}.png" alt="{{match.teams.away.name}}" title="{{match.teams.away.name}}" width="20" height="20" />
+            <span>{{match.teams.away.name}}</span>
+          </span>
+        </td>
+      </tr>
+      {{/each}}
+      {{/each}}
+    </tbody>
+      
+  </table>
+
+{{else}}
+  <span>No World Cup group matches found for league 1.</span>
+{{/if}}

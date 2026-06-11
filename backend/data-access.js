@@ -38,6 +38,49 @@ export async function loadLeagues() {
   }
 }
 
+export async function saveLeagueStandingsToDb(leagueID, standings) {
+  try {
+    await pool.execute("DELETE FROM `League_Standing` WHERE league_id = ?", [leagueID]);
+    await pool.execute(
+      "INSERT INTO `League_Standing` (league_id, standings) VALUES (?, ?)",
+      [leagueID, JSON.stringify(standings)],
+    );
+
+    return { leagueID, standings };
+  } catch (error) {
+    console.error(`Error saving standings for league ${leagueID}:`, error);
+    throw error;
+  }
+}
+
+export async function getLeagueStandingsFromDb(leagueID) {
+  try {
+    const [rows] = await pool.query(
+      "SELECT standings FROM `League_Standing` WHERE league_id = ? ORDER BY id DESC LIMIT 1",
+      [leagueID],
+    );
+
+    if (!rows.length) {
+      return [];
+    }
+
+    const standings = rows[0].standings;
+
+    if (Array.isArray(standings)) {
+      return standings;
+    }
+
+    if (typeof standings === "string") {
+      return JSON.parse(standings);
+    }
+
+    return standings || [];
+  } catch (error) {
+    console.error(`Error loading standings for league ${leagueID}:`, error);
+    return [];
+  }
+}
+
 export async function insertPlayersToDb(allPlayers) {
   // Filter out players without valid IDs
   const validPlayers = allPlayers.filter(

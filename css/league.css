@@ -22,22 +22,6 @@
   flex-shrink: 0;
 }
 
-.league-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.league-info h2 {
-  font-size: 42px;
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  color: #f0f4f8;
-  margin: 0;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
 .league-nation {
   display: flex;
   flex-direction: column; /* Stack the rows vertically */

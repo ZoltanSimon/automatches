@@ -1,0 +1,33 @@
+{{#if groups.length}}
+  {{#each groups as |group|}}
+  <table style='border-collapse: collapse; border: 3px solid #1D3557; margin-bottom: 10px;' border='1' class="world-cup-group-table">
+    <thead>
+      <tr style="border-bottom: 2px solid #1D3557" class="main-table-header">
+        <th style="width:48px;" class="list-header"><b>#</b></th>
+        <th style="width:300px;" colspan="2" class="list-header"><b>{{#with (lookup group 0) as |firstTeam|}}{{firstTeam.group}}{{/with}}</b></th>
+        <th style="width:52px;" class="list-header"><b>P</b></th>
+        <th style="width:58px;" class="list-header"><b>GD</b></th>
+        <th style="width:58px;" class="list-header"><b>Pts</b></th>
+        <th style="padding:4px;" class="form-column"><b>Form</b></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each group as |team|}}
+      <tr>
+        <td style="padding:6px; text-align: center; font-weight: bold; background-color: {{#if (lt @index 2)}}transparent{{else}}transparent{{/if}};">{{team.rank}}</td>
+        <td style="width:36px; padding: 2px; text-align: center; background-color: {{#if (lt @index 2)}}transparent{{else}}transparent{{/if}};">
+          <img src="images/logos/{{team.team.id}}.png" class="logo-picture" alt="{{team.team.name}}" title="{{team.team.name}}" width="32" style="cursor:pointer" onclick="window.location.href='/team?ID={{team.team.id}}'" />
+        </td>
+        <td style="border-left-style: hidden; padding: 2px; cursor:pointer; background-color: {{#if (lt @index 2)}}transparent{{else}}transparent{{/if}};" onclick="window.location.href='/team?ID={{team.team.id}}'">{{team.team.name}}</td>
+        <td style="padding:4px; text-align: center;">{{team.all.played}}</td>
+        <td style="padding:4px; text-align: center;">{{team.goalsDiff}}</td>
+        <td style="padding:4px; text-align: center; font-weight: bold">{{team.points}}</td>
+        <td style="padding:4px; text-align: center;">{{team.form}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{/each}}
+{{else}}
+  <span>No World Cup group standings found in the database yet. Use the Test Standings action in Admin to fetch and save them first.</span>
+{{/if}}

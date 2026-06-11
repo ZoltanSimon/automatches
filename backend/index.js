@@ -4,6 +4,7 @@ import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
 import { getResultsDate, getPlayers, getLeaguesByType } from "../webapi-handler.js";
+import { getStandingsFromApi } from "../webapi-handler.js";
 import {
   getMatchFromServer,
   matchesDir,
@@ -18,9 +19,11 @@ import {
   getLeagueFromDb,
   insertTeamsToDb,
   getAllMatchesFromDbUntilDate,
+  getLeagueStandingsFromDb,
   loadLeagues,
   loadPlayers,
-  loadTeams
+  loadTeams,
+  saveLeagueStandingsToDb,
 } from "./data-access.js";
 import { createRequire } from "module";
 import path from "path";
@@ -100,6 +103,46 @@ app.get("/", async (req, res) => {
     const matches = await matchesOnDay(registry, selectedDate);
     const teams = getTopTeams(registry, selectedTeamLeague);
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
+    const worldCupGroups = await getLeagueStandingsFromDb(1);
+    const worldCupGroupMatchesRaw = (await getLeagueFromDb(1))
+      .filter((match) =>
+        String(match?.league?.round || "").toLowerCase().includes("group"),
+      )
+      .sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
+
+    const groupedMatchesByDate = new Map();
+    for (const match of worldCupGroupMatchesRaw) {
+      const dateObj = new Date(match?.fixture?.date);
+      const dateLabel = Number.isNaN(dateObj.getTime())
+        ? "Unknown Date"
+        : dateObj
+          .toLocaleDateString("en-GB", { timeZone: "Europe/Berlin" })
+          .replace(/\//g, ".");
+        const homeGoals = match?.goals?.home;
+        const awayGoals = match?.goals?.away;
+      if (!groupedMatchesByDate.has(dateLabel)) {
+        groupedMatchesByDate.set(dateLabel, {
+          group: dateLabel,
+          sortValue: Number.isNaN(dateObj.getTime()) ? Number.MAX_SAFE_INTEGER : dateObj.getTime(),
+          matches: [],
+        });
+      }
+
+      groupedMatchesByDate.get(dateLabel).matches.push({
+        ...match,
+        scoreDisplay:
+          homeGoals === null ||
+          homeGoals === undefined ||
+          awayGoals === null ||
+          awayGoals === undefined
+            ? "-"
+            : `${homeGoals} - ${awayGoals}`,
+      });
+    }
+
+    const worldCupGroupMatches = [...groupedMatchesByDate.values()]
+      .sort((a, b) => a.sortValue - b.sortValue)
+      .map(({ group, matches }) => ({ group, matches }));
 
     res.render("home", {
       title: "Generation Football - Football Stats, Players & Teams",
@@ -113,7 +156,9 @@ app.get("/", async (req, res) => {
       selectedSLeague: selectedStandingsLeague,
       teams: teams.slice(0, 10),
       standingsLink: `/league?id=${selectedStandingsLeague}`,
-      standings: standings 
+      standings: standings,
+      worldCupGroups,
+      worldCupGroupMatches,
     });
   } catch (error) {
     handleError(res, error, "Error loading home page");
@@ -413,6 +458,36 @@ app.get("/update-leagues", async (request, response) => {
   }
   console.log(responseToSend);
   response.json(responseToSend);
+});
+
+app.get("/test-standings", async (request, response) => {
+  const leagueID = Number(request.query.leagueID ?? 1);
+
+  if (Number.isNaN(leagueID) || leagueID <= 0) {
+    return response.status(400).json({
+      success: false,
+      message: "Invalid leagueID",
+    });
+  }
+
+  try {
+    const standingsData = await getStandingsFromApi(leagueID);
+    const standings = standingsData?.response?.[0]?.league?.standings ?? [];
+
+    await saveLeagueStandingsToDb(leagueID, standings);
+
+    response.json({
+      success: true,
+      leagueID,
+      standings,
+    });
+  } catch (error) {
+    console.error(`Error saving standings for league ${leagueID}:`, error);
+    response.status(500).json({
+      success: false,
+      message: "Failed to fetch and save standings",
+    });
+  }
 });
 
 //saves match
