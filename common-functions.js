@@ -63,6 +63,29 @@ export function copyToClipboard(element) {
   document.getElementById("btn").value = "Copied";
 }
 
+export function addShowMoreButtons(containerSelector = ".table-container") {
+  document.querySelectorAll(containerSelector).forEach((container) => {
+    const needsExpansion = container.scrollHeight > container.clientHeight;
+
+    if (!needsExpansion || container.querySelector(".show-more-btn")) {
+      return;
+    }
+
+    container.classList.add("has-overflow");
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "show-more-btn";
+    btn.textContent = "Show More";
+    container.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+      container.classList.toggle("expanded");
+      btn.textContent = container.classList.contains("expanded") ? "Show Less" : "Show More";
+    });
+  });
+}
+
 export async function showMatchesOnDate(date, showID) {
   let downloads = 0;
   let allLeaguematches = await fetch(`get-matches-on-day?matchDate=${date}`);

@@ -363,7 +363,12 @@
         </div>
       </div>
       <div id="ai-predict-outcome" class="ai-predict-outcome"></div>
-      <div id="ai-predict-reasoning" class="ai-predict-reasoning"></div>
+      <div id="ai-predict-reasoning" class="ai-predict-reasoning">
+        
+      </div>
+      <div class="ai-predict-logo">
+        <img src="/images/logo.png" alt="AI" style="width:32px; vertical-align:middle;" />
+      </div>
     </div>
   </div>
 
@@ -373,6 +378,11 @@
 </div>
 
 <style>
+  .ai-predict-logo {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
   .ai-predict-rect {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
     border: 1px solid #e94560;
@@ -408,14 +418,15 @@
   }
   .ai-predict-team {
     color: #e0e0e0;
-    font-size: 1rem;
+    font-size: 20px;
     font-weight: 600;
+    width: 30%;
   }
   .ai-predict-score {
     color: #e94560;
     font-size: 2rem;
     font-weight: 800;
-    min-width: 30px;
+    min-width: 40px;
     display: inline-block;
   }
   .ai-predict-separator {

@@ -18,7 +18,8 @@ import { addText, buildResults } from "../autotext.js";
 import { playerGoalList, playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
-import { getPlayerStatsFromApi } from "../webapi-handler.js";
+import { getPlayerStatsFromApi, getSquad } from "../webapi-handler.js";
+import { addSquad } from "../../components/team-squad.js";
 
 const response = await fetch(`/get-all-leagues`);
 const allLeagues = await response.json();
@@ -149,7 +150,7 @@ document.getElementById("getPlayerStats").onclick = async function () {
 
 document.getElementById("getSquad").onclick = async function () {
   let teamID = document.getElementById("teamID").value;
-  squadFromApi = await getSquad(teamID);
+  let squadFromApi = await getSquad(teamID);
   addSquad(squadFromApi.response);
 };
 

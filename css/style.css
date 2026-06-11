@@ -570,17 +570,22 @@ footer p {
   left: 50%;
   transform: translateX(-50%);
   padding: 8px 16px;
-  background-color: #457B9D;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  background: #457B9D;
+  color: #f1faee;
+  border: 1px solid rgba(29, 53, 87, 0.18);
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   z-index: 1;
   pointer-events: auto;
+  box-shadow: 0 4px 10px rgba(29, 53, 87, 0.16);
+  font-weight: 600;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 .show-more-btn:hover {
-  background-color: rgb(53.4292035398, 95.2433628319, 121.5707964602);
+  background: rgb(56.5433628319, 100.7946902655, 128.6566371681);
+  box-shadow: 0 6px 14px rgba(29, 53, 87, 0.2);
+  transform: translateX(-50%) translateY(-1px);
 }
 
 #player-list,

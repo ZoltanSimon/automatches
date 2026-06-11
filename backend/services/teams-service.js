@@ -39,7 +39,7 @@ export function extractTeams(
       teamID !== null
         ? true
         : includeGroupStageOnly
-          ? roundName.includes("league stage")
+          ? roundName.includes("league stage") || roundName.includes("group stage")
           : roundName.includes("regular season");
     // only include matches involving the specified team, if provided
     const normalizedTeamID = teamID === null ? null : Number(teamID);

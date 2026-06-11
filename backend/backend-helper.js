@@ -1,5 +1,6 @@
 import { Team } from "../classes/team.js";
 import { defaultLeagues } from "./services/leagues-service.js";
+import { buildTeamList } from "./json-reader.js";
 
 export function findOrCreateTeam(teams, teamData) {
   let team = teams.find((t) => t.id === teamData.id);
@@ -102,4 +103,117 @@ export function comparePositionsByDisplayOrder(a, b) {
   }
 
   return a.localeCompare(b);
+}
+
+function isWorldCupGroupMatch(match) {
+  const roundName = String(match?.league?.round || "").toLowerCase();
+  return (
+    match?.league?.id === 1 &&
+    ["FT", "AET", "PEN"].includes(match?.fixture?.status?.short) &&
+    roundName.includes("group")
+  );
+}
+
+export function mergeWorldCupGroupStandings(baseGroups, registry) {
+  if (!Array.isArray(baseGroups) || baseGroups.length === 0) {
+    return [];
+  }
+
+  const completedGroupMatches = registry.fixtures
+    .filter(isWorldCupGroupMatch)
+    .map(({ fixture }) => registry.matchByID.get(fixture.id))
+    .filter((match) => match?.teams?.home && match?.teams?.away);
+
+  const computedTeams = new Map(
+    buildTeamList(completedGroupMatches).map((team) => [Number(team.id), team]),
+  );
+
+  return baseGroups.map((group) => {
+    if (!Array.isArray(group) || group.length === 0) {
+      return group;
+    }
+
+    const mergedGroup = group.map((baseTeam, index) => {
+      const teamID = Number(baseTeam?.team?.id);
+      const computedTeam = computedTeams.get(teamID);
+      const baseGoalsFor = Number(baseTeam?.goals?.for ?? 0);
+      const baseGoalsAgainst = Number(baseTeam?.goals?.against ?? 0);
+
+      if (!computedTeam) {
+        return {
+          ...baseTeam,
+          rank: baseTeam.rank ?? index + 1,
+          goalsDiff: baseTeam.goalsDiff ?? baseGoalsFor - baseGoalsAgainst,
+          all: {
+            ...(baseTeam.all ?? {}),
+            played: baseTeam.all?.played ?? 0,
+          },
+        };
+      }
+
+      const played = Number(computedTeam.played ?? baseTeam.all?.played ?? 0);
+      const goalsFor = Number(computedTeam.total?.goals ?? baseGoalsFor);
+      const goalsAgainst = Number(
+        computedTeam.total?.goalsAgainst ?? baseGoalsAgainst,
+      );
+
+      return {
+        ...baseTeam,
+        ...computedTeam,
+        team: baseTeam.team ?? {
+          id: computedTeam.id,
+          name: computedTeam.name,
+          logo: computedTeam.logo,
+        },
+        rank: baseTeam.rank ?? index + 1,
+        played,
+        points: Number(computedTeam.points ?? baseTeam.points ?? 0),
+        form: computedTeam.form || baseTeam.form || "",
+        goalsDiff: goalsFor - goalsAgainst,
+        all: {
+          ...(baseTeam.all ?? {}),
+          played,
+          win: computedTeam.wins ?? baseTeam.all?.win ?? 0,
+          draw: computedTeam.draws ?? baseTeam.all?.draw ?? 0,
+          lose: computedTeam.losses ?? baseTeam.all?.lose ?? 0,
+        },
+        goals: {
+          ...(baseTeam.goals ?? {}),
+          for: goalsFor,
+          against: goalsAgainst,
+        },
+        total: {
+          ...(computedTeam.total ?? {}),
+          goals: goalsFor,
+          goalsAgainst,
+        },
+      };
+    });
+
+    mergedGroup.sort(
+      (a, b) =>
+        b.points - a.points ||
+        b.goalsDiff - a.goalsDiff ||
+        Number(b.goals?.for ?? 0) - Number(a.goals?.for ?? 0) ||
+        Number(a.rank ?? Number.MAX_SAFE_INTEGER) -
+          Number(b.rank ?? Number.MAX_SAFE_INTEGER),
+    );
+
+    return mergedGroup.map((team, index) => ({
+      ...team,
+      rank: index + 1,
+    }));
+  });
+}
+
+export function resolveLeagueStandingsForPage(computedStandings, savedStandings = []) {
+  if (Array.isArray(computedStandings) && computedStandings.length > 0) {
+    return computedStandings;
+  }
+
+  if (!Array.isArray(savedStandings) || savedStandings.length === 0) {
+    return [];
+  }
+
+  return Array.isArray(savedStandings[0]) ? savedStandings.flat() : savedStandings;
 }

@@ -37,7 +37,7 @@ import {
 import { matchesOnDay, matchesInRound, lastMatchesFromLeague, allTeamMatches, buildMatchStatistics } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, defaultLeagues, getLeagueStandings } from "./services/leagues-service.js";
-import { parseDate, parseLeagueIds, handleError } from "./backend-helper.js";
+import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings, resolveLeagueStandingsForPage } from "./backend-helper.js";
 import { extractTeams, getTopTeams } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry } from "./services/registry-service.js";
 import { getPredictionForMatch } from "./services/prediction-service.js";
@@ -103,7 +103,7 @@ app.get("/", async (req, res) => {
     const matches = await matchesOnDay(registry, selectedDate);
     const teams = getTopTeams(registry, selectedTeamLeague);
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
-    const worldCupGroups = await getLeagueStandingsFromDb(1);
+    const worldCupGroupsBase = await getLeagueStandingsFromDb(1);
     const worldCupGroupMatchesRaw = (await getLeagueFromDb(1))
       .filter((match) =>
         String(match?.league?.round || "").toLowerCase().includes("group"),
@@ -143,6 +143,7 @@ app.get("/", async (req, res) => {
     const worldCupGroupMatches = [...groupedMatchesByDate.values()]
       .sort((a, b) => a.sortValue - b.sortValue)
       .map(({ group, matches }) => ({ group, matches }));
+    const worldCupGroups = mergeWorldCupGroupStandings(worldCupGroupsBase, registry);
 
     res.render("home", {
       title: "Generation Football - Football Stats, Players & Teams",
@@ -241,7 +242,14 @@ app.get("/team", async (req, res) => {
     return res.redirect("/");
   }
 
-  teamStats[0].leagues = [...teamStats[0].leagues.values()];
+  teamStats[0].leagues = [...teamStats[0].leagues.values()].map((league) => {
+    const leagueFromDb = allDBLeagues.find((dbLeague) => Number(dbLeague.id) === Number(league.id));
+
+    return {
+      ...league,
+      name: league.name || leagueFromDb?.name || `Competition ${league.id}`,
+    };
+  });
 
   res.render("team", { 
     title: thisTeam.name,
@@ -287,7 +295,12 @@ app.get("/league", async (req, res) => {
 
     const players = getPlayerList(registry, 10, null, [selectedLeague]);
     const { matches, rounds, currentRound } = await lastMatchesFromLeague(registry, selectedLeague);
-    const standings = getLeagueStandings(registry, selectedLeague);
+    const standingsFromRegistry = getLeagueStandings(registry, selectedLeague);
+    const savedStandings = await getLeagueStandingsFromDb(selectedLeague);
+    const standings = resolveLeagueStandingsForPage(standingsFromRegistry, savedStandings);
+    const worldCupGroups = selectedLeague === 1
+      ? mergeWorldCupGroupStandings(await getLeagueStandingsFromDb(1), registry)
+      : [];
     const leagueInfo = allDBLeagues.find(league => league.id === selectedLeague);
 
     res.render("league", {
@@ -297,6 +310,7 @@ app.get("/league", async (req, res) => {
       players,
       matches: (matches),
       standings: standings,
+      worldCupGroups,
       rounds: rounds,
       currentRound: currentRound,
       leagueID: selectedLeague,

@@ -16,7 +16,13 @@
     </div>
   </div>
 </div>
-  {{#if standings.length}}
+  {{#if (eq leagueID 1)}}
+  <div class="rectangle" id="rectangle4">
+    <div id="standings" class="table-container large world-cup-panel">
+      {{> world-cup-groups groups=worldCupGroups }}
+    </div>
+  </div>
+  {{else if standings.length}}
   <div class="rectangle" id="rectangle4">
     <div id="standings" class="table-container large">
       {{> standings }}
