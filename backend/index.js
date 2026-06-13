@@ -72,6 +72,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(
+  "/api",
   createApiRouter({
     setAllDbState: ({ players, teams, leagues }) => {
       allDBPlayers = players;
