@@ -263,11 +263,14 @@ app.get("/league", async (req, res) => {
     const { matches, rounds, currentRound } = await lastMatchesFromLeague(registry, selectedLeague);
     const standingsFromRegistry = getLeagueStandings(registry, selectedLeague);
     const savedStandings = selectedSeason === defaultSeason
-      ? await getLeagueStandingsFromDb(selectedLeague)
+      ? await getLeagueStandingsFromDb(selectedLeague, selectedSeason)
       : [];
     const standings = resolveLeagueStandingsForPage(standingsFromRegistry, savedStandings);
     const worldCupGroups = selectedLeague === 1
-      ? mergeWorldCupGroupStandings(await getLeagueStandingsFromDb(1), registry)
+      ? mergeWorldCupGroupStandings(
+        await getLeagueStandingsFromDb(1, selectedSeason),
+        registry,
+      )
       : [];
     const leagueNation = leagueInfo
       ? allDBTeams.find((nation) => nation.ID == leagueInfo.nation)

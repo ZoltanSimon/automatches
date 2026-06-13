@@ -174,12 +174,16 @@ export async function saveLeagueStandingsToDb(leagueID, standings, season = 2026
   }
 }
 
-export async function getLeagueStandingsFromDb(leagueID) {
+export async function getLeagueStandingsFromDb(leagueID, season = null) {
   try {
-    const [rows] = await pool.query(
-      "SELECT standings FROM `League_Standing` WHERE league_id = ? ORDER BY id DESC LIMIT 1",
-      [leagueID],
-    );
+    const normalizedSeason = normalizeSeasonValue(season);
+    const query = normalizedSeason === null
+      ? "SELECT standings FROM `League_Standing` WHERE league_id = ? ORDER BY id DESC LIMIT 1"
+      : "SELECT standings FROM `League_Standing` WHERE league_id = ? AND season = ? ORDER BY id DESC LIMIT 1";
+    const params = normalizedSeason === null
+      ? [leagueID]
+      : [leagueID, normalizedSeason];
+    const [rows] = await pool.query(query, params);
 
     if (!rows.length) {
       return [];
@@ -197,7 +201,10 @@ export async function getLeagueStandingsFromDb(leagueID) {
 
     return standings || [];
   } catch (error) {
-    console.error(`Error loading standings for league ${leagueID}:`, error);
+    console.error(
+      `Error loading standings for league ${leagueID}${normalizedSeason === null ? "" : ` in season ${normalizedSeason}`}:`,
+      error,
+    );
     return [];
   }
 }
