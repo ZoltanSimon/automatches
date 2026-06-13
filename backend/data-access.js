@@ -7,6 +7,10 @@ const CACHE_TTL = 60 * 10000;
 let leagueSeasonTableConfigPromise = null;
 
 function normalizeSeasonValue(season) {
+  if (season === null || season === undefined || season === "") {
+    return null;
+  }
+
   const parsedSeason = Number(season);
   return Number.isNaN(parsedSeason) ? null : parsedSeason;
 }
