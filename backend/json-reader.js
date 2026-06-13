@@ -3,11 +3,15 @@ import { networkPath } from "./config.js";
 import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
 import { importLeague } from "./data-access.js";
-import { getResultFromApi, getResultsFromApiByIds } from "../webapi-handler.js";
+import { getResultFromApi, getResultsFromApiByIds } from "./webapi-handler.js";
 import * as fsSync from 'fs';  // For synchronous/callback operations
 import fs from 'fs/promises';   // For async/await operations
 
 const cache = new Map();
+
+export function clearReaderCache() {
+  cache.clear();
+}
 
 export const matchesDir = `${networkPath}matches`;
 export const leaguesDir = `${networkPath}leagues`;
@@ -51,15 +55,19 @@ export async function getLeagueFromServer(leagueID) {
   }
 }
 
-export async function writeLeagueToServer(leagueID, dataToWrite) {
-  let file = `${leaguesDir}/${leagueID}.json`;
+export async function writeLeagueToServer(leagueID, dataToWrite, season) {
+  let filename = `${leagueID}.json`;
+  if (season != 2026) {
+    filename = `${leagueID}_${season}.json`;
+  }
+  let file = `${leaguesDir}/${filename}`;
   let responseToSend = "";
 
   fsSync.writeFile(file, JSON.stringify(dataToWrite), function (err) {
     if (err) {
       return console.log(err);
     }
-    importLeague(leagueID);
+    importLeague(filename);
   });
   responseToSend += `${leagueID} was saved!<br/>`;
 
@@ -254,8 +262,9 @@ export function buildTeamList(data) {
   }
 }
 
-export async function saveMatchToServer(fixtureID) {   
+export async function saveMatchToServer(fixtureID, options = {}) {   
   console.log(`Saving match with fixture ID: ${fixtureID}`);
+  const overwrite = Boolean(options?.overwrite);
   
   try {
     let { data, limits } = await getResultFromApi(fixtureID);
@@ -263,7 +272,7 @@ export async function saveMatchToServer(fixtureID) {
     await fs.writeFile(
       `${matchesDir}/${fixtureID}.json`,
       JSON.stringify(data.response),
-      { flag: "wx" }
+      { flag: overwrite ? "w" : "wx" }
     );
 
     const resp = {
@@ -280,7 +289,8 @@ export async function saveMatchToServer(fixtureID) {
   }
 }
 
-export async function saveMatchesToServer(fixtureIDs) {
+export async function saveMatchesToServer(fixtureIDs, options = {}) {
+  const overwrite = Boolean(options?.overwrite);
   const ids = Array.isArray(fixtureIDs)
     ? fixtureIDs.map((id) => String(id).trim()).filter(Boolean)
     : String(fixtureIDs || "")
@@ -320,7 +330,7 @@ export async function saveMatchesToServer(fixtureIDs) {
       await fs.writeFile(
         `${matchesDir}/${id}.json`,
         JSON.stringify([match]),
-        { flag: "wx" }
+        { flag: overwrite ? "w" : "wx" }
       );
       saved.push(id);
     } catch (error) {

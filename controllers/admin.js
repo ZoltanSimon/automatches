@@ -18,11 +18,90 @@ import { addText, buildResults } from "../autotext.js";
 import { playerGoalList, playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
-import { getPlayerStatsFromApi, getSquad } from "../webapi-handler.js";
+import { getPlayerStatsFromApi, getSquad } from "../backend/webapi-handler.js";
 import { addSquad } from "../../components/team-squad.js";
 
 const response = await fetch(`/get-all-leagues`);
 const allLeagues = await response.json();
+const leagueById = new Map(allLeagues.map((league) => [Number(league.id), league]));
+const selectedLeagueSeasons = new Map();
+const seasonSelect = document.getElementById("league-season-select");
+const seasonTarget = document.getElementById("league-season-target");
+let activeLeagueID = null;
+
+function getLeagueSeasons(leagueID) {
+  const league = leagueById.get(Number(leagueID));
+  if (!league) {
+    return [];
+  }
+
+  const seasons = Array.isArray(league.seasons) && league.seasons.length > 0
+    ? league.seasons
+    : [league.season];
+
+  return [...new Set(
+    seasons
+      .map((season) => Number(season))
+      .filter((season) => !Number.isNaN(season))
+  )].sort((a, b) => b - a);
+}
+
+function getStoredSeason(leagueID) {
+  const normalizedLeagueID = Number(leagueID);
+  if (!selectedLeagueSeasons.has(normalizedLeagueID)) {
+    const [defaultSeason] = getLeagueSeasons(normalizedLeagueID);
+    if (defaultSeason) {
+      selectedLeagueSeasons.set(normalizedLeagueID, defaultSeason);
+    }
+  }
+
+  return selectedLeagueSeasons.get(normalizedLeagueID) ?? "";
+}
+
+function renderSeasonOptions(leagueID) {
+  const normalizedLeagueID = Number(leagueID);
+  const league = leagueById.get(normalizedLeagueID);
+  const seasons = getLeagueSeasons(normalizedLeagueID);
+
+  seasonSelect.innerHTML = "";
+
+  if (!league || seasons.length === 0) {
+    seasonSelect.disabled = true;
+    seasonTarget.textContent = "No league selected";
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Select a league";
+    seasonSelect.append(emptyOption);
+    return;
+  }
+
+  seasonSelect.disabled = false;
+  seasonTarget.textContent = league.name;
+  const selectedSeason = String(getStoredSeason(normalizedLeagueID));
+
+  for (const season of seasons) {
+    const option = document.createElement("option");
+    option.value = String(season);
+    option.textContent = String(season);
+    option.selected = option.value === selectedSeason;
+    seasonSelect.append(option);
+  }
+}
+
+function setActiveLeague(leagueID) {
+  const normalizedLeagueID = Number(leagueID);
+  activeLeagueID = Number.isNaN(normalizedLeagueID) ? null : normalizedLeagueID;
+  renderSeasonOptions(activeLeagueID);
+}
+
+seasonSelect.addEventListener("change", () => {
+  if (activeLeagueID === null) {
+    return;
+  }
+
+  selectedLeagueSeasons.set(activeLeagueID, Number(seasonSelect.value));
+});
 
 document.getElementById('datepicker-input').addEventListener('change', function () {
   document.getElementById("fixtures-info").innerHTML = "";
@@ -32,6 +111,19 @@ document.getElementById('datepicker-input').addEventListener('change', function 
 
 await showMatchesOnDate(new Date(), true);
 addLeagues("admin", true);
+
+document.querySelectorAll(".admin-league-to-select").forEach((element) => {
+  element.addEventListener("click", () => {
+    const leagueID = Number(element.id.replace("img-", ""));
+    if (selectedLeagues.includes(leagueID)) {
+      setActiveLeague(leagueID);
+      return;
+    }
+
+    const fallbackLeagueID = selectedLeagues[0] ?? null;
+    setActiveLeague(fallbackLeagueID);
+  });
+});
 
 const matchListDiv = document.getElementById("match-list");
 if (matchListDiv) {
@@ -51,11 +143,15 @@ document.getElementById("select-all-leagues").onclick = function () {
   const allTheLeagues = document
     .getElementById("league-list")
     .querySelectorAll("img");
+  selectedLeagues.length = 0;
   for (let i = 0; i < 10; i++) {
     let league = allTheLeagues[i];
     league.classList.add("selected-league");
-    selectedLeagues.push(league.id.split("img-")[1]);
+    const leagueID = Number(league.id.split("img-")[1]);
+    selectedLeagues.push(leagueID);
+    getStoredSeason(leagueID);
   }
+  setActiveLeague(selectedLeagues[0] ?? null);
   console.log(selectedLeagues);
 };
 
@@ -80,11 +176,16 @@ document.getElementById("submit-match-list").onclick = async function () {
 };
 
 document.getElementById("update-leagues").onclick = async function () {
+  if (selectedLeagues.length === 0) {
+    showToast("Select at least one league before updating.");
+    return;
+  }
+
   let leagueID = selectedLeagues.join(",");
   let seasonsArr = [];
   console.log(selectedLeagues);
   for (let id of selectedLeagues) {
-    seasonsArr.push(allLeagues.find((element) => element.id == id).season);
+    seasonsArr.push(getStoredSeason(id));
   }
 
   let seasons = seasonsArr.join(",");
@@ -242,7 +343,9 @@ document.getElementById("download-image").onclick = function () {
 
 document.getElementById("test-standings").onclick = async function () {
   const leagueID = selectedLeagues[0] || 1;
-  const response = await fetch(`/test-standings?leagueID=${leagueID}`);
+  const season = getStoredSeason(leagueID) || 2026;
+  console.log(`Testing standings for league ID: ${leagueID}, season: ${season}`);
+  const response = await fetch(`/test-standings?leagueID=${leagueID}&season=${season}`);
   const result = await response.json();
   console.log(result);
 };

@@ -4,6 +4,49 @@
   gap: 1.25rem;
 }
 
+.league-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.league-title-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.league-title-row h2 {
+  margin: 0;
+}
+
+.league-season-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.league-season-picker span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.league-season-picker select {
+  min-width: 6rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.league-season-picker option {
+  color: black;
+}
+
 .league-logo {
   width: 80px;
   height: 80px;
@@ -57,5 +100,10 @@
 @media (width <= 768px) {
   .league {
     width: 100% !important;
+  }
+  .league-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 }/*# sourceMappingURL=league.css.map */

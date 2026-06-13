@@ -3,8 +3,8 @@ import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
-import { getResultsDate, getPlayers, getLeaguesByType } from "../webapi-handler.js";
-import { getStandingsFromApi } from "../webapi-handler.js";
+import { getResultsDate, getLeaguesByType } from "./webapi-handler.js";
+import { createApiRouter } from "./api.js";
 import {
   getMatchFromServer,
   matchesDir,
@@ -12,18 +12,15 @@ import {
   buildTeamList,
   getLeagueFromServer,
   saveMatchToServer,
-  saveMatchesToServer,
-  dataDir
 } from "./json-reader.js";
 import {
   getLeagueFromDb,
   insertTeamsToDb,
-  getAllMatchesFromDbUntilDate,
   getLeagueStandingsFromDb,
+  getLeagueSeason,
   loadLeagues,
   loadPlayers,
   loadTeams,
-  saveLeagueStandingsToDb,
 } from "./data-access.js";
 import { createRequire } from "module";
 import path from "path";
@@ -56,10 +53,6 @@ const corsOptions = {
 };
 const partialsPath = path.join(__dirname, "../views/partials");
 export let allDBPlayers, allDBTeams, allDBLeagues;
-let playersFetchJob = {
-  running: false,
-  nextPage: 46,
-};
 
 app.engine(
   "handlebars",
@@ -78,6 +71,15 @@ app.use((req, res, next) => {
   res.locals.headerLeagues = allDBLeagues || [];
   next();
 });
+app.use(
+  createApiRouter({
+    setAllDbState: ({ players, teams, leagues }) => {
+      allDBPlayers = players;
+      allDBTeams = teams;
+      allDBLeagues = leagues;
+    },
+  })
+);
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}, loading registry...`);
@@ -104,45 +106,6 @@ app.get("/", async (req, res) => {
     const teams = getTopTeams(registry, selectedTeamLeague);
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
     const worldCupGroupsBase = await getLeagueStandingsFromDb(1);
-    const worldCupGroupMatchesRaw = (await getLeagueFromDb(1))
-      .filter((match) =>
-        String(match?.league?.round || "").toLowerCase().includes("group"),
-      )
-      .sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
-
-    const groupedMatchesByDate = new Map();
-    for (const match of worldCupGroupMatchesRaw) {
-      const dateObj = new Date(match?.fixture?.date);
-      const dateLabel = Number.isNaN(dateObj.getTime())
-        ? "Unknown Date"
-        : dateObj
-          .toLocaleDateString("en-GB", { timeZone: "Europe/Berlin" })
-          .replace(/\//g, ".");
-        const homeGoals = match?.goals?.home;
-        const awayGoals = match?.goals?.away;
-      if (!groupedMatchesByDate.has(dateLabel)) {
-        groupedMatchesByDate.set(dateLabel, {
-          group: dateLabel,
-          sortValue: Number.isNaN(dateObj.getTime()) ? Number.MAX_SAFE_INTEGER : dateObj.getTime(),
-          matches: [],
-        });
-      }
-
-      groupedMatchesByDate.get(dateLabel).matches.push({
-        ...match,
-        scoreDisplay:
-          homeGoals === null ||
-          homeGoals === undefined ||
-          awayGoals === null ||
-          awayGoals === undefined
-            ? "-"
-            : `${homeGoals} - ${awayGoals}`,
-      });
-    }
-
-    const worldCupGroupMatches = [...groupedMatchesByDate.values()]
-      .sort((a, b) => a.sortValue - b.sortValue)
-      .map(({ group, matches }) => ({ group, matches }));
     const worldCupGroups = mergeWorldCupGroupStandings(worldCupGroupsBase, registry);
 
     res.render("home", {
@@ -158,9 +121,7 @@ app.get("/", async (req, res) => {
       teams: teams.slice(0, 10),
       standingsLink: `/league?id=${selectedStandingsLeague}`,
       standings: standings,
-      worldCupGroups,
-      worldCupGroupMatches,
-    });
+      worldCupGroups,});
   } catch (error) {
     handleError(res, error, "Error loading home page");
   }
@@ -290,22 +251,30 @@ app.get("/league", async (req, res) => {
   try {
     const parsed = parseFloat(req.query.id);
     const selectedLeague = isNaN(parsed) ? 39 : parsed;
-
-    const registry = await getRegistry();
+    const selectedSeason = getLeagueSeason(selectedLeague, req.query.season);
+    const defaultSeason = getLeagueSeason(selectedLeague);
+    const leagueInfo = allDBLeagues.find((league) => league.id === selectedLeague);
+    const registry = await buildMatchRegistry([
+      { leagueID: selectedLeague, season: selectedSeason },
+    ]);
 
     const players = getPlayerList(registry, 10, null, [selectedLeague]);
     const { matches, rounds, currentRound } = await lastMatchesFromLeague(registry, selectedLeague);
     const standingsFromRegistry = getLeagueStandings(registry, selectedLeague);
-    const savedStandings = await getLeagueStandingsFromDb(selectedLeague);
+    const savedStandings = selectedSeason === defaultSeason
+      ? await getLeagueStandingsFromDb(selectedLeague)
+      : [];
     const standings = resolveLeagueStandingsForPage(standingsFromRegistry, savedStandings);
     const worldCupGroups = selectedLeague === 1
       ? mergeWorldCupGroupStandings(await getLeagueStandingsFromDb(1), registry)
       : [];
-    const leagueInfo = allDBLeagues.find(league => league.id === selectedLeague);
+    const leagueNation = leagueInfo
+      ? allDBTeams.find((nation) => nation.ID == leagueInfo.nation)
+      : null;
 
     res.render("league", {
       title: "League",
-      description: `Explore detailed stats, recent matches and league performance for ${leagueInfo ? leagueInfo.name : "this league"} on Generation Football's League page.`,
+      description: `Explore detailed stats, recent matches and league performance for ${leagueInfo ? leagueInfo.name : "this league"} in the ${selectedSeason} season on Generation Football's League page.`,
 
       players,
       matches: (matches),
@@ -315,9 +284,11 @@ app.get("/league", async (req, res) => {
       currentRound: currentRound,
       leagueID: selectedLeague,
       leagueName: leagueInfo ? leagueInfo.name : "Unknown League",
+      leagueSeasons: leagueInfo?.seasons ?? [selectedSeason],
+      selectedSeason,
       leagueNation: {
         ID: leagueInfo ? leagueInfo.nation : 0,
-        name: allDBTeams.find(nation => nation.ID == leagueInfo.nation).name 
+        name: leagueNation?.name || "International",
       },
     });
   } catch (error) {
@@ -434,7 +405,7 @@ app.get("/player", async (request, response) => {
 });
 
 app.get("/starting11", (req, res) => {
-  res.render("starting11", { title: "Starting 11 Builder", description: "Build and explore the best starting 11 lineups for your favorite football teams on Generation Football's Starting 11 page." });
+  res.render("palya", { title: "Starting 11 Builder", description: "Build and explore the best starting 11 lineups for your favorite football teams on Generation Football's Starting 11 page." });
 });
 
 app.get("/privacy-policy", (req, res) => {
@@ -468,40 +439,10 @@ app.get("/update-leagues", async (request, response) => {
 
     let dataToWrite = await getResultsDate(leagueID, season);
 
-    responseToSend += await writeLeagueToServer(leagueID, dataToWrite.response);
+    responseToSend += await writeLeagueToServer(leagueID, dataToWrite.response, season);
   }
   console.log(responseToSend);
   response.json(responseToSend);
-});
-
-app.get("/test-standings", async (request, response) => {
-  const leagueID = Number(request.query.leagueID ?? 1);
-
-  if (Number.isNaN(leagueID) || leagueID <= 0) {
-    return response.status(400).json({
-      success: false,
-      message: "Invalid leagueID",
-    });
-  }
-
-  try {
-    const standingsData = await getStandingsFromApi(leagueID);
-    const standings = standingsData?.response?.[0]?.league?.standings ?? [];
-
-    await saveLeagueStandingsToDb(leagueID, standings);
-
-    response.json({
-      success: true,
-      leagueID,
-      standings,
-    });
-  } catch (error) {
-    console.error(`Error saving standings for league ${leagueID}:`, error);
-    response.status(500).json({
-      success: false,
-      message: "Failed to fetch and save standings",
-    });
-  }
 });
 
 //saves match
@@ -545,66 +486,6 @@ console.log(`Total missing matches across leagues ${leagueIDs.join(", ")}: ${mat
   response.json(matchArr);
 });
 
-app.get("/all-missing-matches", async (request, response) => {
-  let matchArr = [];
-  const today = new Date().toISOString().split('T')[0];
-  let data = await getAllMatchesFromDbUntilDate(today);
-  for (const element of data) {
-    try {
-      fs.accessSync(
-        `${matchesDir}/${element.fixtureId}.json`,
-        fs.constants.R_OK,
-      );
-
-      const savedMatchData = await getMatchFromServer(element.fixtureId);
-      const savedMatch = Array.isArray(savedMatchData)
-        ? savedMatchData[0]
-        : savedMatchData;
-      const savedStatus = String(savedMatch?.fixture?.status?.short || "").trim().toUpperCase();
-      const dbStatus = String(element.fixtureStatus || "").trim().toUpperCase();
-
-      if (savedStatus && dbStatus && savedStatus !== dbStatus) {
-        console.log(
-          `[all-missing-matches] Status mismatch for fixture ${element.fixtureId}: json=${savedStatus}, db=${dbStatus}`,
-        );
-      }
-    } catch (err) {
-      matchArr.push(element);
-    }
-  }
-  console.log(`Total missing matches: ${matchArr.length}`);
-
-  // Download the last 100 missing matches in batches of 20 fixture IDs per API request.
-  const matchesToDownload = Math.min(100, matchArr.length);
-  const batchSize = 20;
-  for (let i = 0; i < matchesToDownload; i += batchSize) {
-    const batch = matchArr.slice(i, i + batchSize);
-    const batchIds = batch.map((match) => String(match.fixtureId));
-    const remaining = matchesToDownload - (i + batch.length);
-
-    try {
-      const result = await saveMatchesToServer(batchIds);
-      console.log(
-        `Saved ${result.savedCount}/${batch.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`
-      );
-
-      if (result.failed.length > 0) {
-        console.warn("Failed matches in batch:", result.failed);
-      }
-    } catch (err) {
-      console.error(`Error saving match batch [${batchIds.join(",")}]`, err);
-    }
-
-    if (remaining > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 7000));
-    }
-  }
-
-  console.log(`✅ Finished downloading ${matchesToDownload} matches. ${matchArr.length - matchesToDownload} matches still missing.`);
-
-  response.json(matchArr);
-});
-
 app.get("/get-teams", async (request, response) => {
   const selectedTeamLeague = parseLeagueIds(request.query.leagueID);
   const date = request.query.date;
@@ -625,7 +506,14 @@ app.get("/get-all-matches", async (request, response) => {
 });
 
 app.get("/insert-all-players", async (request, response) => {
-  response.json(await insertAllPlayers());
+  const insertedPlayers = await insertAllPlayers();
+  allDBPlayers = await loadPlayers();
+
+  response.json({
+    success: true,
+    inserted: Array.isArray(insertedPlayers) ? insertedPlayers.length : 0,
+    loadedPlayers: allDBPlayers.length,
+  });
 });
 
 app.get("/get-player-list", async (request, response) => {
@@ -635,97 +523,6 @@ app.get("/get-player-list", async (request, response) => {
   const registry = await buildMatchRegistry(leagues);
   const playerList = getPlayerList(registry, 300);
   response.json(playerList);
-});
-
-app.get("/get-players", async (request, response) => {
-  if (request.query.stop === "true") {
-    playersFetchJob.running = false;
-    console.log("[get-players] Stop requested. Background fetch loop will halt after current iteration.");
-    return response.json({
-      success: true,
-      message: "Stop requested for get-players background loop.",
-      nextPage: playersFetchJob.nextPage,
-    });
-  }
-
-  if (playersFetchJob.running) {
-    return response.json({
-      success: true,
-      message: "get-players background loop is already running.",
-      nextPage: playersFetchJob.nextPage,
-    });
-  }
-
-  try {
-    playersFetchJob.running = true;
-    if (request.query.startPage) {
-      const parsedStart = Number(request.query.startPage);
-      if (!Number.isNaN(parsedStart) && parsedStart > 0) {
-        playersFetchJob.nextPage = parsedStart;
-      }
-    }
-
-    const playersDir = `${dataDir}players`;
-    if (!fs.existsSync(playersDir)) {
-      fs.mkdirSync(playersDir, { recursive: true });
-    }
-
-    const baseQuery = { ...request.query };
-    delete baseQuery.page;
-    delete baseQuery.stop;
-    delete baseQuery.startPage;
-
-    console.log(
-      `[get-players] Starting background fetch loop at page ${playersFetchJob.nextPage}. Interval: 10s.`
-    );
-
-    (async function runLoop() {
-      while (playersFetchJob.running) {
-        const page = playersFetchJob.nextPage;
-        const startedAt = new Date().toISOString();
-
-        try {
-          console.log(`[get-players] Fetching page ${page} at ${startedAt}`);
-          const players = await getPlayers({ ...baseQuery, page });
-          const filename = `${playersDir}/players${page}.json`;
-          fs.writeFileSync(filename, JSON.stringify(players, null, 2));
-
-          const resultCount = typeof players?.results === "number"
-            ? players.results
-            : Array.isArray(players?.response)
-              ? players.response.length
-              : "unknown";
-
-          console.log(
-            `[get-players] Saved page ${page} -> ${filename} (results: ${resultCount})`
-          );
-
-          playersFetchJob.nextPage += 1;
-        } catch (error) {
-          console.error(`[get-players] Error on page ${page}:`, error);
-          playersFetchJob.running = false;
-          break;
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-      }
-
-      console.log(
-        `[get-players] Background loop stopped. Next page is ${playersFetchJob.nextPage}.`
-      );
-    })();
-
-    response.json({
-      success: true,
-      message: "Started get-players background loop.",
-      intervalSeconds: 10,
-      startPage: playersFetchJob.nextPage,
-    });
-  } catch (error) {
-    playersFetchJob.running = false;
-    console.error("Error fetching players profiles:", error);
-    response.status(500).json({ success: false, message: "Failed to fetch players profiles" });
-  }
 });
 
 app.get("/match-exists", async (request, response) => {
@@ -760,19 +557,6 @@ app.get("/get-all-leagues", (req, res) => {
   res.json(allDBLeagues);
 });
 
-app.get("/get-leagues-from-api", async (req, res) => {
-  try {
-    const type = req.query.type || "league";
-    const result = await getLeaguesByType(type);
-    res.json(result);
-  } catch (error) {
-    console.error("Error fetching leagues from external API:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch leagues from API",
-    });
-  }
-});
 
 app.get("/insert-all-clubs-to-db", async (req, res) => {
   let teamsNew = [];

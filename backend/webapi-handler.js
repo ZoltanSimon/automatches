@@ -1,5 +1,5 @@
 const rapidApiHost = "v3.football.api-sports.io";
-const rapidApiKey = "aba57b743572275dac2835162c201c56";
+const rapidApiKey = "8062741318441fb4f851ea73de223ca5";
 let season = 2024;
 
 function getApiHeaders() {
@@ -74,8 +74,7 @@ export async function getResultsFromApiByIds(matchIDs) {
   return { data, limits };
 }
 
-export async function getStandingsFromApi(leagueID) {
-  season = 2026;
+export async function getStandingsFromApi(leagueID, season = 2026) {
   const response = await fetch(
     `https://v3.football.api-sports.io/standings?league=${leagueID}&season=${season}`,
     {

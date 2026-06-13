@@ -6,7 +6,19 @@
   <div class="league">
     <img class="league-logo" src="images/competitions/{{leagueID}}.png" alt="{{leagueName}}">
     <div class="league-info">
-      <h2>{{leagueName}}</h2>
+      <div class="league-title-row">
+        <h2>{{leagueName}}</h2>
+        {{#if leagueSeasons.length}}
+        <label class="league-season-picker" for="league-season-select">
+          <span>Season</span>
+          <select id="league-season-select" data-league-id="{{leagueID}}" aria-label="Select season for {{leagueName}}">
+            {{#each leagueSeasons}}
+            <option value="{{this}}" {{#if (eq this ../selectedSeason)}}selected{{/if}}>{{this}}</option>
+            {{/each}}
+          </select>
+        </label>
+        {{/if}}
+      </div>
       <div class="league-nation">
         <div class="row">
           <img class="nation-flag" src="images/logos/{{leagueNation.ID}}.png" alt="{{leagueNation.name}}">

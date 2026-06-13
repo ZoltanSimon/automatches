@@ -4,6 +4,108 @@ import { allDBLeagues, allDBTeams, allDBPlayers } from "./index.js";
 
 const leagueCache = new Map();
 const CACHE_TTL = 60 * 10000;
+let leagueSeasonTableConfigPromise = null;
+
+function normalizeSeasonValue(season) {
+  const parsedSeason = Number(season);
+  return Number.isNaN(parsedSeason) ? null : parsedSeason;
+}
+
+async function getLeagueSeasonTableConfig() {
+  if (!leagueSeasonTableConfigPromise) {
+    leagueSeasonTableConfigPromise = (async () => {
+      try {
+        const [columns] = await pool.query("SHOW COLUMNS FROM LeagueSeason");
+        const fields = columns.map((column) => column.Field);
+        const fieldLookup = new Map(fields.map((field) => [field.toLowerCase(), field]));
+        const leagueColumn = ["league_id", "league", "leagueid"].find((candidate) => fieldLookup.has(candidate));
+        const seasonColumn = ["season", "year"].find((candidate) => fieldLookup.has(candidate));
+
+        if (!leagueColumn || !seasonColumn) {
+          console.warn("LeagueSeason table found, but expected league/season columns were not detected.");
+          return null;
+        }
+
+        return {
+          leagueColumn: fieldLookup.get(leagueColumn),
+          seasonColumn: fieldLookup.get(seasonColumn),
+        };
+      } catch (error) {
+        console.warn("LeagueSeason table is unavailable, falling back to League.season.", error.message);
+        return null;
+      }
+    })();
+  }
+
+  return leagueSeasonTableConfigPromise;
+}
+
+async function loadLeagueSeasonRows() {
+  const tableConfig = await getLeagueSeasonTableConfig();
+  if (!tableConfig) {
+    return [];
+  }
+
+  const [rows] = await pool.query(
+    `SELECT \`${tableConfig.leagueColumn}\` AS leagueID, \`${tableConfig.seasonColumn}\` AS season FROM LeagueSeason`,
+  );
+
+  return rows
+    .map((row) => ({
+      leagueID: Number(row.leagueID),
+      season: normalizeSeasonValue(row.season),
+    }))
+    .filter((row) => Number.isFinite(row.leagueID) && row.season !== null);
+}
+
+function getLeagueSeasonsFromMetadata(leagueID) {
+  const league = allDBLeagues?.find((item) => Number(item.id) === Number(leagueID));
+
+  if (Array.isArray(league?.seasons) && league.seasons.length > 0) {
+    return league.seasons.map((season) => Number(season)).filter((season) => !Number.isNaN(season));
+  }
+
+  const fallbackSeason = normalizeSeasonValue(league?.season);
+  return fallbackSeason === null ? [] : [fallbackSeason];
+}
+
+export function getLeagueSeasons(leagueID) {
+  return getLeagueSeasonsFromMetadata(leagueID);
+}
+
+export function getLeagueSeason(leagueID, requestedSeason = null) {
+  const normalizedRequestedSeason = normalizeSeasonValue(requestedSeason);
+  const availableSeasons = getLeagueSeasonsFromMetadata(leagueID);
+
+  if (
+    normalizedRequestedSeason !== null &&
+    availableSeasons.includes(normalizedRequestedSeason)
+  ) {
+    return normalizedRequestedSeason;
+  }
+
+  if (availableSeasons.length > 0) {
+    return availableSeasons[0];
+  }
+
+  return normalizeSeasonValue(requestedSeason) ?? new Date().getFullYear();
+}
+
+function normalizeLeagueConfig(input) {
+  if (typeof input === "object" && input !== null) {
+    const leagueID = Number(input.leagueID ?? input.id);
+    return {
+      leagueID,
+      season: getLeagueSeason(leagueID, input.season),
+    };
+  }
+
+  const leagueID = Number(input);
+  return {
+    leagueID,
+    season: getLeagueSeason(leagueID),
+  };
+}
 
 export async function loadPlayers() {
   try {
@@ -28,7 +130,27 @@ export async function loadTeams() {
 export async function loadLeagues() {
   try {
     const [rows] = await pool.query("SELECT * FROM League");
-    let leagues = rows;
+    const leagueSeasonRows = await loadLeagueSeasonRows();
+    const seasonsByLeague = new Map();
+
+    for (const { leagueID, season } of leagueSeasonRows) {
+      if (!seasonsByLeague.has(leagueID)) {
+        seasonsByLeague.set(leagueID, new Set());
+      }
+
+      seasonsByLeague.get(leagueID).add(season);
+    }
+
+    let leagues = rows.map((league) => {
+      const seasons = [...(seasonsByLeague.get(Number(league.id)) ?? [])]
+        .sort((a, b) => b - a);
+
+      return {
+        ...league,
+        season: seasons[0] ?? league.season,
+        seasons: seasons.length > 0 ? seasons : [Number(league.season)],
+      };
+    });
     leagues = leagues.sort((a, b) => a.sort_order - b.sort_order);
     leagues = leagues.filter((lg) => lg.Visible);
     return leagues;
@@ -38,12 +160,11 @@ export async function loadLeagues() {
   }
 }
 
-export async function saveLeagueStandingsToDb(leagueID, standings) {
+export async function saveLeagueStandingsToDb(leagueID, standings, season = 2026) {
   try {
-    await pool.execute("DELETE FROM `League_Standing` WHERE league_id = ?", [leagueID]);
     await pool.execute(
-      "INSERT INTO `League_Standing` (league_id, standings) VALUES (?, ?)",
-      [leagueID, JSON.stringify(standings)],
+      "INSERT INTO `League_Standing` (league_id, standings, season) VALUES (?, ?, ?)",
+      [leagueID, JSON.stringify(standings), season],
     );
 
     return { leagueID, standings };
@@ -155,8 +276,8 @@ export async function insertTeamsToDb(teams) {
   }
 }
 
-export async function importLeague(leagueID) {
-  const filePath = `${networkPath}leagues\\${leagueID}.json`;
+export async function importLeague(fileName) {
+  const filePath = `${networkPath}leagues\\${fileName}`;
 
   const raw = fs.readFileSync(filePath);
   const json = JSON.parse(raw);
@@ -168,6 +289,7 @@ export async function importLeague(leagueID) {
     return;
   }
 
+  const leagueID = matches[0].league.id;
   const season = matches[0].league.season;
 
   // Create single table if it doesn't exist
@@ -266,12 +388,13 @@ export async function importLeague(leagueID) {
 
 export async function getLeagueFromDb(leagueIDs) {
   leagueIDs = Array.isArray(leagueIDs) ? leagueIDs : [leagueIDs];
-  const leagueConfigs = leagueIDs.map((leagueID) => ({
-    leagueID,
-    season:
-      allDBLeagues.find((lg) => lg.id == leagueID)?.season ||
-      new Date().getFullYear(),
-  }));
+  const leagueConfigs = leagueIDs
+    .map(normalizeLeagueConfig)
+    .filter(({ leagueID, season }) => Number.isFinite(leagueID) && season !== null);
+
+  if (leagueConfigs.length === 0) {
+    return [];
+  }
 
   try {
     const placeholders = leagueConfigs
