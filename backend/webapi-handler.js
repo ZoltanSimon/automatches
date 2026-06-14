@@ -1,11 +1,11 @@
-const rapidApiHost = "v3.football.api-sports.io";
-const rapidApiKey = "8062741318441fb4f851ea73de223ca5";
+import { RAPID_API_HOST, RAPID_API_KEY } from "./config.js";
+
 let season = 2024;
 
 function getApiHeaders() {
   return {
-    "x-rapidapi-host": rapidApiHost,
-    "x-rapidapi-key": rapidApiKey,
+    "x-rapidapi-host": RAPID_API_HOST,
+    "x-rapidapi-key": RAPID_API_KEY,
   };
 }
 

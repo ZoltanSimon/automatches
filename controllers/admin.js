@@ -18,7 +18,6 @@ import { addText, buildResults } from "../autotext.js";
 import { playerGoalList, playerListToCanvas } from "../components/player-list.js";
 import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
-import { getPlayerStatsFromApi, getSquad } from "../backend/webapi-handler.js";
 import { addSquad } from "../../components/team-squad.js";
 
 const response = await fetch(`/get-all-leagues`);
@@ -345,7 +344,7 @@ document.getElementById("test-standings").onclick = async function () {
   const leagueID = selectedLeagues[0] || 1;
   const season = getStoredSeason(leagueID) || 2026;
   console.log(`Testing standings for league ID: ${leagueID}, season: ${season}`);
-  const response = await fetch(`/test-standings?leagueID=${leagueID}&season=${season}`);
+  const response = await fetch(`/api/test-standings?leagueID=${leagueID}&season=${season}`);
   const result = await response.json();
   console.log(result);
 };
