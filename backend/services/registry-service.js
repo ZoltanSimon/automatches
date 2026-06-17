@@ -1,5 +1,5 @@
 import {  getLeagueFromDb } from '../data-access.js';
-import { getMatchFromServer, saveMatchesToServer } from '../json-reader.js';
+import { getMatchFromServer } from '../json-reader.js';
 import { allDBLeagues } from '../index.js';
 
 let _registryPromise = null;
@@ -50,24 +50,7 @@ function hasDetailedMatchData(match) {
   return hasPlayers || hasStatistics || hasLineups;
 }
 
-async function hydrateMatchesFromApi(ids, overwrite = false) {
-  if (!Array.isArray(ids) || ids.length === 0) {
-    return;
-  }
-
-  const batchSize = 20;
-  for (let i = 0; i < ids.length; i += batchSize) {
-    const batch = ids.slice(i, i + batchSize).map(String);
-    try {
-      await saveMatchesToServer(batch, { overwrite });
-    } catch (error) {
-      console.error(`Failed to hydrate registry matches for batch [${batch.join(",")}]:`, error);
-    }
-  }
-}
-
 export async function buildMatchRegistry(leagueIDs, options = {}) {
-  const hydrateMissingFromApi = options.hydrateMissingFromApi !== false;
   const rehydrateIncomplete = options.rehydrateIncomplete === true;
 
   const allFixtures = await getLeagueFromDb(leagueIDs);
@@ -84,46 +67,26 @@ export async function buildMatchRegistry(leagueIDs, options = {}) {
     completedIDs.map(id => getMatchFromServer(id))
   );
   const detailedMatches = [];
-  const matchesToHydrate = [];
 
   results.forEach((r, i) => {
     const fixtureID = completedIDs[i];
 
     if (r.status === "rejected") {
       console.error(`Failed to read saved match ${fixtureID}:`, r.reason);
-      matchesToHydrate.push(fixtureID);
       return;
     }
 
     const match = r.value?.[0] ?? null;
     if (!match) {
-      matchesToHydrate.push(fixtureID);
       return;
     }
 
     if (rehydrateIncomplete && !hasDetailedMatchData(match)) {
-      matchesToHydrate.push(fixtureID);
       return;
     }
 
     detailedMatches.push(match);
   });
-
-  if (hydrateMissingFromApi && matchesToHydrate.length > 0) {
-    await hydrateMatchesFromApi(matchesToHydrate, rehydrateIncomplete);
-
-    const reloaded = await Promise.allSettled(matchesToHydrate.map((id) => getMatchFromServer(id)));
-    reloaded.forEach((r, i) => {
-      if (r.status === "rejected") {
-        console.error(`Failed to reload hydrated match ${matchesToHydrate[i]}:`, r.reason);
-        return;
-      }
-      const hydratedMatch = r.value?.[0] ?? null;
-      if (hydratedMatch) {
-        detailedMatches.push(hydratedMatch);
-      }
-    });
-  }
 
   for (const match of detailedMatches) {
     matchByID.set(match.fixture.id, match);

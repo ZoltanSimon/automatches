@@ -12,6 +12,7 @@ let playersFetchJob = {
   running: false,
   nextPage: 46,
 };
+let missingMatchesHydrationJobRunning = false;
 
 function isLocalRequest(request) {
   const ip = String(request.ip || request.socket?.remoteAddress || "").toLowerCase();
@@ -96,33 +97,60 @@ export function createApiRouter({ setAllDbState }) {
     }
     console.log(`Total missing matches: ${matchArr.length}`);
 
-    // Download the last 100 missing matches in batches of 20 fixture IDs per API request.
-    const matchesToDownload = Math.min(100, matchArr.length);
-    const batchSize = 20;
-    for (let i = 0; i < matchesToDownload; i += batchSize) {
-      const batch = matchArr.slice(i, i + batchSize);
-      const batchIds = batch.map((match) => String(match.fixtureId));
-      const remaining = matchesToDownload - (i + batch.length);
-
-      try {
-        const result = await saveMatchesToServer(batchIds);
-        console.log(
-          `Saved ${result.savedCount}/${batch.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`
-        );
-
-        if (result.failed.length > 0) {
-          console.warn("Failed matches in batch:", result.failed);
-        }
-      } catch (err) {
-        console.error(`Error saving match batch [${batchIds.join(",")}]`, err);
-      }
-
-      if (remaining > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 7000));
-      }
+    if (missingMatchesHydrationJobRunning) {
+      return response.status(409).json({
+        success: false,
+        message: "all-missing-matches hydration is already running",
+      });
     }
 
-    console.log(`Finished downloading ${matchesToDownload} matches. ${matchArr.length - matchesToDownload} matches still missing.`);
+    const matchesToDownload = matchArr.length;
+    const batchSize = 20;
+
+    missingMatchesHydrationJobRunning = true;
+    try {
+      for (let i = 0; i < matchesToDownload; i += batchSize) {
+        const batch = matchArr.slice(i, i + batchSize);
+        const unsavedBatch = batch.filter((match) => {
+          try {
+            fs.accessSync(`${matchesDir}/${match.fixtureId}.json`, fs.constants.R_OK);
+            return false;
+          } catch (error) {
+            return true;
+          }
+        });
+
+        const batchIds = [...new Set(unsavedBatch.map((match) => String(match.fixtureId)))];
+        const remaining = matchesToDownload - (i + batch.length);
+
+        if (batchIds.length === 0) {
+          continue;
+        }
+
+        try {
+          const result = await saveMatchesToServer(batchIds);
+          console.log(
+            `Saved ${result.savedCount}/${batchIds.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`
+          );
+
+          if (result.failed.length > 0) {
+            console.warn("Failed matches in batch:", result.failed);
+          }
+        } catch (err) {
+          console.error(`Error saving match batch [${batchIds.join(",")}]`, err);
+        }
+
+        if (remaining > 0) {
+          await new Promise((resolve) => setTimeout(resolve, 7000));
+        }
+      }
+    } finally {
+      missingMatchesHydrationJobRunning = false;
+    }
+
+    console.log(
+      `Finished downloading ${matchesToDownload} matches. ${matchArr.length - matchesToDownload} matches still missing.`
+    );
 
     response.json(matchArr);
   });
@@ -135,10 +163,7 @@ export function createApiRouter({ setAllDbState }) {
       setAllDbState({ players, teams, leagues });
 
       clearReaderCache();
-      await forceRefreshRegistry({
-        hydrateMissingFromApi: true,
-        rehydrateIncomplete: true,
-      });
+      await forceRefreshRegistry();
 
       const registry = await getRegistry();
 
