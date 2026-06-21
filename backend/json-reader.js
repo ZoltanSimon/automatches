@@ -1,4 +1,4 @@
-import { readFile, stat } from "fs/promises";
+import { readFile } from "fs/promises";
 import { networkPath } from "./config.js";
 import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
@@ -7,12 +7,6 @@ import { getResultFromApi, getResultsFromApiByIds } from "./webapi-handler.js";
 import * as fsSync from 'fs';  // For synchronous/callback operations
 import fs from 'fs/promises';   // For async/await operations
 
-const cache = new Map();
-
-export function clearReaderCache() {
-  cache.clear();
-}
-
 export const matchesDir = `${networkPath}matches`;
 export const leaguesDir = `${networkPath}leagues`;
 export const dataDir = `${networkPath}`;
@@ -20,15 +14,7 @@ export const dataDir = `${networkPath}`;
 export async function getMatchFromServer(fixtureID) {
   let file = `${matchesDir}/${fixtureID}.json`;
   try {
-    const fileStat = await stat(file);
-    const cached = cache.get(file);
-
-    if (cached?.mtimeMs === fileStat.mtimeMs) {
-      return cached.value;
-    }
-
     let response = JSON.parse(await readFile(file));
-    cache.set(file, { mtimeMs: fileStat.mtimeMs, value: response });
     return response;
   } catch (e) {
     //console.error(e);
@@ -39,15 +25,7 @@ export async function getMatchFromServer(fixtureID) {
 export async function getLeagueFromServer(leagueID) {
   let file = `${leaguesDir}/${leagueID}.json`;
   try {
-    const fileStat = await stat(file);
-    const cached = cache.get(file);
-
-    if (cached?.mtimeMs === fileStat.mtimeMs) {
-      return cached.value;
-    }
-
     let response = JSON.parse(await readFile(file));
-    cache.set(file, { mtimeMs: fileStat.mtimeMs, value: response });
     return response;
   } catch (e) {
     console.error(e);
@@ -70,8 +48,6 @@ export async function writeLeagueToServer(leagueID, dataToWrite, season) {
     importLeague(filename);
   });
   responseToSend += `${leagueID} was saved!<br/>`;
-
-  cache.set(file, dataToWrite);
   return responseToSend;
 }
 

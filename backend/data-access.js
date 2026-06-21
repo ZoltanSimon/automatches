@@ -2,8 +2,6 @@ import pool, { networkPath } from "./config.js";
 import fs from "fs";
 import { allDBLeagues, allDBTeams, allDBPlayers } from "./index.js";
 
-const leagueCache = new Map();
-const CACHE_TTL = 60 * 10000;
 let leagueSeasonTableConfigPromise = null;
 
 function normalizeSeasonValue(season) {
@@ -350,51 +348,6 @@ export async function importLeague(fileName) {
   console.log(
     `✅ Imported ${matches.length} matches for league ${leagueID} season ${season}`,
   );
-
-  // Update cache after import
-  const cacheKey = `${leagueID}-${season}`;
-  const now = Date.now();
-
-  // Fetch the updated data from database and transform it
-  const [rows] = await pool.query(
-    `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
-     FROM matches
-     WHERE league_id = ? AND season = ?
-     ORDER BY match_date ASC`,
-    [leagueID, season],
-  );
-
-  let leaguematches = rows.map((r) => ({
-    fixture: {
-      id: r.fixtureId,
-      date: r.match_date,
-      status: { short: r.status },
-    },
-    league: {
-      id: r.league_id,
-      season: r.season,
-      round: r.round,
-    },
-    teams: {
-      home: {
-        id: r.home_team_id,
-        name:
-          allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
-      },
-      away: {
-        id: r.away_team_id,
-        name:
-          allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
-      },
-    },
-    goals: {
-      home: r.home_score,
-      away: r.away_score,
-    },
-  }));
-
-  leagueCache.set(cacheKey, { data: leaguematches, timestamp: now });
-  console.log(`✅ Cache updated for ${cacheKey}`);
 }
 
 export async function getLeagueFromDb(leagueIDs) {

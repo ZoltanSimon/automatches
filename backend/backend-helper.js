@@ -167,7 +167,7 @@ export function mergeWorldCupGroupStandings(baseGroups, registry) {
         },
         rank: baseTeam.rank ?? index + 1,
         played,
-        points: Number(computedTeam.points ?? baseTeam.points ?? 0),
+        points: Number(computedTeam.total?.points ?? baseTeam.points ?? 0),
         form: computedTeam.form || baseTeam.form || "",
         goalsDiff: goalsFor - goalsAgainst,
         all: {

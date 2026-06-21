@@ -59,9 +59,22 @@ export async function buildMatchRegistry(leagueIDs, options = {}) {
   );
   const completedIDs = completedFixtures.map(({ fixture }) => fixture.id);
 
-  const matchByID = new Map(
-    completedFixtures.map((fixture) => [fixture.fixture.id, normalizeFixtureAsMatch(fixture)]),
-  );
+  let _matchByID = null;
+  let _fixturesByLeague = null;
+
+  function buildMatchByID() {
+    if (_matchByID) return _matchByID;
+    _matchByID = new Map(
+      completedFixtures.map((fixture) => [fixture.fixture.id, normalizeFixtureAsMatch(fixture)]),
+    );
+    return _matchByID;
+  }
+
+  function buildFixturesByLeague() {
+    if (_fixturesByLeague) return _fixturesByLeague;
+    _fixturesByLeague = Map.groupBy(allFixtures, f => f.league.id);
+    return _fixturesByLeague;
+  }
 
   const results = await Promise.allSettled(
     completedIDs.map(id => getMatchFromServer(id))
@@ -76,7 +89,9 @@ export async function buildMatchRegistry(leagueIDs, options = {}) {
       return;
     }
 
-    const match = r.value?.[0] ?? null;
+    const match = Array.isArray(r.value)
+      ? (r.value[0] ?? null)
+      : (r.value ?? null);
     if (!match) {
       return;
     }
@@ -88,6 +103,7 @@ export async function buildMatchRegistry(leagueIDs, options = {}) {
     detailedMatches.push(match);
   });
 
+  const matchByID = buildMatchByID();
   for (const match of detailedMatches) {
     matchByID.set(match.fixture.id, match);
   }
@@ -99,7 +115,11 @@ export async function buildMatchRegistry(leagueIDs, options = {}) {
   return {
     fixtures: allFixtures,
     matches: allMatches,
-    matchByID,
-    fixturesByLeague: Map.groupBy(allFixtures, f => f.league.id),
+    get matchByID() {
+      return buildMatchByID();
+    },
+    get fixturesByLeague() {
+      return buildFixturesByLeague();
+    },
   };
 }

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { getPlayers } from "./webapi-handler.js";
 import { getStandingsFromApi } from "./webapi-handler.js";
 import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb } from "./data-access.js";
-import { clearReaderCache, dataDir, getMatchFromServer, matchesDir, saveMatchesToServer } from "./json-reader.js";
+import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer } from "./json-reader.js";
 import { forceRefreshRegistry, getRegistry } from "./services/registry-service.js";
 import * as fs from "fs";
 
@@ -162,7 +162,6 @@ export function createApiRouter({ setAllDbState }) {
       const leagues = await loadLeagues();
       setAllDbState({ players, teams, leagues });
 
-      clearReaderCache();
       await forceRefreshRegistry();
 
       const registry = await getRegistry();
