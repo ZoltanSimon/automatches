@@ -351,7 +351,7 @@ app.get("/league", async (req, res) => {
         ID: leagueInfo ? leagueInfo.nation : 0,
         name: leagueNation?.name || "International",
       },
-      title: leagueInfo ? leagueInfo.name + ' - ' + selectedSeason : "League - " + selectedSeason,
+      title: leagueInfo ? leagueInfo.name + ' - ' + selectedSeason : "League - " + selectedSeason + " - Football League",
     });
   } catch (error) {
     handleError(res, error, "Error loading league page");
@@ -466,7 +466,7 @@ app.get("/player", async (request, response) => {
     const details = getPlayerDetails(registry, playerID, selectedLeague);
 
     response.render("player", {
-      title: details.player.name,
+      title: details.player.name + " - Football Player",
       description: `Explore detailed stats, recent matches and league performance for ${details.player.name} on Generation Football's Player page.`,
       player: details.player,
       matches: details.matches,
@@ -479,19 +479,19 @@ app.get("/player", async (request, response) => {
 });
 
 app.get("/starting11", (req, res) => {
-  res.render("palya", { title: "Starting 11 Builder", description: "Build and explore the best starting 11 lineups for your favorite football teams on Generation Football's Starting 11 page." });
+  res.render("palya", { title: "Starting 11 Builder - Football", description: "Build and explore the best starting 11 lineups for your favorite football teams on Generation Football's Starting 11 page." });
 });
 
 app.get("/privacy-policy", (req, res) => {
-  res.render("privacy-policy", { title: "Privacy Policy", description: "Read Generation Football's Privacy Policy to understand how we handle your data and protect your privacy." });
+  res.render("privacy-policy", { title: "Privacy Policy - Generation Football", description: "Read Generation Football's Privacy Policy to understand how we handle your data and protect your privacy." });
 });
 
 app.get("/about", (req, res) => {
-  res.render("about", { title: "About Page", description: "Learn more about Generation Football, our mission, and the team behind the platform." });
+  res.render("about", { title: "About Page - Generation Football", description: "Learn more about Generation Football, our mission, and the team behind the platform." });
 });
 
 app.get("/compare-players", (req, res) => {
-  res.render("compare-players", { title: "Compare Players", description: "Compare detailed stats, performance metrics, and league performance for multiple football players on Generation Football's Compare Players page." });
+  res.render("compare-players", { title: "Compare Players - Generation Football", description: "Compare detailed stats, performance metrics, and league performance for multiple football players on Generation Football's Compare Players page." });
 });
 
 app.get("/status", (request, response) => {
