@@ -4,37 +4,50 @@ import { allDBLeagues } from '../index.js';
 
 let _registryPromise = null;
 
-export function clearRegistryCache() {
-  _registryPromise = null;
+async function getRegistryLeagueSeasonConfigs() {
+  const leagues = Array.isArray(allDBLeagues) ? allDBLeagues : [];
+
+  // allDBLeagues.season is resolved from LeagueSeason (latest season first in loadLeagues).
+  return leagues
+    .map((league) => ({
+      leagueID: Number(league.id),
+      season: Number(league.season),
+    }))
+    .filter(({ leagueID, season }) => Number.isFinite(leagueID) && Number.isFinite(season));
 }
 
 export async function getRegistry() {
   if (!_registryPromise) {
-    _registryPromise = buildMatchRegistry(allDBLeagues.map(l => l.id));
+    const leagueConfigs = await getRegistryLeagueSeasonConfigs();
+    _registryPromise = buildMatchRegistry(leagueConfigs);
   }
   return _registryPromise; // all callers await the same promise
 }
 
 export async function refreshRegistry(options = {}) {
-  _registryPromise = buildMatchRegistry(allDBLeagues.map(l => l.id), options);
+  const leagueConfigs = await getRegistryLeagueSeasonConfigs();
+  _registryPromise = buildMatchRegistry(leagueConfigs);
   await _registryPromise;
   console.log("Registry refreshed at", new Date().toISOString());
 }
 
 export async function forceRefreshRegistry(options = {}) {
-  clearRegistryCache();
   return refreshRegistry(options);
 }
 
 setInterval(refreshRegistry, 30 * 60 * 1000);
 
 function normalizeFixtureAsMatch(fixture) {
+  const fulltimeHome = fixture?.score?.fulltime?.home ?? fixture?.goals?.home ?? 0;
+  const fulltimeAway = fixture?.score?.fulltime?.away ?? fixture?.goals?.away ?? 0;
+
   return {
     ...fixture,
     score: {
+      ...(fixture?.score ?? {}),
       fulltime: {
-        home: fixture?.goals?.home ?? 0,
-        away: fixture?.goals?.away ?? 0,
+        home: fulltimeHome,
+        away: fulltimeAway,
       },
     },
     statistics: fixture?.statistics?.length >= 2
@@ -43,83 +56,115 @@ function normalizeFixtureAsMatch(fixture) {
   };
 }
 
-function hasDetailedMatchData(match) {
-  const hasPlayers = Array.isArray(match?.players) && match.players.length > 0;
-  const hasStatistics = Array.isArray(match?.statistics) && match.statistics.length >= 2;
-  const hasLineups = Array.isArray(match?.lineups) && match.lineups.length > 0;
-  return hasPlayers || hasStatistics || hasLineups;
+function isPlainObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-export async function buildMatchRegistry(leagueIDs, options = {}) {
-  const rehydrateIncomplete = options.rehydrateIncomplete === true;
+function deepMergeMatch(baseValue, extensionValue) {
+  if (extensionValue === undefined) {
+    return baseValue;
+  }
 
-  const allFixtures = await getLeagueFromDb(leagueIDs);
-  const completedFixtures = allFixtures.filter(
-    ({ fixture }) => ["FT", "AET", "PEN"].includes(fixture.status.short),
-  );
-  const completedIDs = completedFixtures.map(({ fixture }) => fixture.id);
+  if (Array.isArray(extensionValue)) {
+    return extensionValue;
+  }
 
-  let _matchByID = null;
-  let _fixturesByLeague = null;
+  if (!isPlainObject(baseValue) || !isPlainObject(extensionValue)) {
+    return extensionValue;
+  }
 
-  function buildMatchByID() {
-    if (_matchByID) return _matchByID;
-    _matchByID = new Map(
-      completedFixtures.map((fixture) => [fixture.fixture.id, normalizeFixtureAsMatch(fixture)]),
+  const merged = { ...baseValue };
+  const keys = new Set([...Object.keys(baseValue), ...Object.keys(extensionValue)]);
+  for (const key of keys) {
+    merged[key] = deepMergeMatch(baseValue[key], extensionValue[key]);
+  }
+
+  return merged;
+}
+
+function extractSavedMatch(payload) {
+  if (!payload) {
+    return null;
+  }
+
+  if (Array.isArray(payload)) {
+    return payload[0] ?? null;
+  }
+
+  if (Array.isArray(payload?.response)) {
+    return payload.response[0] ?? null;
+  }
+
+  if (payload?.match && typeof payload.match === "object") {
+    const nested = payload.match;
+    if (Array.isArray(nested)) {
+      return nested[0] ?? null;
+    }
+    if (Array.isArray(nested?.response)) {
+      return nested.response[0] ?? null;
+    }
+    return nested;
+  }
+
+  return payload;
+}
+
+export async function buildMatchRegistry(leagueIDs) {
+  const allLeagueMatches = await getLeagueFromDb(leagueIDs);
+  const baseMatches = allLeagueMatches
+    .map(normalizeFixtureAsMatch)
+    .filter((match) => match?.fixture?.id !== undefined && match?.fixture?.id !== null);
+  const matchIDs = [...new Set(baseMatches.map(({ fixture }) => fixture.id))];
+
+  const detailedMatchByID = new Map();
+  const batchSize = 150;
+
+  for (let i = 0; i < matchIDs.length; i += batchSize) {
+    const idBatch = matchIDs.slice(i, i + batchSize);
+    const results = await Promise.allSettled(
+      idBatch.map((id) => getMatchFromServer(id)),
     );
-    return _matchByID;
+
+    results.forEach((result, index) => {
+      const fixtureID = idBatch[index];
+
+      if (result.status === "rejected") {
+        console.error(`Failed to read saved match ${fixtureID}:`, result.reason);
+        return;
+      }
+
+      const match = extractSavedMatch(result.value);
+      if (!match?.fixture?.id) {
+        return;
+      }
+
+      detailedMatchByID.set(String(match.fixture.id), match);
+    });
   }
 
-  function buildFixturesByLeague() {
-    if (_fixturesByLeague) return _fixturesByLeague;
-    _fixturesByLeague = Map.groupBy(allFixtures, f => f.league.id);
-    return _fixturesByLeague;
-  }
-
-  const results = await Promise.allSettled(
-    completedIDs.map(id => getMatchFromServer(id))
-  );
-  const detailedMatches = [];
-
-  results.forEach((r, i) => {
-    const fixtureID = completedIDs[i];
-
-    if (r.status === "rejected") {
-      console.error(`Failed to read saved match ${fixtureID}:`, r.reason);
-      return;
-    }
-
-    const match = Array.isArray(r.value)
-      ? (r.value[0] ?? null)
-      : (r.value ?? null);
-    if (!match) {
-      return;
-    }
-
-    if (rehydrateIncomplete && !hasDetailedMatchData(match)) {
-      return;
-    }
-
-    detailedMatches.push(match);
+  const mergedMatches = baseMatches.map((baseMatch) => {
+    const detailMatch = detailedMatchByID.get(String(baseMatch.fixture.id));
+    const merged = detailMatch ? deepMergeMatch(baseMatch, detailMatch) : baseMatch;
+    return normalizeFixtureAsMatch(merged);
   });
 
-  const matchByID = buildMatchByID();
-  for (const match of detailedMatches) {
-    matchByID.set(match.fixture.id, match);
+  const matchByID = new Map(mergedMatches.map((match) => [match.fixture.id, match]));
+
+  // Add string/number aliases to avoid lookup misses when route query IDs and JSON IDs use different types.
+  for (const match of mergedMatches) {
+    const idAsNumber = Number(match.fixture.id);
+    const idAsString = String(match.fixture.id);
+
+    if (!Number.isNaN(idAsNumber)) {
+      matchByID.set(idAsNumber, match);
+    }
+    matchByID.set(idAsString, match);
   }
 
-  const allMatches = completedIDs
-    .map((id) => matchByID.get(id))
-    .filter(Boolean);
-
   return {
-    fixtures: allFixtures,
-    matches: allMatches,
+    matches: mergedMatches,
     get matchByID() {
-      return buildMatchByID();
-    },
-    get fixturesByLeague() {
-      return buildFixturesByLeague();
+      return matchByID;
     },
   };
 }

@@ -18,6 +18,15 @@ import {
 let imgToAdd = [];
 let yPos = 220;
 
+function getExpectedGoals(match, teamID, fallbackIndex) {
+  const stats = Array.isArray(match?.statistics) ? match.statistics : [];
+  const byTeam = stats.find((entry) => Number(entry?.team?.id) === Number(teamID));
+  const teamStats = byTeam?.statistics ?? stats?.[fallbackIndex]?.statistics ?? [];
+  const byType = teamStats.find((entry) => entry?.type === "expected_goals")?.value;
+  const fallback = teamStats?.[16]?.value;
+  return byType ?? fallback ?? "";
+}
+
  export function matchList(fixtures, showID = false) {
   let addToPage, date;
   let leagueName = fixtures[0].league.name;
@@ -52,6 +61,8 @@ let yPos = 220;
 
     let homeTeam = element.teams.home;
     let awayTeam = element.teams.away;
+    const homeXg = getExpectedGoals(element, homeTeam.id, 0);
+    const awayXg = getExpectedGoals(element, awayTeam.id, 1);
 
     loadClubLogo(homeTeam.id);
     loadClubLogo(awayTeam.id);
@@ -70,8 +81,8 @@ let yPos = 220;
     </tr>
     <tr>
       ${thisTime}
-      <td style="text-align: center;">(${element.statistics?.[0]?.statistics?.[16]?.value || ""})</td>
-      <td style="text-align: center;">(${element.statistics?.[1]?.statistics?.[16]?.value || ""})</td>
+      <td style="text-align: center;">(${homeXg})</td>
+      <td style="text-align: center;">(${awayXg})</td>
     </tr>`;
   });
 

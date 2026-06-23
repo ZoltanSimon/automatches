@@ -1,5 +1,6 @@
 import pool, { networkPath } from "./config.js";
 import fs from "fs";
+import path from "path";
 import { allDBLeagues, allDBTeams, allDBPlayers } from "./index.js";
 
 let leagueSeasonTableConfigPromise = null;
@@ -286,7 +287,7 @@ export async function insertTeamsToDb(teams) {
 }
 
 export async function importLeague(fileName) {
-  const filePath = `${networkPath}leagues\\${fileName}`;
+  const filePath = path.join(networkPath, "leagues", fileName);
 
   const raw = fs.readFileSync(filePath);
   const json = JSON.parse(raw);
@@ -414,6 +415,36 @@ export async function getLeagueFromDb(leagueIDs) {
   }
 }
 
+export async function getLeagueSeasonConfigsFromMatches(leagueIDs) {
+  const ids = (Array.isArray(leagueIDs) ? leagueIDs : [leagueIDs])
+    .map((id) => Number(id))
+    .filter((id) => Number.isFinite(id));
+
+  if (ids.length === 0) {
+    return [];
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT DISTINCT league_id AS leagueID, season
+       FROM matches
+       WHERE league_id IN (?)
+       ORDER BY league_id ASC, season DESC`,
+      [ids],
+    );
+
+    return rows
+      .map((row) => ({
+        leagueID: Number(row.leagueID),
+        season: normalizeSeasonValue(row.season),
+      }))
+      .filter(({ leagueID, season }) => Number.isFinite(leagueID) && season !== null);
+  } catch (error) {
+    console.error("Error loading league season configs from matches table:", error);
+    return [];
+  }
+}
+
 export async function getAllTeamMatchesFromDb(teams) {
   try {
     const [rows] = await pool.query(
@@ -441,6 +472,9 @@ export async function getAllMatchesFromDbUntilDate(givenDate) {
        ORDER BY match_date ASC`,
       [givenDate],
     );
+
+    const teamNameById = new Map((allDBTeams || []).map((team) => [team.ID, team.name]));
+
     return rows.map((r) => ({
       fixtureId: r.fixtureId,
       fixtureDate: r.match_date,
@@ -449,11 +483,9 @@ export async function getAllMatchesFromDbUntilDate(givenDate) {
       leagueSeason: r.season,
       leagueRound: r.round,
       homeTeamId: r.home_team_id,
-      homeTeamName:
-        allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+      homeTeamName: teamNameById.get(r.home_team_id) || "Unknown",
       awayTeamId: r.away_team_id,
-      awayTeamName:
-        allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+      awayTeamName: teamNameById.get(r.away_team_id) || "Unknown",
       homeGoals: r.home_score,
       awayGoals: r.away_score,
     }));

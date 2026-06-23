@@ -32,6 +32,14 @@ function localhostOnly(request, response, next) {
   next();
 }
 
+function readSavedStatus(savedMatchData) {
+  const savedMatch = Array.isArray(savedMatchData)
+    ? savedMatchData[0]
+    : savedMatchData;
+
+  return String(savedMatch?.fixture?.status?.short || "").trim().toUpperCase();
+}
+
 export function createApiRouter({ setAllDbState }) {
   const router = Router();
   router.use(localhostOnly);
@@ -69,21 +77,35 @@ export function createApiRouter({ setAllDbState }) {
   });
 
   router.get("/all-missing-matches", async (request, response) => {
-    let matchArr = [];
     const today = new Date().toISOString().split("T")[0];
-    let data = await getAllMatchesFromDbUntilDate(today);
-    for (const element of data) {
-      try {
-        fs.accessSync(
-          `${matchesDir}/${element.fixtureId}.json`,
-          fs.constants.R_OK,
-        );
+    const data = await getAllMatchesFromDbUntilDate(today);
 
-        const savedMatchData = await getMatchFromServer(element.fixtureId);
-        const savedMatch = Array.isArray(savedMatchData)
-          ? savedMatchData[0]
-          : savedMatchData;
-        const savedStatus = String(savedMatch?.fixture?.status?.short || "").trim().toUpperCase();
+    const existingFileNames = new Set(await fs.promises.readdir(matchesDir));
+    const existingMatches = [];
+    const matchArr = [];
+
+    for (const element of data) {
+      if (existingFileNames.has(`${element.fixtureId}.json`)) {
+        existingMatches.push(element);
+      } else {
+        matchArr.push(element);
+      }
+    }
+
+    const statusBatchSize = 150;
+    for (let i = 0; i < existingMatches.length; i += statusBatchSize) {
+      const batch = existingMatches.slice(i, i + statusBatchSize);
+      const statusChecks = await Promise.allSettled(
+        batch.map((element) => getMatchFromServer(element.fixtureId)),
+      );
+
+      statusChecks.forEach((result, index) => {
+        if (result.status !== "fulfilled") {
+          return;
+        }
+
+        const element = batch[index];
+        const savedStatus = readSavedStatus(result.value);
         const dbStatus = String(element.fixtureStatus || "").trim().toUpperCase();
 
         if (savedStatus && dbStatus && savedStatus !== dbStatus) {
@@ -91,10 +113,9 @@ export function createApiRouter({ setAllDbState }) {
             `[all-missing-matches] Status mismatch for fixture ${element.fixtureId}: json=${savedStatus}, db=${dbStatus}`,
           );
         }
-      } catch (err) {
-        matchArr.push(element);
-      }
+      });
     }
+
     console.log(`Total missing matches: ${matchArr.length}`);
 
     if (missingMatchesHydrationJobRunning) {
@@ -111,16 +132,7 @@ export function createApiRouter({ setAllDbState }) {
     try {
       for (let i = 0; i < matchesToDownload; i += batchSize) {
         const batch = matchArr.slice(i, i + batchSize);
-        const unsavedBatch = batch.filter((match) => {
-          try {
-            fs.accessSync(`${matchesDir}/${match.fixtureId}.json`, fs.constants.R_OK);
-            return false;
-          } catch (error) {
-            return true;
-          }
-        });
-
-        const batchIds = [...new Set(unsavedBatch.map((match) => String(match.fixtureId)))];
+        const batchIds = [...new Set(batch.map((match) => String(match.fixtureId)))];
         const remaining = matchesToDownload - (i + batch.length);
 
         if (batchIds.length === 0) {
@@ -171,7 +183,6 @@ export function createApiRouter({ setAllDbState }) {
         players: players.length,
         teams: teams.length,
         leagues: leagues.length,
-        fixtures: registry.fixtures.length,
         matches: registry.matches.length,
         refreshedAt: new Date().toISOString(),
       });

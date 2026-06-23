@@ -1,84 +1,35 @@
-import { getLeagueFromDb } from "./../data-access.js";
-import {
-  matchesDir,
-  getMatchFromServer,
-} from "./../json-reader.js";
+import { buildMatchRegistry } from "./registry-service.js";
 
 export async function matchesOnDay(registry, dateToCheck) {
   const checkDate = new Date(dateToCheck) || new Date();
-  const daysMatches = registry.fixtures.filter(({ fixture }) => (fixture.date.toDateString()) === checkDate.toDateString());
-
-  // Enrich finished matches from registry cache, fallback to server
-  const enriched = await Promise.all(
-    daysMatches.map(async (element) => {
-      const { id, date } = element.fixture;
-      const matchEnd = new Date(new Date(date).getTime() + 150 * 60000);
-
-      if (new Date() > matchEnd) {
-        // Use registry first
-        if (registry.matchByID.has(id)) {
-          return registry.matchByID.get(id);
-        }
-        // Fallback to server if not in registry
-        try {
-          const matchData = await getMatchFromServer(id);
-          return matchData?.[0] ?? element;
-        } catch (err) {
-          console.warn(`No data found for matchID: ${id}`);
-          return element;
-        }
-      }
-
-      return element;
-    })
-  );
-
-  return enriched;
+  return registry.matches.filter(({ fixture }) => {
+    const matchDate = new Date(fixture.date);
+    return matchDate.toDateString() === checkDate.toDateString();
+  });
 }
 
 export async function matchesInRound(roundNr, leagueID) {
   const roundName = (leagueID == 2) ? `League Stage - ${roundNr}` : `Group Stage - ${roundNr}`;
-  let data = await getLeagueFromDb(leagueID);
-  let matches = data.filter((element) => element.league.round == roundName);
-
-  for (let i = 0; i < matches.length; i++) {
-    let matchID = matches[i].fixture.id;
-    let matchData = await getMatchFromServer(matchID);
-    if (matchData && matchData[0]) {
-      matches[i] = matchData[0];
-    }
-  }
-  return matches;
+  const registry = await buildMatchRegistry([Number(leagueID)]);
+  return registry.matches.filter((match) => match.league.id == leagueID && match.league.round == roundName);
 }
 
 export async function lastMatchesFromLeague(registry, leagueID) {
 
-  const leagueFixtures = registry.fixtures
+  const leagueMatches = registry.matches
     .filter(({ fixture, league }) => 
       league.id === leagueID
     )
     .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
 
-  const matches = (await Promise.all(
-    leagueFixtures.map(async (item) => {
-      const match = registry.matchByID.get(item.fixture.id);
-      if (match) {
-        return match;
-      }
-
-      const savedMatch = await getMatchFromServer(item.fixture.id);
-      return savedMatch?.[0] ?? savedMatch ?? item;
-    }),
-  )).filter(Boolean);
-
-  const rounds = [...new Set(leagueFixtures.map(({ league }) => league.round))].reverse();
+  const rounds = [...new Set(leagueMatches.map(({ league }) => league.round))].reverse();
 
   const now = new Date();
   let currentRound = null;
   let minDiff = Infinity;
   for (const round of rounds) {
-    const roundFixtures = leagueFixtures.filter(item => item.league.round === round);
-    for (const item of roundFixtures) {
+    const roundMatches = leagueMatches.filter((item) => item.league.round === round);
+    for (const item of roundMatches) {
       const diff = Math.abs(new Date(item.fixture.date) - now);
       if (diff < minDiff) {
         minDiff = diff;
@@ -87,11 +38,11 @@ export async function lastMatchesFromLeague(registry, leagueID) {
     }
   }
 
-  return { matches, rounds, currentRound };
+  return { matches: leagueMatches, rounds, currentRound };
 }
 
 export async function allTeamMatches(registry, homeTeamID, awayTeamID = null, checkStatus = true) {
-  const fixturesForTeam = registry.fixtures.filter(({ fixture, teams }) => {
+  const matchesForTeam = registry.matches.filter(({ fixture, teams }) => {
     const { home, away } = teams;
     const teamMatch = awayTeamID
       ? home.id === homeTeamID || away.id === homeTeamID || home.id === awayTeamID || away.id === awayTeamID
@@ -102,25 +53,20 @@ export async function allTeamMatches(registry, homeTeamID, awayTeamID = null, ch
     return true;
   });
 
-  const results = await Promise.all(fixturesForTeam.map(async (fixtureData) => {
-    const match = registry.matchByID.get(fixtureData.fixture.id);
-    if (match) {
-      return match;
-    }
-
-    const savedMatch = await getMatchFromServer(fixtureData.fixture.id);
-    return savedMatch?.[0] ?? savedMatch ?? fixtureData;
-  }));
-
-  return results;
+  return matchesForTeam;
 }
 
 export function buildMatchStatistics(currentMatch) {
   const { home, away } = currentMatch.teams;
-  const [rawA, rawB] = currentMatch.statistics ?? [];
+  const stats = Array.isArray(currentMatch.statistics) ? currentMatch.statistics : [];
+  const [rawA, rawB] = stats;
+  const homeID = Number(home?.id);
+  const awayID = Number(away?.id);
 
-  const homeStats = rawA?.team?.id === home.id ? rawA : rawB;
-  const awayStats = rawB?.team?.id === away.id ? rawB : rawA;
+  const homeStats = stats.find((entry) => Number(entry?.team?.id) === homeID)
+    ?? (Number(rawA?.team?.id) === homeID ? rawA : rawB);
+  const awayStats = stats.find((entry) => Number(entry?.team?.id) === awayID)
+    ?? (Number(rawB?.team?.id) === awayID ? rawB : rawA);
 
   const homeByType = new Map((homeStats?.statistics ?? []).map(s => [s.type, s.value]));
   const awayByType = new Map((awayStats?.statistics ?? []).map(s => [s.type, s.value]));

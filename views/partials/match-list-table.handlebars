@@ -86,8 +86,8 @@
       {{else}}
       <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.home}}
-        {{#if statistics.[0].statistics.[16].value}}
-        <span class="match-list-xg">({{statistics.[0].statistics.[16].value}})</span>
+        {{#if (expectedGoalsForTeam this teams.home.id)}}
+        <span class="match-list-xg">({{expectedGoalsForTeam this teams.home.id}})</span>
         {{/if}}
       </td>
 
@@ -97,8 +97,8 @@
 
       <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.away}}
-        {{#if statistics.[1].statistics.[16].value}}
-        <span class="match-list-xg">({{statistics.[1].statistics.[16].value}})</span>
+        {{#if (expectedGoalsForTeam this teams.away.id)}}
+        <span class="match-list-xg">({{expectedGoalsForTeam this teams.away.id}})</span>
         {{/if}}
       </td>
       {{/if}}
@@ -151,8 +151,8 @@
       {{else}}
       <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.home}}
-        {{#if statistics.[0].statistics.[16].value}}
-        <span class="match-list-xg">({{statistics.[0].statistics.[16].value}})</span>
+        {{#if (expectedGoalsForTeam this teams.home.id)}}
+        <span class="match-list-xg">({{expectedGoalsForTeam this teams.home.id}})</span>
         {{/if}}
       </td>
 
@@ -162,8 +162,8 @@
 
       <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{goals.away}}
-        {{#if statistics.[1].statistics.[16].value}}
-        <span class="match-list-xg">({{statistics.[1].statistics.[16].value}})</span>
+        {{#if (expectedGoalsForTeam this teams.away.id)}}
+        <span class="match-list-xg">({{expectedGoalsForTeam this teams.away.id}})</span>
         {{/if}}
       </td>
       {{/if}}

@@ -1,4 +1,5 @@
 import { readFile } from "fs/promises";
+import path from "path";
 import { networkPath } from "./config.js";
 import { findOrCreateTeam } from "./backend-helper.js";
 import { LineupParser } from "./../classes/lineupparser.js";
@@ -7,12 +8,12 @@ import { getResultFromApi, getResultsFromApiByIds } from "./webapi-handler.js";
 import * as fsSync from 'fs';  // For synchronous/callback operations
 import fs from 'fs/promises';   // For async/await operations
 
-export const matchesDir = `${networkPath}matches`;
-export const leaguesDir = `${networkPath}leagues`;
-export const dataDir = `${networkPath}`;
+export const matchesDir = path.join(networkPath, "matches");
+export const leaguesDir = path.join(networkPath, "leagues");
+export const dataDir = networkPath;
 
 export async function getMatchFromServer(fixtureID) {
-  let file = `${matchesDir}/${fixtureID}.json`;
+  let file = path.join(matchesDir, `${fixtureID}.json`);
   try {
     let response = JSON.parse(await readFile(file));
     return response;
@@ -23,7 +24,7 @@ export async function getMatchFromServer(fixtureID) {
 }
 
 export async function getLeagueFromServer(leagueID) {
-  let file = `${leaguesDir}/${leagueID}.json`;
+  let file = path.join(leaguesDir, `${leagueID}.json`);
   try {
     let response = JSON.parse(await readFile(file));
     return response;
@@ -38,7 +39,7 @@ export async function writeLeagueToServer(leagueID, dataToWrite, season) {
   if (season != 2026) {
     filename = `${leagueID}_${season}.json`;
   }
-  let file = `${leaguesDir}/${filename}`;
+  let file = path.join(leaguesDir, filename);
   let responseToSend = "";
 
   fsSync.writeFile(file, JSON.stringify(dataToWrite), function (err) {

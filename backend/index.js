@@ -94,13 +94,6 @@ async function dumpRegistryOnStartup(registry) {
     await writeChunk("{\n");
     await writeChunk(`  \"generatedAt\": ${JSON.stringify(new Date().toISOString())},\n`);
 
-    await writeChunk("  \"fixtures\": [\n");
-    for (let i = 0; i < registry.fixtures.length; i += 1) {
-      const suffix = i < registry.fixtures.length - 1 ? ",\n" : "\n";
-      await writeChunk(`    ${JSON.stringify(registry.fixtures[i])}${suffix}`);
-    }
-    await writeChunk("  ],\n");
-
     await writeChunk("  \"matches\": [\n");
     for (let i = 0; i < registry.matches.length; i += 1) {
       const suffix = i < registry.matches.length - 1 ? ",\n" : "\n";
@@ -114,15 +107,6 @@ async function dumpRegistryOnStartup(registry) {
       const [matchID, match] = matchEntries[i];
       const suffix = i < matchEntries.length - 1 ? ",\n" : "\n";
       await writeChunk(`    ${JSON.stringify(String(matchID))}: ${JSON.stringify(match)}${suffix}`);
-    }
-    await writeChunk("  },\n");
-
-    const leagueEntries = [...registry.fixturesByLeague.entries()];
-    await writeChunk("  \"fixturesByLeague\": {\n");
-    for (let i = 0; i < leagueEntries.length; i += 1) {
-      const [leagueID, fixtures] = leagueEntries[i];
-      const suffix = i < leagueEntries.length - 1 ? ",\n" : "\n";
-      await writeChunk(`    ${JSON.stringify(String(leagueID))}: ${JSON.stringify(fixtures)}${suffix}`);
     }
     await writeChunk("  }\n");
     await writeChunk("}\n");
@@ -361,24 +345,21 @@ app.get("/league", async (req, res) => {
 app.get("/match", async (request, response) => {
   const { matchID } = request.query;
   const matchKey = Number.isNaN(Number(matchID)) ? matchID : Number(matchID);
-  const hasDetailedMatchData = (match) => {
-    const hasPlayers = Array.isArray(match?.players) && match.players.length > 0;
-    const hasStatistics = Array.isArray(match?.statistics) && match.statistics.length >= 2;
-    const hasLineups = Array.isArray(match?.lineups) && match.lineups.length > 0;
-    return hasPlayers || hasStatistics || hasLineups;
-  };
 
   const registry = await getRegistry();
-  const savedMatch = await getMatchFromServer(matchID);
-  const savedMatchEntry = Array.isArray(savedMatch)
-    ? (savedMatch[0] ?? null)
-    : (savedMatch ?? null);
   const registryMatch = registry.matchByID.get(matchKey) ?? null;
-  const fixtureFallback = registry.fixtures.find((f) => f.fixture.id == matchID) ?? null;
-  const currentMatch = [savedMatchEntry, registryMatch, fixtureFallback].find(hasDetailedMatchData)
-    ?? savedMatchEntry
-    ?? registryMatch
-    ?? fixtureFallback;
+  const currentMatch = registryMatch;
+
+  if (!currentMatch) {
+    return response.status(404).render("match", {
+      title: "Match Not Found",
+      description: "Match details are not available.",
+      matchID,
+      teamList: [],
+      matchInfo: null,
+      matchStatistics: [],
+    });
+  }
 
   let teamList = [];
   let matchStatistics = [];
@@ -399,8 +380,10 @@ app.get("/match", async (request, response) => {
 
     matchStatistics = buildMatchStatistics(currentMatch);
   }
-
-  let leagueName = currentMatch.league.id ? allDBLeagues.find(l => l.id == currentMatch.league.id)?.name : "Unknown League" + " - " + currentMatch.league.season;
+console.log(currentMatch);
+  const leagueName = currentMatch.league.id
+    ? allDBLeagues.find((l) => l.id == currentMatch.league.id)?.name
+    : "Unknown League";
   
   response.render("match", {
     title: teamList.map(team => team.name).join(" vs ") + " - " + leagueName  + " - Football Match Details",

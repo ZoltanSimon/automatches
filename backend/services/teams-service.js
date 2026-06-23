@@ -26,9 +26,8 @@ export function extractTeams(
 ) {
   const filterDate = date ? new Date(date) : new Date(2000, 0, 1);
 
-  const completedMatches = registry.fixtures
+  const completedMatches = registry.matches
     .filter(({ fixture }) => ["FT", "AET", "PEN"].includes(fixture.status.short))
-    .map((fixture) => registry.matchByID.get(fixture.fixture.id) ?? fixture)
     .map(toStatsMatch);
 
   const matches = completedMatches.filter((m) => {

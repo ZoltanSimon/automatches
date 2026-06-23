@@ -119,9 +119,8 @@ export function mergeWorldCupGroupStandings(baseGroups, registry) {
     return [];
   }
 
-  const completedGroupMatches = registry.fixtures
+  const completedGroupMatches = registry.matches
     .filter(isWorldCupGroupMatch)
-    .map(({ fixture }) => registry.matchByID.get(fixture.id))
     .filter((match) => match?.teams?.home && match?.teams?.away);
 
   const computedTeams = new Map(

@@ -124,3 +124,18 @@ export const teamAverageRating = (matchPlayers, teamID) => {
 export const isFinishedStatus = (statusShort) => {
   return ["FT", "AET", "PEN", "CANC", "PST"].includes(statusShort);
 }
+
+export const expectedGoalsForTeam = (match, teamID) => {
+  const stats = Array.isArray(match?.statistics) ? match.statistics : [];
+  if (stats.length === 0) return "";
+
+  const numericTeamID = Number(teamID);
+  const teamStats = stats.find((entry) => Number(entry?.team?.id) === numericTeamID)?.statistics
+    ?? [];
+
+  const byType = teamStats.find((entry) => entry?.type === "expected_goals")?.value;
+  const fallback = teamStats?.[16]?.value;
+  const value = byType ?? fallback;
+
+  return value === null || value === undefined || value === "" ? "" : value;
+}

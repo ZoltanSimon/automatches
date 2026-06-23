@@ -157,9 +157,7 @@ export async function getPredictionForMatch(matchID) {
   const matchKey = Number.isNaN(parsedMatchID) ? matchID : parsedMatchID;
 
   const registry = await getRegistry();
-  const match =
-    registry.matchByID.get(matchKey) ??
-    registry.fixtures.find((f) => f.fixture.id == matchID);
+  const match = registry.matchByID.get(matchKey) ?? null;
 
   if (!match) {
     throw new Error(`Match ${matchID} not found in registry`);
