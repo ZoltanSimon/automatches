@@ -136,7 +136,7 @@ app.listen(PORT, async () => {
 app.get("/", async (req, res) => {
   try {
     const selectedDate = parseDate(req.query.date);
-    const selectedPlayerLeague = parseLeagueIds(req.query.pleague);
+    const selectedPlayerLeague = req.query.pleague ? parseLeagueIds(req.query.pleague) : [1];
     const selectedTeamLeague = parseLeagueIds(req.query.tleague);
     const parsed = parseFloat(req.query.sleague);
     const selectedStandingsLeague = isNaN(parsed) ? 39 : parsed;
