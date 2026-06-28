@@ -1,6 +1,15 @@
 export const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
 import { allDBLeagues } from "../index.js";
 import { extractTeams } from "./teams-service.js";
+import { getLeagueStandingsFromDb } from "../data-access.js";
+import { mergeWorldCupGroupStandings, resolveLeagueStandingsForPage } from "../backend-helper.js";
+import { getPlayerList } from "./players-service.js";
+import { lastMatchesFromLeague } from "./matches-service.js";
+import { getTeamById } from "./teams-service.js";
+
+export function getLeagueById(leagueID) {
+  return allDBLeagues.find((league) => Number(league.id) === Number(leagueID)) || null;
+}
 
 export function groupByLeague(matches) {
   const grouped = {};
@@ -52,4 +61,35 @@ export function getLeagueStandings(registry, league) {
   });
 
   return thisStandings;
+}
+
+export async function getLeaguePageData(registry, selectedLeague, selectedSeason, defaultSeason) {
+  const leagueInfo = getLeagueById(selectedLeague);
+  const players = getPlayerList(registry, 10, null, [selectedLeague]);
+  const { matches, rounds, currentRound } = await lastMatchesFromLeague(registry, selectedLeague);
+  const standingsFromRegistry = getLeagueStandings(registry, selectedLeague);
+  const savedStandings = selectedSeason === defaultSeason
+    ? await getLeagueStandingsFromDb(selectedLeague, selectedSeason)
+    : [];
+  const standings = resolveLeagueStandingsForPage(standingsFromRegistry, savedStandings);
+  const worldCupGroups = selectedLeague === 1
+    ? mergeWorldCupGroupStandings(
+      await getLeagueStandingsFromDb(1, selectedSeason),
+      registry,
+    )
+    : [];
+  const leagueNation = leagueInfo
+    ? getTeamById(leagueInfo.nation)
+    : null;
+
+  return {
+    leagueInfo,
+    leagueNation,
+    players,
+    matches,
+    standings,
+    worldCupGroups,
+    rounds,
+    currentRound,
+  };
 }

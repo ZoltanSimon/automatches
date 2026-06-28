@@ -1,5 +1,6 @@
 import { getRegistry } from "./registry-service.js";
 import { calculateXPts } from "./poisson-model.js";
+import { getMatchById } from "./matches-service.js";
 
 // ─── PREDICTION SETTINGS ─────────────────────────────────────────────────────
 // All weights are in the range 0–1 unless noted otherwise.
@@ -153,11 +154,8 @@ function computeTeamAverages(stats) {
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export async function getPredictionForMatch(matchID) {
-  const parsedMatchID = Number(matchID);
-  const matchKey = Number.isNaN(parsedMatchID) ? matchID : parsedMatchID;
-
   const registry = await getRegistry();
-  const match = registry.matchByID.get(matchKey) ?? null;
+  const match = getMatchById(registry, matchID);
 
   if (!match) {
     throw new Error(`Match ${matchID} not found in registry`);

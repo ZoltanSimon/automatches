@@ -2,6 +2,7 @@ import pool, { networkPath } from "./config.js";
 import fs from "fs";
 import path from "path";
 import { allDBLeagues, allDBTeams, allDBPlayers } from "./index.js";
+import { getTeamById } from "./services/teams-service.js";
 
 let leagueSeasonTableConfigPromise = null;
 
@@ -392,13 +393,11 @@ export async function getLeagueFromDb(leagueIDs) {
       teams: {
         home: {
           id: r.home_team_id,
-          name:
-            allDBTeams.find((t) => t.ID === r.home_team_id)?.name || "Unknown",
+          name: getTeamById(r.home_team_id)?.name || "Unknown",
         },
         away: {
           id: r.away_team_id,
-          name:
-            allDBTeams.find((t) => t.ID === r.away_team_id)?.name || "Unknown",
+          name: getTeamById(r.away_team_id)?.name || "Unknown",
         },
       },
       goals: {
@@ -493,4 +492,51 @@ export async function getAllMatchesFromDbUntilDate(givenDate) {
     console.error(`❌ Failed to load all matches from DB:`, e);
     return [];
   }
+}
+
+export async function saveSquadToDb(teamID, squad) {
+  const normalizedTeamID = Number(teamID);
+  if (!Number.isFinite(normalizedTeamID)) {
+    throw new Error("Invalid team ID provided for squad save.");
+  }
+
+  if (!squad || typeof squad !== "object") {
+    throw new Error("Invalid squad payload provided for squad save.");
+  }
+
+  const serializedSquad = JSON.stringify(squad);
+
+  await pool.execute("DELETE FROM Squads WHERE team_id = ?", [normalizedTeamID]);
+  await pool.execute(
+    "INSERT INTO Squads (team_id, squad) VALUES (?, ?)",
+    [normalizedTeamID, serializedSquad],
+  );
+
+  return {
+    teamID: normalizedTeamID,
+    saved: true,
+  };
+}
+
+export async function getSquadFromDb(teamID) {
+  const normalizedTeamID = Number(teamID);
+  if (!Number.isFinite(normalizedTeamID)) {
+    throw new Error("Invalid team ID provided for squad lookup.");
+  }
+
+  const [rows] = await pool.query(
+    "SELECT squad FROM Squads WHERE team_id = ? ORDER BY id DESC LIMIT 1",
+    [normalizedTeamID],
+  );
+
+  if (!rows.length) {
+    return null;
+  }
+
+  const rawSquad = rows[0].squad;
+  if (typeof rawSquad === "string") {
+    return JSON.parse(rawSquad);
+  }
+
+  return rawSquad;
 }

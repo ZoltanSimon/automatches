@@ -1,4 +1,6 @@
 import { buildMatchRegistry } from "./registry-service.js";
+import { buildTeamList } from "../json-reader.js";
+import { allDBLeagues } from "../index.js";
 
 export async function matchesOnDay(registry, dateToCheck) {
   const checkDate = new Date(dateToCheck) || new Date();
@@ -54,6 +56,36 @@ export async function allTeamMatches(registry, homeTeamID, awayTeamID = null, ch
   });
 
   return matchesForTeam;
+}
+
+export function getMatchById(registry, matchID) {
+  const matchKey = Number.isNaN(Number(matchID)) ? matchID : Number(matchID);
+  return registry.matchByID.get(matchKey) ?? null;
+}
+
+export async function getMatchPageData(registry, currentMatch) {
+  const { home, away } = currentMatch.teams;
+  const allMatches = await allTeamMatches(registry, home.id, away.id);
+  const teamList = buildTeamList(allMatches)
+    .filter((team) => team.id === home.id || team.id === away.id)
+    .sort((a, b) => (a.id === home.id ? -1 : b.id === home.id ? 1 : 0))
+    .map((team) => ({
+      ...team,
+      matches: team.matches
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5),
+    }));
+
+  const matchStatistics = buildMatchStatistics(currentMatch);
+  const leagueName = currentMatch.league.id
+    ? allDBLeagues.find((league) => league.id == currentMatch.league.id)?.name || "Unknown League"
+    : "Unknown League";
+
+  return {
+    teamList,
+    matchStatistics,
+    leagueName,
+  };
 }
 
 export function buildMatchStatistics(currentMatch) {

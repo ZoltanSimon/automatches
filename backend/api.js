@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { getPlayers } from "./webapi-handler.js";
 import { getStandingsFromApi } from "./webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb } from "./data-access.js";
-import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer } from "./json-reader.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb } from "./data-access.js";
+import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer, getLeagueFromServer } from "./json-reader.js";
 import { forceRefreshRegistry, getRegistry } from "./services/registry-service.js";
 import * as fs from "fs";
 
@@ -40,9 +40,17 @@ function readSavedStatus(savedMatchData) {
   return String(savedMatch?.fixture?.status?.short || "").trim().toUpperCase();
 }
 
-export function createApiRouter({ setAllDbState }) {
+export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   const router = Router();
   router.use(localhostOnly);
+  let leaguesCache = allDBLeagues;
+  
+  // Wrap setAllDbState to also update our local cache
+  const originalSetAllDbState = setAllDbState;
+  const wrappedSetAllDbState = (state) => {
+    leaguesCache = state.leagues || [];
+    originalSetAllDbState(state);
+  };
 
   router.get("/test-standings", async (request, response) => {
     const leagueID = Number(request.query.leagueID ?? 1);
@@ -172,7 +180,7 @@ export function createApiRouter({ setAllDbState }) {
       const players = await loadPlayers();
       const teams = await loadTeams();
       const leagues = await loadLeagues();
-      setAllDbState({ players, teams, leagues });
+      wrappedSetAllDbState({ players, teams, leagues });
 
       await forceRefreshRegistry();
 
@@ -294,6 +302,86 @@ export function createApiRouter({ setAllDbState }) {
       console.error("Error fetching players profiles:", error);
       response.status(500).json({ success: false, message: "Failed to fetch players profiles" });
     }
+  });
+
+  router.get("/insert-all-clubs-to-db", async (request, response) => {
+    try {
+      const allDBLeagues = await loadLeagues();
+      const allDBTeams = await loadTeams();
+      let teamsNew = [];
+
+      for (let league of allDBLeagues) {
+        let matches = await getLeagueFromServer(league.id);
+        for (const match of matches) {
+          let homeTeam = {
+            ID: match.teams.home.id,
+            name: match.teams.home.name,
+          };
+          let awayTeam = {
+            ID: match.teams.away.id,
+            name: match.teams.away.name,
+          };
+
+          if (!teamsNew.find((e) => e.ID == homeTeam.ID)) {
+            teamsNew.push(homeTeam);
+          }
+
+          if (!teamsNew.find((e) => e.ID == awayTeam.ID)) {
+            teamsNew.push(awayTeam);
+          }
+        }
+      }
+
+      teamsNew = teamsNew.filter(function (obj) {
+        return !allDBTeams.some((el) => el.ID === obj.ID);
+      });
+
+      await insertTeamsToDb(teamsNew);
+      console.log(teamsNew);
+      response.json({
+        success: true,
+        message: `Inserted ${teamsNew.length} new teams into database`,
+        teams: teamsNew,
+      });
+    } catch (error) {
+      console.error("Error inserting clubs to db:", error);
+      response.status(500).json({
+        success: false,
+        message: "Failed to insert clubs to database",
+      });
+    }
+  });
+
+  router.get("/missing-matches", async (request, response) => {
+    //if the request parameter is empty, get all leagues from the database
+    let leagueIDs = request.query.leagueID
+      ? request.query.leagueID.split(",")
+      : leaguesCache.map(l => l.id);
+
+    let matchArr = [];
+    if (leagueIDs.length == 0 || !(leagueIDs[0] > 0)) {
+      return response.json([]);
+    }
+
+    for (const leagueID of leagueIDs) {
+      let data = await getLeagueFromDb(leagueID);
+
+      console.log(`Checking league ${leagueID} with ${data.length} matches for missing match files...`);
+      for (const element of data) {
+        if (["FT", "AET"].includes(element.fixture.status.short)) {
+          try {
+            fs.accessSync(
+              `${matchesDir}/${element.fixture.id}.json`,
+              fs.constants.R_OK
+            );
+          } catch (err) {
+            matchArr.push(element);
+          }
+        }
+      }
+    }
+    console.log(`Total missing matches across leagues ${leagueIDs.join(", ")}: ${matchArr.length}`);
+    response.json(matchArr);
   });
 
   return router;

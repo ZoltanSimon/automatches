@@ -20,8 +20,7 @@ import { oneFixture } from "../components/match-details.js";
 import { addMatchStats, matchStatsToCanvas } from "../components/match-statistics.js";
 import { addSquad } from "../../components/team-squad.js";
 
-const response = await fetch(`/get-all-leagues`);
-const allLeagues = await response.json();
+const allLeagues = window.allLeagues || [];
 const leagueById = new Map(allLeagues.map((league) => [Number(league.id), league]));
 const selectedLeagueSeasons = new Map();
 const seasonSelect = document.getElementById("league-season-select");
@@ -208,7 +207,7 @@ document.getElementById("get-match-auto").onclick = async function () {
 
 document.getElementById("missing-matches").onclick = async function () {
   let leagueID = selectedLeagues.join(",");
-  const response = await fetch(`/missing-matches?leagueID=${leagueID}`, {
+  const response = await fetch(`/api/missing-matches?leagueID=${leagueID}`, {
     method: "GET",
   });
   const data = await response.json();
@@ -221,7 +220,7 @@ document.getElementById("get-player-goal-list").onclick = async function () {
 };
 
 document.getElementById("get-all-clubs").onclick = async function () {
-  let response = await fetch("/insert-all-clubs-to-db", {
+  let response = await fetch("/api/insert-all-clubs-to-db", {
     method: "GET",
   });
   let result = await response.json();
@@ -241,17 +240,38 @@ document.getElementById("insert-all-players").onclick = async function () {
 
 document.getElementById("getPlayerStats").onclick = async function () {
   let player1 = document.getElementById("playerID").value;
-  //let player2 = findPlayerByID(document.getElementById("playerID2").value);
   console.log(await getPlayerStatsFromApi(player1));
   //playerFromApi = await getLocalPlayerStats(player1);
   //playerFromApi2 = await getLocalPlayerStats(player2);
   //addPlayerStats(playerFromApi, playerFromApi2);
 };
 
-document.getElementById("getSquad").onclick = async function () {
-  let teamID = document.getElementById("teamID").value;
-  let squadFromApi = await getSquad(teamID);
-  addSquad(squadFromApi.response);
+document.getElementById("getSquads").onclick = async function () {
+  const leagueID = selectedLeagues[0];
+  if (!leagueID) {
+    showToast("Select a league first.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/get-squads?leagueID=${leagueID}`);
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data?.message || "Failed to fetch squads.");
+    }
+
+    addSquad(data.squads);
+
+    const failedCount = Array.isArray(data.failedTeams) ? data.failedTeams.length : 0;
+    const statusMessage = failedCount > 0
+      ? `Fetched ${data.squads.length} squads. Failed teams: ${failedCount}.`
+      : `Fetched ${data.squads.length} squads.`;
+    showToast(statusMessage, failedCount > 0 ? "warning" : "success");
+  } catch (error) {
+    console.error("Failed to fetch squads:", error);
+    showToast(error.message || "Failed to fetch squads.");
+  }
 };
 
 document.getElementById("clear-results").onclick = async function () {

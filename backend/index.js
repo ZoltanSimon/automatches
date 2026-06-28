@@ -3,21 +3,20 @@ import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
-import { getResultsDate, getLeaguesByType } from "./webapi-handler.js";
+import { getResultsDate, getLeaguesByType, getSquad as getSquadFromApi } from "./webapi-handler.js";
 import { createApiRouter } from "./api.js";
 import {
   getMatchFromServer,
   matchesDir,
   writeLeagueToServer,
-  buildTeamList,
-  getLeagueFromServer,
   saveMatchToServer,
 } from "./json-reader.js";
 import {
   getLeagueFromDb,
-  insertTeamsToDb,
   getLeagueStandingsFromDb,
   getLeagueSeason,
+  getSquadFromDb,
+  saveSquadToDb,
   loadLeagues,
   loadPlayers,
   loadTeams,
@@ -27,19 +26,20 @@ import path from "path";
 import { fileURLToPath } from "url";
 import {
   getPlayerList,
+  getTeamPlayerList,
   insertAllPlayers,
   getPlayerByID,
-  getPlayerDetails,
+  getPlayerPageData,
+  parseSelectedPositions,
+  buildPositionOptions,
 } from "./services/players-service.js";
-import { matchesOnDay, matchesInRound, lastMatchesFromLeague, allTeamMatches, buildMatchStatistics } from "./services/matches-service.js";
+import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
-import { groupByLeague, defaultLeagues, getLeagueStandings } from "./services/leagues-service.js";
-import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings, resolveLeagueStandingsForPage } from "./backend-helper.js";
-import { extractTeams, getTopTeams } from "./services/teams-service.js";
+import { groupByLeague, defaultLeagues, getLeagueStandings, getLeagueById, getLeaguePageData } from "./services/leagues-service.js";
+import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
+import { getTeamById, getTeamPageData, getTopTeams } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry } from "./services/registry-service.js";
 import { getPredictionForMatch } from "./services/prediction-service.js";
-import { LineupParser } from "../classes/lineupparser.js";
-import { comparePositionsByDisplayOrder } from "./backend-helper.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -53,6 +53,10 @@ const corsOptions = {
 };
 const partialsPath = path.join(__dirname, "../views/partials");
 export let allDBPlayers, allDBTeams, allDBLeagues;
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 app.engine(
   "handlebars",
@@ -143,7 +147,8 @@ app.get("/", async (req, res) => {
 
     const registry = await getRegistry();
 
-    const players = getPlayerList(registry, 10, "", selectedPlayerLeague);
+    const playerPageData = getPlayerPageData(registry, null, selectedPlayerLeague);
+    const players = playerPageData?.players || [];
     const matches = await matchesOnDay(registry, selectedDate);
     const teams = getTopTeams(registry, selectedTeamLeague);
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
@@ -172,31 +177,20 @@ app.get("/", async (req, res) => {
 app.get("/players", async (req, res) => {
   try {
     const selectedLeague = parseLeagueIds(req.query.pleague);
-    const selectedPositions = req.query.pposition
-      ? [...new Set(
-        String(req.query.pposition)
-          .split(",")
-          .map((position) => position.trim().toLowerCase())
-          .filter(Boolean)
-      )]
-      : [];
-    const positionOptions = [...new Set(LineupParser.formations.flatMap((formation) => formation.positions))]
-      .sort(comparePositionsByDisplayOrder)
-      .map((position) => ({
-        value: position.toLowerCase(),
-        label: position,
-      }));
+    const selectedPositions = parseSelectedPositions(req.query.pposition);
+    const teamQuery = req.query.team;
+
     const registry = await getRegistry();
-    const players = getPlayerList(registry, 500, req.query.team, selectedLeague, selectedPositions);
+    const players = getPlayerList(registry, 500, teamQuery, selectedLeague, selectedPositions);
 
     res.render("players", {
-      title: "Players",
+      title: "Top Players - Football Player Stats & Performance",
       description: "Discover detailed football player stats, performance metrics and league comparisons on Generation Football's Players page.",
       players,
-      leagues: allDBLeagues.filter(league => league.type === 'league'),
+      leagues: allDBLeagues.filter((league) => league.type === "league"),
       selectedPLeagues: selectedLeague,
       selectedPPositions: selectedPositions,
-      positionOptions,
+      positionOptions: buildPositionOptions(),
     });
   } catch (error) {
     handleError(res, error, "Error fetching players");
@@ -210,7 +204,7 @@ app.get("/top-teams", async (req, res) => {
   const teams = getTopTeams(registry, selectedTeamLeague);
 
   res.render("top-teams", { 
-    title: "Teams",
+    title: "Top Teams - Football Team Stats & Matches",
     description: "Explore detailed football team stats, performance metrics and league comparisons on Generation Football's Teams page.",
     teams: teams.slice(0,150),
     leagues: allDBLeagues.filter(league => league.type === 'league'),
@@ -223,43 +217,26 @@ app.get("/team", async (req, res) => {
     return res.redirect("/");
   }
 
-  let thisTeam = allDBTeams.find(t => t.ID == req.query.ID);
+  const thisTeam = getTeamById(req.query.ID);
   if (!thisTeam) {
     return res.redirect("/");
   }
 
   const registry = await getRegistry();
-  let fullTeamList = extractTeams(registry, null, [], thisTeam.ID);
-  const selectedTeamID = Number(thisTeam.ID);
-  let teamStats = fullTeamList.filter(team => Number(team.id) === selectedTeamID);
-  let matchesToShow = (await allTeamMatches(registry, thisTeam.ID, null, false))
-    .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
-
-  if (!teamStats.length && matchesToShow.length) {
-    const fallbackTeamList = buildTeamList(matchesToShow);
-    teamStats = fallbackTeamList.filter(team => Number(team.id) === selectedTeamID);
-    console.log(`team stats fallback used for team ${selectedTeamID}, matches: ${matchesToShow.length}`);
-  }
+  const { matches, teamStats } = await getTeamPageData(registry, thisTeam.ID);
+  const savedSquad = await getSquadFromDb(thisTeam.ID);
+  const teamPlayers = getTeamPlayerList(registry, thisTeam.ID, savedSquad, 100);
 
   if (!teamStats.length) {
     return res.redirect("/");
   }
 
-  teamStats[0].leagues = [...teamStats[0].leagues.values()].map((league) => {
-    const leagueFromDb = allDBLeagues.find((dbLeague) => Number(dbLeague.id) === Number(league.id));
-
-    return {
-      ...league,
-      name: league.name || leagueFromDb?.name || `Competition ${league.id}`,
-    };
-  });
-
   res.render("team", { 
-    title: thisTeam.name,
+    title: thisTeam.name + " - Football Team Stats & Matches",
     description: `Explore detailed stats, recent matches and league performance for ${thisTeam.name} on Generation Football's Team page.`,
     thisTeam,
-    players: getPlayerList(registry, 100, thisTeam.ID),
-    matches: matchesToShow, 
+    players: teamPlayers,
+    matches, 
     teamStats,  
   });
 });
@@ -295,27 +272,19 @@ app.get("/league", async (req, res) => {
     const selectedLeague = isNaN(parsed) ? 39 : parsed;
     const selectedSeason = getLeagueSeason(selectedLeague, req.query.season);
     const defaultSeason = getLeagueSeason(selectedLeague);
-    const leagueInfo = allDBLeagues.find((league) => league.id === selectedLeague);
+    const leagueInfo = getLeagueById(selectedLeague);
     const registry = await buildMatchRegistry([
       { leagueID: selectedLeague, season: selectedSeason },
     ]);
-
-    const players = getPlayerList(registry, 10, null, [selectedLeague]);
-    const { matches, rounds, currentRound } = await lastMatchesFromLeague(registry, selectedLeague);
-    const standingsFromRegistry = getLeagueStandings(registry, selectedLeague);
-    const savedStandings = selectedSeason === defaultSeason
-      ? await getLeagueStandingsFromDb(selectedLeague, selectedSeason)
-      : [];
-    const standings = resolveLeagueStandingsForPage(standingsFromRegistry, savedStandings);
-    const worldCupGroups = selectedLeague === 1
-      ? mergeWorldCupGroupStandings(
-        await getLeagueStandingsFromDb(1, selectedSeason),
-        registry,
-      )
-      : [];
-    const leagueNation = leagueInfo
-      ? allDBTeams.find((nation) => nation.ID == leagueInfo.nation)
-      : null;
+    const {
+      leagueNation,
+      players,
+      matches,
+      standings,
+      worldCupGroups,
+      rounds,
+      currentRound,
+    } = await getLeaguePageData(registry, selectedLeague, selectedSeason, defaultSeason);
 
     res.render("league", {
       title: "League",
@@ -344,11 +313,9 @@ app.get("/league", async (req, res) => {
 
 app.get("/match", async (request, response) => {
   const { matchID } = request.query;
-  const matchKey = Number.isNaN(Number(matchID)) ? matchID : Number(matchID);
 
   const registry = await getRegistry();
-  const registryMatch = registry.matchByID.get(matchKey) ?? null;
-  const currentMatch = registryMatch;
+  const currentMatch = getMatchById(registry, matchID);
 
   if (!currentMatch) {
     return response.status(404).render("match", {
@@ -361,29 +328,7 @@ app.get("/match", async (request, response) => {
     });
   }
 
-  let teamList = [];
-  let matchStatistics = [];
-
-  if (currentMatch) {
-    const { home, away } = currentMatch.teams;
-
-    const allMatches = await allTeamMatches(registry, home.id, away.id);
-    teamList = buildTeamList(allMatches)
-      .filter(team => team.id === home.id || team.id === away.id)
-      .sort((a, b) => (a.id === home.id ? -1 : b.id === home.id ? 1 : 0))
-      .map(team => ({
-        ...team,
-        matches: team.matches
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 5),
-      }));
-
-    matchStatistics = buildMatchStatistics(currentMatch);
-  }
-console.log(currentMatch);
-  const leagueName = currentMatch.league.id
-    ? allDBLeagues.find((l) => l.id == currentMatch.league.id)?.name
-    : "Unknown League";
+  const { teamList, matchStatistics, leagueName } = await getMatchPageData(registry, currentMatch);
   
   response.render("match", {
     title: teamList.map(team => team.name).join(" vs ") + " - " + leagueName  + " - Football Match Details",
@@ -423,37 +368,24 @@ app.get("/player", async (request, response) => {
       });
     }
 
-    const registry = await getRegistry(); // reuse cached registry
-    const allDetails = getPlayerDetails(registry, playerID, []);
+    const registry = await getRegistry();
+    const playerPageData = getPlayerPageData(registry, playerID, request.query.pleague);
 
-    if (!allDetails) {
+    if (!playerPageData) {
       return response.status(404).render("player", {
         title: "Player Not Found",
         error: "Player not found",
       });
     }
 
-    const availableLeagueIds = allDetails.player.competitionList.map((competition) => competition.id);
-    const hasLeagueQuery = Object.prototype.hasOwnProperty.call(request.query, "pleague");
-    const requestedLeagueIds = hasLeagueQuery
-      ? [...new Set(
-        String(request.query.pleague)
-        .split(",")
-        .map((id) => Number(id.trim()))
-        .filter(Boolean)
-      )]
-      : availableLeagueIds;
-    const filteredLeagueIds = requestedLeagueIds.filter((leagueId) => availableLeagueIds.includes(leagueId));
-    const selectedLeague = filteredLeagueIds.length > 0 ? filteredLeagueIds : availableLeagueIds;
-
-    const details = getPlayerDetails(registry, playerID, selectedLeague);
+    const { details, leagues, selectedLeague } = playerPageData;
 
     response.render("player", {
-      title: details.player.name + " - Football Player",
+      title: details.player.name + " - Football Player Stats & Performance    ",
       description: `Explore detailed stats, recent matches and league performance for ${details.player.name} on Generation Football's Player page.`,
       player: details.player,
       matches: details.matches,
-      leagues: allDetails.player.competitionList || [],
+      leagues,
       selectedPLeagues: selectedLeague,
     });
   } catch (error) {
@@ -510,39 +442,6 @@ app.get("/save-match", async (request, response) => {
   response.json(savedMatch);
 });
 
-//returns missing matches from given league
-app.get("/missing-matches", async (request, response) => {
-  //if the request parameter is empty, get all leagues from the database
-  let leagueIDs = request.query.leagueID
-    ? request.query.leagueID.split(",")
-    : allDBLeagues.map(l => l.id);
-
-  let matchArr = [];
-  if (leagueIDs.length == 0 || !(leagueIDs[0] > 0)) {
-    return response.json([]);
-  }
-
-  for (const leagueID of leagueIDs) {
-    let data = await getLeagueFromDb(leagueID);
-
-    console.log(`Checking league ${leagueID} with ${data.length} matches for missing match files...`);
-    for (const element of data) {
-      if (["FT", "AET"].includes(element.fixture.status.short)) {
-        try {
-          fs.accessSync(
-            `${matchesDir}/${element.fixture.id}.json`,
-            fs.constants.R_OK
-          );
-        } catch (err) {
-          matchArr.push(element);
-        }
-      }
-    }
-  }
-console.log(`Total missing matches across leagues ${leagueIDs.join(", ")}: ${matchArr.length}`);
-  response.json(matchArr);
-});
-
 app.get("/get-teams", async (request, response) => {
   const selectedTeamLeague = parseLeagueIds(request.query.leagueID);
   const date = request.query.date;
@@ -556,12 +455,6 @@ app.get("/get-teams", async (request, response) => {
   }
 });
 
-app.get("/get-all-matches", async (request, response) => {
-  let bigArr = [];
-  await readFile(matchesDir);
-  response.json(bigArr);
-});
-
 app.get("/insert-all-players", async (request, response) => {
   const insertedPlayers = await insertAllPlayers();
   allDBPlayers = await loadPlayers();
@@ -573,34 +466,10 @@ app.get("/insert-all-players", async (request, response) => {
   });
 });
 
-app.get("/get-player-list", async (request, response) => {
-  const leagues = request.query.leagues
-    ? request.query.leagues.split(",").map(Number)
-    : defaultLeagues;
-  const registry = await buildMatchRegistry(leagues);
-  const playerList = getPlayerList(registry, 300);
-  response.json(playerList);
-});
-
-app.get("/match-exists", async (request, response) => {
-  let matchID = request.query.matchID;
-
-  try {
-    fs.accessSync(`${matchesDir}/${matchID}.json`, fs.constants.R_OK);
-    return response.json(await getMatchFromServer(matchID));
-  } catch (err) {}
-  response.json(null);
-});
-
 app.get("/get-matches-on-day", async (request, response) => {
   const registry = await getRegistry();
   let todaysMatches = await matchesOnDay(registry, new Date(request.query.matchDate));
   response.json(todaysMatches);
-});
-
-app.get("/find-player-by-id", async (request, response) => {
-  let playerID = request.query.playerID;
-  response.json(await getPlayerByID(playerID));
 });
 
 app.get("/get-matches-by-round", async (request, response) => {
@@ -610,38 +479,62 @@ app.get("/get-matches-by-round", async (request, response) => {
   response.json(matches);
 });
 
-app.get("/get-all-leagues", (req, res) => {
-  res.json(allDBLeagues);
-});
+app.get("/get-squads", async (request, response) => {
+  try {
+    const leagueID = Number(request.query.leagueID);
+    const delayMsFromQuery = Number(request.query.delayMs);
+    const delayMs = Number.isFinite(delayMsFromQuery) && delayMsFromQuery >= 0
+      ? delayMsFromQuery
+      : 3000;
+    if (!Number.isFinite(leagueID)) {
+      return response.status(400).json({ success: false, message: "leagueID query parameter is required." });
+    }
 
+    const registry = await getRegistry();
+    const leagueMatches = registry.matches.filter((match) => Number(match?.league?.id) === leagueID);
+    const teamIDs = [...new Set(
+      leagueMatches.flatMap((match) => [
+        Number(match?.teams?.home?.id),
+        Number(match?.teams?.away?.id),
+      ]).filter((teamID) => Number.isFinite(teamID))
+    )];
 
-app.get("/insert-all-clubs-to-db", async (req, res) => {
-  let teamsNew = [];
-  for (let league of allDBLeagues) {
-    let matches = await getLeagueFromServer(league.id);
-    for (const match of matches) {
-      let homeTeam = {
-        ID: match.teams.home.id,
-        name: match.teams.home.name,
-      };
-      let awayTeam = {
-        ID: match.teams.away.id,
-        name: match.teams.away.name,
-      };
+    const squads = [];
+    const failedTeams = [];
+    let savedCount = 0;
 
-      if (!teamsNew.find((e) => e.ID == homeTeam.ID)) {
-        teamsNew.push(homeTeam);
+    for (let i = 0; i < teamIDs.length; i += 1) {
+      const teamID = teamIDs[i];
+
+      try {
+        const responsePayload = await getSquadFromApi(teamID);
+        const squadList = Array.isArray(responsePayload?.response) ? responsePayload.response : [];
+        for (const squad of squadList) {
+          squads.push(squad);
+          await saveSquadToDb(teamID, squad);
+          savedCount += 1;
+        }
+      } catch (error) {
+        failedTeams.push(teamID);
       }
 
-      if (!teamsNew.find((e) => e.ID == awayTeam.ID)) {
-        teamsNew.push(awayTeam);
+      if (i < teamIDs.length - 1 && delayMs > 0) {
+        await wait(delayMs);
       }
     }
-  }
 
-  teamsNew = teamsNew.filter(function (obj) {
-    return !allDBTeams.some((el) => el.ID === obj.ID);
-  });
-  insertTeamsToDb(teamsNew);
-  console.log(teamsNew);
+    response.json({
+      success: true,
+      leagueID,
+      teamCount: teamIDs.length,
+      delayMs,
+      savedCount,
+      squads,
+      failedTeams,
+    });
+  } catch (error) {
+    handleError(response, error, "Error fetching squads");
+  }
 });
+
+

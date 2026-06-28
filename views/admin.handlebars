@@ -1,5 +1,7 @@
 <script type="module" src="./../controllers/admin.js"></script>
-
+<script>
+  window.allLeagues = {{{json leagues}}};
+</script>
 <link rel="stylesheet" href="css/automatches.css" />
 <div class="main-admin-container">
   <div class="work-area child-div">
@@ -95,7 +97,7 @@
           </div>
           <div class="automatches-row">
             <input type="number" placeholder="541" id="teamID" />
-            <button id="getSquad">Get Squad</button>
+            <button id="getSquads">Get Squads</button>
             <button id="get-player-goal-list">Get Player List</button>
           </div>
           <button id="get-all-clubs">Get all clubs</button>

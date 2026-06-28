@@ -1,4 +1,6 @@
 import { buildTeamList } from "./../json-reader.js";
+import { allDBLeagues, allDBTeams } from "../index.js";
+import { allTeamMatches } from "./matches-service.js";
 
 function toStatsMatch(matchOrFixture) {
   if (matchOrFixture?.statistics?.length >= 2) {
@@ -67,4 +69,37 @@ export function getTopTeams(registry, leagues) {
   );
 
   return thisToPTeams;
+}
+
+export function getTeamById(teamID) {
+  return allDBTeams.find((team) => Number(team.ID) === Number(teamID)) || null;
+}
+
+export async function getTeamPageData(registry, teamID) {
+  const selectedTeamID = Number(teamID);
+  const fullTeamList = extractTeams(registry, null, [], selectedTeamID);
+  let teamStats = fullTeamList.filter((team) => Number(team.id) === selectedTeamID);
+  const matches = (await allTeamMatches(registry, selectedTeamID, null, false))
+    .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+
+  if (!teamStats.length && matches.length) {
+    const fallbackTeamList = buildTeamList(matches);
+    teamStats = fallbackTeamList.filter((team) => Number(team.id) === selectedTeamID);
+    console.log(`team stats fallback used for team ${selectedTeamID}, matches: ${matches.length}`);
+  }
+
+  if (!teamStats.length) {
+    return { matches, teamStats: [] };
+  }
+
+  teamStats[0].leagues = [...teamStats[0].leagues.values()].map((league) => {
+    const leagueFromDb = allDBLeagues.find((dbLeague) => Number(dbLeague.id) === Number(league.id));
+
+    return {
+      ...league,
+      name: league.name || leagueFromDb?.name || `Competition ${league.id}`,
+    };
+  });
+
+  return { matches, teamStats };
 }

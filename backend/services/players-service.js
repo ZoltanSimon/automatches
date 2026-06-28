@@ -3,10 +3,13 @@ import {
   } from "./../json-reader.js";
 import { insertPlayersToDb } from "./../data-access.js"; 
 import { Player } from "./../../classes/player.js";
-import { allDBLeagues, allDBPlayers, allDBTeams } from "../index.js";
+import { allDBLeagues, allDBPlayers } from "../index.js";
+import { LineupParser } from "../../classes/lineupparser.js";
+import { comparePositionsByDisplayOrder } from "../backend-helper.js";
+import { getTeamById } from "./teams-service.js";
 
 function getTeamName(id) {
-  return allDBTeams?.find((team) => team.ID == id)?.name || "";
+  return getTeamById(id)?.name || "";
 }
 
 function toPositionList(positionValue = "") {
@@ -20,6 +23,29 @@ function toPositionList(positionValue = "") {
     .split(",")
     .map((position) => position.trim().toLowerCase())
     .filter(Boolean);
+}
+
+export function parseSelectedPositions(positionQuery) {
+  if (!positionQuery) {
+    return [];
+  }
+
+  return [...new Set(
+    String(positionQuery)
+      .split(",")
+      .map((position) => position.trim().toLowerCase())
+      .filter(Boolean)
+  )];
+}
+
+export function buildPositionOptions() {
+  const allPositions = LineupParser.formations.flatMap((formation) => formation.positions);
+  const uniquePositions = [...new Set(allPositions)].sort(comparePositionsByDisplayOrder);
+
+  return uniquePositions.map((position) => ({
+    value: position.toLowerCase(),
+    label: position,
+  }));
 }
 
 export function getPlayerList(
@@ -66,7 +92,17 @@ export function getPlayerList(
     .sort((a, b) => b.goals - a.goals);
 
   if (teamFilter) {
-    players = players.filter(p => p.club === teamFilter);
+    const normalizedTeamFilter = Number(teamFilter);
+    players = players.filter((player) => {
+      const clubID = Number(player.club);
+      const nationID = Number(player.nation);
+
+      if (Number.isFinite(normalizedTeamFilter)) {
+        return clubID === normalizedTeamFilter || nationID === normalizedTeamFilter;
+      }
+
+      return String(player.club) === String(teamFilter) || String(player.nation) === String(teamFilter);
+    });
   }
 
   if (positionFilter.length) {
@@ -78,6 +114,76 @@ export function getPlayerList(
   }
 
   return players.slice(0, nr);
+}
+
+function createFallbackPlayerFromSquadEntry(squadEntry, teamID) {
+  const squadPlayerID = Number(squadEntry?.id ?? squadEntry?.player?.id);
+  if (!Number.isFinite(squadPlayerID)) {
+    return null;
+  }
+
+  const dbPlayer = getPlayerByID(squadPlayerID);
+  const fallbackPosition = squadEntry?.position || "";
+  const inputPlayer = dbPlayer || {
+    id: squadPlayerID,
+    name: squadEntry?.name || squadEntry?.player?.name || `Player ${squadPlayerID}`,
+    club: Number(teamID),
+    nation: 0,
+    position: fallbackPosition,
+  };
+
+  const player = new Player(inputPlayer);
+  if (!player.position && fallbackPosition) {
+    player.position = fallbackPosition;
+  }
+  player.club = Number(teamID);
+  player.clubName = getTeamName(player.club);
+  player.nationName = getTeamName(player.nation);
+
+  return player;
+}
+
+export function getTeamPlayerList(registry, teamID, squad = null, nr = 100) {
+  const normalizedTeamID = Number(teamID);
+  const playersWithStats = getPlayerList(registry, 1000, normalizedTeamID);
+
+  if (!Array.isArray(squad?.players) || squad.players.length === 0) {
+    return playersWithStats.slice(0, nr);
+  }
+
+  const statsByPlayerID = new Map(
+    playersWithStats.map((player) => [Number(player.id), player]),
+  );
+  const mergedPlayers = [];
+  const seenPlayerIDs = new Set();
+
+  for (const squadEntry of squad.players) {
+    const squadPlayerID = Number(squadEntry?.id ?? squadEntry?.player?.id);
+    if (!Number.isFinite(squadPlayerID) || seenPlayerIDs.has(squadPlayerID)) {
+      continue;
+    }
+
+    const playerWithStats = statsByPlayerID.get(squadPlayerID);
+    if (playerWithStats) {
+      mergedPlayers.push(playerWithStats);
+      seenPlayerIDs.add(squadPlayerID);
+      continue;
+    }
+
+    const fallbackPlayer = createFallbackPlayerFromSquadEntry(squadEntry, normalizedTeamID);
+    if (fallbackPlayer) {
+      mergedPlayers.push(fallbackPlayer);
+      seenPlayerIDs.add(squadPlayerID);
+    }
+  }
+
+  mergedPlayers.sort((a, b) => {
+    if (b.goals !== a.goals) return b.goals - a.goals;
+    if (b.apps !== a.apps) return b.apps - a.apps;
+    return String(a.name).localeCompare(String(b.name));
+  });
+
+  return mergedPlayers.slice(0, nr);
 }
 
 export async function insertAllPlayers() {
@@ -113,8 +219,13 @@ export function getPlayerDetails(registry, playerID, leagueFilter = []) {
   const matches = [];
 
   for (const match of filteredMatches) {
-    // each match has two teams in match.players
-    for (const team of match.players) {
+    const matchPlayers = Array.isArray(match.players) ? match.players : [];
+    if (!matchPlayers.length) {
+      continue;
+    }
+
+    // each match has two teams in match.players when player statistics are available
+    for (const team of matchPlayers) {
       for (const p of team.players) {
         if (p.player.id == playerID) {
           const minutesPlayed = Number(p.statistics?.[0]?.games?.minutes || 0);
@@ -141,4 +252,47 @@ export function getPlayerDetails(registry, playerID, leagueFilter = []) {
   matches.sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
 
   return { player: playerObj, matches };
+}
+
+export function getPlayerPageData(registry, playerID, leagueQuery) {
+  const hasPlayerID = playerID !== undefined && playerID !== null && String(playerID).trim() !== "";
+
+  if (!hasPlayerID) {
+    const selectedLeague = Array.isArray(leagueQuery)
+      ? leagueQuery
+      : String(leagueQuery || "")
+        .split(",")
+        .map((id) => Number(id.trim()))
+        .filter(Boolean);
+
+    return {
+      players: getPlayerList(registry, 10, "", selectedLeague),
+      selectedLeague,
+    };
+  }
+
+  const allDetails = getPlayerDetails(registry, playerID, []);
+  if (!allDetails) {
+    return null;
+  }
+
+  const availableLeagueIds = allDetails.player.competitionList.map((competition) => competition.id);
+  const hasLeagueQuery = leagueQuery !== undefined;
+  const requestedLeagueIds = hasLeagueQuery
+    ? [...new Set(
+      String(leagueQuery)
+        .split(",")
+        .map((id) => Number(id.trim()))
+        .filter(Boolean)
+    )]
+    : availableLeagueIds;
+  const filteredLeagueIds = requestedLeagueIds.filter((leagueId) => availableLeagueIds.includes(leagueId));
+  const selectedLeague = filteredLeagueIds.length > 0 ? filteredLeagueIds : availableLeagueIds;
+  const details = getPlayerDetails(registry, playerID, selectedLeague);
+
+  return {
+    details,
+    leagues: allDetails.player.competitionList || [],
+    selectedLeague,
+  };
 }
