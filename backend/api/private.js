@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { getPlayers } from "./webapi-handler.js";
-import { getStandingsFromApi } from "./webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb } from "./data-access.js";
-import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer, getLeagueFromServer } from "./json-reader.js";
-import { forceRefreshRegistry, getRegistry } from "./services/registry-service.js";
+import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi } from "../webapi-handler.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb } from "../data-access.js";
+import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer, getLeagueFromServer, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
+import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
+import { insertAllPlayers } from "../services/players-service.js";
+import { updateLeagueSeasonData } from "../backend-helper.js";
 import * as fs from "fs";
 
 const LOCAL_IPS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
@@ -13,6 +14,10 @@ let playersFetchJob = {
   nextPage: 46,
 };
 let missingMatchesHydrationJobRunning = false;
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function isLocalRequest(request) {
   const ip = String(request.ip || request.socket?.remoteAddress || "").toLowerCase();
@@ -349,6 +354,170 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
         success: false,
         message: "Failed to insert clubs to database",
       });
+    }
+  });
+
+  router.get("/update-leagues", async (request, response) => {
+    let leagueIDs = request.query.leagueID.split(",");
+    let seasons = request.query.seasons.split(",");
+    let responseToSend = "";
+
+    for (let i = 0; i < leagueIDs.length; i++) {
+      let leagueID = leagueIDs[i];
+      let season = seasons[i];
+
+      responseToSend += await updateLeagueSeasonData(leagueID, season, {
+        getResultsDateFn: getResultsDate,
+        writeLeagueToServerFn: writeLeagueToServer,
+      });
+    }
+    console.log(responseToSend);
+    response.json(responseToSend);
+  });
+
+  router.get("/update-league-all-seasons", async (request, response) => {
+    const leagueID = Number(request.query.leagueID);
+
+    if (!Number.isFinite(leagueID)) {
+      return response.status(400).json({
+        success: false,
+        message: "leagueID query parameter is required.",
+      });
+    }
+
+    if (!Array.isArray(leaguesCache) || leaguesCache.length === 0) {
+      leaguesCache = await loadLeagues();
+    }
+
+    const league = leaguesCache.find((lg) => Number(lg.id) === leagueID);
+    if (!league) {
+      return response.status(404).json({
+        success: false,
+        message: `League not found: ${leagueID}`,
+      });
+    }
+
+    const seasons = [...new Set(
+      (Array.isArray(league.seasons) && league.seasons.length > 0
+        ? league.seasons
+        : [league.season])
+        .map((season) => Number(season))
+        .filter((season) => Number.isFinite(season))
+    )].sort((a, b) => b - a);
+
+    if (seasons.length === 0) {
+      return response.status(400).json({
+        success: false,
+        message: `No valid seasons found for league ${leagueID}.`,
+      });
+    }
+
+    const delayMs = 2000;
+    const updates = [];
+
+    for (let i = 0; i < seasons.length; i += 1) {
+      const season = seasons[i];
+      const result = await updateLeagueSeasonData(leagueID, season, {
+        getResultsDateFn: getResultsDate,
+        writeLeagueToServerFn: writeLeagueToServer,
+      });
+      updates.push({ season, result });
+
+      if (i < seasons.length - 1) {
+        await wait(delayMs);
+      }
+    }
+
+    response.json({
+      success: true,
+      leagueID,
+      leagueName: league.name,
+      totalSeasons: seasons.length,
+      updatedSeasons: updates.length,
+      delayMs,
+      updates,
+    });
+  });
+
+  // saves match
+  router.get("/save-match", async (request, response) => {
+    let matchID = request.query.matchID;
+    let savedMatch = await saveMatchToServer(matchID);
+    console.log(`Saved match with ID: ${matchID}`);
+    response.json(savedMatch);
+  });
+
+  router.get("/insert-all-players", async (request, response) => {
+    const insertedPlayers = await insertAllPlayers();
+
+    const players = await loadPlayers();
+    const teams = await loadTeams();
+    const leagues = await loadLeagues();
+    wrappedSetAllDbState({ players, teams, leagues });
+
+    response.json({
+      success: true,
+      inserted: Array.isArray(insertedPlayers) ? insertedPlayers.length : 0,
+      loadedPlayers: players.length,
+    });
+  });
+
+  router.get("/get-squads", async (request, response) => {
+    try {
+      const leagueID = Number(request.query.leagueID);
+      const delayMsFromQuery = Number(request.query.delayMs);
+      const delayMs = Number.isFinite(delayMsFromQuery) && delayMsFromQuery >= 0
+        ? delayMsFromQuery
+        : 3000;
+      if (!Number.isFinite(leagueID)) {
+        return response.status(400).json({ success: false, message: "leagueID query parameter is required." });
+      }
+
+      const registry = await getRegistry();
+      const leagueMatches = registry.matches.filter((match) => Number(match?.league?.id) === leagueID);
+      const teamIDs = [...new Set(
+        leagueMatches.flatMap((match) => [
+          Number(match?.teams?.home?.id),
+          Number(match?.teams?.away?.id),
+        ]).filter((teamID) => Number.isFinite(teamID))
+      )];
+
+      const squads = [];
+      const failedTeams = [];
+      let savedCount = 0;
+
+      for (let i = 0; i < teamIDs.length; i += 1) {
+        const teamID = teamIDs[i];
+
+        try {
+          const responsePayload = await getSquadFromApi(teamID);
+          const squadList = Array.isArray(responsePayload?.response) ? responsePayload.response : [];
+          for (const squad of squadList) {
+            squads.push(squad);
+            await saveSquadToDb(teamID, squad);
+            savedCount += 1;
+          }
+        } catch (error) {
+          failedTeams.push(teamID);
+        }
+
+        if (i < teamIDs.length - 1 && delayMs > 0) {
+          await wait(delayMs);
+        }
+      }
+
+      response.json({
+        success: true,
+        leagueID,
+        teamCount: teamIDs.length,
+        delayMs,
+        savedCount,
+        squads,
+        failedTeams,
+      });
+    } catch (error) {
+      console.error("Error fetching squads", error);
+      response.status(500).json({ success: false, message: "Error fetching squads" });
     }
   });
 

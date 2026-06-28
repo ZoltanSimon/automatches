@@ -188,13 +188,40 @@ document.getElementById("update-leagues").onclick = async function () {
 
   let seasons = seasonsArr.join(",");
   const response = await fetch(
-    `/update-leagues?leagueID=${leagueID}&seasons=${seasons}`,
+    `/api/update-leagues?leagueID=${leagueID}&seasons=${seasons}`,
     {
       method: "GET",
     }
   );
   const data = await response.json();
   showToast(JSON.stringify(data), 'success');
+  console.log(data);
+};
+
+document.getElementById("update-league-all-seasons").onclick = async function () {
+  const leagueID = selectedLeagues[0];
+  if (!leagueID) {
+    showToast("Select one league before updating all seasons.");
+    return;
+  }
+
+  const response = await fetch(
+    `/api/update-league-all-seasons?leagueID=${leagueID}`,
+    {
+      method: "GET",
+    }
+  );
+
+  const data = await response.json();
+  if (!response.ok || !data.success) {
+    showToast(data.message || "Failed to update all seasons.");
+    return;
+  }
+
+  showToast(
+    `Updated ${data.updatedSeasons}/${data.totalSeasons} seasons for league ${leagueID}.`,
+    "success",
+  );
   console.log(data);
 };
 
@@ -229,7 +256,7 @@ document.getElementById("get-all-clubs").onclick = async function () {
 
 document.getElementById("insert-all-players").onclick = async function () {
   try {
-    const response = await fetch(`/insert-all-players`);
+    const response = await fetch(`/api/insert-all-players`);
     const data = await response.json();
     console.log(data);
   } catch (error) {
@@ -254,7 +281,7 @@ document.getElementById("getSquads").onclick = async function () {
   }
 
   try {
-    const response = await fetch(`/get-squads?leagueID=${leagueID}`);
+    const response = await fetch(`/api/get-squads?leagueID=${leagueID}`);
     const data = await response.json();
 
     if (!response.ok || !data.success) {

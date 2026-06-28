@@ -143,9 +143,9 @@ function createFallbackPlayerFromSquadEntry(squadEntry, teamID) {
   return player;
 }
 
-export function getTeamPlayerList(registry, teamID, squad = null, nr = 100) {
+export function getTeamPlayerList(registry, teamID, squad = null, nr = 100, leagueFilter = []) {
   const normalizedTeamID = Number(teamID);
-  const playersWithStats = getPlayerList(registry, 1000, normalizedTeamID);
+  const playersWithStats = getPlayerList(registry, 1000, normalizedTeamID, leagueFilter);
 
   if (!Array.isArray(squad?.players) || squad.players.length === 0) {
     return playersWithStats.slice(0, nr);

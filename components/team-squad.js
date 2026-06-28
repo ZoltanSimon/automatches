@@ -1,16 +1,30 @@
 const tds = `<td width='33%' style='text-align: center; border-color: #1D3557; padding: 9px;'>`;
 
-export function addSquad(squadAPI) {
-  let addToPage = ``;
-  console.log(squadAPI);
+export function addSquad(squads = []) {
+  const output = document.getElementById("one-fixture");
+  if (!output) {
+    return;
+  }
 
-  //addToPage = `<div id="match-stats"><table style='border-collapse: collapse;' border='1'><thead><tr>${tds}${homeTeamName}</td>${tds} </td>${tds}${awayTeamName}</td></tr></thead><tbody>`;
+  if (!Array.isArray(squads) || squads.length === 0) {
+    output.innerHTML = `<div id="match-stats">No squads found for the selected league.</div>`;
+    return;
+  }
 
-  // for (let i = 0; i < stats.length; i++) {
-  //  addToPage += `<tr>${tds}${stats[i].homeTeam}</td>${tds}${stats[i].title}</td>${tds}${stats[i].awayTeam}</td></tr>`;
-  //}
-  addToPage += `</tbody></table></div>`;
-  console.log(addToPage);
-  document.getElementById("one-fixture").innerHTML += addToPage;
-  //1035067
+  let html = ``;
+  for (const squad of squads) {
+    const teamName = squad?.team?.name || "Unknown Team";
+    const players = Array.isArray(squad?.players) ? squad.players : [];
+
+    html += `<div id="match-stats" style="margin-bottom: 18px;"><h4>${teamName}</h4>`;
+    html += `<table style='border-collapse: collapse; width: 100%;' border='1'><thead><tr>${tds}Player</td>${tds}Age</td>${tds}Position</td></tr></thead><tbody>`;
+
+    for (const player of players) {
+      html += `<tr>${tds}${player?.name || "-"}</td>${tds}${player?.age || "-"}</td>${tds}${player?.position || "-"}</td></tr>`;
+    }
+
+    html += `</tbody></table></div>`;
+  }
+
+  output.innerHTML = html;
 }

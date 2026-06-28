@@ -216,3 +216,46 @@ export function resolveLeagueStandingsForPage(computedStandings, savedStandings 
 
   return Array.isArray(savedStandings[0]) ? savedStandings.flat() : savedStandings;
 }
+
+export async function updateLeagueSeasonData(leagueID, season, {
+  getResultsDateFn,
+  writeLeagueToServerFn,
+}) {
+  const dataToWrite = await getResultsDateFn(leagueID, season);
+  return writeLeagueToServerFn(leagueID, dataToWrite.response, season);
+}
+
+export async function dumpRegistryOnStartup(registry) {
+  const dumpPath = path.join(__dirname, "../data/registry-startup.json");
+  const fileHandle = await open(dumpPath, "w");
+
+  const writeChunk = async (chunk) => {
+    await fileHandle.write(chunk);
+  };
+
+  try {
+    await writeChunk("{\n");
+    await writeChunk(`  \"generatedAt\": ${JSON.stringify(new Date().toISOString())},\n`);
+
+    await writeChunk("  \"matches\": [\n");
+    for (let i = 0; i < registry.matches.length; i += 1) {
+      const suffix = i < registry.matches.length - 1 ? ",\n" : "\n";
+      await writeChunk(`    ${JSON.stringify(registry.matches[i])}${suffix}`);
+    }
+    await writeChunk("  ],\n");
+
+    const matchEntries = [...registry.matchByID.entries()];
+    await writeChunk("  \"matchByID\": {\n");
+    for (let i = 0; i < matchEntries.length; i += 1) {
+      const [matchID, match] = matchEntries[i];
+      const suffix = i < matchEntries.length - 1 ? ",\n" : "\n";
+      await writeChunk(`    ${JSON.stringify(String(matchID))}: ${JSON.stringify(match)}${suffix}`);
+    }
+    await writeChunk("  }\n");
+    await writeChunk("}\n");
+  } finally {
+    await fileHandle.close();
+  }
+
+  console.log(`Registry startup dump written to ${dumpPath}`);
+}

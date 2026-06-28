@@ -103,3 +103,46 @@ export async function getTeamPageData(registry, teamID) {
 
   return { matches, teamStats };
 }
+
+function parseShowAllPlayerStats(allStatsQuery) {
+  const value = String(allStatsQuery || "").trim().toLowerCase();
+  return value === "1" || value === "true";
+}
+
+export async function getTeamRouteData(registry, teamID, allStatsQuery) {
+  const { getSquadFromDb } = await import("../data-access.js");
+  const { getTeamPlayerList } = await import("./players-service.js");
+
+  const { matches, teamStats } = await getTeamPageData(registry, teamID);
+  const savedSquad = await getSquadFromDb(teamID);
+  const showAllPlayerStats = parseShowAllPlayerStats(allStatsQuery);
+
+  const latestLeagueID = Number(matches?.[0]?.league?.id);
+  const selectedPlayerStatsLeague = Number.isFinite(latestLeagueID)
+    ? latestLeagueID
+    : null;
+  const selectedPlayerStatsLeagueName = selectedPlayerStatsLeague !== null
+    ? (allDBLeagues.find((league) => Number(league.id) === selectedPlayerStatsLeague)?.name || `Competition ${selectedPlayerStatsLeague}`)
+    : "All competitions";
+
+  const playerLeagueFilter = !showAllPlayerStats && selectedPlayerStatsLeague !== null
+    ? [selectedPlayerStatsLeague]
+    : [];
+
+  const teamPlayers = getTeamPlayerList(
+    registry,
+    teamID,
+    savedSquad,
+    100,
+    playerLeagueFilter,
+  );
+
+  return {
+    matches,
+    teamStats,
+    teamPlayers,
+    showAllPlayerStats,
+    selectedPlayerStatsLeague,
+    selectedPlayerStatsLeagueName,
+  };
+}

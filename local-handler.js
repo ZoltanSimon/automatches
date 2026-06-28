@@ -29,7 +29,7 @@ export async function downloadMatch(fixtureID) {
     fixtureID = fixtureID.target.innerHTML;
   }
 
-  const response = await fetch(`/save-match?matchID=${fixtureID}`, {
+  const response = await fetch(`/api/save-match?matchID=${fixtureID}`, {
     method: "GET",
   });
   const { match, limits } = await response.json();
@@ -40,8 +40,4 @@ export async function downloadMatch(fixtureID) {
   console.log("Rate limits:", limits);
 
   return { match, limits };
-}
-
-export async function findPlayerByID(playerID) {
-  return await fetch(`/find-player-by-id?playerID=${playerID}`);
 }

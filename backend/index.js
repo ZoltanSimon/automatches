@@ -3,20 +3,17 @@ import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
-import { getResultsDate, getLeaguesByType, getSquad as getSquadFromApi } from "./webapi-handler.js";
-import { createApiRouter } from "./api.js";
+import { getLeaguesByType } from "./webapi-handler.js";
+import { createApiRouter } from "./api/private.js";
+import { createPublicRouter } from "./api/public.js";
 import {
   getMatchFromServer,
   matchesDir,
-  writeLeagueToServer,
-  saveMatchToServer,
 } from "./json-reader.js";
 import {
   getLeagueFromDb,
   getLeagueStandingsFromDb,
   getLeagueSeason,
-  getSquadFromDb,
-  saveSquadToDb,
   loadLeagues,
   loadPlayers,
   loadTeams,
@@ -26,8 +23,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import {
   getPlayerList,
-  getTeamPlayerList,
-  insertAllPlayers,
   getPlayerByID,
   getPlayerPageData,
   parseSelectedPositions,
@@ -36,10 +31,9 @@ import {
 import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, defaultLeagues, getLeagueStandings, getLeagueById, getLeaguePageData } from "./services/leagues-service.js";
-import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
-import { getTeamById, getTeamPageData, getTopTeams } from "./services/teams-service.js";
+import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings, dumpRegistryOnStartup } from "./backend-helper.js";
+import { getTeamById, getTopTeams, getTeamRouteData } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry } from "./services/registry-service.js";
-import { getPredictionForMatch } from "./services/prediction-service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -53,10 +47,6 @@ const corsOptions = {
 };
 const partialsPath = path.join(__dirname, "../views/partials");
 export let allDBPlayers, allDBTeams, allDBLeagues;
-
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 app.engine(
   "handlebars",
@@ -85,41 +75,7 @@ app.use(
     },
   })
 );
-
-async function dumpRegistryOnStartup(registry) {
-  const dumpPath = path.join(__dirname, "../data/registry-startup.json");
-  const fileHandle = await open(dumpPath, "w");
-
-  const writeChunk = async (chunk) => {
-    await fileHandle.write(chunk);
-  };
-
-  try {
-    await writeChunk("{\n");
-    await writeChunk(`  \"generatedAt\": ${JSON.stringify(new Date().toISOString())},\n`);
-
-    await writeChunk("  \"matches\": [\n");
-    for (let i = 0; i < registry.matches.length; i += 1) {
-      const suffix = i < registry.matches.length - 1 ? ",\n" : "\n";
-      await writeChunk(`    ${JSON.stringify(registry.matches[i])}${suffix}`);
-    }
-    await writeChunk("  ],\n");
-
-    const matchEntries = [...registry.matchByID.entries()];
-    await writeChunk("  \"matchByID\": {\n");
-    for (let i = 0; i < matchEntries.length; i += 1) {
-      const [matchID, match] = matchEntries[i];
-      const suffix = i < matchEntries.length - 1 ? ",\n" : "\n";
-      await writeChunk(`    ${JSON.stringify(String(matchID))}: ${JSON.stringify(match)}${suffix}`);
-    }
-    await writeChunk("  }\n");
-    await writeChunk("}\n");
-  } finally {
-    await fileHandle.close();
-  }
-
-  console.log(`Registry startup dump written to ${dumpPath}`);
-}
+app.use("/", createPublicRouter());
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}, loading registry...`);
@@ -144,9 +100,7 @@ app.get("/", async (req, res) => {
     const selectedTeamLeague = parseLeagueIds(req.query.tleague);
     const parsed = parseFloat(req.query.sleague);
     const selectedStandingsLeague = isNaN(parsed) ? 39 : parsed;
-
     const registry = await getRegistry();
-
     const playerPageData = getPlayerPageData(registry, null, selectedPlayerLeague);
     const players = playerPageData?.players || [];
     const matches = await matchesOnDay(registry, selectedDate);
@@ -179,7 +133,6 @@ app.get("/players", async (req, res) => {
     const selectedLeague = parseLeagueIds(req.query.pleague);
     const selectedPositions = parseSelectedPositions(req.query.pposition);
     const teamQuery = req.query.team;
-
     const registry = await getRegistry();
     const players = getPlayerList(registry, 500, teamQuery, selectedLeague, selectedPositions);
 
@@ -223,9 +176,14 @@ app.get("/team", async (req, res) => {
   }
 
   const registry = await getRegistry();
-  const { matches, teamStats } = await getTeamPageData(registry, thisTeam.ID);
-  const savedSquad = await getSquadFromDb(thisTeam.ID);
-  const teamPlayers = getTeamPlayerList(registry, thisTeam.ID, savedSquad, 100);
+  const {
+    matches,
+    teamStats,
+    teamPlayers,
+    showAllPlayerStats,
+    selectedPlayerStatsLeague,
+    selectedPlayerStatsLeagueName,
+  } = await getTeamRouteData(registry, thisTeam.ID, req.query.allStats);
 
   if (!teamStats.length) {
     return res.redirect("/");
@@ -237,7 +195,10 @@ app.get("/team", async (req, res) => {
     thisTeam,
     players: teamPlayers,
     matches, 
-    teamStats,  
+    teamStats,
+    showAllPlayerStats,
+    selectedPlayerStatsLeague,
+    selectedPlayerStatsLeagueName,
   });
 });
 
@@ -289,7 +250,6 @@ app.get("/league", async (req, res) => {
     res.render("league", {
       title: "League",
       description: `Explore detailed stats, recent matches and league performance for ${leagueInfo ? leagueInfo.name : "this league"} in the ${selectedSeason} season on Generation Football's League page.`,
-
       players,
       matches: (matches),
       standings: standings,
@@ -338,24 +298,6 @@ app.get("/match", async (request, response) => {
     matchInfo: currentMatch,
     matchStatistics,
   });
-});
-
-app.get("/predict-match", async (request, response) => {
-  try {
-    const { matchID } = request.query;
-
-    if (!matchID) {
-      return response.status(400).json({
-        success: false,
-        message: "matchID query parameter required",
-      });
-    }
-
-    const prediction = await getPredictionForMatch(matchID);
-    response.json({ success: true, prediction });
-  } catch (error) {
-    handleError(response, error, "Error generating match prediction");
-  }
 });
 
 app.get("/player", async (request, response) => {
@@ -409,63 +351,6 @@ app.get("/compare-players", (req, res) => {
   res.render("compare-players", { title: "Compare Players - Generation Football", description: "Compare detailed stats, performance metrics, and league performance for multiple football players on Generation Football's Compare Players page." });
 });
 
-app.get("/status", (request, response) => {
-  const status = {
-    Status: "Running",
-  };
-
-  response.send(status);
-});
-
-app.get("/update-leagues", async (request, response) => {
-  let leagueIDs = request.query.leagueID.split(",");
-  let seasons = request.query.seasons.split(",");
-  let responseToSend = "";
-
-  for (let i = 0; i < leagueIDs.length; i++) {
-    let leagueID = leagueIDs[i];
-    let season = seasons[i];
-
-    let dataToWrite = await getResultsDate(leagueID, season);
-
-    responseToSend += await writeLeagueToServer(leagueID, dataToWrite.response, season);
-  }
-  console.log(responseToSend);
-  response.json(responseToSend);
-});
-
-//saves match
-app.get("/save-match", async (request, response) => {
-  let matchID = request.query.matchID;
-  let savedMatch = await saveMatchToServer(matchID);
-  console.log(`Saved match with ID: ${matchID}`);
-  response.json(savedMatch);
-});
-
-app.get("/get-teams", async (request, response) => {
-  const selectedTeamLeague = parseLeagueIds(request.query.leagueID);
-  const date = request.query.date;
-  const registry = await getRegistry();
-
-  try {
-    const result = extractTeams(registry, date, selectedTeamLeague);
-    response.json(result);
-  } catch (error) {
-    response.status(400).json({ success: false, message: error.message });
-  }
-});
-
-app.get("/insert-all-players", async (request, response) => {
-  const insertedPlayers = await insertAllPlayers();
-  allDBPlayers = await loadPlayers();
-
-  response.json({
-    success: true,
-    inserted: Array.isArray(insertedPlayers) ? insertedPlayers.length : 0,
-    loadedPlayers: allDBPlayers.length,
-  });
-});
-
 app.get("/get-matches-on-day", async (request, response) => {
   const registry = await getRegistry();
   let todaysMatches = await matchesOnDay(registry, new Date(request.query.matchDate));
@@ -477,64 +362,6 @@ app.get("/get-matches-by-round", async (request, response) => {
   let round = request.query.roundNo;
   let matches = await matchesInRound(round, leagueID);
   response.json(matches);
-});
-
-app.get("/get-squads", async (request, response) => {
-  try {
-    const leagueID = Number(request.query.leagueID);
-    const delayMsFromQuery = Number(request.query.delayMs);
-    const delayMs = Number.isFinite(delayMsFromQuery) && delayMsFromQuery >= 0
-      ? delayMsFromQuery
-      : 3000;
-    if (!Number.isFinite(leagueID)) {
-      return response.status(400).json({ success: false, message: "leagueID query parameter is required." });
-    }
-
-    const registry = await getRegistry();
-    const leagueMatches = registry.matches.filter((match) => Number(match?.league?.id) === leagueID);
-    const teamIDs = [...new Set(
-      leagueMatches.flatMap((match) => [
-        Number(match?.teams?.home?.id),
-        Number(match?.teams?.away?.id),
-      ]).filter((teamID) => Number.isFinite(teamID))
-    )];
-
-    const squads = [];
-    const failedTeams = [];
-    let savedCount = 0;
-
-    for (let i = 0; i < teamIDs.length; i += 1) {
-      const teamID = teamIDs[i];
-
-      try {
-        const responsePayload = await getSquadFromApi(teamID);
-        const squadList = Array.isArray(responsePayload?.response) ? responsePayload.response : [];
-        for (const squad of squadList) {
-          squads.push(squad);
-          await saveSquadToDb(teamID, squad);
-          savedCount += 1;
-        }
-      } catch (error) {
-        failedTeams.push(teamID);
-      }
-
-      if (i < teamIDs.length - 1 && delayMs > 0) {
-        await wait(delayMs);
-      }
-    }
-
-    response.json({
-      success: true,
-      leagueID,
-      teamCount: teamIDs.length,
-      delayMs,
-      savedCount,
-      squads,
-      failedTeams,
-    });
-  } catch (error) {
-    handleError(response, error, "Error fetching squads");
-  }
 });
 
 

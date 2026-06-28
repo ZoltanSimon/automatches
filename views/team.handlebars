@@ -59,6 +59,15 @@
     </div>
     <div class="rectangle">
         <h2>Top Players</h2>
+        <div style="display:flex; align-items:center; gap:10px; margin: 0 0 10px 0;">
+            {{#if showAllPlayerStats}}
+            <span>Showing all competitions</span>
+            <a href="/team?ID={{thisTeam.ID}}">Show latest tournament stats</a>
+            {{else}}
+            <span>Showing latest tournament: {{selectedPlayerStatsLeagueName}}</span>
+            <a href="/team?ID={{thisTeam.ID}}&allStats=1">Show all stats</a>
+            {{/if}}
+        </div>
         <div id="player-list" class="table-container">
             {{> player-list-table big=false}}
         </div>
