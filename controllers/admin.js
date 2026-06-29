@@ -162,7 +162,7 @@ document.getElementById("get-matches-by-round").onclick = async function () {
   let roundNumber = document.getElementById("roundnr").value;
   let roundLabel = leagueID != 2 ? `Regular Season - ${roundNumber}` : `League Stage - ${roundNumber}`;
   console.log(roundLabel);
-  const response = await fetch(`/get-matches-by-round?leagueID=${leagueID}&roundNo=${roundLabel}`);
+  const response = await fetch(`/api/get-matches-by-round?leagueID=${leagueID}&roundNo=${roundLabel}`);
   const matches = await response.json();
   matchList(matches, true);
   addText(matches);

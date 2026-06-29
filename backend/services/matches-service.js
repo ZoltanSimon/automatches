@@ -66,7 +66,8 @@ export function getMatchById(registry, matchID) {
 export async function getMatchPageData(registry, currentMatch) {
   const { home, away } = currentMatch.teams;
   const allMatches = await allTeamMatches(registry, home.id, away.id);
-  const teamList = buildTeamList(allMatches)
+  const matchesForTeamList = allMatches.length > 0 ? allMatches : [currentMatch];
+  const teamList = buildTeamList(matchesForTeamList)
     .filter((team) => team.id === home.id || team.id === away.id)
     .sort((a, b) => (a.id === home.id ? -1 : b.id === home.id ? 1 : 0))
     .map((team) => ({

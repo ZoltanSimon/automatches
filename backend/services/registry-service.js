@@ -109,6 +109,39 @@ function extractSavedMatch(payload) {
   return payload;
 }
 
+export async function ensureMatchInRegistry(registry, matchID) {
+  if (!registry || !registry.matchByID || !matchID) {
+    return null;
+  }
+
+  const existingMatch = registry.matchByID.get(matchID) ?? registry.matchByID.get(Number(matchID)) ?? registry.matchByID.get(String(matchID));
+  if (existingMatch) {
+    return existingMatch;
+  }
+
+  const savedMatchPayload = await getMatchFromServer(matchID);
+  const savedMatch = extractSavedMatch(savedMatchPayload);
+  if (!savedMatch?.fixture?.id) {
+    return null;
+  }
+
+  const normalizedMatch = normalizeFixtureAsMatch(savedMatch);
+  const idAsNumber = Number(normalizedMatch.fixture.id);
+  const idAsString = String(normalizedMatch.fixture.id);
+
+  const alreadyInRegistry = registry.matchByID.get(idAsNumber) || registry.matchByID.get(idAsString);
+  if (!alreadyInRegistry) {
+    registry.matches.push(normalizedMatch);
+  }
+
+  if (!Number.isNaN(idAsNumber)) {
+    registry.matchByID.set(idAsNumber, normalizedMatch);
+  }
+  registry.matchByID.set(idAsString, normalizedMatch);
+
+  return normalizedMatch;
+}
+
 export async function buildMatchRegistry(leagueIDs) {
   const allLeagueMatches = await getLeagueFromDb(leagueIDs);
   const baseMatches = allLeagueMatches

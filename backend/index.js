@@ -1,17 +1,9 @@
-import { readFile, open } from "fs/promises";
-import * as fs from "fs";
 import express from "express";
 import { engine } from "express-handlebars";
 import { PORT } from "./config.js";
-import { getLeaguesByType } from "./webapi-handler.js";
 import { createApiRouter } from "./api/private.js";
 import { createPublicRouter } from "./api/public.js";
 import {
-  getMatchFromServer,
-  matchesDir,
-} from "./json-reader.js";
-import {
-  getLeagueFromDb,
   getLeagueStandingsFromDb,
   getLeagueSeason,
   loadLeagues,
@@ -23,17 +15,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 import {
   getPlayerList,
-  getPlayerByID,
   getPlayerPageData,
   parseSelectedPositions,
   buildPositionOptions,
 } from "./services/players-service.js";
 import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
-import { groupByLeague, defaultLeagues, getLeagueStandings, getLeagueById, getLeaguePageData } from "./services/leagues-service.js";
-import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings, dumpRegistryOnStartup } from "./backend-helper.js";
+import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData } from "./services/leagues-service.js";
+import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
 import { getTeamById, getTopTeams, getTeamRouteData } from "./services/teams-service.js";
-import { buildMatchRegistry, refreshRegistry, getRegistry } from "./services/registry-service.js";
+import { buildMatchRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -275,7 +266,11 @@ app.get("/match", async (request, response) => {
   const { matchID } = request.query;
 
   const registry = await getRegistry();
-  const currentMatch = getMatchById(registry, matchID);
+  let currentMatch = getMatchById(registry, matchID);
+
+  if (!currentMatch && matchID) {
+    currentMatch = await ensureMatchInRegistry(registry, matchID);
+  }
 
   if (!currentMatch) {
     return response.status(404).render("match", {
@@ -351,17 +346,5 @@ app.get("/compare-players", (req, res) => {
   res.render("compare-players", { title: "Compare Players - Generation Football", description: "Compare detailed stats, performance metrics, and league performance for multiple football players on Generation Football's Compare Players page." });
 });
 
-app.get("/get-matches-on-day", async (request, response) => {
-  const registry = await getRegistry();
-  let todaysMatches = await matchesOnDay(registry, new Date(request.query.matchDate));
-  response.json(todaysMatches);
-});
-
-app.get("/get-matches-by-round", async (request, response) => {
-  let leagueID = request.query.leagueID;
-  let round = request.query.roundNo;
-  let matches = await matchesInRound(round, leagueID);
-  response.json(matches);
-});
 
 

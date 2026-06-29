@@ -5,6 +5,7 @@ import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer, getLeague
 import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
 import { insertAllPlayers } from "../services/players-service.js";
 import { updateLeagueSeasonData } from "../backend-helper.js";
+import { matchesOnDay, matchesInRound } from "../services/matches-service.js";
 import * as fs from "fs";
 
 const LOCAL_IPS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
@@ -203,6 +204,19 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       console.error("Failed to reload runtime cache:", error);
       response.status(500).json({ success: false, message: "Failed to reload runtime cache" });
     }
+  });
+
+  router.get("/get-matches-on-day", async (request, response) => {
+    const registry = await getRegistry();
+    const todaysMatches = await matchesOnDay(registry, new Date(request.query.matchDate));
+    response.json(todaysMatches);
+  });
+
+  router.get("/get-matches-by-round", async (request, response) => {
+    const leagueID = request.query.leagueID;
+    const round = request.query.roundNo;
+    const matches = await matchesInRound(round, leagueID);
+    response.json(matches);
   });
 
   router.get("/get-players", async (request, response) => {

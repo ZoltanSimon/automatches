@@ -88,22 +88,8 @@ export function addShowMoreButtons(containerSelector = ".table-container") {
 
 export async function showMatchesOnDate(date, showID) {
   let downloads = 0;
-  let allLeaguematches = await fetch(`get-matches-on-day?matchDate=${date}`);
+  let allLeaguematches = await fetch(`/api/get-matches-on-day?matchDate=${date}`);
   let matches = await allLeaguematches.json();
-
-  /*for (let match of matches) {
-    let fixtureDate = new Date(match.fixture.date);
-    const matchEnd = new Date(fixtureDate.getTime() + 150 * 60000);
-
-    if (matchEnd <= new Date() && !match.statistics) {
-      let cachedMatch = await (await fetch(`/match-exists?matchID=${match.fixture.id}`)).json();
-      if (!cachedMatch && downloads < 10) {
-        let downloadedMatch = await downloadMatch(match.fixture.id);
-        updateOrAddMatch(matches, downloadedMatch[0]);
-        downloads++;
-      }
-    }
-  }*/
 
   if (matches.length > 0) matchList(matches, showID);
 }
