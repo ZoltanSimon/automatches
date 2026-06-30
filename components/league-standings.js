@@ -39,7 +39,7 @@ export async function leagueStandings(selectedLeague) {
   let addToPage = ``;
   let tds = `<td style="padding:4px; text-align: center;">`;
 
-  addToPage += `<table style='border-collapse: collapse; border: 3px solid #1D3557;' border='1' id="league-standings">
+  addToPage += `<table class="gf-table" id="league-standings">
         <thead>    
           <tr style="border-bottom: 2px solid #1D3557" class="main-table-header">
             <th style="width:48px;" class="list-header"><b>#</b></th>

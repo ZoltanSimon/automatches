@@ -23,10 +23,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	const eventsPanel = document.querySelector(".match-events-panel");
 	const toggleButton = document.getElementById("events-toggle-btn");
+	const matchCards = document.querySelectorAll(".match-detail[data-match-id]");
+
+	if (matchCards.length > 0) {
+		matchCards.forEach((card) => {
+			const openMatchPage = () => {
+				const { matchId } = card.dataset;
+				if (!matchId) return;
+				window.location.href = `/match?matchID=${matchId}`;
+			};
+
+			card.addEventListener("click", (event) => {
+				if (event.target.closest("a")) {
+					return;
+				}
+				openMatchPage();
+			});
+
+			card.addEventListener("keydown", (event) => {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					openMatchPage();
+				}
+			});
+		});
+	}
 
 	if (!eventsPanel || !toggleButton) {
 		return;
 	}
+
+	// Ensure default view is goals only on initial load.
+	eventsPanel.classList.add("goals-only");
 
 	const updateButtonState = (isGoalsOnly) => {
 		toggleButton.textContent = isGoalsOnly ? "Show All Events" : "Show Goals Only";

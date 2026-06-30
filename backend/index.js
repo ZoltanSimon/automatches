@@ -81,7 +81,11 @@ app.listen(PORT, async () => {
   } catch (error) {
     console.error("Failed to write registry startup dump:", error);
   }*/
-  setInterval(refreshRegistry, 30 * 60 * 1000);
+  setInterval(() => {
+    refreshRegistry().catch((error) => {
+      console.error("Scheduled registry refresh failed:", error);
+    });
+  }, 30 * 60 * 1000);
 });
 
 app.get("/", async (req, res) => {
@@ -234,6 +238,7 @@ app.get("/league", async (req, res) => {
       matches,
       standings,
       worldCupGroups,
+      knockoutRounds,
       rounds,
       currentRound,
     } = await getLeaguePageData(registry, selectedLeague, selectedSeason, defaultSeason);
@@ -245,6 +250,7 @@ app.get("/league", async (req, res) => {
       matches: (matches),
       standings: standings,
       worldCupGroups,
+      knockoutRounds,
       rounds: rounds,
       currentRound: currentRound,
       leagueID: selectedLeague,
@@ -284,6 +290,9 @@ app.get("/match", async (request, response) => {
   }
 
   const { teamList, matchStatistics, leagueName } = await getMatchPageData(registry, currentMatch);
+  const headerLeagueName = typeof currentMatch?.league?.name === "string" && currentMatch.league.name.trim()
+    ? currentMatch.league.name.trim()
+    : leagueName;
   
   response.render("match", {
     title: teamList.map(team => team.name).join(" vs ") + " - " + leagueName  + " - Football Match Details",
@@ -291,6 +300,7 @@ app.get("/match", async (request, response) => {
     matchID,
     teamList,
     matchInfo: currentMatch,
+    headerLeagueName,
     matchStatistics,
   });
 });

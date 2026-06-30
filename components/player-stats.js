@@ -43,7 +43,7 @@ export function addPlayerStats(statsAPI, statsAPI2 = null) {
   loadPlayerFace(statsAPI.id);
   loadPlayerFace(statsAPI2.id);
   let addToPage = `
-  <table id='player-stats' style='border-collapse: collapse; border: 3px solid #1D3557;' border='1'><tbody id=${statsAPI.id}|${statsAPI2.id}>`;
+  <table class='gf-table' id='player-stats'><tbody id=${statsAPI.id}|${statsAPI2.id}>`;
 
   for (let i = 0; i < stats.length; i++) {
     values = stats[i].getValues();

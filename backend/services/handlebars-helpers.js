@@ -58,6 +58,14 @@ export const increment = (nr) => {
   return parseInt(nr) + 1;
 }
 
+export const splitString = (value, separator = "") => {
+  if (value === null || value === undefined || value === "") {
+    return [];
+  }
+
+  return String(value).split(separator);
+}
+
 export const perGame = (total, games) => {
   const g = Number(games);
   if (!g || g === 0) return 0;
@@ -123,6 +131,12 @@ export const teamAverageRating = (matchPlayers, teamID) => {
 
 export const isFinishedStatus = (statusShort) => {
   return ["FT", "AET", "PEN", "CANC", "PST"].includes(statusShort);
+}
+
+export const isGoalEvent = (eventType, eventDetail = "") => {
+  const type = String(eventType ?? "").trim().toLowerCase();
+  const detail = String(eventDetail ?? "").trim().toLowerCase();
+  return type === "goal" || detail.includes("goal");
 }
 
 export const expectedGoalsForTeam = (match, teamID) => {

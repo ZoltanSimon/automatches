@@ -53,7 +53,7 @@ export function addMatchStats(apiResponse) {
   }
 
   addToPage = `
-  <table id='match-stats' style='border-collapse: collapse; border: 3px solid #1D3557;' border='1'><thead>
+  <table class='gf-table' id='match-stats'><thead>
   <tr class="main-table-header" style='font-size:30;'>
   <th style='width: 250px; text-align: center; border-color: #1D3557; padding: 10px;' id="${homeTeam.id}">${homeTeam.name}</th>
   <th style='width: 300px; text-align: center; border-color: #1D3557; padding: 10px;'>-</th>

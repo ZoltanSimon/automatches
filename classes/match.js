@@ -1,5 +1,6 @@
 export class Match {
   constructor(match) {
+    this.id = match.fixture.id;
     this.homeTeam = match.teams.home;
     this.awayTeam = match.teams.away;
     this.date = match.fixture.date;
@@ -11,6 +12,7 @@ export class Match {
     this.endTime = null;
     this.isDownloaded = false;
     this.stats = {};
+    this.leagueId = match.league.id;
     this.league = match.league.name;
   }
 }

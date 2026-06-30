@@ -44,7 +44,7 @@ export function oneFixture(response) {
   document.getElementById("standings").innerHTML = ``;
 
   let addToPage = `
-    <table>
+    <table class="gf-table">
       <tr>
         <td><img src=${imagePath(homeTeam.id)} width="30px"></td>
         <td><a href="${homeTeam.name}/">${homeTeam.name}</a></td>
@@ -54,7 +54,7 @@ export function oneFixture(response) {
         <td width="30px">${fixture.goals.away || 0}</td>
       </tr>
     </table>
-    <table>
+    <table class="gf-table">
       <tr>
         <td width=50%>${addGoals(homeTeam.goals)}</td>
         <td>${addGoals(awayTeam.goals)}</td>

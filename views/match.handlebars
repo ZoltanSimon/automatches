@@ -1,21 +1,27 @@
 <script type="module" src="./../controllers/match.js"></script>
-<div class="container">
+<div class="container match-page">
   {{#if matchInfo}}
   <div class="match-header">
     <div class="team">
-      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}" title="{{matchInfo.teams.home.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'"/>
-      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'">{{matchInfo.teams.home.name}}</div>
+      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}"
+        title="{{matchInfo.teams.home.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'" />
+      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'">
+        {{matchInfo.teams.home.name}}</div>
     </div>
 
     <div class="score-section">
       <div class="score">{{matchInfo.goals.home}} - {{matchInfo.goals.away}}</div>
-      <div><a class="cursor-pointer" style="color: white;" href="/league?id={{matchInfo.league.id}}">{{matchInfo.league.name}}</a> - {{matchInfo.league.round}} - {{formatDate matchInfo.fixture.date}}</div>
+      <div><a class="cursor-pointer" style="color: white;"
+          href="/league?id={{matchInfo.league.id}}">{{headerLeagueName}}</a> - {{matchInfo.league.round}} -
+        {{formatDate matchInfo.fixture.date}}</div>
       <span class="status">{{matchInfo.fixture.status.short}}</span>
     </div>
 
     <div class="team">
-      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.away.id}}.png" alt="{{matchInfo.teams.away.name}}" title="{{matchInfo.teams.away.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'"/>
-      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'">{{matchInfo.teams.away.name}}</div>
+      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.away.id}}.png" alt="{{matchInfo.teams.away.name}}"
+        title="{{matchInfo.teams.away.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'" />
+      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'">
+        {{matchInfo.teams.away.name}}</div>
     </div>
   </div>
   {{/if}}
@@ -23,8 +29,10 @@
   {{#if (isFinishedStatus matchInfo.fixture.status.short)}}
   {{#if teamList.length}}
   <div class="match-tabs" role="tablist" aria-label="Match view tabs">
-    <button id="match-summary-tab" class="match-tab-btn is-active" type="button" role="tab" aria-selected="true" aria-controls="match-summary-panel">Match Summary</button>
-    <button id="match-preview-tab" class="match-tab-btn" type="button" role="tab" aria-selected="false" aria-controls="match-preview-panel">Match Preview</button>
+    <button id="match-summary-tab" class="match-tab-btn is-active" type="button" role="tab" aria-selected="true"
+      aria-controls="match-summary-panel">Match Summary</button>
+    <button id="match-preview-tab" class="match-tab-btn" type="button" role="tab" aria-selected="false"
+      aria-controls="match-preview-panel">Match Preview</button>
   </div>
   {{/if}}
   {{/if}}
@@ -32,345 +40,405 @@
   {{#if (eq matchInfo.fixture.status.short "NS")}}
   {{else}}
   <div id="match-summary-panel" class="match-content-panel is-active">
-  <div class="match-center-layout">
-    <div class="lineup-panel lineup-home">
-      {{#if matchInfo.lineups}}
-      {{#each matchInfo.lineups}}
-      {{#if (eq this.team.id ../matchInfo.teams.home.id)}}
-      <table class="lineup-table">
-        <thead>
-          <tr class="lineup-title-row"><th colspan="3">Home Lineup</th></tr>
-          <tr class="lineup-section-row"><th colspan="3">Starting 11</th></tr>
-        </thead>
-        <tbody>
-          {{#each this.startXI}}
-          <tr class="lineup-player-row">
-            <td class="lineup-number-td">{{this.player.number}}</td>
-            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
-            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
-          </tr>
-          {{/each}}
-          {{#if this.substitutes.length}}
-          <tr class="lineup-section-row"><th colspan="3">Substitutes</th></tr>
-          {{#each this.substitutes}}
-          <tr class="lineup-player-row lineup-sub-row">
-            <td class="lineup-number-td">{{this.player.number}}</td>
-            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
-            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
-          </tr>
-          {{/each}}
-          {{/if}}
-          {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
-          <tr class="lineup-footer-row lineup-avg-row">
-            <td colspan="2">Team Avg Rating</td>
-            <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
-          </tr>
-          {{/with}}
-          {{#if this.formation}}
-          <tr class="lineup-footer-row lineup-meta-row">
-            <td colspan="3">Formation: {{this.formation}}</td>
-          </tr>
-          {{/if}}
-          {{#if this.coach.name}}
-          <tr class="lineup-footer-row lineup-meta-row">
-            <td colspan="3">Manager: {{this.coach.name}}</td>
-          </tr>
-          {{/if}}
-        </tbody>
-      </table>
-      {{/if}}
-      {{/each}}
-      {{else}}
-      <div class="lineup-empty">No lineup data available.</div>
-      {{/if}}
-    </div>
-
-    <div class="match-center-column">
-      <div class="match-events-panel goals-only">
-        <div class="match-events-header">
-          <h3>Match Events</h3>
-          {{#if matchInfo.events}}
-          <button type="button" id="events-toggle-btn" class="more-button match-events-toggle" aria-pressed="false">Show All Events</button>
-          {{/if}}
-        </div>
-        {{#if matchInfo.events}}
-        <div class="match-events-grid">
-          {{#each matchInfo.events}}
-          <div class="event-row {{#if (eq this.type "Goal")}}event-goal{{else}}event-other{{/if}}">
-            <div class="event-side event-side-home">
-              {{#if (eq this.team.id ../matchInfo.teams.home.id)}}
-              <span class="event-text"><a class="event-player-link cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}} ({{this.detail}}){{/if}}</span>
-              {{/if}}
-            </div>
-
-            <span class="event-minute">{{this.time.elapsed}}'</span>
-
-            <div class="event-side event-side-away">
-              {{#if (eq this.team.id ../matchInfo.teams.away.id)}}
-              <span class="event-text"><a class="event-player-link cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}} ({{this.detail}}){{/if}}</span>
-              {{/if}}
-            </div>
-          </div>
-          {{/each}}
-        </div>
-        {{else}}
-        <div class="lineup-empty">No events available.</div>
-        {{/if}}
-      </div>
-
-      <div class="match-stats-panel">
-        {{#if matchStatistics.length}}
-        <table class="match-stats-table">
+    <div class="match-center-layout">
+      <div class="lineup-panel lineup-home">
+        {{#if matchInfo.lineups}}
+        {{#each matchInfo.lineups}}
+        {{#if (eq this.team.id ../matchInfo.teams.home.id)}}
+        <table class="gf-table lineup-table">
           <thead>
-            <tr>
-              <th colspan="3">
-            Match Statistics
-            </th>
+            <tr class="lineup-title-row">
+              <th colspan="3">Home Lineup</th>
+            </tr>
+            <tr class="lineup-section-row">
+              <th colspan="3">Starting 11</th>
             </tr>
           </thead>
           <tbody>
-            {{#each matchStatistics}}
-            <tr>
-              <td class="match-stats-home">{{this.homeValue}}</td>
-              <td class="match-stats-type">{{this.type}}</td>
-              <td class="match-stats-away">{{this.awayValue}}</td>
+            {{#each this.startXI}}
+            <tr class="lineup-player-row">
+              <td class="lineup-number-td">{{this.player.number}}</td>
+              <td><a class="lineup-player-name cursor-pointer"
+                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              <td
+                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                  class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
             </tr>
             {{/each}}
+            {{#if this.substitutes.length}}
+            <tr class="lineup-section-row">
+              <th colspan="3">Substitutes</th>
+            </tr>
+            {{#each this.substitutes}}
+            <tr class="lineup-player-row lineup-sub-row">
+              <td class="lineup-number-td">{{this.player.number}}</td>
+              <td><a class="lineup-player-name cursor-pointer"
+                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              <td
+                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                  class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
+            </tr>
+            {{/each}}
+            {{/if}}
+            {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
+            <tr class="lineup-footer-row lineup-avg-row">
+              <td colspan="2">Team Avg Rating</td>
+              <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if
+                  avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
+            </tr>
+            {{/with}}
+            {{#if this.formation}}
+            <tr class="lineup-footer-row lineup-meta-row">
+              <td colspan="3">Formation: {{this.formation}}</td>
+            </tr>
+            {{/if}}
+            {{#if this.coach.name}}
+            <tr class="lineup-footer-row lineup-meta-row">
+              <td colspan="3">Manager: {{this.coach.name}}</td>
+            </tr>
+            {{/if}}
           </tbody>
         </table>
+        {{/if}}
+        {{/each}}
         {{else}}
-        <div class="lineup-empty">No statistics available.</div>
+        <div class="lineup-empty">No lineup data available.</div>
+        {{/if}}
+      </div>
+
+      <div class="match-center-column">
+        <div class="match-events-panel goals-only">
+          <div class="match-events-header">
+            <h3>Match Events</h3>
+            {{#if matchInfo.events}}
+            <button type="button" id="events-toggle-btn" class="more-button match-events-toggle"
+              aria-pressed="false">Show All Events</button>
+            {{/if}}
+          </div>
+          {{#if matchInfo.events}}
+          <div class="match-events-grid">
+            {{#each matchInfo.events}}
+            <div class="event-row {{#if (isGoalEvent this.type this.detail)}}event-goal{{else}}event-other{{/if}}">
+              <div class="event-side event-side-home">
+                {{#if (eq this.team.id ../matchInfo.teams.home.id)}}
+                <span class="event-text"><a class="event-player-link cursor-pointer"
+                    href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}}
+                  ({{this.detail}}){{/if}}</span>
+                {{/if}}
+              </div>
+
+              <span class="event-minute">{{this.time.elapsed}}'</span>
+
+              <div class="event-side event-side-away">
+                {{#if (eq this.team.id ../matchInfo.teams.away.id)}}
+                <span class="event-text"><a class="event-player-link cursor-pointer"
+                    href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}}
+                  ({{this.detail}}){{/if}}</span>
+                {{/if}}
+              </div>
+            </div>
+            {{/each}}
+          </div>
+          {{else}}
+          <div class="lineup-empty">No events available.</div>
+          {{/if}}
+        </div>
+
+        <div class="match-stats-panel">
+          {{#if matchStatistics.length}}
+          <table class="gf-table match-stats-table">
+            <thead>
+              <tr>
+                <th colspan="3">
+                  Match Statistics
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each matchStatistics}}
+              <tr>
+                <td class="match-stats-home">{{this.homeValue}}</td>
+                <td class="match-stats-type">{{this.type}}</td>
+                <td class="match-stats-away">{{this.awayValue}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+          {{else}}
+          <div class="lineup-empty">No statistics available.</div>
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="lineup-panel lineup-away">
+        {{#if matchInfo.lineups}}
+        {{#each matchInfo.lineups}}
+        {{#if (eq this.team.id ../matchInfo.teams.away.id)}}
+        <table class="gf-table lineup-table">
+          <thead>
+            <tr class="lineup-title-row">
+              <th colspan="3">Away Lineup</th>
+            </tr>
+            <tr class="lineup-section-row">
+              <th colspan="3">Starting 11</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each this.startXI}}
+            <tr class="lineup-player-row">
+              <td class="lineup-number-td">{{this.player.number}}</td>
+              <td><a class="lineup-player-name cursor-pointer"
+                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              <td
+                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                  class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
+            </tr>
+            {{/each}}
+            {{#if this.substitutes.length}}
+            <tr class="lineup-section-row">
+              <th colspan="3">Substitutes</th>
+            </tr>
+            {{#each this.substitutes}}
+            <tr class="lineup-player-row lineup-sub-row">
+              <td class="lineup-number-td">{{this.player.number}}</td>
+              <td><a class="lineup-player-name cursor-pointer"
+                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              <td
+                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                  class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
+            </tr>
+            {{/each}}
+            {{/if}}
+            {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
+            <tr class="lineup-footer-row lineup-avg-row">
+              <td colspan="2">Team Avg Rating</td>
+              <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if
+                  avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
+            </tr>
+            {{/with}}
+            {{#if this.formation}}
+            <tr class="lineup-footer-row lineup-meta-row">
+              <td colspan="3">Formation: {{this.formation}}</td>
+            </tr>
+            {{/if}}
+            {{#if this.coach.name}}
+            <tr class="lineup-footer-row lineup-meta-row">
+              <td colspan="3">Manager: {{this.coach.name}}</td>
+            </tr>
+            {{/if}}
+          </tbody>
+        </table>
+        {{/if}}
+        {{/each}}
+        {{else}}
+        <div class="lineup-empty">No lineup data available.</div>
         {{/if}}
       </div>
     </div>
-
-    <div class="lineup-panel lineup-away">
-      {{#if matchInfo.lineups}}
-      {{#each matchInfo.lineups}}
-      {{#if (eq this.team.id ../matchInfo.teams.away.id)}}
-      <table class="lineup-table">
-        <thead>
-          <tr class="lineup-title-row"><th colspan="3">Away Lineup</th></tr>
-          <tr class="lineup-section-row"><th colspan="3">Starting 11</th></tr>
-        </thead>
-        <tbody>
-          {{#each this.startXI}}
-          <tr class="lineup-player-row">
-            <td class="lineup-number-td">{{this.player.number}}</td>
-            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
-            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
-          </tr>
-          {{/each}}
-          {{#if this.substitutes.length}}
-          <tr class="lineup-section-row"><th colspan="3">Substitutes</th></tr>
-          {{#each this.substitutes}}
-          <tr class="lineup-player-row lineup-sub-row">
-            <td class="lineup-number-td">{{this.player.number}}</td>
-            <td><a class="lineup-player-name cursor-pointer" href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
-            <td class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">{{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
-          </tr>
-          {{/each}}
-          {{/if}}
-          {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
-          <tr class="lineup-footer-row lineup-avg-row">
-            <td colspan="2">Team Avg Rating</td>
-            <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
-          </tr>
-          {{/with}}
-          {{#if this.formation}}
-          <tr class="lineup-footer-row lineup-meta-row">
-            <td colspan="3">Formation: {{this.formation}}</td>
-          </tr>
-          {{/if}}
-          {{#if this.coach.name}}
-          <tr class="lineup-footer-row lineup-meta-row">
-            <td colspan="3">Manager: {{this.coach.name}}</td>
-          </tr>
-          {{/if}}
-        </tbody>
-      </table>
-      {{/if}}
-      {{/each}}
-      {{else}}
-      <div class="lineup-empty">No lineup data available.</div>
-      {{/if}}
-    </div>
-  </div>
   </div>
 
   {{/if}}
 
   {{#if teamList.length}}
-  <div id="match-preview-panel" class="match-content-panel {{#if (isFinishedStatus matchInfo.fixture.status.short)}}{{else}}is-active{{/if}}">
-  {{#each teamList}}
-  <div class="team-card">
-    <div class="team-header">
-      <img class="cursor-pointer" src="images/logos/{{this.id}}.png" alt="{{this.name}}" title="{{this.name}}" onclick="window.location.href='team?ID={{this.id}}'"/>
-      <div>
-        <h3 class="cursor-pointer" onclick="window.location.href='team?ID={{this.id}}'">{{this.name}}</h3>
-        <div class="record">
-          <div class="pts-container">
-            <span class="pts">{{percentage this.wins this.played}} % win</span>
-            <span class="pts-per">{{this.perGame.points}} pts/game</span>
+  <div id="match-preview-panel"
+    class="match-content-panel {{#if (isFinishedStatus matchInfo.fixture.status.short)}}{{else}}is-active{{/if}}">
+    {{#each teamList}}
+    <div class="team-card gf-table {{#if (eq this.id ../matchInfo.teams.away.id)}}team-card-away{{/if}}">
+      <div class="team-header">
+        <img class="cursor-pointer" src="images/logos/{{this.id}}.png" alt="{{this.name}}" title="{{this.name}}"
+          onclick="window.location.href='team?ID={{this.id}}'" />
+        <div style="width: 92%;">
+          <h3 class="cursor-pointer" onclick="window.location.href='team?ID={{this.id}}'">{{this.name}}</h3>
+          <div class="record">
+            <table style="color: white; background-color: #1D3557;">
+              <tr>
+                <td>{{percentage this.wins this.played}} % win</td>
+                <td>{{this.perGame.points}} pts/game</td>
+                <td>{{this.wins}} Wins</td>
+                <td>{{this.draws}} Draws</td>
+                <td>{{this.losses}} Losses</td>
+              </tr>
+            </table>
           </div>
-          <span>{{this.wins}}W</span>
-          <span>{{this.draws}}D</span>
-          <span>{{this.losses}}L</span>
         </div>
-      </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="label">Goals</div>
-        <div class="value">{{this.total.goals}}</div>
-        <div class="per-game">{{this.perGame.goals}}/game</div>
-      </div>
-
-      <div class="stat">
-        <div class="label">Goals Against</div>
-        <div class="value">{{this.total.goalsAgainst}}</div>
-        <div class="per-game">{{this.perGame.goalsAgainst}}/game</div>
-      </div>
-
-      <div class="stat">
-        <div class="label">xG</div>
-        <div class="value">{{this.total.xG}}</div>
-        <div class="per-game">{{this.perGame.xG}}/game</div>
-      </div>
-
-      <div class="stat">
-        <div class="label">xGA</div>
-        <div class="value">{{this.total.xGA}}</div>
-        <div class="per-game">{{this.perGame.xGA}}/game</div>
-      </div>
-
-      <div class="stat">
-        <div class="label">Corners</div>
-        <div class="value">{{this.total.corners}}</div>
-        <div class="per-game">{{this.perGame.corners}}/game</div>
-      </div>
-
-      <div class="stat">
-        <div class="label">Shots on Goal</div>
-        <div class="value">{{this.total.shotsOnGoal}}</div>
-        <div class="per-game">{{this.perGame.shotsOnGoal}}/game</div>
-      </div>
-    </div>
-
-    <div class="last5">
-      <h4>Last 5 Matches</h4>
-      <div class="record">
-        <div class="pts-container">
-          <span class="pts">{{this.last5.points}} pts</span>
-          <span class="pts-per">{{this.last5PerGame.points}} pts/game</span>
-        </div>
-        <span>Form: {{this.form}}</span>
       </div>
 
       <div class="stats">
         <div class="stat">
           <div class="label">Goals</div>
-          <div class="value">{{this.last5.goals}}</div>
-          <div class="per-game">{{this.last5PerGame.goals}}/game</div>
+          <div class="value">{{this.total.goals}}</div>
+          <div class="per-game">{{this.perGame.goals}}/game</div>
         </div>
 
         <div class="stat">
           <div class="label">Goals Against</div>
-          <div class="value">{{this.last5.goalsAgainst}}</div>
-          <div class="per-game">{{this.last5PerGame.goalsAgainst}}/game</div>
+          <div class="value">{{this.total.goalsAgainst}}</div>
+          <div class="per-game">{{this.perGame.goalsAgainst}}/game</div>
         </div>
 
         <div class="stat">
           <div class="label">xG</div>
-          <div class="value">{{this.last5.xG}}</div>
-          <div class="per-game">{{this.last5PerGame.xG}}/game</div>
+          <div class="value">{{this.total.xG}}</div>
+          <div class="per-game">{{this.perGame.xG}}/game</div>
         </div>
 
         <div class="stat">
           <div class="label">xGA</div>
-          <div class="value">{{this.last5.xGA}}</div>
-          <div class="per-game">{{this.last5PerGame.xGA}}/game</div>
+          <div class="value">{{this.total.xGA}}</div>
+          <div class="per-game">{{this.perGame.xGA}}/game</div>
         </div>
 
         <div class="stat">
           <div class="label">Corners</div>
-          <div class="value">{{this.last5.corners}}</div>
-          <div class="per-game">{{this.last5PerGame.corners}}/game</div>
+          <div class="value">{{this.total.corners}}</div>
+          <div class="per-game">{{this.perGame.corners}}/game</div>
         </div>
 
         <div class="stat">
           <div class="label">Shots on Goal</div>
-          <div class="value">{{this.last5.shotsOnGoal}}</div>
-          <div class="per-game">{{this.last5PerGame.shotsOnGoal}}/game</div>
+          <div class="value">{{this.total.shotsOnGoal}}</div>
+          <div class="per-game">{{this.perGame.shotsOnGoal}}/game</div>
         </div>
       </div>
 
-      <h4>Match Details</h4>
-      {{#each this.matches}}
-      <div class="match-detail">
-        <div class="match-opponent">
-          <div class="home-side">
-            <img width="40px" src="images/logos/{{this.homeTeam.id}}.png" alt="{{this.homeTeam.name}}">
-            <span class="team-name">{{this.homeTeam.name}}</span>
-          </div>
-          <div class="center-info">
-            <span class="match-score">{{this.homeScore}} - {{this.awayScore}}</span>
-            <span class="match-date">{{this.league}} - {{formatDate this.date}}</span>
-          </div>
-          <div class="away-side">
-            <span class="team-name">{{this.awayTeam.name}}</span>
-            <img width="40px" src="images/logos/{{this.awayTeam.id}}.png" alt="{{this.awayTeam.name}}">
+      <div class="last5">
+        <div class="last5-header">
+          <center><h3 style="margin-top: 0px">Last 5 Matches</h3></center>
+          <div class="record">
+             <table style="color: white; background-color: #1D3557;">
+              <tr>
+                <td>{{this.last5.points}} pts</td>
+                <td>{{this.last5.xPoints}} xPts</td>
+                <td>{{this.last5PerGame.points}} pts/game</td>
+                  <td style="width: 20%;">
+                    <div style="display: flex; align-items: center; height: 100%;">
+                      {{#each this.formArray as |form|}}
+                      <span class="form-indicator {{form}}"></span>
+                      {{/each}}
+                    </div>
+                  </td>
+              </tr>
+            </table>
           </div>
         </div>
-        <div class="match-stats-detail">
-          <span>Corners: {{this.stats.cornersHome}} - {{this.stats.cornersAway}}</span>
-          <span>Shots: {{this.stats.shotsOnGoalHome}} - {{this.stats.shotsOnGoalAway}}</span>
-          {{#if this.xG}}
-          <span>xG: {{this.stats.xGHome}} - {{this.stats.xGAway}}</span>
-          {{/if}}
-        </div>
-      </div>
-      {{/each}}
-    </div>
-  </div>
-  {{/each}}
 
-  <div class="ai-predict-rect">
-    <button type="button" id="ai-predict-btn" class="ai-predict-btn">
-      ✨ Predict Match &mdash; AI Powered
-    </button>
-    <div id="ai-predict-result" class="ai-predict-result" style="display:none;">
-      <div class="ai-predict-score-row">
-        <span class="ai-predict-team">{{matchInfo.teams.home.name}}</span>
-        <span class="ai-predict-score" id="ai-score-home">-</span>
-        <span class="ai-predict-separator">:</span>
-        <span class="ai-predict-score" id="ai-score-away">-</span>
-        <span class="ai-predict-team">{{matchInfo.teams.away.name}}</span>
-      </div>
-      <div class="ai-predict-stats">
-        <div class="ai-predict-stat">
-          <span class="ai-predict-stat-label">Corners</span>
-          <span class="ai-predict-stat-values"><span id="ai-corners-home">-</span> &ndash; <span id="ai-corners-away">-</span></span>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Goals</div>
+            <div class="value">{{this.last5.goals}}</div>
+            <div class="per-game">{{this.last5PerGame.goals}}/game</div>
+          </div>
+
+          <div class="stat">
+            <div class="label">Goals Against</div>
+            <div class="value">{{this.last5.goalsAgainst}}</div>
+            <div class="per-game">{{this.last5PerGame.goalsAgainst}}/game</div>
+          </div>
+
+          <div class="stat">
+            <div class="label">xG</div>
+            <div class="value">{{this.last5.xG}}</div>
+            <div class="per-game">{{this.last5PerGame.xG}}/game</div>
+          </div>
+
+          <div class="stat">
+            <div class="label">xGA</div>
+            <div class="value">{{this.last5.xGA}}</div>
+            <div class="per-game">{{this.last5PerGame.xGA}}/game</div>
+          </div>
+
+          <div class="stat">
+            <div class="label">Corners</div>
+            <div class="value">{{this.last5.corners}}</div>
+            <div class="per-game">{{this.last5PerGame.corners}}/game</div>
+          </div>
+
+          <div class="stat">
+            <div class="label">Shots on Goal</div>
+            <div class="value">{{this.last5.shotsOnGoal}}</div>
+            <div class="per-game">{{this.last5PerGame.shotsOnGoal}}/game</div>
+          </div>
         </div>
-        <div class="ai-predict-stat">
-          <span class="ai-predict-stat-label">Shots on Goal</span>
-          <span class="ai-predict-stat-values"><span id="ai-shots-home">-</span> &ndash; <span id="ai-shots-away">-</span></span>
-        </div>
-        <div class="ai-predict-stat">
-          <span class="ai-predict-stat-label">Possession</span>
-          <span class="ai-predict-stat-values"><span id="ai-poss-home">-</span>% &ndash; <span id="ai-poss-away">-</span>%</span>
-        </div>
       </div>
-      <div id="ai-predict-outcome" class="ai-predict-outcome"></div>
-      <div id="ai-predict-reasoning" class="ai-predict-reasoning">
-        
+      <div class="match-detail-list">
+        {{#each this.matches}}
+        <div class="match-detail cursor-pointer" data-match-id="{{this.id}}" role="link" tabindex="0"
+          aria-label="Open match {{this.homeTeam.name}} vs {{this.awayTeam.name}}">
+          <div class="match-opponent">
+            <div class="home-side">
+              <a href="/team?ID={{this.homeTeam.id}}" aria-label="{{this.homeTeam.name}} team page">
+                <img width="40px" src="images/logos/{{this.homeTeam.id}}.png" alt="{{this.homeTeam.name}}">
+              </a>
+              <a class="team-name" href="/team?ID={{this.homeTeam.id}}">{{this.homeTeam.name}}</a>
+            </div>
+            <div class="center-info">
+              <span class="match-score">{{this.homeScore}} - {{this.awayScore}}</span>
+              <span class="match-date"><a class="match-competition-link"
+                  href="/league?id={{this.leagueId}}">{{this.league}}</a> - {{formatDate this.date}}</span>
+            </div>
+            <div class="away-side">
+              <a class="team-name" href="/team?ID={{this.awayTeam.id}}">{{this.awayTeam.name}}</a>
+              <a href="/team?ID={{this.awayTeam.id}}" aria-label="{{this.awayTeam.name}} team page">
+                <img width="40px" src="images/logos/{{this.awayTeam.id}}.png" alt="{{this.awayTeam.name}}">
+              </a>
+            </div>
+          </div>
+          <div class="match-stats-detail">
+            <span>Corners: {{this.stats.cornersHome}} - {{this.stats.cornersAway}}</span>
+            <span>Shots: {{this.stats.shotsOnGoalHome}} - {{this.stats.shotsOnGoalAway}}</span>
+            {{#if this.xG}}
+            <span>xG: {{this.stats.xGHome}} - {{this.stats.xGAway}}</span>
+            {{/if}}
+          </div>
+        </div>
+        {{/each}}
       </div>
-      <div class="ai-predict-logo">
-        <img src="/images/logo.png" alt="AI" style="width:32px; vertical-align:middle;" />
+
+    </div>
+    {{/each}}
+
+    <div class="ai-predict-rect">
+      <button type="button" id="ai-predict-btn" class="ai-predict-btn">
+        ✨ Predict Match &mdash; AI Powered
+      </button>
+      <div id="ai-predict-result" class="ai-predict-result" style="display:none;">
+        <div class="ai-predict-score-row">
+          <span class="ai-predict-team">{{matchInfo.teams.home.name}}</span>
+          <span class="ai-predict-score" id="ai-score-home">-</span>
+          <span class="ai-predict-separator">:</span>
+          <span class="ai-predict-score" id="ai-score-away">-</span>
+          <span class="ai-predict-team">{{matchInfo.teams.away.name}}</span>
+        </div>
+        <div class="ai-predict-stats">
+          <div class="ai-predict-stat">
+            <span class="ai-predict-stat-label">Corners</span>
+            <span class="ai-predict-stat-values"><span id="ai-corners-home">-</span> &ndash; <span
+                id="ai-corners-away">-</span></span>
+          </div>
+          <div class="ai-predict-stat">
+            <span class="ai-predict-stat-label">Shots on Goal</span>
+            <span class="ai-predict-stat-values"><span id="ai-shots-home">-</span> &ndash; <span
+                id="ai-shots-away">-</span></span>
+          </div>
+          <div class="ai-predict-stat">
+            <span class="ai-predict-stat-label">Possession</span>
+            <span class="ai-predict-stat-values"><span id="ai-poss-home">-</span>% &ndash; <span
+                id="ai-poss-away">-</span>%</span>
+          </div>
+        </div>
+        <div id="ai-predict-outcome" class="ai-predict-outcome"></div>
+        <div id="ai-predict-reasoning" class="ai-predict-reasoning">
+
+        </div>
+        <div class="ai-predict-logo">
+          <img src="/images/logo.png" alt="AI" style="width:32px; vertical-align:middle;" />
+        </div>
       </div>
     </div>
-  </div>
 
   </div>
   {{/if}}
@@ -383,6 +451,7 @@
     justify-content: flex-end;
     margin-top: 12px;
   }
+
   .ai-predict-rect {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
     border: 1px solid #e94560;
@@ -393,6 +462,7 @@
     text-align: center;
     grid-column: 1 / -1;
   }
+
   .ai-predict-btn {
     background: linear-gradient(90deg, #e94560, #c0392b);
     color: #fff;
@@ -405,10 +475,15 @@
     cursor: pointer;
     transition: opacity 0.2s;
   }
-  .ai-predict-btn:hover { opacity: 0.85; }
+
+  .ai-predict-btn:hover {
+    opacity: 0.85;
+  }
+
   .ai-predict-result {
     margin-top: 22px;
   }
+
   .ai-predict-score-row {
     display: flex;
     align-items: center;
@@ -416,12 +491,14 @@
     gap: 12px;
     margin-bottom: 18px;
   }
+
   .ai-predict-team {
     color: #e0e0e0;
     font-size: 20px;
     font-weight: 600;
     width: 30%;
   }
+
   .ai-predict-score {
     color: #e94560;
     font-size: 2rem;
@@ -429,11 +506,13 @@
     min-width: 40px;
     display: inline-block;
   }
+
   .ai-predict-separator {
     color: #e0e0e0;
     font-size: 2rem;
     font-weight: 300;
   }
+
   .ai-predict-stats {
     display: flex;
     flex-wrap: wrap;
@@ -441,8 +520,9 @@
     gap: 16px;
     margin-bottom: 14px;
   }
+
   .ai-predict-stat {
-    background: rgba(255,255,255,0.07);
+    background: rgba(255, 255, 255, 0.07);
     border-radius: 6px;
     padding: 8px 18px;
     display: flex;
@@ -450,6 +530,7 @@
     align-items: center;
     min-width: 110px;
   }
+
   .ai-predict-stat-label {
     color: #aaa;
     font-size: 0.75rem;
@@ -457,17 +538,20 @@
     letter-spacing: 0.06em;
     margin-bottom: 4px;
   }
+
   .ai-predict-stat-values {
     color: #fff;
     font-size: 1.05rem;
     font-weight: 700;
   }
+
   .ai-predict-outcome {
     color: #c8d6e5;
     font-size: 0.95rem;
     font-weight: 600;
     margin-bottom: 8px;
   }
+
   .ai-predict-reasoning {
     color: #aab4be;
     font-size: 0.85rem;
@@ -475,6 +559,7 @@
     max-width: 560px;
     margin: 0 auto 10px;
   }
+
   .ai-predict-note {
     color: #777;
     font-size: 0.75rem;

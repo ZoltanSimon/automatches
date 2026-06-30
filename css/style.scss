@@ -4,7 +4,7 @@
 $gray: #333;
 $light-gray: #ccc;
 $background-gray: #f8f9fa;
-$green: green;
+$green: $brand-green;
 $gray-neutral: gray;
 
 body {
@@ -43,6 +43,16 @@ table {
   border-collapse: collapse;
 }
 
+.gf-table {
+  border-collapse: collapse;
+  border: 3px solid $dark-blue;
+}
+
+.world-cup-group-table,
+.world-cup-group-matches-table {
+  margin-bottom: 10px;
+}
+
 table,
 th,
 td {
@@ -65,6 +75,14 @@ table tbody tr:nth-child(even) {
 
 table tbody tr:hover {
   background-color: $lightest-blue;
+}
+
+.match-page table tbody tr:hover {
+  background-color: transparent;
+}
+
+.match-page table tbody tr:nth-child(even):hover {
+  background-color: lighten($light-blue, 10%);
 }
 
 form label {
@@ -864,7 +882,7 @@ td .form-indicator {
   }
 
   &.success {
-    background: #4CAF50;
+    background: $brand-green;
   }
 
   &.error {
@@ -932,7 +950,7 @@ td .form-indicator {
 .status {
   display: inline-block;
   padding: 4px 8px;
-  background: #4CAF50;
+  background: $brand-green;
   color: $lightest-blue;
   border-radius: 4px;
   font-size: 12px;
@@ -985,9 +1003,9 @@ td .form-indicator {
 }
 
 .match-events-panel {
-  background: $blue;
+  background: $light-blue;
   color: $dark-blue;
-  padding: 16px;
+  padding: 8px;
   border: 1px solid $dark-blue;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
@@ -1023,9 +1041,9 @@ td .form-indicator {
 }
 
 .match-stats-panel {
-  background: $blue;
+  background: $light-blue;
   color: white;
-  padding: 16px;
+  padding: 8px;
   border: 1px solid $dark-blue;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
@@ -1243,19 +1261,21 @@ a.event-player-link {
 }
 
 .team-card {
-  background: $blue;
-  border: 1px solid $dark-blue;
-  padding: 20px;
-  margin-bottom: 20px;
+  background: $light-blue;
+  padding: 8px;
 }
 
 .team-header {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.last5-header, .team-header {
+  margin-bottom: 16px;
   padding: 16px;
-  border-bottom: 1px solid $dark-blue;
-  background-color: $lightest-blue;
+  border: 1px solid $dark-blue;
+  background-color: $blue;
+  color: $lightest-blue;
 }
 
 .team-header img {
@@ -1270,18 +1290,8 @@ a.event-player-link {
 
 .record {
   display: flex;
-  gap: 10px;
+  gap: 20%;
   font-size: 14px;
-}
-
-.record .pts {
-  color: black;
-  font-weight: bold;
-  font-size: 15px;
-}
-
-.record .pts-per {
-  color: black;
 }
 
 .stats {
@@ -1318,8 +1328,7 @@ a.event-player-link {
 
 .last5 {
   background: $light-blue;
-  padding: 15px;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
 .last5 h4 {
@@ -1329,21 +1338,28 @@ a.event-player-link {
 }
 
 .last5 .record {
-  margin-bottom: 15px;
-}
-
-.pts-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-right: 24px;
+  margin-bottom: 12px;
 }
 
 .match-detail {
-  background: $lightest-blue;
-  border-radius: 6px;
+  background: $light-blue;
+  border-radius: 4px;
   padding: 0.5rem 0.75rem;
   margin-bottom: 0.5rem;
+  border: 1px solid $dark-blue;
+  margin-top: 16px;
+}
+
+.match-detail-list .match-detail:nth-child(even) {
+  background: lighten($light-blue, 10%);
+}
+
+.team-card-away .match-detail {
+  background: lighten($light-blue, 10%);
+}
+
+.team-card-away .match-detail-list .match-detail:nth-child(even) {
+  background: $light-blue;
 }
 
 .match-opponent {
@@ -1389,8 +1405,8 @@ a.event-player-link {
 }
 
 .match-date {
-  color: $blue;
-  font-size: 0.8rem;
+  color: $red;
+  font-size: 0.9rem;
 }
 
 .match-stats-detail {
@@ -1399,7 +1415,6 @@ a.event-player-link {
   justify-content: center;
   font-size: 0.85rem;
   color: $dark-blue;
-  padding-top: 0.25rem;
 }
 
 .match-stats-detail span {
@@ -1463,8 +1478,8 @@ a.event-player-link {
   text-align: center;
 }
 
-.rating-dark-green { background-color: #1a7a3c; color: #fff; font-weight: bold;}
-.rating-green      { background-color: #4caf50; color: #fff; font-weight: bold;}
+.rating-dark-green { background-color: darken($brand-green, 12%); color: #fff; font-weight: bold;}
+.rating-green      { background-color: $brand-green; color: #fff; font-weight: bold;}
 .rating-yellow     { background-color: #ffeb3b; color: #000; font-weight: bold;}
 .rating-orange     { background-color: #ff9800; color: #fff; font-weight: bold;}
 .rating-red        { background-color: #f44336; color: #fff; font-weight: bold;}
@@ -1484,13 +1499,13 @@ a.event-player-link {
 
 .lineup-table .lineup-player-row td.rating-dark-green,
 .lineup-table .lineup-footer-row td.rating-dark-green {
-  background-color: #1a7a3c;
+  background-color: darken($brand-green, 12%);
   color: #fff;
 }
 
 .lineup-table .lineup-player-row td.rating-green,
 .lineup-table .lineup-footer-row td.rating-green {
-  background-color: #4caf50;
+  background-color: $brand-green;
   color: #fff;
 }
 

@@ -551,7 +551,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
 
       console.log(`Checking league ${leagueID} with ${data.length} matches for missing match files...`);
       for (const element of data) {
-        if (["FT", "AET"].includes(element.fixture.status.short)) {
+        if (["FT", "AET", "PEN"].includes(element.fixture.status.short)) {
           try {
             fs.accessSync(
               `${matchesDir}/${element.fixture.id}.json`,

@@ -78,9 +78,13 @@ export async function getMatchPageData(registry, currentMatch) {
     }));
 
   const matchStatistics = buildMatchStatistics(currentMatch);
-  const leagueName = currentMatch.league.id
-    ? allDBLeagues.find((league) => league.id == currentMatch.league.id)?.name || "Unknown League"
-    : "Unknown League";
+  const matchLeagueName = typeof currentMatch?.league?.name === "string"
+    ? currentMatch.league.name.trim()
+    : "";
+  const dbLeagueName = currentMatch?.league?.id
+    ? allDBLeagues.find((league) => league.id == currentMatch.league.id)?.name || ""
+    : "";
+  const leagueName = matchLeagueName || dbLeagueName || "Unknown League";
 
   return {
     teamList,

@@ -17,7 +17,7 @@ export function addSquad(squads = []) {
     const players = Array.isArray(squad?.players) ? squad.players : [];
 
     html += `<div id="match-stats" style="margin-bottom: 18px;"><h4>${teamName}</h4>`;
-    html += `<table style='border-collapse: collapse; width: 100%;' border='1'><thead><tr>${tds}Player</td>${tds}Age</td>${tds}Position</td></tr></thead><tbody>`;
+    html += `<table class="gf-table"><thead><tr>${tds}Player</td>${tds}Age</td>${tds}Position</td></tr></thead><tbody>`;
 
     for (const player of players) {
       html += `<tr>${tds}${player?.name || "-"}</td>${tds}${player?.age || "-"}</td>${tds}${player?.position || "-"}</td></tr>`;

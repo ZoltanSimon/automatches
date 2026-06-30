@@ -42,7 +42,7 @@ function getExpectedGoals(match, teamID, fallbackIndex) {
     return new Date(a.fixture.date) - new Date(b.fixture.date);
   });
 
-  addToPage = `<table style='border-collapse: collapse; border: 3px solid #1D3557; visibility: visible;' border='1' id="match-list"><thead>
+  addToPage = `<table class="gf-table" id="match-list"><thead>
     <tr class="main-table-header"><th colspan=9>${getDate(new Date())}</th></tr></thead><tbody>`;
 
   fixtures.forEach((element) => {

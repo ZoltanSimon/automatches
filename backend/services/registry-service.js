@@ -3,6 +3,13 @@ import { getMatchFromServer } from '../json-reader.js';
 import { allDBLeagues } from '../index.js';
 
 let _registryPromise = null;
+let _registry = null;
+let _refreshPromise = null;
+
+async function buildRegistryFromCurrentLeagues() {
+  const leagueConfigs = await getRegistryLeagueSeasonConfigs();
+  return buildMatchRegistry(leagueConfigs);
+}
 
 async function getRegistryLeagueSeasonConfigs() {
   const leagues = Array.isArray(allDBLeagues) ? allDBLeagues : [];
@@ -17,25 +24,54 @@ async function getRegistryLeagueSeasonConfigs() {
 }
 
 export async function getRegistry() {
-  if (!_registryPromise) {
-    const leagueConfigs = await getRegistryLeagueSeasonConfigs();
-    _registryPromise = buildMatchRegistry(leagueConfigs);
+  if (_registry) {
+    return _registry;
   }
+
+  if (!_registryPromise) {
+    _registryPromise = buildRegistryFromCurrentLeagues()
+      .then((registry) => {
+        _registry = registry;
+        return registry;
+      })
+      .catch((error) => {
+        _registryPromise = null;
+        throw error;
+      });
+  }
+
   return _registryPromise; // all callers await the same promise
 }
 
 export async function refreshRegistry(options = {}) {
-  const leagueConfigs = await getRegistryLeagueSeasonConfigs();
-  _registryPromise = buildMatchRegistry(leagueConfigs);
-  await _registryPromise;
-  console.log("Registry refreshed at", new Date().toISOString());
+  if (_refreshPromise) {
+    return _refreshPromise;
+  }
+
+  _refreshPromise = (async () => {
+    const nextRegistry = await buildRegistryFromCurrentLeagues();
+    _registry = nextRegistry;
+    _registryPromise = Promise.resolve(nextRegistry);
+    console.log("Registry refreshed at", new Date().toISOString());
+    return nextRegistry;
+  })()
+    .catch((error) => {
+      console.error("Registry refresh failed:", error);
+      if (!_registry) {
+        _registryPromise = null;
+      }
+      throw error;
+    })
+    .finally(() => {
+      _refreshPromise = null;
+    });
+
+  return _refreshPromise;
 }
 
 export async function forceRefreshRegistry(options = {}) {
   return refreshRegistry(options);
 }
-
-setInterval(refreshRegistry, 30 * 60 * 1000);
 
 function normalizeFixtureAsMatch(fixture) {
   const fulltimeHome = fixture?.score?.fulltime?.home ?? fixture?.goals?.home ?? 0;

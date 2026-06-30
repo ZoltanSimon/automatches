@@ -35,6 +35,16 @@ table {
   border-collapse: collapse;
 }
 
+.gf-table {
+  border-collapse: collapse;
+  border: 3px solid #1d3557;
+}
+
+.world-cup-group-table,
+.world-cup-group-matches-table {
+  margin-bottom: 10px;
+}
+
 table,
 th,
 td {
@@ -57,6 +67,14 @@ table tbody tr:nth-child(even) {
 
 table tbody tr:hover {
   background-color: #f1faee;
+}
+
+.match-page table tbody tr:hover {
+  background-color: transparent;
+}
+
+.match-page table tbody tr:nth-child(even):hover {
+  background-color: rgb(204.368852459, 233.4672131148, 234.631147541);
 }
 
 form label {
@@ -647,7 +665,7 @@ footer p {
   border-radius: 2px;
 }
 .form-indicator.W {
-  background-color: green;
+  background-color: #279b65;
 }
 .form-indicator.L {
   background-color: #E63946;
@@ -842,7 +860,7 @@ td .form-indicator:last-child {
   transform: translateY(0);
 }
 .toast.success {
-  background: #4CAF50;
+  background: #279b65;
 }
 .toast.error {
   background: #f44336;
@@ -906,7 +924,7 @@ td .form-indicator:last-child {
 .status {
   display: inline-block;
   padding: 4px 8px;
-  background: #4CAF50;
+  background: #279b65;
   color: #f1faee;
   border-radius: 4px;
   font-size: 12px;
@@ -961,9 +979,9 @@ td .form-indicator:last-child {
 }
 
 .match-events-panel {
-  background: #457B9D;
+  background: #a8dadc;
   color: #1d3557;
-  padding: 16px;
+  padding: 8px;
   border: 1px solid #1d3557;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -997,9 +1015,9 @@ td .form-indicator:last-child {
 }
 
 .match-stats-panel {
-  background: #457B9D;
+  background: #a8dadc;
   color: white;
-  padding: 16px;
+  padding: 8px;
   border: 1px solid #1d3557;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -1201,19 +1219,21 @@ a.event-player-link:hover {
 }
 
 .team-card {
-  background: #457B9D;
-  border: 1px solid #1d3557;
-  padding: 20px;
-  margin-bottom: 20px;
+  background: #a8dadc;
+  padding: 8px;
 }
 
 .team-header {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.last5-header, .team-header {
+  margin-bottom: 16px;
   padding: 16px;
-  border-bottom: 1px solid #1d3557;
-  background-color: #f1faee;
+  border: 1px solid #1d3557;
+  background-color: #457B9D;
+  color: #f1faee;
 }
 
 .team-header img {
@@ -1228,18 +1248,8 @@ a.event-player-link:hover {
 
 .record {
   display: flex;
-  gap: 10px;
+  gap: 20%;
   font-size: 14px;
-}
-
-.record .pts {
-  color: black;
-  font-weight: bold;
-  font-size: 15px;
-}
-
-.record .pts-per {
-  color: black;
 }
 
 .stats {
@@ -1276,8 +1286,7 @@ a.event-player-link:hover {
 
 .last5 {
   background: #a8dadc;
-  padding: 15px;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
 .last5 h4 {
@@ -1287,21 +1296,28 @@ a.event-player-link:hover {
 }
 
 .last5 .record {
-  margin-bottom: 15px;
-}
-
-.pts-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-right: 24px;
+  margin-bottom: 12px;
 }
 
 .match-detail {
-  background: #f1faee;
-  border-radius: 6px;
+  background: #a8dadc;
+  border-radius: 4px;
   padding: 0.5rem 0.75rem;
   margin-bottom: 0.5rem;
+  border: 1px solid #1d3557;
+  margin-top: 16px;
+}
+
+.match-detail-list .match-detail:nth-child(even) {
+  background: rgb(204.368852459, 233.4672131148, 234.631147541);
+}
+
+.team-card-away .match-detail {
+  background: rgb(204.368852459, 233.4672131148, 234.631147541);
+}
+
+.team-card-away .match-detail-list .match-detail:nth-child(even) {
+  background: #a8dadc;
 }
 
 .match-opponent {
@@ -1347,8 +1363,8 @@ a.event-player-link:hover {
 }
 
 .match-date {
-  color: #457B9D;
-  font-size: 0.8rem;
+  color: #E63946;
+  font-size: 0.9rem;
 }
 
 .match-stats-detail {
@@ -1357,7 +1373,6 @@ a.event-player-link:hover {
   justify-content: center;
   font-size: 0.85rem;
   color: #1d3557;
-  padding-top: 0.25rem;
 }
 
 .match-stats-detail span {
@@ -1422,13 +1437,13 @@ a.event-player-link:hover {
 }
 
 .rating-dark-green {
-  background-color: #1a7a3c;
+  background-color: rgb(26.6969072165, 106.1030927835, 69.1381443299);
   color: #fff;
   font-weight: bold;
 }
 
 .rating-green {
-  background-color: #4caf50;
+  background-color: #279b65;
   color: #fff;
   font-weight: bold;
 }
@@ -1466,13 +1481,13 @@ a.event-player-link:hover {
 
 .lineup-table .lineup-player-row td.rating-dark-green,
 .lineup-table .lineup-footer-row td.rating-dark-green {
-  background-color: #1a7a3c;
+  background-color: rgb(26.6969072165, 106.1030927835, 69.1381443299);
   color: #fff;
 }
 
 .lineup-table .lineup-player-row td.rating-green,
 .lineup-table .lineup-footer-row td.rating-green {
-  background-color: #4caf50;
+  background-color: #279b65;
   color: #fff;
 }
 
