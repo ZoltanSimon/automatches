@@ -91,7 +91,7 @@ function mapRoundLabel(roundName) {
 
 async function loadWorldCupBracketTemplate() {
   if (!worldCupBracketTemplatePromise) {
-    worldCupBracketTemplatePromise = readFile(path.join(process.cwd(), "data", "wc_brackets.json"), "utf8")
+    worldCupBracketTemplatePromise = readFile(path.join(process.cwd(), "backend", "wc_brackets.json"), "utf8")
       .then((contents) => JSON.parse(contents))
       .catch((error) => {
         console.warn("Failed to load wc_brackets.json:", error.message);
