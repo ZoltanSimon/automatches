@@ -1,0 +1,173 @@
+{
+  "tournament": "FIFA World Cup 2026",
+  "api_football_league_id": 1,
+  "comment": "Expanded 48-team tournament introducing the Round of 32 stage",
+  "stages": {
+    "round_of_32": [
+      {
+        "match_id": 73,
+        "home_team": { "id": 1531, "name": "South Africa", "code": "RSA" },
+        "away_team": { "id": 5529, "name": "Canada", "code": "CAN" },
+        "venue": "Los Angeles Stadium",
+        "date": "2026-06-28",
+        "next_match_id": 90
+      },
+      {
+        "match_id": 74,
+        "home_team": { "id": 25, "name": "Germany", "code": "GER" },
+        "away_team": { "id": 2380, "name": "Paraguay", "code": "PAR" },
+        "venue": "Boston Stadium",
+        "date": "2026-06-29",
+        "next_match_id": 89
+      },
+      {
+        "match_id": 75,
+        "home_team": { "id": 1118, "name": "Netherlands", "code": "NED" },
+        "away_team": { "id": 31, "name": "Morocco", "code": "MAR" },
+        "venue": "Estadio Monterrey",
+        "date": "2026-06-29",
+        "next_match_id": 90
+      },
+      {
+        "match_id": 76,
+        "home_team": { "id": 6, "name": "Brazil", "code": "BRA" },
+        "away_team": { "id": 12, "name": "Japan", "code": "JPN" },
+        "venue": "Houston Stadium",
+        "date": "2026-06-29",
+        "next_match_id": 91
+      },
+      {
+        "match_id": 77,
+        "home_team": { "id": 2, "name": "France", "code": "FRA" },
+        "away_team": { "id": 5, "name": "Sweden", "code": "SWE" },
+        "venue": "New York New Jersey Stadium",
+        "date": "2026-06-30",
+        "next_match_id": 89
+      },
+      {
+        "match_id": 78,
+        "home_team": { "id": 1501, "name": "Ivory Coast", "code": "CIV" },
+        "away_team": { "id": 1090, "name": "Norway", "code": "NOR" },
+        "venue": "Dallas Stadium",
+        "date": "2026-06-30",
+        "next_match_id": 91
+      },
+      {
+        "match_id": 79,
+        "home_team": { "id": 16, "name": "Mexico", "code": "MEX" },
+        "away_team": { "id": 2382, "name": "Ecuador", "code": "ECU" },
+        "venue": "Mexico City Stadium",
+        "date": "2026-07-01",
+        "next_match_id": 92
+      },
+      {
+        "match_id": 80,
+        "home_team": { "id": 10, "name": "England", "code": "ENG" },
+        "away_team": { "id": 1508, "name": "DR Congo", "code": "COD" },
+        "venue": "Atlanta Stadium",
+        "date": "2026-07-01",
+        "next_match_id": 92
+      },
+      {
+        "match_id": 81,
+        "home_team": { "id": 2384, "name": "USA", "code": "USA" },
+        "away_team": { "id": 1113, "name": "Bosnia and Herzegovina", "code": "BIH" },
+        "venue": "San Francisco Bay Area Stadium",
+        "date": "2026-07-01",
+        "next_match_id": 94
+      },
+      {
+        "match_id": 82,
+        "home_team": { "id": 1, "name": "Belgium", "code": "BEL" },
+        "away_team": { "id": 13, "name": "Senegal", "code": "SEN" },
+        "venue": "Seattle Stadium",
+        "date": "2026-07-01",
+        "next_match_id": 94
+      },
+      {
+        "match_id": 83,
+        "home_team": { "id": 27, "name": "Portugal", "code": "POR" },
+        "away_team": { "id": 3, "name": "Croatia", "code": "CRO" },
+        "venue": "Toronto Stadium",
+        "date": "2026-07-02",
+        "next_match_id": 93
+      },
+      {
+        "match_id": 84,
+        "home_team": { "id": 9, "name": "Spain", "code": "ESP" },
+        "away_team": { "id": 775, "name": "Austria", "code": "AUT" },
+        "venue": "Los Angeles Stadium",
+        "date": "2026-07-02",
+        "next_match_id": 93
+      },
+      {
+        "match_id": 85,
+        "home_team": { "id": 15, "name": "Switzerland", "code": "SUI" },
+        "away_team": { "id": 1532, "name": "Algeria", "code": "ALG" },
+        "venue": "BC Place Vancouver",
+        "date": "2026-07-02",
+        "next_match_id": 96
+      },
+      {
+        "match_id": 86,
+        "home_team": { "id": 26, "name": "Argentina", "code": "ARG" },
+        "away_team": { "id": 1533, "name": "Cape Verde", "code": "CPV" },
+        "venue": "Miami Stadium",
+        "date": "2026-07-03",
+        "next_match_id": 95
+      },
+      {
+        "match_id": 87,
+        "home_team": { "id": 8, "name": "Colombia", "code": "COL" },
+        "away_team": { "id": 1504, "name": "Ghana", "code": "GHA" },
+        "venue": "Kansas City Stadium",
+        "date": "2026-07-03",
+        "next_match_id": 96
+      },
+      {
+        "match_id": 88,
+        "home_team": { "id": 20, "name": "Australia", "code": "AUS" },
+        "away_team": { "id": 32, "name": "Egypt", "code": "EGY" },
+        "venue": "Dallas Stadium",
+        "date": "2026-07-03",
+        "next_match_id": 95
+      }
+    ],
+    "round_of_16": [
+      { "match_id": 89, "home_team_from_match": 74, "away_team_from_match": 77, "venue": "Philadelphia Stadium", "date": "2026-07-04", "next_match_id": 97 },
+      { "match_id": 90, "home_team_from_match": 73, "away_team_from_match": 75, "venue": "Houston Stadium", "date": "2026-07-04", "next_match_id": 97 },
+      { "match_id": 91, "home_team_from_match": 76, "away_team_from_match": 78, "venue": "New York New Jersey Stadium", "date": "2026-07-05", "next_match_id": 99 },
+      { "match_id": 92, "home_team_from_match": 79, "away_team_from_match": 80, "venue": "Mexico City Stadium", "date": "2026-07-05", "next_match_id": 99 },
+      { "match_id": 93, "home_team_from_match": 83, "away_team_from_match": 84, "venue": "Dallas Stadium", "date": "2026-07-06", "next_match_id": 98 },
+      { "match_id": 94, "home_team_from_match": 81, "away_team_from_match": 82, "venue": "Seattle Stadium", "date": "2026-07-06", "next_match_id": 98 },
+      { "match_id": 95, "home_team_from_match": 86, "away_team_from_match": 88, "venue": "Atlanta Stadium", "date": "2026-07-07", "next_match_id": 100 },
+      { "match_id": 96, "home_team_from_match": 85, "away_team_from_match": 87, "venue": "BC Place Vancouver", "date": "2026-07-07", "next_match_id": 100 }
+    ],
+    "quarter_finals": [
+      { "match_id": 97, "home_team_from_match": 89, "away_team_from_match": 90, "venue": "Boston Stadium", "date": "2026-07-09", "next_match_id": 101 },
+      { "match_id": 98, "home_team_from_match": 93, "away_team_from_match": 94, "venue": "Los Angeles Stadium", "date": "2026-07-10", "next_match_id": 101 },
+      { "match_id": 99, "home_team_from_match": 91, "away_team_from_match": 92, "venue": "Miami Stadium", "date": "2026-07-11", "next_match_id": 102 },
+      { "match_id": 100, "home_team_from_match": 95, "away_team_from_match": 96, "venue": "Kansas City Stadium", "date": "2026-07-11", "next_match_id": 102 }
+    ],
+    "semi_finals": [
+      { "match_id": 101, "home_team_from_match": 97, "away_team_from_match": 98, "venue": "Dallas Stadium", "date": "2026-07-14", "next_match_id": 104 },
+      { "match_id": 102, "home_team_from_match": 99, "away_team_from_match": 100, "venue": "Atlanta Stadium", "date": "2026-07-15", "next_match_id": 104 }
+    ],
+    "final": [
+      {
+        "match_id": 104,
+        "home_team_from_match": 101,
+        "away_team_from_match": 102,
+        "venue": "New York New Jersey Stadium",
+        "date": "2026-07-19"
+      },
+      {
+        "match_id": 103,
+        "loser_team_from_match": 101,
+        "loser_team_from_match_2": 102,
+        "venue": "Miami Stadium",
+        "date": "2026-07-18"
+      }
+    ]
+  }
+}

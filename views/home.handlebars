@@ -48,14 +48,14 @@ We calculate xPts using expected goals (xG) and a Poisson probability model to e
       </div>
     </div>
     <div class="world-cup-content">
-      <div id="world-cup-groups" class="table-container world-cup-panel">
-        {{> world-cup-groups groups=worldCupGroups }}
+      {{#if knockoutRounds.length}}
+      <div id="knockout-bracket-wrapper">
+        {{> knockout-bracket knockoutRounds=knockoutRounds }}
       </div>
-      <!--div id="world-cup-group-matches" class="table-container world-cup-panel">
-        {{> world-cup-group-matches groupedMatches=worldCupGroupMatches }}
-      </div-->
+      {{else}}
+      {{/if}}
     </div>
-    <span style="grid-column: 1/4; padding-left: 4px; padding-right: 4px">Current FIFA World Cup group tables with points, goal difference and form. Group winners and runners-up are highlighted to make qualification spots easier to scan.</span>
+    <span style="grid-column: 1/4; padding-left: 4px; padding-right: 4px">FIFA World Cup knockout bracket showing all remaining matches, qualified teams, and current scorelines.</span>
   </div>
 
   <div class="rectangle" id="rectangle2">

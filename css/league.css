@@ -115,12 +115,11 @@
 .knockout-round-title {
   margin: 0;
   padding: 0.4rem 0.6rem;
-  border-radius: 8px;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: rgba(255, 255, 255, 0.12);
-  color: #1d3557;
+  background: #1d3557;
+  color: #f1faee;
 }
 
 .knockout-round-matches {
@@ -131,13 +130,13 @@
 }
 
 .knockout-match {
-  --match-card-height: 106px;
+  --match-card-height: 80px;
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: var(--match-card-height);
   border: 1px solid #1d3557;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
 }
@@ -161,7 +160,7 @@
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #1d3557;
+  color: #f1faee;
   min-width: 2.6rem;
   text-align: center;
   padding: 0.15rem 0.35rem;
@@ -171,18 +170,23 @@
   flex-shrink: 0;
 }
 
+.knockout-match-status.is-ns {
+  color: #f1faee;
+  background: #457B9D;
+}
+
 .knockout-team {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  min-height: 2.5rem;
-  padding: 0.45rem 0.75rem;
+  min-height: 32px;
+  padding: 4px 8px;
   border: 0;
   background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
+  font-weight: 400;
 }
 
 .knockout-team + .knockout-team {
@@ -217,7 +221,6 @@
 }
 
 .knockout-team-name {
-  font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -232,6 +235,7 @@
 .knockout-team.is-winner .knockout-team-name,
 .knockout-team.is-winner .knockout-team-score {
   color: #1d3557;
+  font-weight: 700;
 }
 
 @media (width <= 768px) {

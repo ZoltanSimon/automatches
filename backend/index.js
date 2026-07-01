@@ -103,6 +103,9 @@ app.get("/", async (req, res) => {
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
     const worldCupGroupsBase = await getLeagueStandingsFromDb(1);
     const worldCupGroups = mergeWorldCupGroupStandings(worldCupGroupsBase, registry);
+    
+    const defaultSeason = new Date().getFullYear();
+    const { knockoutRounds } = await getLeaguePageData(registry, 1, defaultSeason, defaultSeason);
 
     res.render("home", {
       title: "Generation Football - Football Stats, Players & Teams",
@@ -117,7 +120,9 @@ app.get("/", async (req, res) => {
       teams: teams.slice(0, 10),
       standingsLink: `/league?id=${selectedStandingsLeague}`,
       standings: standings,
-      worldCupGroups,});
+      worldCupGroups,
+      knockoutRounds,
+    });
   } catch (error) {
     handleError(res, error, "Error loading home page");
   }

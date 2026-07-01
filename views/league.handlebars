@@ -2,32 +2,41 @@
 <link rel="stylesheet" href="css/league.css" />
 
 <div class="container">
-<div class="team-page-header">
-  <div class="league">
-    <img class="league-logo" src="images/competitions/{{leagueID}}.png" alt="{{leagueName}}">
-    <div class="league-info">
-      <div class="league-title-row">
-        <h2>{{leagueName}}</h2>
-        {{#if leagueSeasons.length}}
-        <label class="league-season-picker" for="league-season-select">
-          <span>Season</span>
-          <select id="league-season-select" data-league-id="{{leagueID}}" aria-label="Select season for {{leagueName}}">
-            {{#each leagueSeasons}}
-            <option value="{{this}}" {{#if (eq this ../selectedSeason)}}selected{{/if}}>{{this}}</option>
-            {{/each}}
-          </select>
-        </label>
-        {{/if}}
-      </div>
-      <div class="league-nation">
-        <div class="row">
-          <img class="nation-flag" src="images/logos/{{leagueNation.ID}}.png" alt="{{leagueNation.name}}">
-          <span>{{leagueNation.name}}</span>
+  <div class="team-page-header">
+    <div class="league">
+      <img class="league-logo" src="images/competitions/{{leagueID}}.png" alt="{{leagueName}}">
+      <div class="league-info">
+        <div class="league-title-row">
+          <h2>{{leagueName}}</h2>
+          {{#if leagueSeasons.length}}
+          <label class="league-season-picker" for="league-season-select">
+            <span>Season</span>
+            <select id="league-season-select" data-league-id="{{leagueID}}"
+              aria-label="Select season for {{leagueName}}">
+              {{#each leagueSeasons}}
+              <option value="{{this}}" {{#if (eq this ../selectedSeason)}}selected{{/if}}>{{this}}</option>
+              {{/each}}
+            </select>
+          </label>
+          {{/if}}
+        </div>
+        <div class="league-nation">
+          <div class="row">
+            <img class="nation-flag" src="images/logos/{{leagueNation.ID}}.png" alt="{{leagueNation.name}}">
+            <span>{{leagueNation.name}}</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+  {{#if knockoutRounds.length}}
+  <div class="rectangle" id="knockout-bracket-wrapper">
+    <h2>World Cup - Knockout Bracket</h2>
+    <div class="table-container large">
+      {{> knockout-bracket knockoutRounds=knockoutRounds }}
+    </div>
+  </div>
+  {{/if}}
   {{#if (eq leagueID 1)}}
   <div class="rectangle" id="rectangle4">
     <div id="standings" class="table-container large world-cup-panel">

@@ -1,0 +1,35 @@
+<div class="knockout-bracket">
+  {{#each knockoutRounds}}
+  <section class="knockout-round" data-round-index="{{this.roundIndex}}">
+    <h3 class="knockout-round-title">{{this.name}}</h3>
+
+    <div class="knockout-round-matches" style="--round-offset: {{this.columnTopOffset}}px;">
+      {{#each this.matches}}
+      <article class="knockout-match">
+        <span class="knockout-match-status {{#if (eq this.status "NS")}}is-ns{{/if}}">{{this.status}}</span>
+
+        <a class="knockout-team {{#if this.home.winner}}is-winner{{/if}} {{#unless this.home.url}}is-placeholder{{/unless}}" href="{{#if this.home.url}}{{this.home.url}}{{else}}#{{/if}}">
+          <span class="knockout-team-main">
+            {{#if this.home.id}}
+            <img class="knockout-team-logo" src="images/logos/{{this.home.id}}.png" alt="{{this.home.name}}" loading="lazy">
+            {{/if}}
+            <span class="knockout-team-name">{{this.home.name}}</span>
+          </span>
+          <span class="knockout-team-score">{{#if (eq this.status "NS")}}-{{else}}{{#if (eq this.home.goals null)}}-{{else}}{{this.home.goals}}{{/if}}{{/if}}</span>
+        </a>
+
+        <a class="knockout-team {{#if this.away.winner}}is-winner{{/if}} {{#unless this.away.url}}is-placeholder{{/unless}}" href="{{#if this.away.url}}{{this.away.url}}{{else}}#{{/if}}">
+          <span class="knockout-team-main">
+            {{#if this.away.id}}
+            <img class="knockout-team-logo" src="images/logos/{{this.away.id}}.png" alt="{{this.away.name}}" loading="lazy">
+            {{/if}}
+            <span class="knockout-team-name">{{this.away.name}}</span>
+          </span>
+          <span class="knockout-team-score">{{#if (eq this.status "NS")}}-{{else}}{{#if (eq this.away.goals null)}}-{{else}}{{this.away.goals}}{{/if}}{{/if}}</span>
+        </a>
+      </article>
+      {{/each}}
+    </div>
+  </section>
+  {{/each}}
+</div>
