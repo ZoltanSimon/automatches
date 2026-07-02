@@ -906,9 +906,8 @@ export async function getLeaguePageData(registry, selectedLeague, selectedSeason
     )
     : [];
 
-  const knockoutRounds = isWorldCup
-    ? await buildWorldCupBracket(worldCupGroups, matches, selectedSeason)
-    : buildKnockoutRounds(matches);
+  const knockoutRounds = isWorldCup ? await buildWorldCupBracket(worldCupGroups, matches, selectedSeason) : [];
+  //const knockoutRounds = isWorldCup ? await buildWorldCupBracket(worldCupGroups, matches, selectedSeason) : buildKnockoutRounds(matches);
 
   const leagueNation = leagueInfo
     ? getTeamById(leagueInfo.nation)
