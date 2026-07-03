@@ -57,8 +57,13 @@
     <div id="fixtures-info" class="table-container"></div>
     {{> match-list-table}}
   </div>
+
   <div class="rectangle" id="rectangle1">
     <h2>Top Players</h2>
+      <div class="rect-expand">
+      <a href="/players?pleague={{leagueID}}" class="more-link more-button">More ►</a>
+
+  </div>
     <div id="player-list" class="table-container">
       {{> player-list-table big=false}}
     </div>

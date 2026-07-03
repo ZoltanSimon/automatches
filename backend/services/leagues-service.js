@@ -22,9 +22,6 @@ const ROUND_ORDER = [
   "Third place",
 ];
 
-const BRACKET_UNIT_PX = 90;
-const BRACKET_MATCH_CARD_HEIGHT_PX = 80;
-
 const WORLD_CUP_LEAGUE_ID = 1;
 const DEFAULT_PLAYER_LIST_LIMIT = 10;
 
@@ -43,14 +40,6 @@ function toFiniteNumber(value) {
 /** Extract a finite fixture id from a match object, or null. */
 function fixtureIdOf(match) {
   return toFiniteNumber(match?.fixture?.id);
-}
-
-function getBracketRoundLayout(roundIndex) {
-  const step = Math.pow(2, roundIndex);
-  const columnTopOffset = roundIndex === 0
-    ? 0
-    : Math.round(((step - 1) * BRACKET_UNIT_PX) / 2);
-  return { columnTopOffset };
 }
 
 function normalizeRound(roundName) {
@@ -642,12 +631,9 @@ async function buildWorldCupBracket(worldCupGroups, matches, selectedSeason) {
 
     if (matchesForRound.length === 0) continue;
 
-    const { columnTopOffset } = getBracketRoundLayout(roundIndex);
-
     rounds.push({
       name,
       roundIndex,
-      columnTopOffset,
       matches: matchesForRound,
     });
   }
@@ -816,12 +802,9 @@ function buildKnockoutRounds(matches) {
   }
 
   return roundsWithMatches.map((round, roundIndex) => {
-    const { columnTopOffset } = getBracketRoundLayout(roundIndex);
-
     return {
       name: round.name,
       roundIndex,
-      columnTopOffset,
       matches: round.matches,
     };
   });

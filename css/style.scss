@@ -906,7 +906,7 @@ td .form-indicator {
 .player-page-header {
   background: $dark-blue;
   padding: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid $dark-blue;
   display: flex;
@@ -1531,7 +1531,7 @@ a.event-player-link {
   grid-auto-columns: minmax(220px, 1fr);
   gap: 1rem;
   overflow-x: auto;
-  padding: 0.5rem 0.25rem 0.5rem 0;
+  padding: 2px 0px;
 }
 
 .knockout-round {
@@ -1558,7 +1558,7 @@ a.event-player-link {
 }
 
 .knockout-match {
-  --match-card-height: 80px;
+  --match-card-height: 60px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1607,8 +1607,8 @@ a.event-player-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 32px;
-  padding: 4px 8px;
+  min-height: 26px;
+  padding: 2px 8px;
   border: 0;
   background: transparent;
   color: inherit;

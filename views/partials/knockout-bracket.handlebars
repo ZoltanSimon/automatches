@@ -3,7 +3,7 @@
   <section class="knockout-round" data-round-index="{{this.roundIndex}}">
     <h3 class="knockout-round-title">{{this.name}}</h3>
 
-    <div class="knockout-round-matches" style="--round-offset: {{this.columnTopOffset}}px;">
+    <div class="knockout-round-matches">
       {{#each this.matches}}
       <article class="knockout-match">
         <span class="knockout-match-status {{#if (eq this.status "NS")}}is-ns{{/if}}">{{this.status}}</span>

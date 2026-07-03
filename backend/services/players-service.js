@@ -89,6 +89,7 @@ export function getPlayerList(
 
   let players = [...playerMap.values()]
     .filter(p => p.apps >= 1)
+    .sort((a, b) => b.rating - a.rating)
     .sort((a, b) => b.goals - a.goals);
 
   if (teamFilter) {

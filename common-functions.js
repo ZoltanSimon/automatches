@@ -1,6 +1,41 @@
 import { matchList } from "./components/match-list.js";
 import { selectedLeagues } from "./local-handler.js";
 
+export const BRACKET_UNIT_PX = 71;
+export const BRACKET_MATCH_CARD_HEIGHT_PX = 63;
+export const BRACKET_ROUND_OFFSET_UNIT_PX = 72;
+
+export function getBracketRoundLayout(roundIndex) {
+  const step = Math.pow(2, roundIndex);
+  const columnTopOffset = roundIndex === 0
+    ? 0
+    : Math.round(((step - 1) * BRACKET_ROUND_OFFSET_UNIT_PX) / 2);
+
+  return { columnTopOffset };
+}
+
+export function applyKnockoutBracketLayout(root = document) {
+  for (const section of root.querySelectorAll(".knockout-round")) {
+    const roundIndex = Number(section.dataset.roundIndex);
+    let step = Math.pow(2, roundIndex);
+
+    if (roundIndex === 4) {
+      step = 7;
+    }
+
+    const { columnTopOffset } = getBracketRoundLayout(roundIndex);
+    const matchGap = roundIndex === 0
+      ? 8
+      : Math.max(8, step * BRACKET_UNIT_PX - BRACKET_MATCH_CARD_HEIGHT_PX);
+    const matchesDiv = section.querySelector(".knockout-round-matches");
+
+    if (matchesDiv) {
+      matchesDiv.style.setProperty("--round-gap", `${matchGap}px`);
+      matchesDiv.style.setProperty("--round-offset", `${columnTopOffset}px`);
+    }
+  }
+}
+
 export let download = function (canvasName = "my-canvas") {
   var link = document.createElement("a");
   link.download = "genfoot.png";
