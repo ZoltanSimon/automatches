@@ -833,7 +833,7 @@ td .form-indicator:last-child {
 }
 
 .logo-picture {
-  width: 40px;
+  width: 36px;
 }
 
 .toast {
@@ -1403,21 +1403,33 @@ a.event-player-link:hover {
 .match-list-logo-td {
   text-align: center;
   cursor: pointer;
-  width: 10%;
+  width: 8%;
+}
+.match-list-logo-td.left {
+  border-left: 0px;
+}
+.match-list-logo-td.right {
+  border-right: 0px;
 }
 
 .match-list-team-name-td {
   text-align: right;
   cursor: pointer;
   padding: 10px 8px;
-  width: 30%;
+  width: 32%;
+}
+.match-list-team-name-td.left {
+  border-right: 0px;
+}
+.match-list-team-name-td.right {
+  border-left: 0px;
+  text-align: left;
 }
 
 .gf-input {
   background-color: #457b9d;
   color: #f1faee;
   border: none;
-  padding: 2px 8px;
   font-weight: bold;
   cursor: pointer;
   height: 24px;
@@ -1885,7 +1897,7 @@ a.event-player-link:hover {
     width: 100%;
   }
   .input-change-arrow {
-    padding: 4px 8px;
+    padding: 4px;
     font-size: 12px;
   }
   .knockout-bracket {
@@ -1945,7 +1957,7 @@ a.event-player-link:hover {
     width: 44px;
   }
   .logo-picture {
-    width: 30px;
+    width: 28px;
   }
   #player-list table tr td:first-child {
     width: 44px;

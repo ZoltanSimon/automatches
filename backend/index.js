@@ -128,7 +128,7 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.get("/players", async (req, res) => {
+app.get("/top-players", async (req, res) => {
   try {
     const selectedLeague = parseLeagueIds(req.query.pleague);
     const selectedPositions = parseSelectedPositions(req.query.pposition);
@@ -136,7 +136,7 @@ app.get("/players", async (req, res) => {
     const registry = await getRegistry();
     const players = getPlayerList(registry, 500, teamQuery, selectedLeague, selectedPositions);
 
-    res.render("players", {
+    res.render("top-players", {
       title: "Top Players - Football Player Stats & Performance",
       description: "Discover detailed football player stats, performance metrics and league comparisons on Generation Football's Players page.",
       players,

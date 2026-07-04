@@ -51,7 +51,7 @@ export async function allTeamMatches(registry, homeTeamID, awayTeamID = null, ch
       : home.id === homeTeamID || away.id === homeTeamID;
 
     if (!teamMatch) return false;
-    if (checkStatus) return ["FT", "AET"].includes(fixture.status.short);
+    if (checkStatus) return ["FT", "AET", "PEN"].includes(fixture.status.short);
     return true;
   });
 

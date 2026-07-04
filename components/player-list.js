@@ -11,7 +11,7 @@ const tableName = "player-list-table";
 const table = document.getElementById(tableName);
 const statFilterButtons = document.querySelectorAll(".stat-filter-btn");
 const playerStatFiltersStorageKey = "players.activeStatFilters";
-const isPlayersPage = window.location.pathname.toLowerCase() === "/players";
+const isPlayersPage = window.location.pathname.toLowerCase() === "/top-players";
 const hasPlayerStatFilters = isPlayersPage && statFilterButtons.length > 0;
 const defaultVisiblePlayerStats = [
   "apps",
