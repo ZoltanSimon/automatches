@@ -61,7 +61,8 @@
     {{#each this.matches}}
     <tr id="{{fixture.id}}">
       <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
-        {{formatTime fixture.date}}<br />{{fixture.status.short}}
+        {{formatTime fixture.date}}<br />
+        <span class="match-list-status {{#if (eq fixture.status.short "NS")}}is-ns{{/if}}">{{fixture.status.short}}</span>
       </td>
 
       <td class="match-list-team-name-td left" id="{{teams.home.id}}"

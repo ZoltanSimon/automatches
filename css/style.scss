@@ -688,13 +688,14 @@ td .form-indicator {
 
 .list-header {
   text-align: center;
-  padding: 1px;
+  padding: 2px;
   width: 60px;
   border-right: 1px solid $lightest-blue;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 64px;
+  max-width: 58px;
+  min-width: 32px;
 }
 
 .list-header2 {
@@ -1423,6 +1424,28 @@ a.event-player-link {
   cursor: pointer;
   padding: 8px;
   width: 10%;
+}
+
+.match-list-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.6rem;
+  margin-top: 0.35rem;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: $brand-green;
+  color: $lightest-blue;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.match-list-status.is-ns {
+  background: $blue;
 }
 
 .match-list-center-td {

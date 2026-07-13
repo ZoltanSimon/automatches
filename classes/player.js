@@ -1,5 +1,7 @@
 export class Player {
   constructor(inputPlayer) {
+    const birthDate = inputPlayer.birth_date || inputPlayer.birthdate || "";
+
     this.id = inputPlayer.id;
     this.name = inputPlayer.name;
     this.club = inputPlayer.club;
@@ -38,8 +40,30 @@ export class Player {
     this.tackles = 0;
     this.yellowCards = 0;
     this.birthdate = "";
-    this.age = 0;
+    this.birthdate = birthDate;
+    this.age = Number(inputPlayer.age) || this.calculateAgeFromBirthDate(birthDate);
     this.exactPositions = [];
+  }
+
+  calculateAgeFromBirthDate(birthDate) {
+    if (!birthDate) {
+      return 0;
+    }
+
+    const parsedDate = new Date(birthDate);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return 0;
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - parsedDate.getFullYear();
+    const monthDiff = today.getMonth() - parsedDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < parsedDate.getDate())) {
+      age -= 1;
+    }
+
+    return age > 0 ? age : 0;
   }
 
   getPlayerStats(playerFound, league) {

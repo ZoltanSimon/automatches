@@ -1,4 +1,5 @@
 import { RAPID_API_HOST, RAPID_API_KEY } from "./config.js";
+import { toTrimmedString } from "./backend-helper.js";
 
 let season = 2024;
 
@@ -32,11 +33,11 @@ export async function getResultFromApi(matchID) {
 export async function getResultsFromApiByIds(matchIDs) {
   const ids = Array.isArray(matchIDs)
     ? matchIDs
-      .map((id) => String(id).trim())
+      .map((id) => toTrimmedString(id))
       .filter(Boolean)
     : String(matchIDs || "")
       .split(",")
-      .map((id) => id.trim())
+      .map((id) => toTrimmedString(id))
       .filter(Boolean);
 
   if (ids.length === 0) {

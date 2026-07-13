@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import path from "path";
 import { networkPath } from "./config.js";
-import { findOrCreateTeam } from "./backend-helper.js";
+import { findOrCreateTeam } from "./services/teams-service.js";
 import { LineupParser } from "./../classes/lineupparser.js";
 import { importLeague } from "./data-access.js";
 import { getResultFromApi, getResultsFromApiByIds } from "./webapi-handler.js";
@@ -10,6 +10,7 @@ import fs from 'fs/promises';   // For async/await operations
 
 export const matchesDir = path.join(networkPath, "matches");
 export const leaguesDir = path.join(networkPath, "leagues");
+export const playersDir = path.join(networkPath, "players");
 export const dataDir = networkPath;
 
 export async function getMatchFromServer(fixtureID) {
@@ -191,6 +192,65 @@ export async function getAllPlayers(compList, nationList) {
   }
 
   return Array.from(playerMap.values());
+}
+
+export async function readPlayersFromFiles() {
+  try {
+    const directoryEntries = await fs.readdir(playersDir, { withFileTypes: true });
+    const playerFiles = directoryEntries
+      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".json"))
+      .map((entry) => entry.name)
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+    console.log(
+      `[readPlayersFromFiles] Found ${playerFiles.length} player file(s) in ${playersDir}`,
+    );
+
+    const players = [];
+
+    for (const fileName of playerFiles) {
+      const filePath = path.join(playersDir, fileName);
+
+      try {
+        const fileContents = await readFile(filePath);
+        const json = JSON.parse(fileContents);
+
+        if (Array.isArray(json?.response)) {
+          players.push(...json.response);
+          console.log(
+            `[readPlayersFromFiles] Loaded ${json.response.length} player record(s) from ${fileName}. Running total: ${players.length}`,
+          );
+          continue;
+        }
+
+        if (Array.isArray(json)) {
+          players.push(...json);
+          console.log(
+            `[readPlayersFromFiles] Loaded ${json.length} player record(s) from ${fileName}. Running total: ${players.length}`,
+          );
+          continue;
+        }
+
+        console.warn(
+          `[readPlayersFromFiles] Skipped ${fileName} because it did not contain an array payload.`,
+        );
+      } catch (error) {
+        console.error(`[readPlayersFromFiles] Failed to parse ${fileName}:`, error);
+      }
+    }
+
+    console.log(`[readPlayersFromFiles] Finished loading ${players.length} player record(s).`);
+
+    return players;
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      console.warn(`[readPlayersFromFiles] Players directory not found: ${playersDir}`);
+      return [];
+    }
+
+    console.error("[readPlayersFromFiles] Failed to read players directory:", error);
+    return [];
+  }
 }
 
 export function buildTeamList(data) {

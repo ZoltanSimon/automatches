@@ -3,6 +3,10 @@ import fs from "fs";
 import path from "path";
 import { allDBLeagues, allDBTeams, allDBPlayers } from "./index.js";
 import { getTeamById } from "./services/teams-service.js";
+import {
+  extractPlayerProfile,
+  mergeProfileValue,
+} from "./backend-helper.js";
 
 let leagueSeasonTableConfigPromise = null;
 
@@ -108,6 +112,41 @@ function normalizeLeagueConfig(input) {
   return {
     leagueID,
     season: getLeagueSeason(leagueID),
+  };
+}
+
+function normalizeNationLookupKey(value) {
+  const normalized = String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+  return normalized.length > 0 ? normalized : null;
+}
+
+function buildNationIdResolver() {
+  const nationIdByName = new Map();
+
+  for (const team of allDBTeams || []) {
+    const key = normalizeNationLookupKey(team?.name);
+    const teamID = Number(team?.ID);
+
+    if (!key || !Number.isFinite(teamID) || nationIdByName.has(key)) {
+      continue;
+    }
+
+    nationIdByName.set(key, teamID);
+  }
+
+  return (nationName) => {
+    const key = normalizeNationLookupKey(nationName);
+    if (!key) {
+      return null;
+    }
+
+    return nationIdByName.get(key) ?? null;
   };
 }
 
@@ -267,6 +306,128 @@ export async function insertPlayersToDb(allPlayers) {
   } catch (error) {
     console.error({ error: "Error loading players.", details: error.message });
   }
+}
+
+export async function updatePlayerProfilesInDb(playerPayloads = []) {
+  console.log(
+    `[updatePlayerProfilesInDb] Starting profile update from ${playerPayloads.length} raw player payload(s).`,
+  );
+
+  const profilesById = new Map();
+  const resolveNationId = buildNationIdResolver();
+  let skippedPayloads = 0;
+  let unresolvedNationPayloads = 0;
+
+  for (const payload of playerPayloads) {
+    const profile = extractPlayerProfile(payload, { resolveNationId });
+    if (!profile) {
+      skippedPayloads += 1;
+      continue;
+    }
+
+    const nationality = String(payload?.player?.nationality || payload?.nationality || "").trim();
+    if (nationality && profile.nation === null) {
+      unresolvedNationPayloads += 1;
+    }
+
+    const existing = profilesById.get(profile.id);
+    if (!existing) {
+      profilesById.set(profile.id, profile);
+      continue;
+    }
+
+    profilesById.set(profile.id, {
+      id: profile.id,
+      firstName: mergeProfileValue(existing.firstName, profile.firstName),
+      lastName: mergeProfileValue(existing.lastName, profile.lastName),
+      birthDate: mergeProfileValue(existing.birthDate, profile.birthDate),
+      birthLocation: mergeProfileValue(existing.birthLocation, profile.birthLocation),
+      height: mergeProfileValue(existing.height, profile.height),
+      weight: mergeProfileValue(existing.weight, profile.weight),
+      nation: mergeProfileValue(existing.nation, profile.nation),
+      shirtNumber: mergeProfileValue(existing.shirtNumber, profile.shirtNumber),
+    });
+  }
+
+  const profiles = [...profilesById.values()];
+  console.log(
+    `[updatePlayerProfilesInDb] Collapsed to ${profiles.length} unique player profile(s). Skipped ${skippedPayloads} payload(s) without a valid player id.`,
+  );
+
+  if (unresolvedNationPayloads > 0) {
+    console.warn(
+      `[updatePlayerProfilesInDb] Could not map nationality name to nation ID for ${unresolvedNationPayloads} payload(s). Existing DB nation values were preserved for those players.`,
+    );
+  }
+
+  if (profiles.length === 0) {
+    console.warn("[updatePlayerProfilesInDb] No valid player profiles found to update.");
+    return {
+      processed: 0,
+      updatedRows: 0,
+    };
+  }
+
+  let updatedRows = 0;
+  const LOG_INTERVAL = 250;
+
+  for (let i = 0; i < profiles.length; i += 1) {
+    const profile = profiles[i];
+
+    try {
+      const [result] = await pool.execute(
+        `UPDATE Player
+         SET
+           first_name = COALESCE(?, first_name),
+           last_name = COALESCE(?, last_name),
+           birth_date = COALESCE(?, birth_date),
+           birth_location = COALESCE(?, birth_location),
+           height = COALESCE(?, height),
+           weight = COALESCE(?, weight),
+           nation = COALESCE(?, nation),
+           shirt_number = COALESCE(?, shirt_number)
+         WHERE id = ?`,
+        [
+          profile.firstName,
+          profile.lastName,
+          profile.birthDate,
+          profile.birthLocation,
+          profile.height,
+          profile.weight,
+          profile.nation,
+          profile.shirtNumber,
+          profile.id,
+        ],
+      );
+
+      updatedRows += Number(result?.affectedRows || 0);
+    } catch (error) {
+      console.error(
+        `[updatePlayerProfilesInDb] Failed updating player ${profile.id}:`,
+        {
+          profile,
+          error: error.message,
+        },
+      );
+      throw error;
+    }
+
+    const processed = i + 1;
+    if (processed % LOG_INTERVAL === 0 || processed === profiles.length) {
+      console.log(
+        `[updatePlayerProfilesInDb] Processed ${processed}/${profiles.length} profile(s). Rows affected so far: ${updatedRows}`,
+      );
+    }
+  }
+
+  console.log(
+    `[updatePlayerProfilesInDb] Completed profile update. Processed ${profiles.length} unique player(s), rows affected: ${updatedRows}`,
+  );
+
+  return {
+    processed: profiles.length,
+    updatedRows,
+  };
 }
 
 export async function insertTeamsToDb(teams) {

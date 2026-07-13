@@ -1,7 +1,7 @@
 import { playerGoalList } from "../components/player-list.js";
 import { addLeagues } from "../common-functions.js";
 
-await playerGoalList(true);
+await playerGoalList({ big: true, enableStatFilters: true });
 addLeagues("pleague");
 
 document.querySelector(".more-button").addEventListener("click", function () {

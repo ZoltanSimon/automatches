@@ -4,7 +4,7 @@ import { createTeamsTable } from "../components/team-list.js";
 
 applyKnockoutBracketLayout();
 
-await playerGoalList(false);
+await playerGoalList({ big: false, enableStatFilters: false });
 
 document.getElementById("match-list").style.visibility = "visible";
 

@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { parseLeagueIds, handleError } from "../backend-helper.js";
+import { handleError } from "../backend-helper.js";
+import { parseLeagueIds } from "../services/leagues-service.js";
 import { extractTeams } from "../services/teams-service.js";
 import { getRegistry } from "../services/registry-service.js";
 import { getPredictionForMatch } from "../services/prediction-service.js";

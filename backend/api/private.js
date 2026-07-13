@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi } from "../webapi-handler.js";
 import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb } from "../data-access.js";
-import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer, getLeagueFromServer, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
+import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
 import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
-import { insertAllPlayers } from "../services/players-service.js";
-import { updateLeagueSeasonData } from "../backend-helper.js";
+import { insertAllPlayers, updatePlayerProfilesFromFiles } from "../services/players-service.js";
+import { toTrimmedString } from "../backend-helper.js";
+import { updateLeagueSeasonData } from "../services/leagues-service.js";
 import { matchesOnDay, matchesInRound } from "../services/matches-service.js";
 import * as fs from "fs";
 
@@ -43,7 +44,7 @@ function readSavedStatus(savedMatchData) {
     ? savedMatchData[0]
     : savedMatchData;
 
-  return String(savedMatch?.fixture?.status?.short || "").trim().toUpperCase();
+  return String(toTrimmedString(savedMatch?.fixture?.status?.short) || "").toUpperCase();
 }
 
 export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
@@ -124,7 +125,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
 
         if (savedStatus && dbStatus && savedStatus !== dbStatus) {
           console.log(
-            `[all-missing-matches] Status mismatch for fixture ${element.fixtureId}: json=${savedStatus}, db=${dbStatus}`,
+            `[all-missing-matches] Status mismatch for fixture ${element.fixtureId}, league ${element.leagueId}: json=${savedStatus}, db=${dbStatus}`,
           );
         }
       });
@@ -323,43 +324,117 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     }
   });
 
+  router.get("/update-player-profiles-from-files", async (request, response) => {
+    try {
+      console.log("[update-player-profiles-from-files] Request received.");
+      const result = await updatePlayerProfilesFromFiles();
+      console.log("[update-player-profiles-from-files] Request completed:", result);
+
+      response.json({
+        success: true,
+        message: "Player profile fields updated from player files.",
+        ...result,
+      });
+    } catch (error) {
+      console.error("[update-player-profiles-from-files] Error updating player profiles from files:", error);
+      response.status(500).json({
+        success: false,
+        message: "Failed to update player profiles from files",
+      });
+    }
+  });
+
   router.get("/insert-all-clubs-to-db", async (request, response) => {
     try {
-      const allDBLeagues = await loadLeagues();
-      const allDBTeams = await loadTeams();
-      let teamsNew = [];
+      const [allDBTeams, allMatches] = await Promise.all([
+        loadTeams(),
+        getAllMatchesFromDbUntilDate("2999-12-31"),
+      ]);
 
-      for (let league of allDBLeagues) {
-        let matches = await getLeagueFromServer(league.id);
-        for (const match of matches) {
-          let homeTeam = {
-            ID: match.teams.home.id,
-            name: match.teams.home.name,
-          };
-          let awayTeam = {
-            ID: match.teams.away.id,
-            name: match.teams.away.name,
-          };
+      const existingTeamIDs = new Set(allDBTeams.map((team) => Number(team.ID)));
+      const knownTeamNames = new Map(
+        allDBTeams.map((team) => [Number(team.ID), team.name])
+      );
 
-          if (!teamsNew.find((e) => e.ID == homeTeam.ID)) {
-            teamsNew.push(homeTeam);
-          }
+      const teamIDsFromMatches = new Set();
+      for (const match of allMatches) {
+        const homeTeamID = Number(match.homeTeamId);
+        const awayTeamID = Number(match.awayTeamId);
 
-          if (!teamsNew.find((e) => e.ID == awayTeam.ID)) {
-            teamsNew.push(awayTeam);
-          }
+        if (Number.isFinite(homeTeamID)) {
+          teamIDsFromMatches.add(homeTeamID);
+        }
+
+        if (Number.isFinite(awayTeamID)) {
+          teamIDsFromMatches.add(awayTeamID);
         }
       }
 
-      teamsNew = teamsNew.filter(function (obj) {
-        return !allDBTeams.some((el) => el.ID === obj.ID);
-      });
+      const missingTeamIDs = [...teamIDsFromMatches].filter((teamID) => !existingTeamIDs.has(teamID));
+      const pendingTeamIDs = new Set(missingTeamIDs);
+      const resolvedTeamNamesByID = new Map();
 
-      await insertTeamsToDb(teamsNew);
+      for (const match of allMatches) {
+        if (pendingTeamIDs.size === 0) {
+          break;
+        }
+
+        const homeTeamID = Number(match.homeTeamId);
+        const awayTeamID = Number(match.awayTeamId);
+        const needsHomeTeam = pendingTeamIDs.has(homeTeamID);
+        const needsAwayTeam = pendingTeamIDs.has(awayTeamID);
+
+        if (!needsHomeTeam && !needsAwayTeam) {
+          continue;
+        }
+
+        const savedMatchData = await getMatchFromServer(match.fixtureId);
+        const savedMatch = Array.isArray(savedMatchData)
+          ? savedMatchData[0]
+          : savedMatchData;
+
+        const savedHomeTeam = savedMatch?.teams?.home;
+        const savedAwayTeam = savedMatch?.teams?.away;
+
+        if (needsHomeTeam && savedHomeTeam?.name) {
+          resolvedTeamNamesByID.set(homeTeamID, String(savedHomeTeam.name).trim());
+          pendingTeamIDs.delete(homeTeamID);
+        }
+
+        if (needsAwayTeam && savedAwayTeam?.name) {
+          resolvedTeamNamesByID.set(awayTeamID, String(savedAwayTeam.name).trim());
+          pendingTeamIDs.delete(awayTeamID);
+        }
+      }
+
+      const unresolvedTeamIDs = [];
+      const teamsNew = [];
+
+      for (const teamID of missingTeamIDs) {
+        const teamName = knownTeamNames.get(teamID) || resolvedTeamNamesByID.get(teamID);
+
+        if (!teamName) {
+          unresolvedTeamIDs.push(teamID);
+          continue;
+        }
+
+        teamsNew.push({
+          ID: teamID,
+          name: teamName,
+        });
+      }
+
+      if (teamsNew.length > 0) {
+        await insertTeamsToDb(teamsNew);
+      }
+
       console.log(teamsNew);
       response.json({
         success: true,
-        message: `Inserted ${teamsNew.length} new teams into database`,
+        message: `Inserted ${teamsNew.length} new teams into database from matches table`,
+        matchesScanned: allMatches.length,
+        distinctTeamsFromMatches: teamIDsFromMatches.size,
+        unresolvedTeamIDs,
         teams: teamsNew,
       });
     } catch (error) {

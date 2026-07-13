@@ -21,8 +21,8 @@ import {
 } from "./services/players-service.js";
 import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
-import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData } from "./services/leagues-service.js";
-import { parseDate, parseLeagueIds, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
+import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData, parseLeagueIds } from "./services/leagues-service.js";
+import { parseDate, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
 import { getTeamById, getTopTeams, getTeamRouteData } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
 
@@ -92,7 +92,7 @@ app.get("/", async (req, res) => {
   try {
     const selectedDate = parseDate(req.query.date);
     const selectedPlayerLeague = req.query.pleague ? parseLeagueIds(req.query.pleague) : [1];
-    const selectedTeamLeague = parseLeagueIds(req.query.tleague);
+    const selectedTeamLeague = [1];
     const parsed = parseFloat(req.query.sleague);
     const selectedStandingsLeague = isNaN(parsed) ? 39 : parsed;
     const registry = await getRegistry();
@@ -151,7 +151,20 @@ app.get("/top-players", async (req, res) => {
 });
 
 app.get("/top-teams", async (req, res) => {
+  const teamLeagueQuery = typeof req.query.tleague === "string"
+    ? req.query.tleague.trim()
+    : "";
+  const explicitlyRequestsWorldCup = teamLeagueQuery
+    .split(",")
+    .map((value) => Number(value.trim()))
+    .filter(Number.isFinite)
+    .includes(1);
+
   let selectedTeamLeague = parseLeagueIds(req.query.tleague);
+  if (!explicitlyRequestsWorldCup) {
+    selectedTeamLeague = selectedTeamLeague.filter((leagueID) => Number(leagueID) !== 1);
+  }
+
   const registry = await getRegistry();
   
   const teams = getTopTeams(registry, selectedTeamLeague);

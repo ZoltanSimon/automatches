@@ -134,6 +134,15 @@ export function createTeamsTable(response, onlyTotal, big) {
     let subheaderCell = table.rows[1].cells[i];
 
     subheaderCell.addEventListener("click", function () {
+      const currentOrder = this.getAttribute("data-default-order") || "desc";
+      const newOrder = currentOrder === "asc" ? "desc" : "asc";
+
+      this.setAttribute("data-default-order", newOrder);
+      document
+        .querySelectorAll(`#${tableName} th.sortable`)
+        .forEach((header) => header.classList.remove("asc", "desc"));
+      this.classList.add(newOrder);
+
       let index = lastRowLength - subHeaderLength + i;
       sortTable(index, subheaderCell, table, 2);
     });

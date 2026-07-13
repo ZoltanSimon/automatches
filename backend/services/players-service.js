@@ -1,11 +1,12 @@
 import {
     getAllPlayers,
+    readPlayersFromFiles,
   } from "./../json-reader.js";
-import { insertPlayersToDb } from "./../data-access.js"; 
+import { insertPlayersToDb, updatePlayerProfilesInDb } from "./../data-access.js"; 
 import { Player } from "./../../classes/player.js";
 import { allDBLeagues, allDBPlayers } from "../index.js";
 import { LineupParser } from "../../classes/lineupparser.js";
-import { comparePositionsByDisplayOrder } from "../backend-helper.js";
+import { comparePositionsByDisplayOrder, toTrimmedString } from "../backend-helper.js";
 import { getTeamById } from "./teams-service.js";
 
 function getTeamName(id) {
@@ -15,14 +16,18 @@ function getTeamName(id) {
 function toPositionList(positionValue = "") {
   if (Array.isArray(positionValue)) {
     return positionValue
-      .map((position) => String(position).trim().toLowerCase())
+      .map((position) => toTrimmedString(position))
+      .filter(Boolean)
+      .map((position) => position.toLowerCase())
       .filter(Boolean);
   }
 
   return String(positionValue)
     .split(",")
-    .map((position) => position.trim().toLowerCase())
-    .filter(Boolean);
+    .map((position) => toTrimmedString(position))
+    .filter(Boolean)
+    .map((position) => position.toLowerCase())
+      .filter(Boolean);
 }
 
 export function parseSelectedPositions(positionQuery) {
@@ -33,7 +38,9 @@ export function parseSelectedPositions(positionQuery) {
   return [...new Set(
     String(positionQuery)
       .split(",")
-      .map((position) => position.trim().toLowerCase())
+      .map((position) => toTrimmedString(position))
+      .filter(Boolean)
+      .map((position) => position.toLowerCase())
       .filter(Boolean)
   )];
 }
@@ -107,7 +114,10 @@ export function getPlayerList(
   }
 
   if (positionFilter.length) {
-    const selectedPositions = positionFilter.map((position) => String(position).trim().toLowerCase());
+    const selectedPositions = positionFilter
+      .map((position) => toTrimmedString(position))
+      .filter(Boolean)
+      .map((position) => position.toLowerCase());
     players = players.filter((player) => {
       const playerPositions = toPositionList(player.position);
       return playerPositions.some((position) => selectedPositions.includes(position));
@@ -195,6 +205,14 @@ export async function insertAllPlayers() {
 
   await insertPlayersToDb(allPlayers);
   return allPlayers;
+}
+
+export async function updatePlayerProfilesFromFiles() {
+  console.log("[updatePlayerProfilesFromFiles] Reading player files and updating Player table.");
+  const playersFromFiles = await readPlayersFromFiles();
+  const result = await updatePlayerProfilesInDb(playersFromFiles);
+  console.log("[updatePlayerProfilesFromFiles] Update finished:", result);
+  return result;
 }
 
 export function getPlayerByID(playerID) {

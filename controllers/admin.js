@@ -243,7 +243,7 @@ document.getElementById("missing-matches").onclick = async function () {
 };
 
 document.getElementById("get-player-goal-list").onclick = async function () {
-  playerGoalList(false, 10);
+  playerGoalList({ big: false, enableStatFilters: false });
 };
 
 document.getElementById("get-all-clubs").onclick = async function () {

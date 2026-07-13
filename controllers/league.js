@@ -15,7 +15,7 @@ if (seasonSelect) {
 	});
 }
 
-await playerGoalList(false);
+await playerGoalList({ big: false, enableStatFilters: false });
 
 addShowMoreButtons();
 

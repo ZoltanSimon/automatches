@@ -1,25 +1,4 @@
-import { Team } from "../classes/team.js";
-import { defaultLeagues } from "./services/leagues-service.js";
 import { buildTeamList } from "./json-reader.js";
-
-export function findOrCreateTeam(teams, teamData) {
-  let team = teams.find((t) => t.id === teamData.id);
-  if (!team) {
-    team = new Team(teamData);
-    teams.push(team);
-  }
-  return team;
-}
-
-// Helper function to parse league IDs from query string
-export const parseLeagueIds = (leagueQuery) => {
-  if (!leagueQuery) return defaultLeagues;
-
-  return leagueQuery
-    .split(",")
-    .map((id) => Number(id.trim()))
-    .filter(Boolean);
-};
 
 // Helper function to parse date from query string
 export const parseDate = (dateQuery) => {
@@ -31,6 +10,87 @@ export const handleError = (res, error, message = "Error fetching data") => {
   console.error(message, error);
   res.status(500).send(message);
 };
+
+export function toTrimmedString(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const normalized = String(value).trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+export function toShirtNumber(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export function toIntegerValue(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.round(value);
+  }
+
+  const match = String(value).match(/-?\d+/);
+  if (!match) {
+    return null;
+  }
+
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function mergeProfileValue(existingValue, nextValue) {
+  return nextValue !== null && nextValue !== undefined ? nextValue : existingValue;
+}
+
+export function extractPlayerProfile(playerPayload, options = {}) {
+  const { resolveNationId } = options;
+  const player = playerPayload?.player || playerPayload;
+  const id = Number(player?.id);
+
+  if (!Number.isFinite(id)) {
+    return null;
+  }
+
+  const birthPlace = toTrimmedString(player?.birth?.place);
+  const birthCountry = toTrimmedString(player?.birth?.country);
+  const birthLocation = [birthPlace, birthCountry].filter(Boolean).join(", ") || null;
+
+  const shirtNumber = Array.isArray(playerPayload?.statistics)
+    ? playerPayload.statistics
+      .map((stat) => toShirtNumber(stat?.games?.number))
+      .find((number) => number !== null) ?? null
+    : null;
+
+  const nationality = toTrimmedString(player?.nationality);
+  const nation = typeof resolveNationId === "function"
+    ? resolveNationId(nationality)
+    : null;
+
+  return {
+    id,
+    firstName: toTrimmedString(player?.firstname),
+    lastName: toTrimmedString(player?.lastname),
+    birthDate: toTrimmedString(player?.birth?.date),
+    birthLocation,
+    height: toIntegerValue(player?.height),
+    weight: toIntegerValue(player?.weight),
+    nation,
+    shirtNumber,
+  };
+}
 
 export function getPositionGroupOrder(position) {
   const normalized = String(position || "").toLowerCase();
@@ -203,26 +263,6 @@ export function mergeWorldCupGroupStandings(baseGroups, registry) {
       rank: index + 1,
     }));
   });
-}
-
-export function resolveLeagueStandingsForPage(computedStandings, savedStandings = []) {
-  if (Array.isArray(computedStandings) && computedStandings.length > 0) {
-    return computedStandings;
-  }
-
-  if (!Array.isArray(savedStandings) || savedStandings.length === 0) {
-    return [];
-  }
-
-  return Array.isArray(savedStandings[0]) ? savedStandings.flat() : savedStandings;
-}
-
-export async function updateLeagueSeasonData(leagueID, season, {
-  getResultsDateFn,
-  writeLeagueToServerFn,
-}) {
-  const dataToWrite = await getResultsDateFn(leagueID, season);
-  return writeLeagueToServerFn(leagueID, dataToWrite.response, season);
 }
 
 export async function dumpRegistryOnStartup(registry) {

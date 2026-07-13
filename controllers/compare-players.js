@@ -1,2 +1,2 @@
 import { playerGoalList } from "../components/player-list.js";
-await playerGoalList(true);
+await playerGoalList({ big: true, enableStatFilters: false });

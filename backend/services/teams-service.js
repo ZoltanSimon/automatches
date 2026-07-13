@@ -1,6 +1,16 @@
 import { buildTeamList } from "./../json-reader.js";
 import { allDBLeagues, allDBTeams } from "../index.js";
 import { allTeamMatches } from "./matches-service.js";
+import { Team } from "../../classes/team.js";
+
+export function findOrCreateTeam(teams, teamData) {
+  let team = teams.find((t) => t.id === teamData.id);
+  if (!team) {
+    team = new Team(teamData);
+    teams.push(team);
+  }
+  return team;
+}
 
 function toStatsMatch(matchOrFixture) {
   if (matchOrFixture?.statistics?.length >= 2) {
@@ -25,6 +35,8 @@ export function extractTeams(
   leagueIDs = [],
   teamID = null,
   includeGroupStageOnly = false,
+  includeAllRounds = false,
+  seasonByLeague = null,
 ) {
   const filterDate = date ? new Date(date) : new Date(2000, 0, 1);
 
@@ -34,11 +46,19 @@ export function extractTeams(
 
   const matches = completedMatches.filter((m) => {
     const inLeague = leagueIDs.length === 0 || leagueIDs.includes(m.league.id);
+    const selectedSeason = seasonByLeague instanceof Map
+      ? seasonByLeague.get(Number(m.league.id))
+      : null;
+    const inSeason = selectedSeason === null || selectedSeason === undefined
+      ? true
+      : Number(m.league?.season) === Number(selectedSeason);
     const afterDate = new Date(m.fixture.date) > filterDate;
     const roundName = (m.league?.round || "").toLowerCase();
     const isIncludedRound =
       teamID !== null
         ? true
+        : includeAllRounds
+          ? true
         : includeGroupStageOnly
           ? roundName.includes("league stage") || roundName.includes("group stage")
           : roundName.includes("regular season");
@@ -51,14 +71,28 @@ export function extractTeams(
       homeID === normalizedTeamID ||
       awayID === normalizedTeamID;
 
-    return inLeague && afterDate && isIncludedRound && hasTeam;
+    return inLeague && inSeason && afterDate && isIncludedRound && hasTeam;
   });
 
   return buildTeamList(matches);
 }
 
 export function getTopTeams(registry, leagues) {
-  let thisToPTeams = extractTeams(registry, null, leagues);
+  const leagueIds = Array.isArray(leagues)
+    ? leagues.map((id) => Number(id)).filter(Number.isFinite)
+    : [];
+
+  const seasonByLeague = new Map(
+    (Array.isArray(allDBLeagues) ? allDBLeagues : [])
+      .map((league) => [Number(league.id), Number(league.season)]),
+  );
+
+  let thisToPTeams = extractTeams(registry, null, leagueIds, null, false, true, seasonByLeague);
+
+  // Fallback when matches have missing/legacy season metadata.
+  if (!thisToPTeams.length) {
+    thisToPTeams = extractTeams(registry, null, leagueIds, null, false, true);
+  }
 
   thisToPTeams.sort((a, b) =>
     a.last5PerGame.points < b.last5PerGame.points

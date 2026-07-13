@@ -1,7 +1,7 @@
 import { allDBLeagues } from "../index.js";
 import { extractTeams } from "./teams-service.js";
 import { getLeagueStandingsFromDb } from "../data-access.js";
-import { mergeWorldCupGroupStandings, resolveLeagueStandingsForPage } from "../backend-helper.js";
+import { mergeWorldCupGroupStandings } from "../backend-helper.js";
 import { getPlayerList } from "./players-service.js";
 import { lastMatchesFromLeague } from "./matches-service.js";
 import { getTeamById } from "./teams-service.js";
@@ -10,6 +10,15 @@ import path from "path";
 
 // Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League
 export const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
+
+export function parseLeagueIds(leagueQuery) {
+  if (!leagueQuery) return defaultLeagues;
+
+  return leagueQuery
+    .split(",")
+    .map((id) => Number(id.trim()))
+    .filter(Boolean);
+}
 
 const FINISHED_STATUSES = new Set(["FT", "AET", "PEN"]);
 
@@ -26,6 +35,26 @@ const WORLD_CUP_LEAGUE_ID = 1;
 const DEFAULT_PLAYER_LIST_LIMIT = 10;
 
 let worldCupBracketTemplatePromise = null;
+
+export function resolveLeagueStandingsForPage(computedStandings, savedStandings = []) {
+  if (Array.isArray(computedStandings) && computedStandings.length > 0) {
+    return computedStandings;
+  }
+
+  if (!Array.isArray(savedStandings) || savedStandings.length === 0) {
+    return [];
+  }
+
+  return Array.isArray(savedStandings[0]) ? savedStandings.flat() : savedStandings;
+}
+
+export async function updateLeagueSeasonData(leagueID, season, {
+  getResultsDateFn,
+  writeLeagueToServerFn,
+}) {
+  const dataToWrite = await getResultsDateFn(leagueID, season);
+  return writeLeagueToServerFn(leagueID, dataToWrite.response, season);
+}
 
 // ---------------------------------------------------------------------------
 // Small shared helpers

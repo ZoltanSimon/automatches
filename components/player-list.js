@@ -1,8 +1,6 @@
 import { buildTableForTableType, imgs, ctx } from "../instapics.js";
 import {
   removeNewlines,
-  hideColumn,
-  showColumn,
   adjustColspan,
   sortTable,
 } from "../common-functions.js";
@@ -11,19 +9,8 @@ const tableName = "player-list-table";
 const table = document.getElementById(tableName);
 const statFilterButtons = document.querySelectorAll(".stat-filter-btn");
 const playerStatFiltersStorageKey = "players.activeStatFilters";
-const isPlayersPage = window.location.pathname.toLowerCase() === "/top-players";
-const hasPlayerStatFilters = isPlayersPage && statFilterButtons.length > 0;
-const defaultVisiblePlayerStats = [
-  "apps",
-  "goals",
-  "npg",
-  "assists",
-  "ga",
-  "gap90",
-  "avRating",
-];
 
-function saveActiveStats() {
+function saveActiveStats(hasPlayerStatFilters) {
   if (!hasPlayerStatFilters) {
     return;
   }
@@ -43,7 +30,7 @@ function saveActiveStats() {
   }
 }
 
-function restoreActiveStats() {
+function restoreActiveStats(hasPlayerStatFilters) {
   if (!hasPlayerStatFilters) {
     return;
   }
@@ -53,7 +40,7 @@ function restoreActiveStats() {
     const savedStats = savedValue ? JSON.parse(savedValue) : null;
 
     if (!Array.isArray(savedStats) || !savedStats.length) {
-      saveActiveStats();
+      saveActiveStats(hasPlayerStatFilters);
       return;
     }
 
@@ -66,7 +53,8 @@ function restoreActiveStats() {
   }
 }
 
-export function playerGoalList(big) {
+export function playerGoalList({ big = false, enableStatFilters = false } = {}) {
+  const hasPlayerStatFilters = enableStatFilters && statFilterButtons.length > 0;
   const tableBody = table.getElementsByTagName("tbody")[0];
 
   window.addEventListener("resize", () =>
@@ -86,7 +74,7 @@ export function playerGoalList(big) {
   const statsFilterSide = document.getElementById("stats-filter-side");
   if (hasPlayerStatFilters && statsFilterSide) {
     statsFilterSide.style.display = "none";
-    restoreActiveStats();
+    restoreActiveStats(hasPlayerStatFilters);
   }
 
   displayedPlayers.forEach((player) => {
@@ -115,7 +103,7 @@ export function playerGoalList(big) {
 
       sortTable(columnIndex, this, table, 1);
 
-      updateTableVisibility();
+      updateTableVisibility(hasPlayerStatFilters);
     });
   });
 
@@ -123,13 +111,13 @@ export function playerGoalList(big) {
     statFilterButtons.forEach((button) => {
       button.addEventListener("click", () => {
         button.classList.toggle("active");
-        saveActiveStats();
-        updateTableVisibility();
+        saveActiveStats(hasPlayerStatFilters);
+        updateTableVisibility(hasPlayerStatFilters);
       });
     });
   }
 
-  updateTableVisibility();
+  updateTableVisibility(hasPlayerStatFilters);
 
   let rows = document.querySelectorAll(`#${tableName} tbody tr`); // Select all rows inside your table
   let rowsPerPage = 100;
@@ -262,24 +250,25 @@ export function playerListToCanvas() {
 
 document.addEventListener("DOMContentLoaded", function () {});
 
-function updateTableVisibility() {
-  const activeStats = hasPlayerStatFilters
-    ? new Set(
-        Array.from(document.querySelectorAll(".stat-filter-btn.active")).map(
-          (button) => button.dataset.stat,
-        ),
-      )
-    : new Set(defaultVisiblePlayerStats);
+function updateTableVisibility(hasPlayerStatFilters) {
+  if (hasPlayerStatFilters) {
+    const activeStats = new Set(
+      Array.from(document.querySelectorAll(".stat-filter-btn.active")).map(
+        (button) => button.dataset.stat,
+      ),
+    );
 
-  document.querySelectorAll(`#${tableName} th`).forEach((el, index) => {
-    if (el.dataset.stat) {
-      if (!activeStats.has(el.dataset.stat)) {
-        hideColumn(el.dataset.stat);
-      } else {
-        showColumn(el.dataset.stat);
-      }
-    }
-  });
+    document.querySelectorAll(`#${tableName} th[data-stat]`).forEach((el) => {
+      const isVisible = activeStats.has(el.dataset.stat);
+      document
+        .querySelectorAll(
+          `#${tableName} th[data-stat="${el.dataset.stat}"], #${tableName} td[data-stat="${el.dataset.stat}"]`,
+        )
+        .forEach((cell) => {
+          cell.style.display = isVisible ? "" : "none";
+        });
+    });
+  }
 
   document.querySelectorAll(`#${tableName} tbody tr`).forEach((row, index) => {
     row.style.display = index < 200 ? "" : "none";
