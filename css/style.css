@@ -1411,9 +1411,15 @@ a.event-player-link:hover {
   font-weight: bold;
   cursor: pointer;
   padding: 4px;
+  padding-left: 8px;
   font-size: 1.1em;
   border-left: 0;
   border-right: 0;
+}
+
+tr td.match-list-center-td + td.match-list-center-td {
+  padding-left: 4px;
+  padding-right: 8px;
 }
 
 .match-list-xg {

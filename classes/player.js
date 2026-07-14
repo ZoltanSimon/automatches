@@ -1,9 +1,15 @@
 export class Player {
   constructor(inputPlayer) {
     const birthDate = inputPlayer.birth_date || inputPlayer.birthdate || "";
+    const birthLocation = inputPlayer.birth_location || inputPlayer.birthLocation || "";
+    const height = inputPlayer.height || "";
+    const firstName = (inputPlayer.first_name || inputPlayer.firstname || inputPlayer.firstName || "").trim();
+    const lastName = (inputPlayer.last_name || inputPlayer.lastname || inputPlayer.lastName || "").trim();
+    const combinedFullName = `${firstName} ${lastName}`.trim();
 
     this.id = inputPlayer.id;
     this.name = inputPlayer.name;
+    this.fullName = combinedFullName || inputPlayer.name;
     this.club = inputPlayer.club;
     this.nation = inputPlayer.nation;
     this.position = inputPlayer.position;
@@ -39,8 +45,9 @@ export class Player {
     this.shotsTotal = 0;
     this.tackles = 0;
     this.yellowCards = 0;
-    this.birthdate = "";
     this.birthdate = birthDate;
+    this.birthLocation = birthLocation;
+    this.height = height;
     this.age = Number(inputPlayer.age) || this.calculateAgeFromBirthDate(birthDate);
     this.exactPositions = [];
   }

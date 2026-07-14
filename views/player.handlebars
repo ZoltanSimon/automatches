@@ -3,21 +3,44 @@
 
 <div class="container">
     <div class="player-page-header">
-        <div class="league">
+        <div class="league player-header-grid">
             <img class="player-face" src="images/player-pictures/{{player.id}}.png" alt="{{player.name}}">
-            <div class="league-info">
+            <div class="league-info player-header-main">
                 <h2>{{player.name}}</h2>
-                <div class="league-nation">
-                    <div class="row">
+                <div class="league-nation player-subinfo">
+                    <div class="row player-club-row">
                         <img class="club-logo" src="images/logos/{{player.club}}.png" alt="{{player.clubName}}"
                             onclick="window.location.href='team?ID={{player.club}}'">
                         <span onclick="window.location.href='team?ID={{player.club}}'">{{player.clubName}}</span>
                     </div>
-                    <div class="row">
-                        <span style="color: white;">{{player.position}}</span> -
+                    <div class="row player-position-row">
+                        <span style="color: white;">{{player.position}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="player-meta">
+                <div class="player-meta-row">
+                    <span class="player-meta-label">Age:</span>
+                    <span class="player-meta-value">{{player.age}}</span>
+                </div>
+                <div class="player-meta-row">
+                    <span class="player-meta-label">Nationality:</span>
+                    <span class="player-meta-value player-meta-value-with-flag">
                         <img class="nation-flag" src="images/logos/{{player.nation}}.png" alt="{{player.nationName}}">
                         <span>{{player.nationName}}</span>
-                    </div>
+                    </span>
+                </div>
+                <div class="player-meta-row">
+                    <span class="player-meta-label">Birth Date:</span>
+                    <span class="player-meta-value">{{formatDateOnly player.birthdate}}</span>
+                </div>
+                <div class="player-meta-row">
+                    <span class="player-meta-label">Birth Location:</span>
+                    <span class="player-meta-value">{{player.birthLocation}}</span>
+                </div>
+                <div class="player-meta-row">
+                    <span class="player-meta-label">Height:</span>
+                    <span class="player-meta-value">{{player.height}} cm</span>
                 </div>
             </div>
         </div>
@@ -29,21 +52,23 @@
         <div class="error-message">{{error}}</div>
         {{else}}
         <div class="rect-header" style="grid-template-columns: auto 1fr;">
-            <div class="rect-title"><h2>Stats</h2></div>
-            <div class="rect-league-list" style="display: flex; position: static; opacity: 1; pointer-events: auto; margin-left: auto; grid-column: 2; justify-self: end; flex-wrap: nowrap; white-space: nowrap; gap: 8px; max-width: none; width: max-content; overflow: visible;">
+            <div class="rect-title">
+                <h2>Stats</h2>
+            </div>
+            <div class="rect-league-list"
+                style="display: flex; position: static; opacity: 1; pointer-events: auto; margin-left: auto; grid-column: 2; justify-self: end; flex-wrap: nowrap; white-space: nowrap; gap: 8px; max-width: none; width: max-content; overflow: visible;">
                 {{#each leagues}}
-                <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}" class="pleague-league-to-select{{#if (includesID ../selectedPLeagues this.id)}} selected-league{{/if}}" />
+                <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}"
+                    title="{{this.name}}"
+                    class="pleague-league-to-select{{#if (includesID ../selectedPLeagues this.id)}} selected-league{{/if}}" />
                 {{/each}}
             </div>
         </div>
-        <div class="stats" style="grid-column: 1 / 4; width: 100%; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+        <div class="stats"
+            style="grid-column: 1 / 4; width: 100%; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
             <div class="stat">
                 <div class="label">Appearances</div>
                 <div class="value">{{player.apps}}</div>
-            </div>
-            <div class="stat">
-                <div class="label">Age</div>
-                <div class="value">{{player.age}}</div>
             </div>
             <div class="stat">
                 <div class="label">Goals</div>
@@ -146,8 +171,13 @@
 
     </div>
     <div class="rectangle" style="padding: 8px;">
-        <span>{{player.name}} is a football player, representing the country of {{player.nationName}}. He plays for <a href="team?ID={{player.club}}">{{player.clubName}}</a>, mainly as a {{player.position}}. He has made {{player.apps}} appearances and has scored {{player.goals}} goals, providing {{player.assists}} assists in all competitions this season, for club and country.<br/><br/>
-        If you are interested in his statistics in specific leagues, click on the league icons above to filter the match list below. You can also click on the matches to see more details about them, or on the teams to see their respective pages.   </span>
+        <span>{{player.fullName}} is a football player, aged {{player.age}}, representing the country of {{player.nationName}}. He was born on {{formatDateOnly player.birthdate}}, in {{player.birthLocation}}. {{player.name}} plays for <a
+                href="team?ID={{player.club}}">{{player.clubName}}</a>, mainly as a {{player.position}}. He has made
+            {{player.apps}} appearances and has scored {{player.goals}} goals, providing {{player.assists}} assists in
+            all competitions this season, for club and country.<br /><br />
+            If you are interested in his statistics in specific leagues, click on the league icons above to filter the
+            match list below. You can also click on the matches to see more details about them, or on the teams to see
+            their respective pages. </span>
     </div>
     <div class="rectangle">
         <div id="player-matches" class="table-container">
