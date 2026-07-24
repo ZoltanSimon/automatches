@@ -18,6 +18,7 @@ export class Player {
     this.apps = 0;
     this.avRating = 0;
     this.blocks = 0;
+    this.captainApps = 0;
     this.competitionList = [];
     this.competitions = "";
     this.dribbles = ``;
@@ -31,18 +32,29 @@ export class Player {
     this.foulsAgainst = 0;
     this.ga=0;
     this.gap90 = 0;
+    this.goalsConceded = 0;
+    this.goalkeeperSaves = 0;
     this.interceptions = 0;
     this.keyPasses = 0;
+    this.matchPositions = "";
     this.minutes = 0;
     this.npg = 0;
+    this.offsides = 0;
+    this.passAccuracy = "0%";
+    this.passesAccurate = 0;
     this.passes = 0;
     this.penalties = 0;
+    this.penaltiesCommitted = 0;
     this.penaltiesMissed = 0;
+    this.penaltiesSaved = 0;
+    this.penaltiesWon = 0;
     this.rating = 0;
     this.redCards = 0;
     this.shots = ``;
     this.shotsOn = 0;
     this.shotsTotal = 0;
+    this.starts = 0;
+    this.substituteApps = 0;
     this.tackles = 0;
     this.yellowCards = 0;
     this.birthdate = birthDate;
@@ -50,6 +62,8 @@ export class Player {
     this.height = height;
     this.age = Number(inputPlayer.age) || this.calculateAgeFromBirthDate(birthDate);
     this.exactPositions = [];
+    this.shirtNumber = inputPlayer.shirtNumber || inputPlayer.shirt_number || "";
+    this.shirtNumbers = this.shirtNumber;
   }
 
   calculateAgeFromBirthDate(birthDate) {
@@ -74,40 +88,81 @@ export class Player {
   }
 
   getPlayerStats(playerFound, league) {
-    let stats = playerFound.statistics[0];
+    const stats = playerFound.statistics?.[0];
+    if (!stats) {
+      return;
+    }
 
-    if (stats.goals.total) {
-      this.goals += stats.goals.total;
-      this.ga += stats.goals.total;
+    const numberValue = (value) => {
+      const parsedValue = Number(value);
+      return Number.isFinite(parsedValue) ? parsedValue : 0;
+    };
+
+    const games = stats.games || {};
+    const goals = stats.goals || {};
+    const shots = stats.shots || {};
+    const dribbles = stats.dribbles || {};
+    const duels = stats.duels || {};
+    const passes = stats.passes || {};
+    const fouls = stats.fouls || {};
+    const tackles = stats.tackles || {};
+    const cards = stats.cards || {};
+    const penalty = stats.penalty || {};
+    const minutes = numberValue(games.minutes);
+
+    if (goals.total) {
+      this.goals += goals.total;
+      this.ga += goals.total;
     }
-    if (stats.goals.assists) {
-      this.assists += stats.goals.assists;
-      this.ga += stats.goals.assists;
+    if (goals.assists) {
+      this.assists += goals.assists;
+      this.ga += goals.assists;
     }
-    if (stats.shots.on) this.shotsOn += stats.shots.on;
-    if (stats.shots.total) this.shotsTotal += stats.shots.total;
-    if (stats.dribbles.attempts)
-      this.dribblesAttempts += stats.dribbles.attempts;
-    if (stats.dribbles.success) this.dribblesSucc += stats.dribbles.success;
-    if (stats.duels.won) this.duelsWon += stats.duels.won;
-    if (stats.duels.total) this.duelsTotal += stats.duels.total;
-    if (stats.passes.key) this.keyPasses += stats.passes.key;
-    if (stats.fouls.drawn) this.foulsAgainst += stats.fouls.drawn;
-    if (stats.games.minutes) this.apps++;
-    this.minutes += stats.games.minutes;
-    if (stats.penalty.scored) this.penalties++;
-    if (stats.games.rating) this.rating += parseFloat(stats.games.rating);
-    if (stats.position) this.position = position.concat(stats.games.position);
-    if (stats.passes.total) this.passes += stats.passes.total;
-    if (stats.tackles.total) this.tackles += stats.tackles.total;
-    if (stats.tackles.blocks) this.blocks += stats.tackles.blocks;
-    if (stats.tackles.interceptions)
-      this.interceptions += stats.tackles.interceptions;
-    if (stats.dribbles.past) this.dribblesPast += stats.dribbles.past;
-    if (stats.fouls.committed) this.foulsCommited += stats.fouls.committed;
-    if (stats.cards.yellow) this.yellowCards += stats.cards.yellow;
-    if (stats.cards.red) this.redCards += stats.cards.red;
-    if (stats.penalty.missed) this.penaltiesMissed += stats.penalty.missed;
+    if (shots.on) this.shotsOn += shots.on;
+    if (shots.total) this.shotsTotal += shots.total;
+    if (dribbles.attempts) this.dribblesAttempts += dribbles.attempts;
+    if (dribbles.success) this.dribblesSucc += dribbles.success;
+    if (duels.won) this.duelsWon += duels.won;
+    if (duels.total) this.duelsTotal += duels.total;
+    if (passes.key) this.keyPasses += passes.key;
+    if (fouls.drawn) this.foulsAgainst += fouls.drawn;
+    if (minutes > 0) {
+      this.apps++;
+      if (games.substitute) {
+        this.substituteApps++;
+      } else {
+        this.starts++;
+      }
+      if (games.captain) this.captainApps++;
+    }
+    this.minutes += minutes;
+    if (penalty.scored) this.penalties += penalty.scored;
+    if (games.rating) this.rating += parseFloat(games.rating);
+    if (games.position && !this.exactPositions.includes(games.position)) {
+      this.exactPositions.push(games.position);
+      if (!this.position || (Array.isArray(this.position) && this.position.length === 0)) {
+        this.position = this.exactPositions.join(", ");
+      }
+    }
+    if (games.number) {
+      this.shirtNumber = games.number;
+    }
+    if (stats.offsides) this.offsides += stats.offsides;
+    if (goals.conceded) this.goalsConceded += goals.conceded;
+    if (goals.saves) this.goalkeeperSaves += goals.saves;
+    if (passes.total) this.passes += passes.total;
+    if (passes.accuracy) this.passesAccurate += numberValue(passes.accuracy);
+    if (tackles.total) this.tackles += tackles.total;
+    if (tackles.blocks) this.blocks += tackles.blocks;
+    if (tackles.interceptions) this.interceptions += tackles.interceptions;
+    if (dribbles.past) this.dribblesPast += dribbles.past;
+    if (fouls.committed) this.foulsCommited += fouls.committed;
+    if (cards.yellow) this.yellowCards += cards.yellow;
+    if (cards.red) this.redCards += cards.red;
+    if (penalty.won) this.penaltiesWon += penalty.won;
+    if (penalty.commited) this.penaltiesCommitted += penalty.commited;
+    if (penalty.missed) this.penaltiesMissed += penalty.missed;
+    if (penalty.saved) this.penaltiesSaved += penalty.saved;
 
     // Add competition (id + name) to competitionList if not already present
     if (league && league.id && league.name) {
@@ -122,12 +177,15 @@ export class Player {
   }
 
   getGAper90() {
-    this.gap90 = (((this.goals + this.assists) * 90) / this.minutes).toFixed(2);
+    this.gap90 = this.minutes > 0 ? (((this.goals + this.assists) * 90) / this.minutes).toFixed(2) : "0.00";
     this.shots = `${this.shotsOn} / ${this.shotsTotal}`;
     this.dribbles = `${this.dribblesSucc} / ${this.dribblesAttempts}`;
     this.duels = `${this.duelsWon} / ${this.duelsTotal}`;
     this.competitions = this.competitionList.map((comp) => comp.name).join(", ");
-    this.avRating = (this.rating / this.apps).toFixed(2);
+    this.avRating = this.apps > 0 ? (this.rating / this.apps).toFixed(2) : "0.00";
     this.npg = this.goals - this.penalties;
+    this.passAccuracy = this.passes > 0 ? `${((this.passesAccurate / this.passes) * 100).toFixed(0)}%` : "0%";
+    this.matchPositions = this.exactPositions.join(", ");
+    this.shirtNumbers = this.shirtNumber;
   }
 }

@@ -21,7 +21,7 @@ import {
 } from "./services/players-service.js";
 import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
-import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData, parseLeagueIds } from "./services/leagues-service.js";
+import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData, parseLeagueIds, defaultLeagues } from "./services/leagues-service.js";
 import { parseDate, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
 import { getTeamById, getTopTeams, getTeamRouteData } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
@@ -92,21 +92,16 @@ app.get("/", async (req, res) => {
   try {
     const selectedDate = parseDate(req.query.date);
     const selectedPlayerLeague = req.query.pleague ? parseLeagueIds(req.query.pleague) : [1];
-    const selectedTeamLeague = [1];
+    const selectedTeamLeague = req.query.tleague ? parseLeagueIds(req.query.tleague) : [1];
     const parsed = parseFloat(req.query.sleague);
-    const selectedStandingsLeague = isNaN(parsed) ? 39 : parsed;
+    const selectedStandingsLeague = isNaN(parsed) ? 71 : parsed;
     const registry = await getRegistry();
     const playerPageData = getPlayerPageData(registry, null, selectedPlayerLeague);
     const players = playerPageData?.players || [];
     const matches = await matchesOnDay(registry, selectedDate);
     const teams = getTopTeams(registry, selectedTeamLeague);
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
-    const worldCupGroupsBase = await getLeagueStandingsFromDb(1);
-    const worldCupGroups = mergeWorldCupGroupStandings(worldCupGroupsBase, registry);
     
-    const defaultSeason = new Date().getFullYear();
-    const { knockoutRounds } = await getLeaguePageData(registry, 1, defaultSeason, defaultSeason);
-
     res.render("home", {
       title: "Generation Football - Football Stats, Players & Teams",
       description: "Explore live football standings, detailed team stats and league tables across Europe on Generation Football.",
@@ -120,8 +115,7 @@ app.get("/", async (req, res) => {
       teams: teams.slice(0, 10),
       standingsLink: `/league?id=${selectedStandingsLeague}`,
       standings: standings,
-      worldCupGroups,
-      knockoutRounds,
+      standingsTitle: getLeagueById(selectedStandingsLeague)?.name || "Unknown League",
     });
   } catch (error) {
     handleError(res, error, "Error loading home page");

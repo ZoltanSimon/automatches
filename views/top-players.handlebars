@@ -19,33 +19,53 @@
     <div id="stats-filter-side" class="side-filter-panel">
       <h3>Statistics</h3>
       <div id="statCheckboxes">
+        <h4>General</h4>
         <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="apps">Appearances</button>
-        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="goals">Goals</button>
-        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide active" data-stat="npg">Non-Penalty Goals</button>
-        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide active" data-stat="ga">Goals + Assists</button>
-        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="assists">Assists</button>
-        
-        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="gap90">GA / 90</button>
-        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="avRating">Rating</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="minutes">Minutes</button>
-        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="pens">Penalties</button>
-        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="penaltiesMissed">Pens Missed</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="starts">Starts</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="substituteApps">Substitute Apps</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="captainApps">Captain Apps</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="shirtNumbers">Shirt Number</button>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="avRating">Rating</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="age">Age</button>
+
+        <h4>Offense</h4>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="goals">Goals</button>
+                <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="assists">Assists</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide active" data-stat="npg">Non-Penalty Goals</button>
+
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide active" data-stat="ga">Goals + Assists</button>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="gap90">GA / 90</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="shotsTotal">Total Shots</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="shotsOn">Shots On Target</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="offsides">Offsides</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="dribblesAttempts">Dribble Attempts</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="dribblesSucc">Dribbles Success</button>
-        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="dribblesPast">Dribbled Past</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="keyPasses">Key Passes</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="passes">Passes</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="passesAccurate">Accurate Passes</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="passAccuracy">Pass Accuracy</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="pens">Penalties</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="penaltiesWon">Penalties Won</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="penaltiesMissed">Pens Missed</button>
+
+        <h4>Defense</h4>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="duelsTotal">Duels Total</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="duelsWon">Duels Won</button>
-        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="keyPasses">Key Passes</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="dribblesPast">Dribbled Past</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="foulsAgainst">Fouls Against</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="foulsCommited">Fouls Committed</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="penaltiesCommitted">Pens Committed</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="blocks">Blocks</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="interceptions">Interceptions</button>
         <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="tackles">Tackles</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="yellowCards">Yellow Cards</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="redCards">Red Cards</button>
-        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="age">Age</button>
+
+        <h4>Goalkeeper</h4>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="goalsConceded">Goals Conceded</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn" data-stat="goalkeeperSaves">Saves</button>
+        <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="penaltiesSaved">Penalties Saved</button>
       </div>
     </div>
 

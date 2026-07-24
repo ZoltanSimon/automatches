@@ -1,5 +1,5 @@
 import { playerGoalList } from "../components/player-list.js";
-import { addLeagues } from "../common-functions.js";
+import { addLeagues, setupLeagueListToggleButtons } from "../common-functions.js";
 
 await playerGoalList({ big: true, enableStatFilters: true });
 addLeagues("pleague");
@@ -24,13 +24,7 @@ document.querySelector(".more-button").addEventListener("click", function () {
   }
 });
 
-document.querySelectorAll('.rect-expand-league-list a').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.target.closest('.rect-header').querySelector('.rect-league-list').classList.toggle('visible');
-    e.target.closest('.rect-expand-league-list').classList.toggle('active');
-  });
-});
+setupLeagueListToggleButtons();
 
 document.querySelectorAll('.position-filter-btn[data-position]').forEach((btn) => {
   btn.addEventListener('click', (e) => {

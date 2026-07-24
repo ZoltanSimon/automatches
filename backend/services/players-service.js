@@ -6,8 +6,74 @@ import { insertPlayersToDb, updatePlayerProfilesInDb } from "./../data-access.js
 import { Player } from "./../../classes/player.js";
 import { allDBLeagues, allDBPlayers } from "../index.js";
 import { LineupParser } from "../../classes/lineupparser.js";
-import { comparePositionsByDisplayOrder, toTrimmedString } from "../backend-helper.js";
+import { comparePositionsByDisplayOrder, toTrimmedString, wait } from "../backend-helper.js";
 import { getTeamById } from "./teams-service.js";
+import * as fs from "fs";
+
+export function startPlayerFetchJob(playersFetchJob, {
+  baseQuery,
+  dataDir,
+  getPlayersFn,
+  maxRuns,
+  intervalMs = 10000,
+}) {
+  const playersDir = `${dataDir}players`;
+  if (!fs.existsSync(playersDir)) {
+    fs.mkdirSync(playersDir, { recursive: true });
+  }
+
+  console.log(
+    `[get-players] Starting background fetch loop at page ${playersFetchJob.nextPage}. Interval: ${intervalMs / 1000}s. Max runs: ${maxRuns}.`
+  );
+
+  void (async () => {
+    let completedRuns = 0;
+
+    while (playersFetchJob.running && completedRuns < maxRuns) {
+      const page = playersFetchJob.nextPage;
+      const startedAt = new Date().toISOString();
+
+      try {
+        console.log(`[get-players] Fetching page ${page} at ${startedAt}`);
+        const players = await getPlayersFn({ ...baseQuery, page });
+        const filename = `${playersDir}/players${page}.json`;
+        fs.writeFileSync(filename, JSON.stringify(players, null, 2));
+
+        const resultCount = typeof players?.results === "number"
+          ? players.results
+          : Array.isArray(players?.response)
+            ? players.response.length
+            : "unknown";
+
+        console.log(
+          `[get-players] Saved page ${page} -> ${filename} (results: ${resultCount})`
+        );
+
+        playersFetchJob.nextPage += 1;
+        completedRuns += 1;
+      } catch (error) {
+        console.error(`[get-players] Error on page ${page}:`, error);
+        playersFetchJob.running = false;
+        break;
+      }
+
+      if (playersFetchJob.running && completedRuns < maxRuns) {
+        await wait(intervalMs);
+      }
+    }
+
+    if (completedRuns >= maxRuns && playersFetchJob.running) {
+      playersFetchJob.running = false;
+      console.log(
+        `[get-players] Reached max runs (${maxRuns}) for this start request. Next page is ${playersFetchJob.nextPage}.`
+      );
+    }
+
+    console.log(
+      `[get-players] Background loop stopped. Next page is ${playersFetchJob.nextPage}.`
+    );
+  })();
+}
 
 function getTeamName(id) {
   return getTeamById(id)?.name || "";

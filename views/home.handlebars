@@ -11,8 +11,8 @@
     </div>
   </div>
 
-  <!--div class="rectangle" id="rectangle4">
-    {{> rect-header title="Standings" link=standingsLink leagues=leagues selectedLeagues=selectedSLeague
+  <div class="rectangle" id="rectangle4">
+    {{> rect-header title=(concat standingsTitle " - Standings") titleLogoId=selectedSLeague titleLogoAlt=standingsTitle link=standingsLink leagues=leagues selectedLeagues=selectedSLeague
     leaguepar="sleague" }}
     <div id="standings" class="table-container">
       {{> standings }}
@@ -22,10 +22,10 @@
       showing points, goal difference and recent form to help track qualification and elimination positions. Click on <a
         href="./league">MORE</a> for full league details, fixtures and historical performance. <br />Expected Points (xPts) estimate how many points a team deserved from a match based on performance rather than the final score.
 We calculate xPts using expected goals (xG) and a Poisson probability model to estimate the likelihood of every possible scoreline. From these probabilities, we derive the chances of winning, drawing, or losing the match. Expected Points are then calculated as (win probability × 3) + (draw probability × 1), giving a more objective view of results over time and helping identify teams that are over- or under-performing.</span>
-  </div-->
+  </div>
 
   <div class="rectangle" id="rectangle1">
-    {{> rect-header title="Top Players" link="/top-players" leagues=leagues selectedLeagues=selectedPLeagues
+    {{> rect-header title="World Cup - Top Players" link="/top-players" leagues=leagues selectedLeagues=selectedPLeagues
     leaguepar="pleague" }}
     <div id="player-list" class="table-container">
       {{> player-list-table big=false}}
@@ -35,7 +35,8 @@ We calculate xPts using expected goals (xG) and a Poisson probability model to e
       isolated performances. Filter players by league by pressing the League button and extending the list of available leagues. <br/>Visit the <a href="./top-players">Players page</a> for advanced filters and detailed per-match
       statistics.</span>
   </div>
-  <div class="rectangle" id="rectangle5">
+
+  <!--div class="rectangle" id="rectangle5">
     <div class="team-page-header">
       <div class="rect-title">
         <div class="league-info">
@@ -56,10 +57,10 @@ We calculate xPts using expected goals (xG) and a Poisson probability model to e
       {{/if}}
     </div>
     <span style="grid-column: 1/4; padding-left: 4px; padding-right: 4px">FIFA World Cup knockout bracket showing all remaining matches, qualified teams, and current scorelines.</span>
-  </div>
+  </div-->
 
   <div class="rectangle" id="rectangle2">
-    {{> rect-header title="Top Teams" link="/top-teams?tleague=1" leaguepar="tleague" leagues=leagues
+    {{> rect-header title="World Cup - Top Teams" link="/top-teams" leaguepar="tleague" leagues=leagues
     selectedLeagues=selectedTLeagues }}
     <div id="top-team-list" class="table-container">
       {{> team-list-table big=false}}

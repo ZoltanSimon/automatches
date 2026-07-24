@@ -16,6 +16,11 @@
                     <div class="row player-position-row">
                         <span style="color: white;">{{player.position}}</span>
                     </div>
+                    {{#if player.shirtNumbers}}
+                    <div class="row player-position-row">
+                        <span style="color: white;">Shirt Number: {{player.shirtNumbers}}</span>
+                    </div>
+                    {{/if}}
                 </div>
             </div>
             <div class="player-meta">
@@ -56,7 +61,7 @@
                 <h2>Stats</h2>
             </div>
             <div class="rect-league-list"
-                style="display: flex; position: static; opacity: 1; pointer-events: auto; margin-left: auto; grid-column: 2; justify-self: end; flex-wrap: nowrap; white-space: nowrap; gap: 8px; max-width: none; width: max-content; overflow: visible;">
+                style="display: flex; position: static; opacity: 1; pointer-events: auto; margin-left: auto; grid-column: 2; grid-row: 1; justify-self: end; flex-wrap: nowrap; white-space: nowrap; gap: 8px; max-width: none; max-height: none; width: max-content; overflow: visible;">
                 {{#each leagues}}
                 <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}"
                     title="{{this.name}}"
@@ -65,23 +70,23 @@
             </div>
         </div>
         <div class="stats"
-            style="grid-column: 1 / 4; width: 100%; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+            style="grid-column: 1 / 4; width: 100%; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); --stat-icon-primary: #1D3557; --stat-icon-secondary: #F1FAEE; --stat-icon-danger: #E63946;">
             <div class="stat">
-                <div class="label">Appearances</div>
+                <div class="label">{{> stat-icon name="apps"}} Appearances</div>
                 <div class="value">{{player.apps}}</div>
             </div>
             <div class="stat">
-                <div class="label">Goals</div>
+                <div class="label">{{> stat-icon name="goals"}} Goals</div>
                 <div class="value">{{player.goals}}</div>
                 <div class="per-game">{{perGame player.goals player.apps}}/game</div>
             </div>
             <div class="stat">
-                <div class="label">Assists</div>
+                <div class="label">{{> stat-icon name="assists"}} Assists</div>
                 <div class="value">{{player.assists}}</div>
                 <div class="per-game">{{perGame player.assists player.apps}}/game</div>
             </div>
             <div class="stat">
-                <div class="label">Goals + Assists</div>
+                <div class="label">{{> stat-icon name="ga"}} Goals + Assists</div>
                 <div class="value">{{player.ga}}</div>
                 <div class="per-game">{{perGame player.ga player.apps}}/game</div>
             </div>
@@ -90,29 +95,64 @@
                 <div class="value">{{player.gap90}}</div>
             </div>
             <div class="stat">
-                <div class="label">Rating</div>
+                <div class="label">{{> stat-icon name="rating"}} Rating</div>
                 <div class="value">{{player.avRating}}</div>
             </div>
             <div class="stat">
-                <div class="label">Minutes</div>
+                <div class="label">{{> stat-icon name="minutes"}} Minutes</div>
                 <div class="value">{{player.minutes}}</div>
                 <div class="per-game">{{perGame player.minutes player.apps}}/game</div>
             </div>
             <div class="stat">
-                <div class="label">Penalties</div>
+                <div class="label">Starts</div>
+                <div class="value">{{player.starts}}</div>
+                <div class="per-game">{{perGame player.starts player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Substitute Apps</div>
+                <div class="value">{{player.substituteApps}}</div>
+                <div class="per-game">{{perGame player.substituteApps player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Captain Apps</div>
+                <div class="value">{{player.captainApps}}</div>
+                <div class="per-game">{{perGame player.captainApps player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">{{> stat-icon name="pens"}} Penalties</div>
                 <div class="value">{{player.penalties}}</div>
                 <div class="per-game">{{perGame player.penalties player.apps}}/game</div>
             </div>
             <div class="stat">
-                <div class="label">Pens Missed</div>
+                <div class="label">Penalties Won</div>
+                <div class="value">{{player.penaltiesWon}}</div>
+                <div class="per-game">{{perGame player.penaltiesWon player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Penalties Committed</div>
+                <div class="value">{{player.penaltiesCommitted}}</div>
+                <div class="per-game">{{perGame player.penaltiesCommitted player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">{{> stat-icon name="penaltiesMissed"}} Pens Missed</div>
                 <div class="value">{{player.penaltiesMissed}}</div>
                 <div class="per-game">{{perGame player.penaltiesMissed player.apps}}/game</div>
             </div>
             <div class="stat">
-                <div class="label">Shots (On / Total)</div>
+                <div class="label">Penalties Saved</div>
+                <div class="value">{{player.penaltiesSaved}}</div>
+                <div class="per-game">{{perGame player.penaltiesSaved player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">{{> stat-icon name="shotsOn"}} Shots (On / Total)</div>
                 <div class="value">{{player.shots}}</div>
                 <div class="per-game">{{perGame player.shotsOn player.apps}} / {{perGame player.shotsTotal player.apps}}
                     per game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Offsides</div>
+                <div class="value">{{player.offsides}}</div>
+                <div class="per-game">{{perGame player.offsides player.apps}}/game</div>
             </div>
             <div class="stat">
                 <div class="label">Dribbles (Succ / Att)</div>
@@ -130,6 +170,20 @@
                 <div class="label">Key Passes</div>
                 <div class="value">{{player.keyPasses}}</div>
                 <div class="per-game">{{perGame player.keyPasses player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Passes</div>
+                <div class="value">{{player.passes}}</div>
+                <div class="per-game">{{perGame player.passes player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Accurate Passes</div>
+                <div class="value">{{player.passesAccurate}}</div>
+                <div class="per-game">{{perGame player.passesAccurate player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Pass Accuracy</div>
+                <div class="value">{{player.passAccuracy}}</div>
             </div>
             <div class="stat">
                 <div class="label">Tackles</div>
@@ -165,6 +219,16 @@
                 <div class="label">Red Cards</div>
                 <div class="value">{{player.redCards}}</div>
                 <div class="per-game">{{perGame player.redCards player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Goals Conceded</div>
+                <div class="value">{{player.goalsConceded}}</div>
+                <div class="per-game">{{perGame player.goalsConceded player.apps}}/game</div>
+            </div>
+            <div class="stat">
+                <div class="label">Goalkeeper Saves</div>
+                <div class="value">{{player.goalkeeperSaves}}</div>
+                <div class="per-game">{{perGame player.goalkeeperSaves player.apps}}/game</div>
             </div>
         </div>
         {{/if}}

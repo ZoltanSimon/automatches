@@ -2,6 +2,11 @@ export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;
 export const eq = (a, b) => a === b;
 export const json = (context) => JSON.stringify(context);
+export const concat = (...parts) => {
+  // Handlebars passes an options object as the last argument to helpers.
+  const values = parts.slice(0, -1);
+  return values.join("");
+};
 
 export const formatTime = (datestamp) => {
   if (!datestamp) return "";

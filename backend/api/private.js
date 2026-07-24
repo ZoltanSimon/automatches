@@ -1,15 +1,13 @@
 import { Router } from "express";
 import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi } from "../webapi-handler.js";
 import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb } from "../data-access.js";
-import { dataDir, getMatchFromServer, matchesDir, saveMatchesToServer, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
+import { dataDir, getMatchFromServer, matchFileExists, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
 import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
-import { insertAllPlayers, updatePlayerProfilesFromFiles } from "../services/players-service.js";
-import { toTrimmedString } from "../backend-helper.js";
-import { updateLeagueSeasonData } from "../services/leagues-service.js";
-import { matchesOnDay, matchesInRound } from "../services/matches-service.js";
-import * as fs from "fs";
+import { insertAllPlayers, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
+import { localhostOnly, wait } from "../backend-helper.js";
+import { updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
+import { findMissingFinishedMatches, hydrateMissingMatches, matchesOnDay, matchesInRound } from "../services/matches-service.js";
 
-const LOCAL_IPS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 const MAX_GET_PLAYERS_RUNS = 50;
 let playersFetchJob = {
   running: false,
@@ -17,48 +15,11 @@ let playersFetchJob = {
 };
 let missingMatchesHydrationJobRunning = false;
 
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function isLocalRequest(request) {
-  const ip = String(request.ip || request.socket?.remoteAddress || "").toLowerCase();
-  const hostname = String(request.hostname || "").toLowerCase();
-
-  return LOCAL_IPS.has(ip) || hostname === "localhost";
-}
-
-function localhostOnly(request, response, next) {
-  if (!isLocalRequest(request)) {
-    return response.status(403).json({
-      success: false,
-      message: "Forbidden",
-    });
-  }
-
-  next();
-}
-
-function readSavedStatus(savedMatchData) {
-  const savedMatch = Array.isArray(savedMatchData)
-    ? savedMatchData[0]
-    : savedMatchData;
-
-  return String(toTrimmedString(savedMatch?.fixture?.status?.short) || "").toUpperCase();
-}
-
 export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   const router = Router();
   router.use(localhostOnly);
   let leaguesCache = allDBLeagues;
   
-  // Wrap setAllDbState to also update our local cache
-  const originalSetAllDbState = setAllDbState;
-  const wrappedSetAllDbState = (state) => {
-    leaguesCache = state.leagues || [];
-    originalSetAllDbState(state);
-  };
-
   router.get("/test-standings", async (request, response) => {
     const leagueID = Number(request.query.leagueID ?? 1);
     const season = Number(request.query.season ?? 2026);
@@ -92,47 +53,6 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   });
 
   router.get("/all-missing-matches", async (request, response) => {
-    const today = new Date().toISOString().split("T")[0];
-    const data = await getAllMatchesFromDbUntilDate(today);
-
-    const existingFileNames = new Set(await fs.promises.readdir(matchesDir));
-    const existingMatches = [];
-    const matchArr = [];
-
-    for (const element of data) {
-      if (existingFileNames.has(`${element.fixtureId}.json`)) {
-        existingMatches.push(element);
-      } else {
-        matchArr.push(element);
-      }
-    }
-
-    const statusBatchSize = 150;
-    for (let i = 0; i < existingMatches.length; i += statusBatchSize) {
-      const batch = existingMatches.slice(i, i + statusBatchSize);
-      const statusChecks = await Promise.allSettled(
-        batch.map((element) => getMatchFromServer(element.fixtureId)),
-      );
-
-      statusChecks.forEach((result, index) => {
-        if (result.status !== "fulfilled") {
-          return;
-        }
-
-        const element = batch[index];
-        const savedStatus = readSavedStatus(result.value);
-        const dbStatus = String(element.fixtureStatus || "").trim().toUpperCase();
-
-        if (savedStatus && dbStatus && savedStatus !== dbStatus) {
-          console.log(
-            `[all-missing-matches] Status mismatch for fixture ${element.fixtureId}, league ${element.leagueId}: json=${savedStatus}, db=${dbStatus}`,
-          );
-        }
-      });
-    }
-
-    console.log(`Total missing matches: ${matchArr.length}`);
-
     if (missingMatchesHydrationJobRunning) {
       return response.status(409).json({
         success: false,
@@ -140,46 +60,52 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       });
     }
 
-    const matchesToDownload = matchArr.length;
-    const batchSize = 20;
-
     missingMatchesHydrationJobRunning = true;
     try {
-      for (let i = 0; i < matchesToDownload; i += batchSize) {
-        const batch = matchArr.slice(i, i + batchSize);
-        const batchIds = [...new Set(batch.map((match) => String(match.fixtureId)))];
-        const remaining = matchesToDownload - (i + batch.length);
+      const matchArr = await findMissingFinishedMatches("[all-missing-matches]");
+      await hydrateMissingMatches(matchArr, "[all-missing-matches]");
 
-        if (batchIds.length === 0) {
-          continue;
-        }
-
-        try {
-          const result = await saveMatchesToServer(batchIds);
-          console.log(
-            `Saved ${result.savedCount}/${batchIds.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`
-          );
-
-          if (result.failed.length > 0) {
-            console.warn("Failed matches in batch:", result.failed);
-          }
-        } catch (err) {
-          console.error(`Error saving match batch [${batchIds.join(",")}]`, err);
-        }
-
-        if (remaining > 0) {
-          await new Promise((resolve) => setTimeout(resolve, 7000));
-        }
-      }
+      response.json(matchArr);
     } finally {
       missingMatchesHydrationJobRunning = false;
     }
+  });
 
-    console.log(
-      `Finished downloading ${matchesToDownload} matches. ${matchArr.length - matchesToDownload} matches still missing.`
-    );
+  router.get("/import-and-update-matches", async (request, response) => {
+    if (missingMatchesHydrationJobRunning) {
+      return response.status(409).json({
+        success: false,
+        message: "match import/update job is already running",
+      });
+    }
 
-    response.json(matchArr);
+    missingMatchesHydrationJobRunning = true;
+    try {
+      const { leagues, ...leagueUpdate } = await updateCurrentSeasonLeagues(leaguesCache, {
+        getResultsDateFn: getResultsDate,
+        writeLeagueToServerFn: writeLeagueToServer,
+      });
+      leaguesCache = leagues;
+      console.log("[import-and-update-matches] League import finished. Finding missing finished match files...");
+      const missingMatches = await findMissingFinishedMatches("[import-and-update-matches]");
+      console.log(`[import-and-update-matches] Hydrating ${missingMatches.length} missing finished match files...`);
+      const hydration = await hydrateMissingMatches(missingMatches, "[import-and-update-matches]");
+
+      response.json({
+        success: true,
+        leagueUpdate,
+        missingMatches: missingMatches.length,
+        hydration,
+      });
+    } catch (error) {
+      console.error("Error importing leagues and updating matches:", error);
+      response.status(500).json({
+        success: false,
+        message: "Failed to import leagues and update matches",
+      });
+    } finally {
+      missingMatchesHydrationJobRunning = false;
+    }
   });
 
   router.get("/reload-runtime-cache", async (request, response) => {
@@ -187,7 +113,8 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       const players = await loadPlayers();
       const teams = await loadTeams();
       const leagues = await loadLeagues();
-      wrappedSetAllDbState({ players, teams, leagues });
+      leaguesCache = leagues;
+      setAllDbState({ players, teams, leagues });
 
       await forceRefreshRegistry();
 
@@ -248,67 +175,17 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
         }
       }
 
-      const playersDir = `${dataDir}players`;
-      if (!fs.existsSync(playersDir)) {
-        fs.mkdirSync(playersDir, { recursive: true });
-      }
-
       const baseQuery = { ...request.query };
       delete baseQuery.page;
       delete baseQuery.stop;
       delete baseQuery.startPage;
 
-      console.log(
-        `[get-players] Starting background fetch loop at page ${playersFetchJob.nextPage}. Interval: 10s. Max runs: ${MAX_GET_PLAYERS_RUNS}.`
-      );
-
-      (async function runLoop() {
-        let completedRuns = 0;
-
-        while (playersFetchJob.running && completedRuns < MAX_GET_PLAYERS_RUNS) {
-          const page = playersFetchJob.nextPage;
-          const startedAt = new Date().toISOString();
-
-          try {
-            console.log(`[get-players] Fetching page ${page} at ${startedAt}`);
-            const players = await getPlayers({ ...baseQuery, page });
-            const filename = `${playersDir}/players${page}.json`;
-            fs.writeFileSync(filename, JSON.stringify(players, null, 2));
-
-            const resultCount = typeof players?.results === "number"
-              ? players.results
-              : Array.isArray(players?.response)
-                ? players.response.length
-                : "unknown";
-
-            console.log(
-              `[get-players] Saved page ${page} -> ${filename} (results: ${resultCount})`
-            );
-
-            playersFetchJob.nextPage += 1;
-            completedRuns += 1;
-          } catch (error) {
-            console.error(`[get-players] Error on page ${page}:`, error);
-            playersFetchJob.running = false;
-            break;
-          }
-
-          if (playersFetchJob.running && completedRuns < MAX_GET_PLAYERS_RUNS) {
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-          }
-        }
-
-        if (completedRuns >= MAX_GET_PLAYERS_RUNS && playersFetchJob.running) {
-          playersFetchJob.running = false;
-          console.log(
-            `[get-players] Reached max runs (${MAX_GET_PLAYERS_RUNS}) for this start request. Next page is ${playersFetchJob.nextPage}.`
-          );
-        }
-
-        console.log(
-          `[get-players] Background loop stopped. Next page is ${playersFetchJob.nextPage}.`
-        );
-      })();
+      startPlayerFetchJob(playersFetchJob, {
+        baseQuery,
+        dataDir,
+        getPlayersFn: getPlayers,
+        maxRuns: MAX_GET_PLAYERS_RUNS,
+      });
 
       response.json({
         success: true,
@@ -447,21 +324,16 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   });
 
   router.get("/update-leagues", async (request, response) => {
-    let leagueIDs = request.query.leagueID.split(",");
-    let seasons = request.query.seasons.split(",");
-    let responseToSend = "";
+    const { leagues, ...leagueUpdate } = await updateCurrentSeasonLeagues(leaguesCache, {
+      getResultsDateFn: getResultsDate,
+      writeLeagueToServerFn: writeLeagueToServer,
+    });
+    leaguesCache = leagues;
 
-    for (let i = 0; i < leagueIDs.length; i++) {
-      let leagueID = leagueIDs[i];
-      let season = seasons[i];
-
-      responseToSend += await updateLeagueSeasonData(leagueID, season, {
-        getResultsDateFn: getResultsDate,
-        writeLeagueToServerFn: writeLeagueToServer,
-      });
-    }
-    console.log(responseToSend);
-    response.json(responseToSend);
+    response.json({
+      success: true,
+      ...leagueUpdate,
+    });
   });
 
   router.get("/update-league-all-seasons", async (request, response) => {
@@ -542,7 +414,8 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     const players = await loadPlayers();
     const teams = await loadTeams();
     const leagues = await loadLeagues();
-    wrappedSetAllDbState({ players, teams, leagues });
+    leaguesCache = leagues;
+    setAllDbState({ players, teams, leagues });
 
     response.json({
       success: true,
@@ -627,12 +500,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       console.log(`Checking league ${leagueID} with ${data.length} matches for missing match files...`);
       for (const element of data) {
         if (["FT", "AET", "PEN"].includes(element.fixture.status.short)) {
-          try {
-            fs.accessSync(
-              `${matchesDir}/${element.fixture.id}.json`,
-              fs.constants.R_OK
-            );
-          } catch (err) {
+          if (!(await matchFileExists(element.fixture.id))) {
             matchArr.push(element);
           }
         }

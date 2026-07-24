@@ -11,6 +11,30 @@ export const handleError = (res, error, message = "Error fetching data") => {
   res.status(500).send(message);
 };
 
+const LOCAL_IPS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
+
+export function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function isLocalRequest(request) {
+  const ip = String(request.ip || request.socket?.remoteAddress || "").toLowerCase();
+  const hostname = String(request.hostname || "").toLowerCase();
+
+  return LOCAL_IPS.has(ip) || hostname === "localhost";
+}
+
+export function localhostOnly(request, response, next) {
+  if (!isLocalRequest(request)) {
+    return response.status(403).json({
+      success: false,
+      message: "Forbidden",
+    });
+  }
+
+  next();
+}
+
 export function toTrimmedString(value) {
   if (value === null || value === undefined) {
     return null;

@@ -1,7 +1,7 @@
 import { allDBLeagues } from "../index.js";
 import { extractTeams } from "./teams-service.js";
-import { getLeagueStandingsFromDb } from "../data-access.js";
-import { mergeWorldCupGroupStandings } from "../backend-helper.js";
+import { getLeagueStandingsFromDb, loadLeagueSeasonRows, loadLeagues } from "../data-access.js";
+import { mergeWorldCupGroupStandings, wait } from "../backend-helper.js";
 import { getPlayerList } from "./players-service.js";
 import { lastMatchesFromLeague } from "./matches-service.js";
 import { getTeamById } from "./teams-service.js";
@@ -33,6 +33,8 @@ const ROUND_ORDER = [
 
 const WORLD_CUP_LEAGUE_ID = 1;
 const DEFAULT_PLAYER_LIST_LIMIT = 10;
+const CURRENT_SEASON = 2026;
+const UPDATE_LEAGUES_DELAY_MS = 2000;
 
 let worldCupBracketTemplatePromise = null;
 
@@ -54,6 +56,54 @@ export async function updateLeagueSeasonData(leagueID, season, {
 }) {
   const dataToWrite = await getResultsDateFn(leagueID, season);
   return writeLeagueToServerFn(leagueID, dataToWrite.response, season);
+}
+
+export async function updateCurrentSeasonLeagues(leaguesCache, {
+  getResultsDateFn,
+  writeLeagueToServerFn,
+}) {
+  const leagues = Array.isArray(leaguesCache) && leaguesCache.length > 0
+    ? leaguesCache
+    : await loadLeagues();
+  const leagueIDs = leagues
+    .map((league) => Number(league.id))
+    .filter((leagueID) => Number.isFinite(leagueID) && leagueID > 0);
+  const leagueSeasonRows = await loadLeagueSeasonRows();
+  const currentSeasonLeagueIDs = new Set(
+    leagueSeasonRows
+      .filter((row) => Number(row.season) === CURRENT_SEASON)
+      .map((row) => Number(row.leagueID)),
+  );
+
+  const updates = [];
+  const skippedLeagues = [];
+
+  for (const leagueID of leagueIDs) {
+    if (!currentSeasonLeagueIDs.has(leagueID)) {
+      console.log(`Current season ${CURRENT_SEASON} not available in LeagueSeason for league ${leagueID}.`);
+      skippedLeagues.push({ leagueID, season: CURRENT_SEASON });
+      continue;
+    }
+
+    const result = await updateLeagueSeasonData(leagueID, CURRENT_SEASON, {
+      getResultsDateFn,
+      writeLeagueToServerFn,
+    });
+    updates.push({ leagueID, season: CURRENT_SEASON, result });
+
+    if (updates.length + skippedLeagues.length < leagueIDs.length) {
+      await wait(UPDATE_LEAGUES_DELAY_MS);
+    }
+  }
+
+  return {
+    leagues,
+    season: CURRENT_SEASON,
+    delayMs: UPDATE_LEAGUES_DELAY_MS,
+    updatedLeagues: updates.length,
+    skippedLeagues,
+    updates,
+  };
 }
 
 // ---------------------------------------------------------------------------

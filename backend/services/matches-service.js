@@ -1,6 +1,79 @@
 import { buildMatchRegistry } from "./registry-service.js";
-import { buildTeamList } from "../json-reader.js";
+import { saveMatchesToServer, buildTeamList, matchFileExists } from "../json-reader.js";
 import { allDBLeagues } from "../index.js";
+import { getAllMatchesFromDb } from "../data-access.js";
+import { wait } from "../backend-helper.js";
+
+const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
+const UPDATE_MATCHES_DELAY_MS = 3000;
+
+export async function findMissingFinishedMatches(logPrefix) {
+  const data = await getAllMatchesFromDb();
+  const missingMatches = [];
+
+  for (const element of data) {
+    const dbStatus = String(element.fixtureStatus || "").trim().toUpperCase();
+
+    if (!FINISHED_MATCH_STATUSES.has(dbStatus)) {
+      continue;
+    }
+
+    if (!(await matchFileExists(element.fixtureId))) {
+      missingMatches.push(element);
+    }
+  }
+
+  console.log(`${logPrefix} Total missing matches: ${missingMatches.length}`);
+  return missingMatches;
+}
+
+export async function hydrateMissingMatches(missingMatches, logPrefix) {
+  const matchesToDownload = missingMatches.length;
+  const batchSize = 20;
+  const saved = [];
+  const failed = [];
+
+  for (let i = 0; i < matchesToDownload; i += batchSize) {
+    const batch = missingMatches.slice(i, i + batchSize);
+    const batchIds = [...new Set(batch.map((match) => String(match.fixtureId)))];
+    const remaining = matchesToDownload - (i + batch.length);
+
+    if (batchIds.length === 0) {
+      continue;
+    }
+
+    try {
+      const result = await saveMatchesToServer(batchIds);
+      saved.push(...result.saved);
+      failed.push(...result.failed);
+
+      console.log(
+        `${logPrefix} Saved ${result.savedCount}/${batchIds.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`,
+      );
+
+      if (result.failed.length > 0) {
+        console.warn(`${logPrefix} Failed matches in batch:`, result.failed);
+      }
+    } catch (err) {
+      console.error(`${logPrefix} Error saving match batch [${batchIds.join(",")}]`, err);
+      failed.push(...batchIds.map((fixtureID) => ({ fixtureID, error: err.message })));
+    }
+
+    if (remaining > 0) {
+      await wait(UPDATE_MATCHES_DELAY_MS);
+    }
+  }
+
+  console.log(`${logPrefix} Finished downloading ${matchesToDownload} matches.`);
+
+  return {
+    requested: matchesToDownload,
+    savedCount: saved.length,
+    failedCount: failed.length,
+    saved,
+    failed,
+  };
+}
 
 export async function matchesOnDay(registry, dateToCheck) {
   const checkDate = new Date(dateToCheck) || new Date();

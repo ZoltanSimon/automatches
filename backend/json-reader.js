@@ -5,7 +5,6 @@ import { findOrCreateTeam } from "./services/teams-service.js";
 import { LineupParser } from "./../classes/lineupparser.js";
 import { importLeague } from "./data-access.js";
 import { getResultFromApi, getResultsFromApiByIds } from "./webapi-handler.js";
-import * as fsSync from 'fs';  // For synchronous/callback operations
 import fs from 'fs/promises';   // For async/await operations
 
 export const matchesDir = path.join(networkPath, "matches");
@@ -13,15 +12,79 @@ export const leaguesDir = path.join(networkPath, "leagues");
 export const playersDir = path.join(networkPath, "players");
 export const dataDir = networkPath;
 
-export async function getMatchFromServer(fixtureID) {
-  let file = path.join(matchesDir, `${fixtureID}.json`);
-  try {
-    let response = JSON.parse(await readFile(file));
-    return response;
-  } catch (e) {
-    //console.error(e);
-    return null;
+const MATCH_SHARD_BUCKET_COUNT = 1000;
+
+function normalizeFixtureID(fixtureID) {
+  return String(fixtureID ?? "").trim();
+}
+
+export function getLegacyMatchFilePath(fixtureID) {
+  return path.join(matchesDir, `${normalizeFixtureID(fixtureID)}.json`);
+}
+
+export function getMatchShardDirectoryName(fixtureID) {
+  const normalizedID = normalizeFixtureID(fixtureID);
+  const numericID = Number(normalizedID);
+
+  if (!normalizedID) {
+    throw new Error("fixtureID is required");
   }
+
+  if (Number.isFinite(numericID)) {
+    return String(Math.abs(numericID) % MATCH_SHARD_BUCKET_COUNT).padStart(3, "0");
+  }
+
+  let hash = 0;
+  for (const character of normalizedID) {
+    hash = (hash * 31 + character.charCodeAt(0)) % MATCH_SHARD_BUCKET_COUNT;
+  }
+
+  return String(hash).padStart(3, "0");
+}
+
+export function getMatchFilePath(fixtureID) {
+  return path.join(
+    matchesDir,
+    getMatchShardDirectoryName(fixtureID),
+    `${normalizeFixtureID(fixtureID)}.json`,
+  );
+}
+
+export async function ensureMatchFileDirectory(fixtureID) {
+  await fs.mkdir(path.dirname(getMatchFilePath(fixtureID)), { recursive: true });
+}
+
+export async function matchFileExists(fixtureID) {
+  const candidatePaths = [getMatchFilePath(fixtureID), getLegacyMatchFilePath(fixtureID)];
+
+  for (const filePath of candidatePaths) {
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch (error) {
+      if (error?.code !== "ENOENT") {
+        throw error;
+      }
+    }
+  }
+
+  return false;
+}
+
+export async function getMatchFromServer(fixtureID) {
+  const candidatePaths = [getMatchFilePath(fixtureID), getLegacyMatchFilePath(fixtureID)];
+
+  for (const filePath of candidatePaths) {
+    try {
+      return JSON.parse(await readFile(filePath));
+    } catch (error) {
+      if (error?.code !== "ENOENT") {
+        return null;
+      }
+    }
+  }
+
+  return null;
 }
 
 export async function getLeagueFromServer(leagueID) {
@@ -43,12 +106,9 @@ export async function writeLeagueToServer(leagueID, dataToWrite, season) {
   let file = path.join(leaguesDir, filename);
   let responseToSend = "";
 
-  fsSync.writeFile(file, JSON.stringify(dataToWrite), function (err) {
-    if (err) {
-      return console.log(err);
-    }
-    importLeague(filename);
-  });
+  await fs.writeFile(file, JSON.stringify(dataToWrite));
+  await importLeague(filename);
+
   responseToSend += `${leagueID} was saved!<br/>`;
   return responseToSend;
 }
@@ -306,8 +366,10 @@ export async function saveMatchToServer(fixtureID, options = {}) {
   try {
     let { data, limits } = await getResultFromApi(fixtureID);
 
+    await ensureMatchFileDirectory(fixtureID);
+
     await fs.writeFile(
-      `${matchesDir}/${fixtureID}.json`,
+      getMatchFilePath(fixtureID),
       JSON.stringify(data.response),
       { flag: overwrite ? "w" : "wx" }
     );
@@ -364,8 +426,9 @@ export async function saveMatchesToServer(fixtureIDs, options = {}) {
     }
 
     try {
+      await ensureMatchFileDirectory(id);
       await fs.writeFile(
-        `${matchesDir}/${id}.json`,
+        getMatchFilePath(id),
         JSON.stringify([match]),
         { flag: overwrite ? "w" : "wx" }
       );

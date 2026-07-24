@@ -121,6 +121,30 @@ export function addShowMoreButtons(containerSelector = ".table-container") {
   });
 }
 
+export function setupLeagueListToggleButtons() {
+  document.querySelectorAll('.rect-expand-league-list a').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const header = e.currentTarget.closest('.rect-header');
+      const leagueList = header?.querySelector('.rect-league-list');
+      if (!leagueList) return;
+
+      const isVisible = leagueList.classList.contains('visible');
+
+      if (isVisible) {
+        leagueList.classList.remove('visible');
+        leagueList.style.display = 'none';
+      } else {
+        leagueList.style.display = 'grid';
+        leagueList.classList.add('visible');
+      }
+
+      e.currentTarget.closest('.rect-expand-league-list')?.classList.toggle('active');
+    });
+  });
+}
+
 export async function showMatchesOnDate(date, showID) {
   let downloads = 0;
   let allLeaguematches = await fetch(`/api/get-matches-on-day?matchDate=${date}`);

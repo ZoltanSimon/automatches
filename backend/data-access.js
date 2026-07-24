@@ -9,6 +9,7 @@ import {
 } from "./backend-helper.js";
 
 let leagueSeasonTableConfigPromise = null;
+const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
 
 function normalizeSeasonValue(season) {
   if (season === null || season === undefined || season === "") {
@@ -48,7 +49,7 @@ async function getLeagueSeasonTableConfig() {
   return leagueSeasonTableConfigPromise;
 }
 
-async function loadLeagueSeasonRows() {
+export async function loadLeagueSeasonRows() {
   const tableConfig = await getLeagueSeasonTableConfig();
   if (!tableConfig) {
     return [];
@@ -487,14 +488,54 @@ export async function importLeague(fileName) {
   console.log(
     `✅ Table 'matches' ensured for league ${leagueID} season ${season}`,
   );
+
+  const fixtureIDs = matches
+    .map((match) => Number(match?.fixture?.id))
+    .filter((fixtureID) => Number.isFinite(fixtureID));
+  const finishedFixtureIDs = new Set();
+
+  if (fixtureIDs.length > 0) {
+    const [existingFinishedMatches] = await pool.query(
+      "SELECT id FROM matches WHERE id IN (?) AND status IN (?)",
+      [fixtureIDs, [...FINISHED_MATCH_STATUSES]],
+    );
+
+    for (const row of existingFinishedMatches) {
+      finishedFixtureIDs.add(Number(row.id));
+    }
+  }
+
+  let importedMatches = 0;
+  let skippedFinishedMatches = 0;
+
   // Insert matches
   for (const match of matches) {
+    const fixtureID = Number(match?.fixture?.id);
+    if (!Number.isFinite(fixtureID)) {
+      continue;
+    }
+
+    if (finishedFixtureIDs.has(fixtureID)) {
+      skippedFinishedMatches += 1;
+      continue;
+    }
+
     await pool.query(
-      `REPLACE INTO matches
+      `INSERT INTO matches
     (id, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      league_id = VALUES(league_id),
+      season = VALUES(season),
+      round = VALUES(round),
+      home_team_id = VALUES(home_team_id),
+      away_team_id = VALUES(away_team_id),
+      match_date = VALUES(match_date),
+      status = VALUES(status),
+      home_score = VALUES(home_score),
+      away_score = VALUES(away_score)`,
       [
-        match.fixture.id,
+        fixtureID,
         leagueID,
         season,
         match.league.round,
@@ -506,10 +547,11 @@ export async function importLeague(fileName) {
         match.goals.away,
       ],
     );
+    importedMatches += 1;
   }
 
   console.log(
-    `✅ Imported ${matches.length} matches for league ${leagueID} season ${season}`,
+    `✅ Imported ${importedMatches} matches for league ${leagueID} season ${season}. Skipped ${skippedFinishedMatches} finished matches.`,
   );
 }
 
@@ -631,6 +673,37 @@ export async function getAllMatchesFromDbUntilDate(givenDate) {
         WHERE match_date < ? AND status <> 'PST'
        ORDER BY match_date ASC`,
       [givenDate],
+    );
+
+    const teamNameById = new Map((allDBTeams || []).map((team) => [team.ID, team.name]));
+
+    return rows.map((r) => ({
+      fixtureId: r.fixtureId,
+      fixtureDate: r.match_date,
+      fixtureStatus: r.status,
+      leagueId: r.league_id,
+      leagueSeason: r.season,
+      leagueRound: r.round,
+      homeTeamId: r.home_team_id,
+      homeTeamName: teamNameById.get(r.home_team_id) || "Unknown",
+      awayTeamId: r.away_team_id,
+      awayTeamName: teamNameById.get(r.away_team_id) || "Unknown",
+      homeGoals: r.home_score,
+      awayGoals: r.away_score,
+    }));
+  } catch (e) {
+    console.error(`❌ Failed to load all matches from DB:`, e);
+    return [];
+  }
+}
+
+export async function getAllMatchesFromDb() {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+       FROM matches
+       WHERE status <> 'PST'
+       ORDER BY match_date ASC`,
     );
 
     const teamNameById = new Map((allDBTeams || []).map((team) => [team.ID, team.name]));

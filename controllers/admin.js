@@ -174,27 +174,33 @@ document.getElementById("submit-match-list").onclick = async function () {
 };
 
 document.getElementById("update-leagues").onclick = async function () {
-  if (selectedLeagues.length === 0) {
-    showToast("Select at least one league before updating.");
-    return;
-  }
-
-  let leagueID = selectedLeagues.join(",");
-  let seasonsArr = [];
-  console.log(selectedLeagues);
-  for (let id of selectedLeagues) {
-    seasonsArr.push(getStoredSeason(id));
-  }
-
-  let seasons = seasonsArr.join(",");
   const response = await fetch(
-    `/api/update-leagues?leagueID=${leagueID}&seasons=${seasons}`,
+    "/api/update-leagues",
     {
       method: "GET",
     }
   );
   const data = await response.json();
-  showToast(JSON.stringify(data), 'success');
+  showToast(`Updated ${data.updatedLeagues} leagues for season ${data.season}.`, 'success');
+  console.log(data);
+};
+
+document.getElementById("import-and-update-matches").onclick = async function () {
+  const response = await fetch("/api/import-and-update-matches", {
+    method: "GET",
+  });
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    showToast(data.message || "Failed to import and update matches.");
+    console.log(data);
+    return;
+  }
+
+  showToast(
+    `Imported ${data.leagueUpdate.updatedLeagues} leagues and saved ${data.hydration.savedCount}/${data.missingMatches} match files.`,
+    "success",
+  );
   console.log(data);
 };
 

@@ -1,114 +1,162 @@
 <table class="gf-table" id="player-list-table">
   <thead>
     <tr class="main-table-header">
-      <th colspan="3" class="list-header">Player</th>
-      <th width="50" class="list-header player-country">Team</th>
-      <th class="list-header sortable" data-stat="apps">
-        <span class="big-played">Apps</span>
-        <span class="small-played">P</span>
+      <th colspan="3" class="list-header" title="Player">Player</th>
+      <th width="50" class="list-header player-country" title="Team">Team</th>
+      <th class="list-header sortable" data-stat="apps" title="Appearances">
+        {{> stat-icon name="apps"}}
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="goals">
-        <img class="goal-icon" src="images/goal-icon.png" alt="Goals" title="Goals" width="20px"/>
+      <th class="list-header sortable" data-stat="goals" title="Goals">
+        {{> stat-icon name="goals"}}
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="npg">
+      <th class="list-header sortable" data-stat="npg" title="Non-penalty goals">
         NPG
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="assists">
-        <span class="big-played">Assists</span>
-        <span class="small-played">A</span>
+      <th class="list-header sortable" data-stat="assists" title="Assists">
+        {{> stat-icon name="assists"}}
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable corners" data-stat="ga">
-        GA
+      <th class="list-header sortable corners" data-stat="ga" title="Goals + Assists">
+        {{> stat-icon name="ga"}}
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="gap90">
+      <th class="list-header sortable" data-stat="gap90" title="Goals + Assists per 90 minutes">
         <span class="big-played">GA/90</span>
         <span class="small-played">GA90</span>
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="avRating">
-        <span class="big-played">Rating</span>
-        <span class="small-played">Rat.</span>
+      <th class="list-header sortable" data-stat="avRating" title="Average rating">
+        {{> stat-icon name="rating"}}
         <span class="sort-indicator"></span>
       </th>
       {{#if big}}
-      <th class="list-header sortable" data-stat="minutes">
-        Mins
+      <th class="list-header sortable" data-stat="minutes" title="Minutes played">
+        {{> stat-icon name="minutes"}}
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="pens">
-        Pens
+      <th class="list-header sortable" data-stat="starts" title="Starts">
+        Starts
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="penaltiesMissed">
-        Pens Miss
+      <th class="list-header sortable" data-stat="substituteApps" title="Substitute appearances">
+        Sub Apps
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="shotsTotal">
-        Shots Total
+      <th class="list-header sortable" data-stat="captainApps" title="Captain appearances">
+        Captain
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="shotsOn">
-        Shots OnTarget
+      <th class="list-header sortable" data-stat="shirtNumbers" title="Shirt number">
+        No.
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="dribblesAttempts">
-        Drib. Att
+      <th class="list-header sortable" data-stat="pens" title="Penalties scored">
+        {{> stat-icon name="pens"}}
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="dribblesSucc">
+      <th class="list-header sortable" data-stat="penaltiesWon" title="Penalties won">
+        Pens Won
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="penaltiesCommitted" title="Penalties committed">
+        Pens Com.
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="penaltiesMissed" title="Penalties missed">
+        {{> stat-icon name="penaltiesMissed"}} <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="penaltiesSaved" title="Penalties saved">
+        Pens Saved
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="shotsTotal" title="Total shots">
+Shots
+<span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="shotsOn" title="Shots on target">
+        {{> stat-icon name="shotsOn"}}
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="offsides" title="Offsides">
+        Offsides
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="dribblesAttempts" title="Dribbles attempted">
+        Dribbles
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="dribblesSucc" title="Successful dribbles">
         Drib. Succ
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="dribblesPast">
+      <th class="list-header sortable" data-stat="dribblesPast" title="Times dribbled past opponents">
         Drib. Past
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="duelsTotal">
-        Duels Total
+      <th class="list-header sortable" data-stat="duelsTotal" title="Total duels">
+        Duels
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="duelsWon">
+      <th class="list-header sortable" data-stat="duelsWon" title="Duels won">
         Duels Won
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="keyPasses">
+      <th class="list-header sortable" data-stat="keyPasses" title="Key passes">
         Key Passes
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="foulsAgainst">
-        Fouled.
+      <th class="list-header sortable" data-stat="passes" title="Passes">
+        Passes
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="foulsCommited">
+      <th class="list-header sortable" data-stat="passesAccurate" title="Accurate passes">
+        Acc. Passes
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="passAccuracy" title="Pass accuracy">
+        Pass %
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="foulsAgainst" title="Fouls won">
+        Fouled
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="foulsCommited" title="Fouls committed">
         Fouls
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="blocks">
+      <th class="list-header sortable" data-stat="blocks" title="Blocks">
         Blocks
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="interceptions">
+      <th class="list-header sortable" data-stat="interceptions" title="Interceptions">
         Interc.
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="tackles">
+      <th class="list-header sortable" data-stat="tackles" title="Tackles">
         Tackles
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="yellowCards">
+      <th class="list-header sortable" data-stat="yellowCards" title="Yellow cards">
         <span class="yellow-card"></span>
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="redCards">
+      <th class="list-header sortable" data-stat="redCards" title="Red cards">
         <span class="red-card"></span>
         <span class="sort-indicator"></span>
       </th>
-      <th class="list-header sortable" data-stat="age">
+      <th class="list-header sortable" data-stat="goalsConceded" title="Goals conceded">
+        GC
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="goalkeeperSaves" title="Goalkeeper saves">
+        Saves
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable" data-stat="age" title="Age">
         Age
         <span class="sort-indicator"></span>
       </th>
@@ -133,7 +181,8 @@
         <div class="player-position">{{this.position}}</div>
       </td>
       <td class="stat-td player-club" id={{this.club}}>
-        <a href="/team?ID={{this.club}}"><img class="logo-picture" src="images/logos/{{this.club}}.png" alt="{{this.clubName}}" title="{{this.clubName}}" /></a>
+        <a href="/team?ID={{this.club}}"><img class="logo-picture" src="images/logos/{{this.club}}.png"
+            alt="{{this.clubName}}" title="{{this.clubName}}" /></a>
       </td>
       <td class="stat-td" data-stat="apps">{{this.apps}}</td>
       <td class="stat-td" data-stat="goals">{{this.goals}}</td>
@@ -144,16 +193,27 @@
       <td class="stat-td {{ratingClass this.avRating}}" data-stat="avRating">{{this.avRating}}</td>
       {{#if ../big}}
       <td class="stat-td" data-stat="minutes">{{this.minutes}}</td>
+      <td class="stat-td" data-stat="starts">{{this.starts}}</td>
+      <td class="stat-td" data-stat="substituteApps">{{this.substituteApps}}</td>
+      <td class="stat-td" data-stat="captainApps">{{this.captainApps}}</td>
+      <td class="stat-td" data-stat="shirtNumbers">{{this.shirtNumbers}}</td>
       <td class="stat-td" data-stat="pens">{{this.penalties}}</td>
+      <td class="stat-td" data-stat="penaltiesWon">{{this.penaltiesWon}}</td>
+      <td class="stat-td" data-stat="penaltiesCommitted">{{this.penaltiesCommitted}}</td>
       <td class="stat-td" data-stat="penaltiesMissed">{{this.penaltiesMissed}}</td>
+      <td class="stat-td" data-stat="penaltiesSaved">{{this.penaltiesSaved}}</td>
       <td class="stat-td" data-stat="shotsTotal">{{this.shotsTotal}}</td>
       <td class="stat-td" data-stat="shotsOn">{{this.shotsOn}}</td>
+      <td class="stat-td" data-stat="offsides">{{this.offsides}}</td>
       <td class="stat-td" data-stat="dribblesAttempts">{{this.dribblesAttempts}}</td>
       <td class="stat-td" data-stat="dribblesSucc">{{this.dribblesSucc}}</td>
       <td class="stat-td" data-stat="dribblesPast">{{this.dribblesPast}}</td>
       <td class="stat-td" data-stat="duelsTotal">{{this.duelsTotal}}</td>
       <td class="stat-td" data-stat="duelsWon">{{this.duelsWon}}</td>
       <td class="stat-td" data-stat="keyPasses">{{this.keyPasses}}</td>
+      <td class="stat-td" data-stat="passes">{{this.passes}}</td>
+      <td class="stat-td" data-stat="passesAccurate">{{this.passesAccurate}}</td>
+      <td class="stat-td" data-stat="passAccuracy">{{this.passAccuracy}}</td>
       <td class="stat-td" data-stat="foulsAgainst">{{this.foulsAgainst}}</td>
       <td class="stat-td" data-stat="foulsCommited">{{this.foulsCommited}}</td>
       <td class="stat-td" data-stat="blocks">{{this.blocks}}</td>
@@ -161,6 +221,8 @@
       <td class="stat-td" data-stat="tackles">{{this.tackles}}</td>
       <td class="stat-td" data-stat="yellowCards">{{this.yellowCards}}</td>
       <td class="stat-td" data-stat="redCards">{{this.redCards}}</td>
+      <td class="stat-td" data-stat="goalsConceded">{{this.goalsConceded}}</td>
+      <td class="stat-td" data-stat="goalkeeperSaves">{{this.goalkeeperSaves}}</td>
       <td class="stat-td" data-stat="age">{{this.age}}</td>
       {{/if}}
     </tr>
