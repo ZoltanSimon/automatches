@@ -1,6 +1,6 @@
 <script type="module" src="./../controllers/home.js"></script>
 
-<div class="container">
+<div class="container home-page-layout">
 
   <div class="rectangle" id="rectangle3">
     <span hidden id="league-name"></span>
@@ -10,7 +10,7 @@
       {{> match-list-table}}
     </div>
   </div>
-  
+
   <div class="rectangle" id="rectangle6">
     {{> rect-header title="Latest Transfers" link="/transfers" leagues=leagues selectedLeagues=selectedLeagues leaguepar="league"}}
     <div id="player-transfers" class="table-container">
