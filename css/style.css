@@ -150,15 +150,14 @@ footer p {
 .container {
   width: 1800px;
   margin: 0 auto;
-  -moz-columns: 2;
-       columns: 2;
-  -moz-column-gap: 20px;
-       column-gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: row;
+  gap: 20px;
+  align-items: start;
 }
 .container > * {
-  -moz-column-break-inside: avoid;
-       break-inside: avoid;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 .container::before {
   display: none;
