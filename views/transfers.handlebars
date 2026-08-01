@@ -1,0 +1,9 @@
+<script type="module" src="../controllers/transfers.js"></script>
+<div class="small-container">
+  <div class="rectangle">
+    {{> rect-header title="Latest Transfers" link="" leagues=leagues selectedLeagues=selectedLeagues leaguepar="league"}}
+    <div id="player-transfers">
+      {{> player-transfer latestTransfers=latestTransfers}}
+    </div>
+  </div>
+</div>

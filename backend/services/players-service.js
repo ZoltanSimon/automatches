@@ -2,7 +2,12 @@ import {
     getAllPlayers,
     readPlayersFromFiles,
   } from "./../json-reader.js";
-import { insertPlayersToDb, updatePlayerProfilesInDb } from "./../data-access.js"; 
+import {
+  getPlayersMissingExtraData,
+  getTransferPlayersForInsert,
+  insertPlayersToDb,
+  updatePlayerProfilesInDb,
+} from "./../data-access.js";
 import { Player } from "./../../classes/player.js";
 import { allDBLeagues, allDBPlayers } from "../index.js";
 import { LineupParser } from "../../classes/lineupparser.js";
@@ -264,13 +269,50 @@ export function getTeamPlayerList(registry, teamID, squad = null, nr = 100, leag
 }
 
 export async function insertAllPlayers() {
-  let allPlayers = await getAllPlayers(
+  const allPlayers = await getAllPlayers(
     allDBLeagues.filter((el) => el.type == "league").concat(allDBLeagues.filter((el) => el.type == "cup")),
     allDBLeagues.filter((el) => el.type == "nt")
   );
 
-  await insertPlayersToDb(allPlayers);
-  return allPlayers;
+  const transferPlayers = await getTransferPlayersForInsert();
+  const playersById = new Map();
+
+  for (const player of allPlayers) {
+    const playerID = Number(player?.id);
+    if (!Number.isFinite(playerID)) {
+      continue;
+    }
+
+    playersById.set(playerID, player);
+  }
+
+  let addedFromTransfers = 0;
+  for (const transferPlayer of transferPlayers) {
+    const playerID = Number(transferPlayer?.id);
+    if (!Number.isFinite(playerID) || playersById.has(playerID)) {
+      continue;
+    }
+
+    playersById.set(playerID, transferPlayer);
+    addedFromTransfers += 1;
+  }
+
+  const playersToInsert = [...playersById.values()];
+
+  await insertPlayersToDb(playersToInsert);
+  const playersMissingExtraData = await getPlayersMissingExtraData();
+
+  console.log(
+    `[insertAllPlayers] Added ${addedFromTransfers} player(s) from transfers. Players with no extra data: ${playersMissingExtraData.length}.`,
+  );
+
+  return {
+    insertedCandidates: playersToInsert.length,
+    transferCandidates: transferPlayers.length,
+    addedFromTransfers,
+    playersMissingExtraData,
+    playersMissingExtraDataCount: playersMissingExtraData.length,
+  };
 }
 
 export async function updatePlayerProfilesFromFiles() {

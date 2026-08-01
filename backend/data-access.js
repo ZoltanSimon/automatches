@@ -309,6 +309,68 @@ export async function insertPlayersToDb(allPlayers) {
   }
 }
 
+export async function getTransferPlayersForInsert() {
+  try {
+    const [rows] = await pool.query(
+      `SELECT
+         latest.player_id AS id,
+         COALESCE(NULLIF(TRIM(latest.player_name), ''), CONCAT('Player ', latest.player_id)) AS name,
+         COALESCE(
+           NULLIF(latest.team_in_id, 0),
+           NULLIF(latest.team_out_id, 0),
+           0
+         ) AS club
+       FROM Player_Transfer latest
+       INNER JOIN (
+         SELECT player_id, MAX(id) AS max_id
+         FROM Player_Transfer
+         GROUP BY player_id
+       ) grouped ON grouped.max_id = latest.id`,
+    );
+
+    return rows.map((row) => ({
+      id: Number(row.id),
+      name: row.name,
+      club: Number(row.club) || 0,
+      nation: 0,
+      position: [""],
+    }));
+  } catch (error) {
+    if (error?.code === "ER_NO_SUCH_TABLE") {
+      console.warn("[getTransferPlayersForInsert] Player_Transfer table does not exist yet.");
+      return [];
+    }
+
+    console.error("Error loading transfer players for insert:", error);
+    throw error;
+  }
+}
+
+export async function getPlayersMissingExtraData() {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, name
+       FROM Player
+       WHERE (first_name IS NULL OR TRIM(first_name) = '')
+         AND (last_name IS NULL OR TRIM(last_name) = '')
+         AND birth_date IS NULL
+         AND (birth_location IS NULL OR TRIM(birth_location) = '')
+         AND (height IS NULL OR height = 0)
+         AND (weight IS NULL OR weight = 0)
+         AND (shirt_number IS NULL OR shirt_number = 0)
+       ORDER BY name ASC, id ASC`,
+    );
+
+    return rows.map((row) => ({
+      id: Number(row.id),
+      name: row.name,
+    }));
+  } catch (error) {
+    console.error("Error loading players missing extra data:", error);
+    throw error;
+  }
+}
+
 export async function updatePlayerProfilesInDb(playerPayloads = []) {
   console.log(
     `[updatePlayerProfilesInDb] Starting profile update from ${playerPayloads.length} raw player payload(s).`,
@@ -774,3 +836,211 @@ export async function getSquadFromDb(teamID) {
 
   return rawSquad;
 }
+
+export async function saveTransfersToDb(transfersData) {
+  const players = Array.isArray(transfersData) ? transfersData : [];
+
+  if (players.length === 0) {
+    return { saved: 0 };
+  }
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS Player_Transfer (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      player_id INT NOT NULL,
+      player_name VARCHAR(255) NOT NULL,
+      transfer_date DATE NULL,
+      type VARCHAR(50) NULL,
+      team_in_id INT NULL,
+      team_in_name VARCHAR(255) NULL,
+      team_out_id INT NULL,
+      team_out_name VARCHAR(255) NULL,
+      api_updated_at DATETIME NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY uniq_transfer (player_id, transfer_date, team_in_id, team_out_id),
+      INDEX idx_player (player_id),
+      INDEX idx_team_in (team_in_id),
+      INDEX idx_team_out (team_out_id)
+    )
+  `);
+
+  const playerIDs = [...new Set(
+    players
+      .map((entry) => Number(entry?.player?.id))
+      .filter((playerID) => Number.isFinite(playerID))
+  )];
+
+  if (playerIDs.length === 0) {
+    return { saved: 0 };
+  }
+
+  // Replace each player's transfer history with the freshly fetched set instead of
+  // upserting row-by-row: the API can report a slightly different `date` for the
+  // same real-world transfer across calls, which defeats a date-based unique key
+  // and piles up near-duplicate rows. Deleting first guarantees the table always
+  // matches the latest snapshot returned for these players.
+  await pool.query("DELETE FROM Player_Transfer WHERE player_id IN (?)", [playerIDs]);
+
+  let savedCount = 0;
+
+  for (const playerEntry of players) {
+    const playerID = Number(playerEntry?.player?.id);
+    if (!Number.isFinite(playerID)) {
+      continue;
+    }
+
+    const playerName = playerEntry?.player?.name ?? null;
+    const apiUpdatedAt = playerEntry?.update
+      ? new Date(playerEntry.update)
+      : null;
+    const transfers = Array.isArray(playerEntry.transfers) ? playerEntry.transfers : [];
+
+    // The API sometimes reports the exact same real-world transfer twice within a single
+    // response, with the `date` off by a day or two. Collapse those near-duplicates here
+    // (same player, same club pair, dates within DUPLICATE_WINDOW_DAYS) before inserting,
+    // since a date-based UNIQUE KEY can't catch them.
+    const DUPLICATE_WINDOW_DAYS = 3;
+    const dedupedTransfers = [];
+    let skippedNearDuplicates = 0;
+
+    for (const transfer of transfers) {
+      const transferDate = transfer?.date || null;
+      const teamInID = transfer?.teams?.in?.id ?? null;
+      const teamOutID = transfer?.teams?.out?.id ?? null;
+
+      const isNearDuplicate = dedupedTransfers.some((existing) => {
+        if (existing.teamInID !== teamInID || existing.teamOutID !== teamOutID) {
+          return false;
+        }
+        if (!existing.transferDate || !transferDate) {
+          return existing.transferDate === transferDate;
+        }
+        const diffDays = Math.abs(new Date(existing.transferDate) - new Date(transferDate)) / (1000 * 60 * 60 * 24);
+        return diffDays <= DUPLICATE_WINDOW_DAYS;
+      });
+
+      if (isNearDuplicate) {
+        skippedNearDuplicates += 1;
+        continue;
+      }
+
+      dedupedTransfers.push({ transfer, transferDate, teamInID, teamOutID });
+    }
+
+    if (skippedNearDuplicates > 0) {
+      console.log(
+        `[saveTransfersToDb] Skipped ${skippedNearDuplicates} near-duplicate transfer(s) for player ${playerID} (${playerName}).`,
+      );
+    }
+
+    for (const { transfer, transferDate, teamInID, teamOutID } of dedupedTransfers) {
+      const type = transfer?.type ?? null;
+      const teamInName = transfer?.teams?.in?.name ?? null;
+      const teamOutName = transfer?.teams?.out?.name ?? null;
+
+      await pool.execute(
+        `INSERT IGNORE INTO Player_Transfer
+          (player_id, player_name, transfer_date, type, team_in_id, team_in_name, team_out_id, team_out_name, api_updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+        [playerID, playerName, transferDate, type, teamInID, teamInName, teamOutID, teamOutName, apiUpdatedAt],
+      );
+      savedCount += 1;
+    }
+  }
+
+  return { saved: savedCount };
+}
+
+export async function getLatestTransfers(limit = 10, leagueIDs = []) {
+  const normalizedLimit = Number(limit);
+  const safeLimit = Number.isFinite(normalizedLimit) && normalizedLimit > 0
+    ? Math.floor(normalizedLimit)
+    : 10;
+  const leagues = (Array.isArray(leagueIDs) ? leagueIDs : [leagueIDs])
+    .map(Number)
+    .filter(Number.isFinite);
+
+  // Team-to-league membership only exists per-fixture in `matches`. Resolve it to a team ID list first
+  // (filtered by the indexed league_id) instead of correlating against the ~80k-row matches table per
+  // transfer row, which was a full cross-scan against Player_Transfer's ~240k rows and hung indefinitely.
+  let teamFilter = "";
+  let teamParams = [];
+  if (leagues.length) {
+    const placeholders = leagues.map(() => "?").join(",");
+    const [teamRows] = await pool.query(
+      `SELECT DISTINCT home_team_id AS team_id FROM matches WHERE league_id IN (${placeholders})
+       UNION
+       SELECT DISTINCT away_team_id AS team_id FROM matches WHERE league_id IN (${placeholders})`,
+      [...leagues, ...leagues],
+    );
+    const teamIDs = teamRows.map((row) => Number(row.team_id)).filter(Number.isFinite);
+
+    if (teamIDs.length === 0) {
+      return [];
+    }
+
+    const teamPlaceholders = teamIDs.map(() => "?").join(",");
+    teamFilter = `AND (pt.team_in_id IN (${teamPlaceholders}) OR pt.team_out_id IN (${teamPlaceholders}))`;
+    teamParams = [...teamIDs, ...teamIDs];
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT
+         pt.player_id,
+         pt.player_name,
+         pt.transfer_date,
+         pt.type,
+         pt.team_in_id,
+         pt.team_in_name,
+         pt.team_out_id,
+         pt.team_out_name,
+         p.nation AS player_nation,
+         nation.name AS player_nation_name,
+         p.position AS player_position
+       FROM Player_Transfer pt
+       LEFT JOIN Player p ON p.id = pt.player_id
+       LEFT JOIN Team nation ON nation.ID = p.nation
+       WHERE 1=1 ${teamFilter}
+       ORDER BY pt.transfer_date DESC, pt.id DESC
+       LIMIT ${safeLimit}`,
+      teamParams,
+    );
+
+    return rows;
+  } catch (error) {
+    console.error("Error loading latest transfers:", error);
+    return [];
+  }
+}
+
+export async function getTeamsDueForTransferUpdate(limit = 150) {
+  const normalizedLimit = Number(limit);
+  const safeLimit = Number.isFinite(normalizedLimit) && normalizedLimit > 0
+    ? Math.floor(normalizedLimit)
+    : 150;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT ID, name FROM Team m 
+       WHERE is_club = 1
+       ORDER BY (m.transfer_updated IS NOT NULL), m.transfer_updated ASC
+       LIMIT ${safeLimit}`,
+    );
+
+    return rows;
+  } catch (error) {
+    console.error("Error loading clubs due for a transfer update:", error);
+    return [];
+  }
+}
+
+export async function markTeamTransfersUpdated(teamID) {
+  const normalizedTeamID = Number(teamID);
+  if (!Number.isFinite(normalizedTeamID)) {
+    return;
+  }
+
+  await pool.execute("UPDATE Team SET transfer_updated = NOW() WHERE ID = ?", [normalizedTeamID]);
+}
+

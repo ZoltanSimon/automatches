@@ -53,6 +53,7 @@ export async function leagueStandings(selectedLeague) {
             <th style="padding:4px;" class="form-column"><b>Form</b></th>
             <th style="width:58px;" class="list-header"><b>Pts</b></th>
             <th style="width:58px;" class="list-header"><b>xP</b></th>
+            <th style="width:58px;" class="list-header"><b>ID</b></th>
           </tr>
         </thead><tbody>`;
 
@@ -86,6 +87,7 @@ export async function leagueStandings(selectedLeague) {
 
     addToPage += `</td><td style="padding:4px; text-align: center; font-weight: bold">${team.total.points}</td>
       <td style="padding:4px; text-align: center; font-weight: bold">${team.total.xPoints}</td>
+      <td style="padding:4px; text-align: center; font-weight: bold">${team.id}</td>
       </tr>`;
   }
   addToPage += `</tbody></table>`;

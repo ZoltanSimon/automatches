@@ -11,11 +11,18 @@ applyKnockoutBracketLayout();
 
 await playerGoalList({ big: false, enableStatFilters: false });
 
+const fixturesInfo = document.getElementById("fixtures-info");
+if (fixturesInfo) {
+  fixturesInfo.classList.add("expanded");
+}
+
 document.getElementById("match-list").style.visibility = "visible";
+document.getElementById("player-transfers").style.visibility = "visible";
 
 createTeamsTable(null, null, true);
 addLeagues("pleague");
 addLeagues("tleague");
 addLeagues("sleague");
-addShowMoreButtons();
+addLeagues("league");
+addShowMoreButtons(".table-container:not(#player-transfers):not(#fixtures-info)");
 setupLeagueListToggleButtons();

@@ -6,6 +6,7 @@ import { createPublicRouter } from "./api/public.js";
 import {
   getLeagueStandingsFromDb,
   getLeagueSeason,
+  getLatestTransfers,
   loadLeagues,
   loadPlayers,
   loadTeams,
@@ -95,13 +96,15 @@ app.get("/", async (req, res) => {
     const selectedTeamLeague = req.query.tleague ? parseLeagueIds(req.query.tleague) : [1];
     const parsed = parseFloat(req.query.sleague);
     const selectedStandingsLeague = isNaN(parsed) ? 71 : parsed;
+    const selectedTransferLeagues = req.query.league ? parseLeagueIds(req.query.league) : [];
     const registry = await getRegistry();
     const playerPageData = getPlayerPageData(registry, null, selectedPlayerLeague);
     const players = playerPageData?.players || [];
     const matches = await matchesOnDay(registry, selectedDate);
     const teams = getTopTeams(registry, selectedTeamLeague);
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
-    
+    const latestTransfers = await getLatestTransfers(10, selectedTransferLeagues);
+
     res.render("home", {
       title: "Generation Football - Football Stats, Players & Teams",
       description: "Explore live football standings, detailed team stats and league tables across Europe on Generation Football.",
@@ -112,10 +115,12 @@ app.get("/", async (req, res) => {
       selectedPLeagues: selectedPlayerLeague,
       selectedTLeagues: selectedTeamLeague,
       selectedSLeague: selectedStandingsLeague,
+      selectedLeagues: selectedTransferLeagues,
       teams: teams.slice(0, 10),
       standingsLink: `/league?id=${selectedStandingsLeague}`,
       standings: standings,
       standingsTitle: getLeagueById(selectedStandingsLeague)?.name || "Unknown League",
+      latestTransfers,
     });
   } catch (error) {
     handleError(res, error, "Error loading home page");
@@ -170,6 +175,23 @@ app.get("/top-teams", async (req, res) => {
     leagues: allDBLeagues.filter(league => league.type === 'league'),
      selectedTLeagues: selectedTeamLeague,
   });
+});
+
+app.get("/transfers", async (req, res) => {
+  try {
+    const selectedLeagues = parseLeagueIds(req.query.league);
+    const latestTransfers = await getLatestTransfers(100, selectedLeagues);
+
+    res.render("transfers", {
+      title: "Latest Transfers - Football Player Transfer News",
+      description: "Browse the latest confirmed football player transfers, including the clubs involved, transfer dates and reported fees.",
+      latestTransfers,
+      leagues: allDBLeagues.filter((league) => league.type === "league"),
+      selectedLeagues,
+    });
+  } catch (error) {
+    handleError(res, error, "Error loading transfers page");
+  }
 });
 
 app.get("/team", async (req, res) => {

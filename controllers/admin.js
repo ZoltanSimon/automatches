@@ -307,6 +307,29 @@ document.getElementById("getSquads").onclick = async function () {
   }
 };
 
+document.getElementById("get-transfers").onclick = async function () {
+  const button = this;
+  button.disabled = true;
+  showToast("Fetching transfers for clubs due an update (10s between calls, this can take a while)...", "success");
+
+  try {
+    const response = await fetch("/api/get-transfers");
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data?.message || "Failed to fetch transfers.");
+    }
+
+    console.log(data.results);
+    showToast(`Processed ${data.teamsProcessed} club(s), saved ${data.totalSaved} transfer row(s).`, "success");
+  } catch (error) {
+    console.error("Failed to fetch transfers:", error);
+    showToast(error.message || "Failed to fetch transfers.");
+  } finally {
+    button.disabled = false;
+  }
+};
+
 document.getElementById("clear-results").onclick = async function () {
   document.getElementById("fixtures-info").innerHTML = "";
 };

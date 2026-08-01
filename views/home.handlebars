@@ -10,6 +10,15 @@
       {{> match-list-table}}
     </div>
   </div>
+  
+  <div class="rectangle" id="rectangle6">
+    {{> rect-header title="Latest Transfers" link="/transfers" leagues=leagues selectedLeagues=selectedLeagues leaguepar="league"}}
+    <div id="player-transfers" class="table-container">
+      {{> player-transfer latestTransfers=latestTransfers}}
+    </div>
+    <span style="grid-column: 1/4; padding-left: 4px; padding-right: 4px">The 10 most recently recorded player
+      transfers, showing the club a player left, the club they joined, the transfer date and the reported fee.</span>
+  </div>
 
   <div class="rectangle" id="rectangle4">
     {{> rect-header title=(concat standingsTitle " - Standings") titleLogoId=selectedSLeague titleLogoAlt=standingsTitle link=standingsLink leagues=leagues selectedLeagues=selectedSLeague

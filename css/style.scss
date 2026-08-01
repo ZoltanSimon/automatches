@@ -646,7 +646,8 @@ footer {
 #player-list,
 #top-team-list,
 #match-list,
-#standings {
+#standings,
+#player-transfers {
   grid-column: 1 / 4;
   grid-row: 2 / 3;
   padding-top: 0px;
@@ -911,6 +912,52 @@ td .form-indicator {
   font-size: 0.85em;
   color: $dark-blue;
   margin-top: 2px;
+}
+
+#player-transfer-table .transfer-player-face {
+  width: 60px;
+  min-width: 60px;
+  text-align: center;
+  padding: 0;
+  border-right: none;
+}
+
+#player-transfer-table .transfer-player-nation-cell {
+  width: 32px;
+  min-width: 32px;
+  text-align: center;
+}
+
+#player-transfer-table .transfer-player-details-cell {
+  width: 18%;
+  min-width: 150px;
+}
+
+#player-transfer-table .transfer-club-cell {
+  width: 20%;
+  min-width: 156px;
+}
+
+#player-transfer-table .transfer-club-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 400;
+}
+
+#player-transfer-table .transfer-date-cell,
+#player-transfer-table .transfer-fee-cell {
+  white-space: nowrap;
+}
+
+#player-transfer-table .transfer-date-cell {
+  width: 105px;
+  min-width: 105px;
+}
+
+#player-transfer-table .transfer-fee-cell {
+  width: 90px;
+  min-width: 90px;
 }
 
 .logo-picture {

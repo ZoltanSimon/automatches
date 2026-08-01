@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi } from "../webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb } from "../data-access.js";
+import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam } from "../webapi-handler.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated } from "../data-access.js";
 import { dataDir, getMatchFromServer, matchFileExists, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
 import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
 import { insertAllPlayers, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
@@ -14,6 +14,7 @@ let playersFetchJob = {
   nextPage: 46,
 };
 let missingMatchesHydrationJobRunning = false;
+let transfersJobRunning = false;
 
 export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   const router = Router();
@@ -80,30 +81,53 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     }
 
     missingMatchesHydrationJobRunning = true;
+    const startedAt = Date.now();
+    const logProgress = (message, details) => {
+      if (details !== undefined) {
+        console.log(`[import-and-update-matches] ${message}`, details);
+        return;
+      }
+
+      console.log(`[import-and-update-matches] ${message}`);
+    };
+
     try {
+      logProgress("Job started.");
+      logProgress("Updating current season leagues from API...");
       const { leagues, ...leagueUpdate } = await updateCurrentSeasonLeagues(leaguesCache, {
         getResultsDateFn: getResultsDate,
         writeLeagueToServerFn: writeLeagueToServer,
       });
       leaguesCache = leagues;
-      console.log("[import-and-update-matches] League import finished. Finding missing finished match files...");
+      logProgress("League update finished.", leagueUpdate);
+      logProgress("Finding missing finished match files...");
       const missingMatches = await findMissingFinishedMatches("[import-and-update-matches]");
-      console.log(`[import-and-update-matches] Hydrating ${missingMatches.length} missing finished match files...`);
+      logProgress(`Found ${missingMatches.length} missing finished match files.`);
+      logProgress("Hydrating missing finished match files...");
       const hydration = await hydrateMissingMatches(missingMatches, "[import-and-update-matches]");
+      logProgress("Hydration finished.", hydration);
+
+      const elapsedMs = Date.now() - startedAt;
+      logProgress(`Job completed in ${elapsedMs}ms.`, {
+        missingMatches: missingMatches.length,
+        elapsedMs,
+      });
 
       response.json({
         success: true,
         leagueUpdate,
         missingMatches: missingMatches.length,
         hydration,
+        elapsedMs,
       });
     } catch (error) {
-      console.error("Error importing leagues and updating matches:", error);
+      console.error("[import-and-update-matches] Job failed:", error);
       response.status(500).json({
         success: false,
         message: "Failed to import leagues and update matches",
       });
     } finally {
+      logProgress("Job finished, releasing lock.");
       missingMatchesHydrationJobRunning = false;
     }
   });
@@ -409,7 +433,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   });
 
   router.get("/insert-all-players", async (request, response) => {
-    const insertedPlayers = await insertAllPlayers();
+    const insertResult = await insertAllPlayers();
 
     const players = await loadPlayers();
     const teams = await loadTeams();
@@ -419,7 +443,13 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
 
     response.json({
       success: true,
-      inserted: Array.isArray(insertedPlayers) ? insertedPlayers.length : 0,
+      inserted: Number(insertResult?.insertedCandidates || 0),
+      transferCandidates: Number(insertResult?.transferCandidates || 0),
+      addedFromTransfers: Number(insertResult?.addedFromTransfers || 0),
+      playersMissingExtraDataCount: Number(insertResult?.playersMissingExtraDataCount || 0),
+      playersMissingExtraData: Array.isArray(insertResult?.playersMissingExtraData)
+        ? insertResult.playersMissingExtraData
+        : [],
       loadedPlayers: players.length,
     });
   });
@@ -480,6 +510,90 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     } catch (error) {
       console.error("Error fetching squads", error);
       response.status(500).json({ success: false, message: "Error fetching squads" });
+    }
+  });
+
+  router.get("/get-transfers", async (request, response) => {
+    if (transfersJobRunning) {
+      return response.status(409).json({
+        success: false,
+        message: "get-transfers job is already running.",
+      });
+    }
+
+    const delayMs = 10000;
+    transfersJobRunning = true;
+    const startedAt = Date.now();
+    const logProgress = (message, details) => {
+      if (details !== undefined) {
+        console.log(`[get-transfers] ${message}`, details);
+        return;
+      }
+      console.log(`[get-transfers] ${message}`);
+    };
+
+    try {
+      const teams = await getTeamsDueForTransferUpdate(150);
+      logProgress(`Found ${teams.length} club(s) to update (is_club=1), ordered by oldest transfer_updated first with never-updated clubs first.`);
+
+      const results = [];
+      let totalSaved = 0;
+
+      for (let i = 0; i < teams.length; i += 1) {
+        const team = teams[i];
+        const teamID = Number(team.ID);
+        logProgress(`(${i + 1}/${teams.length}) Fetching transfers for team ${teamID} (${team.name})...`);
+
+        try {
+          const { data, limits } = await getTransfersByTeam(teamID);
+
+          if (data?.errors && Object.keys(data.errors).length > 0) {
+            logProgress(`API returned errors for team ${teamID}.`, data.errors);
+            results.push({ teamID, name: team.name, success: false, message: "API returned errors" });
+          } else {
+            const transfers = data?.response ?? [];
+            const transferCount = transfers.reduce(
+              (total, entry) => total + (Array.isArray(entry.transfers) ? entry.transfers.length : 0),
+              0,
+            );
+            const { saved } = await saveTransfersToDb(transfers);
+            await markTeamTransfersUpdated(teamID);
+            totalSaved += saved;
+
+            logProgress(
+              `Saved ${saved} transfer row(s) for team ${teamID} (${transfers.length} player(s), ${transferCount} record(s)). API limits:`,
+              limits,
+            );
+            results.push({ teamID, name: team.name, success: true, players: transfers.length, saved });
+          }
+        } catch (error) {
+          console.error(`[get-transfers] Failed to process team ${teamID}:`, error);
+          results.push({ teamID, name: team.name, success: false, message: "Request failed" });
+        }
+
+        if (i < teams.length - 1) {
+          await wait(delayMs);
+        }
+      }
+
+      const elapsedMs = Date.now() - startedAt;
+      logProgress(`Done. Processed ${teams.length} club(s), saved ${totalSaved} transfer row(s) in ${elapsedMs}ms.`);
+
+      response.json({
+        success: true,
+        teamsProcessed: teams.length,
+        totalSaved,
+        elapsedMs,
+        results,
+      });
+    } catch (error) {
+      console.error("[get-transfers] Job failed:", error);
+      response.status(500).json({
+        success: false,
+        message: "Failed to fetch transfers",
+      });
+    } finally {
+      transfersJobRunning = false;
     }
   });
 

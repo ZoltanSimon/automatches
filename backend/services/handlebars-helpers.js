@@ -50,6 +50,11 @@ export const formatDateOnly = (date) => {
   }).replace(/\//g, '.');
 }
 
+export const transferFee = (type) => {
+  if (!type || type === "N/A") return "-";
+  return type;
+}
+
 export const percentage = (wins, played) => {
   return ((wins / played) * 100).toFixed(1);
 }
