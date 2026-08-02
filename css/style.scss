@@ -205,6 +205,12 @@ footer {
   }
 }
 
+@media (max-width: 900px) {
+  .home-page-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .league-info {
   display: flex;
   flex-direction: column;

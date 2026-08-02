@@ -13,26 +13,36 @@ function arrangeHomeColumns() {
     return;
   }
 
-  const existingColumns = layoutContainer.querySelectorAll(".home-page-column");
-  existingColumns.forEach((column) => column.remove());
-
-  const items = Array.from(layoutContainer.children).filter((child) =>
-    child.classList.contains("rectangle") || child.classList.contains("ads-container")
+  const existingColumns = Array.from(layoutContainer.querySelectorAll(".home-page-column"));
+  const currentItems = existingColumns.flatMap((column) =>
+    Array.from(column.children).filter(
+      (child) => child.classList.contains("rectangle") || child.classList.contains("ads-container")
+    )
   );
+
+  const items = currentItems.length > 0
+    ? currentItems
+    : Array.from(layoutContainer.children).filter(
+        (child) => child.classList.contains("rectangle") || child.classList.contains("ads-container")
+      );
 
   if (items.length === 0) {
     return;
   }
 
-  const columns = [document.createElement("div"), document.createElement("div")];
-  columns.forEach((column) => {
+  existingColumns.forEach((column) => column.remove());
+
+  const columnCount = window.innerWidth <= 900 ? 1 : 2;
+  const columns = Array.from({ length: columnCount }, () => {
+    const column = document.createElement("div");
     column.className = "home-page-column";
     layoutContainer.appendChild(column);
+    return column;
   });
 
-  const columnHeights = [0, 0];
+  const columnHeights = Array(columnCount).fill(0);
   items.forEach((item) => {
-    const targetIndex = columnHeights[0] <= columnHeights[1] ? 0 : 1;
+    const targetIndex = columnCount === 1 ? 0 : columnHeights[0] <= columnHeights[1] ? 0 : 1;
     columns[targetIndex].appendChild(item);
     const itemHeight = item.offsetHeight || item.getBoundingClientRect().height || 0;
     columnHeights[targetIndex] += itemHeight + 20;
