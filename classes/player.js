@@ -1,3 +1,5 @@
+import { formatPlayerPosition } from "../backend/backend-helper.js";
+
 export class Player {
   constructor(inputPlayer) {
     const birthDate = inputPlayer.birth_date || inputPlayer.birthdate || "";
@@ -13,6 +15,7 @@ export class Player {
     this.club = inputPlayer.club;
     this.nation = inputPlayer.nation;
     this.position = inputPlayer.position;
+    this.displayPosition = formatPlayerPosition(inputPlayer.position);
     this.goals = 0;
     this.assists = 0;
     this.apps = 0;
@@ -142,6 +145,7 @@ export class Player {
       this.exactPositions.push(games.position);
       if (!this.position || (Array.isArray(this.position) && this.position.length === 0)) {
         this.position = this.exactPositions.join(", ");
+        this.displayPosition = formatPlayerPosition(this.position);
       }
     }
     if (games.number) {
@@ -187,5 +191,8 @@ export class Player {
     this.passAccuracy = this.passes > 0 ? `${((this.passesAccurate / this.passes) * 100).toFixed(0)}%` : "0%";
     this.matchPositions = this.exactPositions.join(", ");
     this.shirtNumbers = this.shirtNumber;
+    if (!this.displayPosition) {
+      this.displayPosition = formatPlayerPosition(this.position);
+    }
   }
 }

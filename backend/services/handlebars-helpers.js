@@ -1,3 +1,5 @@
+import { formatPlayerPosition as formatPlayerPositionLabel } from "../backend-helper.js";
+
 export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;
 export const eq = (a, b) => a === b;
@@ -54,6 +56,8 @@ export const transferFee = (type) => {
   if (!type || type === "N/A") return "-";
   return type;
 }
+
+export const formatPlayerPosition = (position) => formatPlayerPositionLabel(position);
 
 export const percentage = (wins, played) => {
   return ((wins / played) * 100).toFixed(1);

@@ -173,6 +173,10 @@ footer p {
   -moz-column-gap: 0;
        column-gap: 0;
 }
+.home-page-layout.home-page-layout-pending {
+  opacity: 0;
+  visibility: hidden;
+}
 .home-page-layout > * {
   -moz-column-break-inside: unset;
        break-inside: unset;
@@ -958,7 +962,7 @@ td .form-indicator:last-child {
 
 #player-transfer-table .transfer-club-cell {
   width: 20%;
-  min-width: 156px;
+  min-width: 148px;
 }
 
 #player-transfer-table .transfer-club-link {

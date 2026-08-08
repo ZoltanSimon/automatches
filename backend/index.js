@@ -7,6 +7,8 @@ import {
   getLeagueStandingsFromDb,
   getLeagueSeason,
   getLatestTransfers,
+  getTransfersByPlayer,
+  getTransfersByTeam,
   loadLeagues,
   loadPlayers,
   loadTeams,
@@ -150,14 +152,11 @@ app.get("/top-players", async (req, res) => {
 });
 
 app.get("/top-teams", async (req, res) => {
-  const teamLeagueQuery = typeof req.query.tleague === "string"
-    ? req.query.tleague.trim()
-    : "";
-  const explicitlyRequestsWorldCup = teamLeagueQuery
-    .split(",")
-    .map((value) => Number(value.trim()))
-    .filter(Number.isFinite)
-    .includes(1);
+  const explicitlyRequestedLeagueIds = parseLeagueIds(req.query.tleague, {
+    fallback: [],
+    unique: true,
+  });
+  const explicitlyRequestsWorldCup = explicitlyRequestedLeagueIds.includes(1);
 
   let selectedTeamLeague = parseLeagueIds(req.query.tleague);
   if (!explicitlyRequestsWorldCup) {
@@ -213,6 +212,7 @@ app.get("/team", async (req, res) => {
     selectedPlayerStatsLeague,
     selectedPlayerStatsLeagueName,
   } = await getTeamRouteData(registry, thisTeam.ID, req.query.allStats);
+  const teamTransfers = await getTransfersByTeam(thisTeam.ID, 25);
 
   if (!teamStats.length) {
     return res.redirect("/");
@@ -225,6 +225,7 @@ app.get("/team", async (req, res) => {
     players: teamPlayers,
     matches, 
     teamStats,
+    teamTransfers,
     showAllPlayerStats,
     selectedPlayerStatsLeague,
     selectedPlayerStatsLeagueName,
@@ -360,12 +361,14 @@ app.get("/player", async (request, response) => {
     }
 
     const { details, leagues, selectedLeague } = playerPageData;
+    const playerTransfers = await getTransfersByPlayer(playerID);
 
     response.render("player", {
       title: details.player.name + " - Football Player Stats & Performance    ",
       description: `Explore detailed stats, recent matches and league performance for ${details.player.name} on Generation Football's Player page.`,
       player: details.player,
       matches: details.matches,
+      playerTransfers,
       leagues,
       selectedPLeagues: selectedLeague,
     });

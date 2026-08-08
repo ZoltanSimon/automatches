@@ -14,7 +14,7 @@
                         <span onclick="window.location.href='team?ID={{player.club}}'">{{player.clubName}}</span>
                     </div>
                     <div class="row player-position-row">
-                        <span style="color: white;">{{player.position}}</span>
+                        <span style="color: white;">{{player.displayPosition}}</span>
                     </div>
                     {{#if player.shirtNumbers}}
                     <div class="row player-position-row">
@@ -234,18 +234,19 @@
         {{/if}}
 
     </div>
+    <div class="rectangle">
+        <div id="player-matches" class="table-container">
+            {{> mini-match-list matches=matches}}
+        </div>
+    </div>
+    {{> player-transfers playerTransfers=playerTransfers}}
     <div class="rectangle" style="padding: 8px;">
         <span>{{player.fullName}} is a football player, aged {{player.age}}, representing the country of {{player.nationName}}. He was born on {{formatDateOnly player.birthdate}}, in {{player.birthLocation}}. {{player.name}} plays for <a
-                href="team?ID={{player.club}}">{{player.clubName}}</a>, mainly as a {{player.position}}. He has made
+            href="team?ID={{player.club}}">{{player.clubName}}</a>, mainly as a {{player.displayPosition}}. He has made
             {{player.apps}} appearances and has scored {{player.goals}} goals, providing {{player.assists}} assists in
             all competitions this season, for club and country.<br /><br />
             If you are interested in his statistics in specific leagues, click on the league icons above to filter the
             match list below. You can also click on the matches to see more details about them, or on the teams to see
             their respective pages. </span>
-    </div>
-    <div class="rectangle">
-        <div id="player-matches" class="table-container">
-            {{> mini-match-list matches=matches}}
-        </div>
     </div>
 </div>

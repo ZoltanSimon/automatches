@@ -1,5 +1,22 @@
 const tds = `<td width='33%' style='text-align: center; border-color: #1D3557; padding: 9px;'>`;
 
+function formatPlayerPosition(position) {
+  const labels = {
+    g: "Goalkeeper",
+    gk: "Goalkeeper",
+    d: "Defender",
+    m: "Midfielder",
+    f: "Forward",
+  };
+
+  return String(position || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .map((value) => labels[value.toLowerCase()] || value)
+    .join(", ");
+}
+
 export function addSquad(squads = []) {
   const output = document.getElementById("one-fixture");
   if (!output) {
@@ -20,7 +37,7 @@ export function addSquad(squads = []) {
     html += `<table class="gf-table"><thead><tr>${tds}Player</td>${tds}Age</td>${tds}Position</td></tr></thead><tbody>`;
 
     for (const player of players) {
-      html += `<tr>${tds}${player?.name || "-"}</td>${tds}${player?.age || "-"}</td>${tds}${player?.position || "-"}</td></tr>`;
+      html += `<tr>${tds}${player?.name || "-"}</td>${tds}${player?.age || "-"}</td>${tds}${formatPlayerPosition(player?.position) || "-"}</td></tr>`;
     }
 
     html += `</tbody></table></div>`;

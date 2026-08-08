@@ -23,7 +23,7 @@
       </td>
       <td class="sec-stats transfer-player-details-cell">
         <div class="player-name"><a href="/player?id={{this.player_id}}">{{this.player_name}}</a></div>
-        <div class="player-position">{{this.player_position}}</div>
+        <div class="player-position">{{formatPlayerPosition this.player_position}}</div>
       </td>
       <td class="transfer-club-cell" id="{{this.team_out_id}}">
         {{#if this.team_out_id}}

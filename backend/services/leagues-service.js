@@ -1,8 +1,7 @@
 import { allDBLeagues } from "../index.js";
 import { extractTeams } from "./teams-service.js";
 import { getLeagueStandingsFromDb, loadLeagueSeasonRows, loadLeagues } from "../data-access.js";
-import { mergeWorldCupGroupStandings, wait } from "../backend-helper.js";
-import { getPlayerList } from "./players-service.js";
+import { mergeWorldCupGroupStandings, parseStringList, wait } from "../backend-helper.js";
 import { lastMatchesFromLeague } from "./matches-service.js";
 import { getTeamById } from "./teams-service.js";
 import { readFile } from "fs/promises";
@@ -11,13 +10,19 @@ import path from "path";
 // Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League
 export const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
 
-export function parseLeagueIds(leagueQuery) {
-  if (!leagueQuery) return defaultLeagues;
+export function parseLeagueIds(leagueQuery, options = {}) {
+  const { fallback = defaultLeagues, unique = false } = options;
 
-  return leagueQuery
-    .split(",")
-    .map((id) => Number(id.trim()))
+  if (!leagueQuery) {
+    const fallbackIds = Array.isArray(fallback) ? fallback : [];
+    return unique ? [...new Set(fallbackIds)] : fallbackIds;
+  }
+
+  const parsedLeagueIds = parseStringList(leagueQuery)
+    .map((id) => Number(id))
     .filter(Boolean);
+
+  return unique ? [...new Set(parsedLeagueIds)] : parsedLeagueIds;
 }
 
 const FINISHED_STATUSES = new Set(["FT", "AET", "PEN"]);
@@ -951,6 +956,7 @@ export function getLeagueStandings(registry, league) {
 
 export async function getLeaguePageData(registry, selectedLeague, selectedSeason, defaultSeason) {
   const leagueInfo = getLeagueById(selectedLeague);
+  const { getPlayerList } = await import("./players-service.js");
   const players = getPlayerList(registry, DEFAULT_PLAYER_LIST_LIMIT, null, [selectedLeague]);
   const { matches, rounds, currentRound } = await lastMatchesFromLeague(registry, selectedLeague);
   const standingsFromRegistry = getLeagueStandings(registry, selectedLeague);

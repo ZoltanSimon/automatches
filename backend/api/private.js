@@ -5,7 +5,7 @@ import { dataDir, getMatchFromServer, matchFileExists, writeLeagueToServer, save
 import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
 import { insertAllPlayers, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
 import { localhostOnly, wait } from "../backend-helper.js";
-import { updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
+import { parseLeagueIds, updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
 import { findMissingFinishedMatches, hydrateMissingMatches, matchesOnDay, matchesInRound } from "../services/matches-service.js";
 
 const MAX_GET_PLAYERS_RUNS = 50;
@@ -597,11 +597,29 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     }
   });
 
+  router.get("/get-transfers-by-team", async (request, response) => {
+    const teamID = Number(request.query.teamID);
+    if (!Number.isFinite(teamID) || teamID <= 0) {
+      return response.status(400).json({ success: false, message: "Invalid teamID." });
+    }
+
+    try {
+      const { data, limits } = await getTransfersByTeam(teamID);
+      console.log(`[get-transfers-by-team] teamID=${teamID}, API limits:`, limits);
+      console.log(`[get-transfers-by-team] response:`, JSON.stringify(data, null, 2));
+      response.json({ success: true, data, limits });
+    } catch (error) {
+      console.error(`[get-transfers-by-team] Error for teamID=${teamID}:`, error);
+      response.status(500).json({ success: false, message: error.message });
+    }
+  });
+
   router.get("/missing-matches", async (request, response) => {
     //if the request parameter is empty, get all leagues from the database
-    let leagueIDs = request.query.leagueID
-      ? request.query.leagueID.split(",")
-      : leaguesCache.map(l => l.id);
+    let leagueIDs = parseLeagueIds(request.query.leagueID, {
+      fallback: leaguesCache.map((league) => league.id),
+      unique: true,
+    });
 
     let matchArr = [];
     if (leagueIDs.length == 0 || !(leagueIDs[0] > 0)) {

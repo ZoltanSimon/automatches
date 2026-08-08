@@ -334,6 +334,11 @@ export function addLeagues(lp, admin = false) {
     );
   }
 
+  document.querySelectorAll(`.${lp}-league-to-select`).forEach((element) => {
+    const leagueID = Number(element.id.replace("img-", ""));
+    element.classList.toggle("selected-league", pickedLeagues.includes(leagueID));
+  });
+
   if (lp === "sleague") {
     document.querySelectorAll(`.${lp}-league-to-select`).forEach((e) =>
       e.addEventListener("click", (evt) => selectOneLeague(evt, lp))

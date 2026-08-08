@@ -44,6 +44,58 @@ export function toTrimmedString(value) {
   return normalized.length > 0 ? normalized : null;
 }
 
+export function parseStringList(value) {
+  const rawValues = Array.isArray(value)
+    ? value
+    : String(value ?? "").split(",");
+
+  return rawValues
+    .map((item) => toTrimmedString(item))
+    .filter(Boolean);
+}
+
+export function parseLowercaseStringList(value, unique = false) {
+  const normalized = parseStringList(value).map((item) => item.toLowerCase());
+  return unique ? [...new Set(normalized)] : normalized;
+}
+
+const PLAYER_POSITION_LABELS = {
+  g: "Goalkeeper",
+  gk: "Goalkeeper",
+  d: "Defender",
+  m: "Midfielder",
+  f: "Forward",
+};
+
+function normalizePlayerPositionToken(position) {
+  const trimmed = toTrimmedString(position);
+  if (!trimmed) {
+    return "";
+  }
+
+  return PLAYER_POSITION_LABELS[trimmed.toLowerCase()] || trimmed;
+}
+
+export function formatPlayerPosition(positionValue) {
+  if (Array.isArray(positionValue)) {
+    return positionValue
+      .map((position) => normalizePlayerPositionToken(position))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  const trimmed = toTrimmedString(positionValue);
+  if (!trimmed) {
+    return "";
+  }
+
+  return trimmed
+    .split(",")
+    .map((position) => normalizePlayerPositionToken(position))
+    .filter(Boolean)
+    .join(", ");
+}
+
 export function toShirtNumber(value) {
   if (value === null || value === undefined || value === "") {
     return null;

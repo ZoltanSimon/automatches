@@ -11,8 +11,9 @@ import {
 import { Player } from "./../../classes/player.js";
 import { allDBLeagues, allDBPlayers } from "../index.js";
 import { LineupParser } from "../../classes/lineupparser.js";
-import { comparePositionsByDisplayOrder, toTrimmedString, wait } from "../backend-helper.js";
+import { comparePositionsByDisplayOrder, parseLowercaseStringList, wait } from "../backend-helper.js";
 import { getTeamById } from "./teams-service.js";
+import { parseLeagueIds } from "./leagues-service.js";
 import * as fs from "fs";
 
 export function startPlayerFetchJob(playersFetchJob, {
@@ -84,21 +85,21 @@ function getTeamName(id) {
   return getTeamById(id)?.name || "";
 }
 
-function toPositionList(positionValue = "") {
-  if (Array.isArray(positionValue)) {
-    return positionValue
-      .map((position) => toTrimmedString(position))
-      .filter(Boolean)
-      .map((position) => position.toLowerCase())
-      .filter(Boolean);
-  }
+function getMatchesByLeagueFilter(registry, leagueFilter = []) {
+  return leagueFilter.length > 0
+    ? registry.matches.filter((match) => leagueFilter.includes(match.league.id))
+    : registry.matches;
+}
 
-  return String(positionValue)
-    .split(",")
-    .map((position) => toTrimmedString(position))
-    .filter(Boolean)
-    .map((position) => position.toLowerCase())
-      .filter(Boolean);
+function createPlayerWithResolvedTeamNames(inputPlayer) {
+  const player = new Player(inputPlayer);
+  player.clubName = getTeamName(player.club);
+  player.nationName = getTeamName(player.nation);
+  return player;
+}
+
+function toPositionList(positionValue = "") {
+  return parseLowercaseStringList(positionValue);
 }
 
 export function parseSelectedPositions(positionQuery) {
@@ -106,14 +107,7 @@ export function parseSelectedPositions(positionQuery) {
     return [];
   }
 
-  return [...new Set(
-    String(positionQuery)
-      .split(",")
-      .map((position) => toTrimmedString(position))
-      .filter(Boolean)
-      .map((position) => position.toLowerCase())
-      .filter(Boolean)
-  )];
+  return parseLowercaseStringList(positionQuery, true);
 }
 
 export function buildPositionOptions() {
@@ -135,9 +129,7 @@ export function getPlayerList(
 ) {
   const playerMap = new Map();
 
-  const matches = leagueFilter.length > 0
-    ? registry.matches.filter(m => leagueFilter.includes(m.league.id))
-    : registry.matches;
+  const matches = getMatchesByLeagueFilter(registry, leagueFilter);
 
   for (const match of matches) {
     const { players: matchPlayers } = match;
@@ -155,9 +147,7 @@ export function getPlayerList(
             //console.error(`Player with ID ${playerID} not found.`);
             continue;
           }
-          const thisPlayer = new Player(inputPlayer);
-          thisPlayer.clubName = getTeamName(thisPlayer.club);
-          thisPlayer.nationName = getTeamName(thisPlayer.nation);
+          const thisPlayer = createPlayerWithResolvedTeamNames(inputPlayer);
           thisPlayer.getPlayerStats(player, match.league);
           playerMap.set(playerID, thisPlayer);
         }
@@ -185,10 +175,7 @@ export function getPlayerList(
   }
 
   if (positionFilter.length) {
-    const selectedPositions = positionFilter
-      .map((position) => toTrimmedString(position))
-      .filter(Boolean)
-      .map((position) => position.toLowerCase());
+    const selectedPositions = parseLowercaseStringList(positionFilter);
     players = players.filter((player) => {
       const playerPositions = toPositionList(player.position);
       return playerPositions.some((position) => selectedPositions.includes(position));
@@ -214,13 +201,12 @@ function createFallbackPlayerFromSquadEntry(squadEntry, teamID) {
     position: fallbackPosition,
   };
 
-  const player = new Player(inputPlayer);
+  const player = createPlayerWithResolvedTeamNames(inputPlayer);
   if (!player.position && fallbackPosition) {
     player.position = fallbackPosition;
   }
   player.club = Number(teamID);
   player.clubName = getTeamName(player.club);
-  player.nationName = getTeamName(player.nation);
 
   return player;
 }
@@ -289,12 +275,17 @@ export async function insertAllPlayers() {
   let addedFromTransfers = 0;
   for (const transferPlayer of transferPlayers) {
     const playerID = Number(transferPlayer?.id);
-    if (!Number.isFinite(playerID) || playersById.has(playerID)) {
+    if (!Number.isFinite(playerID)) {
       continue;
     }
 
-    playersById.set(playerID, transferPlayer);
-    addedFromTransfers += 1;
+    if (!playersById.has(playerID)) {
+      playersById.set(playerID, transferPlayer);
+      addedFromTransfers += 1;
+    } else if (transferPlayer.club) {
+      // Transfer data reflects the most recent club; override match-derived club
+      playersById.get(playerID).club = transferPlayer.club;
+    }
   }
 
   const playersToInsert = [...playersById.values()];
@@ -335,13 +326,9 @@ export function getPlayerDetails(registry, playerID, leagueFilter = []) {
   const inputPlayer = getPlayerByID(playerID);
   if (!inputPlayer) return null;
 
-  const playerObj = new Player(inputPlayer);
-  playerObj.clubName = getTeamName(playerObj.club);
-  playerObj.nationName = getTeamName(playerObj.nation);
+  const playerObj = createPlayerWithResolvedTeamNames(inputPlayer);
 
-  const filteredMatches = leagueFilter.length
-    ? registry.matches.filter((m) => leagueFilter.includes(m.league.id))
-    : registry.matches;
+  const filteredMatches = getMatchesByLeagueFilter(registry, leagueFilter);
 
   const matches = [];
 
@@ -385,12 +372,7 @@ export function getPlayerPageData(registry, playerID, leagueQuery) {
   const hasPlayerID = playerID !== undefined && playerID !== null && String(playerID).trim() !== "";
 
   if (!hasPlayerID) {
-    const selectedLeague = Array.isArray(leagueQuery)
-      ? leagueQuery
-      : String(leagueQuery || "")
-        .split(",")
-        .map((id) => Number(id.trim()))
-        .filter(Boolean);
+    const selectedLeague = parseLeagueIds(leagueQuery, { fallback: [], unique: false });
 
     return {
       players: getPlayerList(registry, 10, "", selectedLeague),
@@ -406,12 +388,7 @@ export function getPlayerPageData(registry, playerID, leagueQuery) {
   const availableLeagueIds = allDetails.player.competitionList.map((competition) => competition.id);
   const hasLeagueQuery = leagueQuery !== undefined;
   const requestedLeagueIds = hasLeagueQuery
-    ? [...new Set(
-      String(leagueQuery)
-        .split(",")
-        .map((id) => Number(id.trim()))
-        .filter(Boolean)
-    )]
+    ? parseLeagueIds(leagueQuery, { fallback: [], unique: true })
     : availableLeagueIds;
   const filteredLeagueIds = requestedLeagueIds.filter((leagueId) => availableLeagueIds.includes(leagueId));
   const selectedLeague = filteredLeagueIds.length > 0 ? filteredLeagueIds : availableLeagueIds;

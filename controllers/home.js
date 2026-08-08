@@ -51,12 +51,20 @@ function arrangeHomeColumns() {
   layoutContainer.classList.add("home-page-layout-grid");
 }
 
+function showHomeColumns() {
+  const layoutContainer = document.querySelector(".home-page-layout");
+  if (!layoutContainer) {
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    layoutContainer.classList.remove("home-page-layout-pending");
+  });
+}
+
 applyKnockoutBracketLayout();
 
 await playerGoalList({ big: false, enableStatFilters: false });
-
-requestAnimationFrame(arrangeHomeColumns);
-window.addEventListener("resize", arrangeHomeColumns);
 
 const fixturesInfo = document.getElementById("fixtures-info");
 if (fixturesInfo) {
@@ -73,3 +81,7 @@ addLeagues("sleague");
 addLeagues("league");
 addShowMoreButtons(".table-container:not(#player-transfers):not(#fixtures-info)");
 setupLeagueListToggleButtons();
+
+arrangeHomeColumns();
+showHomeColumns();
+window.addEventListener("resize", arrangeHomeColumns);

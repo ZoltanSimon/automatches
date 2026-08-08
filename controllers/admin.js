@@ -307,6 +307,28 @@ document.getElementById("getSquads").onclick = async function () {
   }
 };
 
+document.getElementById("get-transfers-by-team").onclick = async function () {
+  const teamID = document.getElementById("teamID").value;
+  if (!teamID) {
+    showToast("Enter a team ID first.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/get-transfers-by-team?teamID=${teamID}`);
+    const data = await response.json();
+    console.log(data);
+    if (!response.ok || !data.success) {
+      showToast(data.message || "Failed to fetch transfers.");
+      return;
+    }
+    showToast(`Got transfers for team ${teamID}. See console.`, "success");
+  } catch (error) {
+    console.error("Failed to fetch transfers by team:", error);
+    showToast(error.message || "Failed to fetch transfers.");
+  }
+};
+
 document.getElementById("get-transfers").onclick = async function () {
   const button = this;
   button.disabled = true;

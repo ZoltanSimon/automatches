@@ -52,6 +52,12 @@
             {{> match-list-table}}
         </div>
     </div>
+    <div class="rectangle" id="team-transfers">
+        {{> rect-header title="Latest Transfers" link="/transfers"}}
+        <div class="table-container" style="grid-column: 1 / 4; width: 100%;">
+            {{> player-transfer latestTransfers=teamTransfers}}
+        </div>
+    </div>
     <div class="rectangle" style="padding: 8px;">
         <span>{{thisTeam.name}} is a football club which featured in the following competitions this season: {{#each teamStats.[0].leagues}} {{this.name}},
             {{/each}} having {{teamStats.[0].wins}} wins, {{teamStats.[0].draws}} draws, and {{teamStats.[0].losses}} losses. They've scored a total of {{teamStats.[0].total.goals}}, from {{teamStats.[0].total.xG}} expected goals, conceding {{teamStats.[0].total.goalsAgainst}} goals from {{teamStats.[0].total.xGA}} expected goals. <br/><br/>
@@ -68,7 +74,7 @@
             <a href="/team?ID={{thisTeam.ID}}&allStats=1">Show all stats</a>
             {{/if}}
         </div>
-        <div id="player-list" class="table-container">
+        <div id="player-list" class="table-container expanded">
             {{> player-list-table big=false}}
         </div>
     </div>

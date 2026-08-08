@@ -1,0 +1,59 @@
+<div class="rectangle">
+    <div class="rect-header" style="grid-template-columns: auto 1fr;">
+        <div class="rect-title">
+            <h2>Transfers</h2>
+        </div>
+    </div>
+    <div class="table-container" style="grid-column: 1 / 4; width: 100%;">
+        <table class="gf-table" id="player-transfer-table">
+            <thead>
+                <tr class="main-table-header">
+                    <th class="list-header" title="From">From</th>
+                    <th class="list-header" title="To">To</th>
+                    <th class="list-header" title="Date">Date</th>
+                    <th class="list-header" title="Fee">Fee</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each playerTransfers}}
+                <tr>
+                    <td class="transfer-club-cell" id="{{this.team_out_id}}">
+                        {{#if this.team_out_id}}
+                        <a href="/team?ID={{this.team_out_id}}" class="transfer-club-link">
+                            <img class="logo-picture" src="images/logos/{{this.team_out_id}}.png" alt="{{this.team_out_name}}"
+                                title="{{this.team_out_name}}" onerror="this.onerror=null; this.src='images/logos/0.png';" />
+                            <span>{{this.team_out_name}}</span>
+                        </a>
+                        {{else}}
+                        <span class="transfer-club-link">
+                            <img class="logo-picture" src="images/logos/0.png" alt="Unknown club" title="Unknown club" />
+                            <span>{{#if this.team_out_name}}{{this.team_out_name}}{{else}}Unknown{{/if}}</span>
+                        </span>
+                        {{/if}}
+                    </td>
+                    <td class="transfer-club-cell" id="{{this.team_in_id}}">
+                        {{#if this.team_in_id}}
+                        <a href="/team?ID={{this.team_in_id}}" class="transfer-club-link">
+                            <img class="logo-picture" src="images/logos/{{this.team_in_id}}.png" alt="{{this.team_in_name}}"
+                                title="{{this.team_in_name}}" onerror="this.onerror=null; this.src='images/logos/0.png';" />
+                            <span>{{this.team_in_name}}</span>
+                        </a>
+                        {{else}}
+                        <span class="transfer-club-link">
+                            <img class="logo-picture" src="images/logos/0.png" alt="Unknown club" title="Unknown club" />
+                            <span>{{#if this.team_in_name}}{{this.team_in_name}}{{else}}Unknown{{/if}}</span>
+                        </span>
+                        {{/if}}
+                    </td>
+                    <td class="stat-td transfer-date-cell" data-stat="date">{{formatDateOnly this.transfer_date}}</td>
+                    <td class="stat-td transfer-fee-cell" data-stat="fee">{{transferFee this.type}}</td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="4">No transfers recorded yet.</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>

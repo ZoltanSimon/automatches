@@ -179,6 +179,11 @@ footer {
   columns: unset;
   column-gap: 0;
 
+  &.home-page-layout-pending {
+    opacity: 0;
+    visibility: hidden;
+  }
+
   > * {
     break-inside: unset;
     margin-bottom: 0;
@@ -974,7 +979,7 @@ td .form-indicator {
 
 #player-transfer-table .transfer-club-cell {
   width: 20%;
-  min-width: 156px;
+  min-width: 148px;
 }
 
 #player-transfer-table .transfer-club-link {
