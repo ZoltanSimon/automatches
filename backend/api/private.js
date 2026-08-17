@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam } from "../webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated } from "../data-access.js";
+import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam, getTransfersByPlayer, getPlayerStatsFromApi, getTeamsByPlayer } from "../webapi-handler.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, insertPlayersToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, updatePlayerProfilesInDb } from "../data-access.js";
 import { dataDir, getMatchFromServer, matchFileExists, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
 import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
 import { insertAllPlayers, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
@@ -30,7 +30,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
         success: false,
         message: "Invalid leagueID",
       });
-    }
+    } 
 
     try {
       const standingsData = await getStandingsFromApi(leagueID, season);
@@ -455,61 +455,28 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   });
 
   router.get("/get-squads", async (request, response) => {
+    const teamID = Number(request.query.teamID);
+    if (!Number.isFinite(teamID) || teamID <= 0) {
+      return response.status(400).json({ success: false, message: "teamID query parameter is required." });
+    }
+
     try {
-      const leagueID = Number(request.query.leagueID);
-      const delayMsFromQuery = Number(request.query.delayMs);
-      const delayMs = Number.isFinite(delayMsFromQuery) && delayMsFromQuery >= 0
-        ? delayMsFromQuery
-        : 3000;
-      if (!Number.isFinite(leagueID)) {
-        return response.status(400).json({ success: false, message: "leagueID query parameter is required." });
-      }
+      const responsePayload = await getSquadFromApi(teamID);
+      const squads = Array.isArray(responsePayload?.response) ? responsePayload.response : [];
+      console.log(`[get-squads] teamID=${teamID}, squad:`, JSON.stringify(squads, null, 2));
 
-      const registry = await getRegistry();
-      const leagueMatches = registry.matches.filter((match) => Number(match?.league?.id) === leagueID);
-      const teamIDs = [...new Set(
-        leagueMatches.flatMap((match) => [
-          Number(match?.teams?.home?.id),
-          Number(match?.teams?.away?.id),
-        ]).filter((teamID) => Number.isFinite(teamID))
-      )];
-
-      const squads = [];
-      const failedTeams = [];
-      let savedCount = 0;
-
-      for (let i = 0; i < teamIDs.length; i += 1) {
-        const teamID = teamIDs[i];
-
-        try {
-          const responsePayload = await getSquadFromApi(teamID);
-          const squadList = Array.isArray(responsePayload?.response) ? responsePayload.response : [];
-          for (const squad of squadList) {
-            squads.push(squad);
-            await saveSquadToDb(teamID, squad);
-            savedCount += 1;
-          }
-        } catch (error) {
-          failedTeams.push(teamID);
-        }
-
-        if (i < teamIDs.length - 1 && delayMs > 0) {
-          await wait(delayMs);
-        }
-      }
+      await saveSquadToDb(teamID, squads);
 
       response.json({
         success: true,
-        leagueID,
-        teamCount: teamIDs.length,
-        delayMs,
-        savedCount,
+        teamID,
+        saved: true,
+        savedCount: squads.length,
         squads,
-        failedTeams,
       });
     } catch (error) {
-      console.error("Error fetching squads", error);
-      response.status(500).json({ success: false, message: "Error fetching squads" });
+      console.error(`[get-squads] Error for teamID=${teamID}:`, error);
+      response.status(500).json({ success: false, message: "Error fetching squad" });
     }
   });
 
@@ -610,6 +577,106 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       response.json({ success: true, data, limits });
     } catch (error) {
       console.error(`[get-transfers-by-team] Error for teamID=${teamID}:`, error);
+      response.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  router.get("/get-teams-by-player", async (request, response) => {
+    const playerID = Number(request.query.playerID);
+    if (!Number.isFinite(playerID) || playerID <= 0) {
+      return response.status(400).json({ success: false, message: "Invalid playerID." });
+    }
+
+    try {
+      const { data, limits } = await getTeamsByPlayer(playerID);
+      console.log(`[get-teams-by-player] playerID=${playerID}, API limits:`, limits);
+      response.json({ success: true, data, limits });
+    } catch (error) {
+      console.error(`[get-teams-by-player] Error for playerID=${playerID}:`, error);
+      response.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  router.get("/get-player-profile", async (request, response) => {
+    const playerID = Number(request.query.playerID);
+    if (!Number.isFinite(playerID) || playerID <= 0) {
+      return response.status(400).json({ success: false, message: "Invalid playerID." });
+    }
+
+    try {
+      console.log(`[get-player-profile] Fetching playerID=${playerID} from API-Football.`);
+      const data = await getPlayers({ playerID });
+      const playerPayload = data?.response?.[0] ?? null;
+      let playerInsert = { processed: 0 };
+      let profileUpdate = { processed: 0, updatedRows: 0 };
+
+      if (!playerPayload?.player) {
+        console.warn(`[get-player-profile] No player found for playerID=${playerID}.`, data?.errors);
+        return response.status(404).json({
+          success: false,
+          message: `No player profile found for playerID=${playerID}.`,
+          data,
+        });
+      }
+
+      if (playerPayload.player) {
+        const firstStatistic = Array.isArray(playerPayload.statistics)
+          ? playerPayload.statistics.find((stat) => stat?.team?.id)
+          : null;
+
+        console.log(`[get-player-profile] Upserting basic Player row for playerID=${playerID}.`);
+        await insertPlayersToDb([{
+          id: playerPayload.player.id,
+          name: playerPayload.player.name,
+          club: firstStatistic?.team?.id ?? 0,
+          nation: 0,
+          position: [firstStatistic?.games?.position ?? ""],
+        }]);
+        playerInsert = { processed: 1 };
+        console.log(`[get-player-profile] Updating detailed profile fields for playerID=${playerID}.`);
+        profileUpdate = await updatePlayerProfilesInDb([playerPayload]);
+      }
+
+      response.json({
+        success: true,
+        player: playerPayload?.player ?? null,
+        playerInsert,
+        profileUpdate,
+        data,
+      });
+    } catch (error) {
+      console.error(`[get-player-profile] Error for playerID=${playerID}:`, error);
+      response.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  router.get("/get-player-stats", async (request, response) => {
+    const playerID = Number(request.query.playerID);
+    if (!Number.isFinite(playerID) || playerID <= 0) {
+      return response.status(400).json({ success: false, message: "Invalid playerID." });
+    }
+
+    try {
+      const data = await getPlayerStatsFromApi(playerID);
+      response.json({ success: true, data });
+    } catch (error) {
+      console.error(`[get-player-stats] Error for playerID=${playerID}:`, error);
+      response.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  router.get("/get-transfers-by-player", async (request, response) => {
+    const playerID = Number(request.query.playerID);
+    if (!Number.isFinite(playerID) || playerID <= 0) {
+      return response.status(400).json({ success: false, message: "Invalid playerID." });
+    }
+
+    try {
+      const { data, limits } = await getTransfersByPlayer(playerID);
+      console.log(`[get-transfers-by-player] playerID=${playerID}, API limits:`, limits);
+      response.json({ success: true, data, limits });
+    } catch (error) {
+      console.error(`[get-transfers-by-player] Error for playerID=${playerID}:`, error);
       response.status(500).json({ success: false, message: error.message });
     }
   });

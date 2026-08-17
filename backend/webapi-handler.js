@@ -199,9 +199,49 @@ export async function getPlayers(params = {}) {
   return data;
 }
 
+export async function getTeamsByPlayer(playerID) {
+  const response = await fetch(
+    `https://v3.football.api-sports.io/players/teams?player=${playerID}`,
+    {
+      method: "GET",
+      headers: getApiHeaders(),
+    }
+  );
+
+  const data = await response.json();
+  const limits = {
+    perMinuteLimit: response.headers.get("x-ratelimit-limit"),
+    perMinuteRemaining: response.headers.get("x-ratelimit-remaining"),
+    dailyLimit: response.headers.get("x-ratelimit-requests-limit"),
+    dailyRemaining: response.headers.get("x-ratelimit-requests-remaining"),
+  };
+
+  return { data, limits };
+}
+
 export async function getTransfersByTeam(teamID) {
   const response = await fetch(
     `https://v3.football.api-sports.io/transfers?team=${teamID}`,
+    {
+      method: "GET",
+      headers: getApiHeaders(),
+    }
+  );
+
+  const data = await response.json();
+  const limits = {
+    perMinuteLimit: response.headers.get("x-ratelimit-limit"),
+    perMinuteRemaining: response.headers.get("x-ratelimit-remaining"),
+    dailyLimit: response.headers.get("x-ratelimit-requests-limit"),
+    dailyRemaining: response.headers.get("x-ratelimit-requests-remaining"),
+  };
+
+  return { data, limits };
+}
+
+export async function getTransfersByPlayer(playerID) {
+  const response = await fetch(
+    `https://v3.football.api-sports.io/transfers?player=${playerID}`,
     {
       method: "GET",
       headers: getApiHeaders(),

@@ -101,11 +101,14 @@ seasonSelect.addEventListener("change", () => {
   selectedLeagueSeasons.set(activeLeagueID, Number(seasonSelect.value));
 });
 
-document.getElementById('datepicker-input').addEventListener('change', function () {
-  document.getElementById("fixtures-info").innerHTML = "";
-  const selectedDate = this.value;
-  showMatchesOnDate(selectedDate, true);
-});
+const datepickerInput = document.getElementById("datepicker-input");
+if (datepickerInput) {
+  datepickerInput.addEventListener("change", function () {
+    document.getElementById("fixtures-info").innerHTML = "";
+    const selectedDate = this.value;
+    showMatchesOnDate(selectedDate, true);
+  });
+}
 
 await showMatchesOnDate(new Date(), true);
 addLeagues("admin", true);
@@ -157,21 +160,27 @@ document.getElementById("submit-league-info").onclick = async function () {
   await leagueStandings(selectedLeagues[0]);
 };
 
-document.getElementById("get-matches-by-round").onclick = async function () {
-  let leagueID = selectedLeagues[0];
-  let roundNumber = document.getElementById("roundnr").value;
-  let roundLabel = leagueID != 2 ? `Regular Season - ${roundNumber}` : `League Stage - ${roundNumber}`;
-  console.log(roundLabel);
-  const response = await fetch(`/api/get-matches-by-round?leagueID=${leagueID}&roundNo=${roundLabel}`);
-  const matches = await response.json();
-  matchList(matches, true);
-  addText(matches);
-  buildResults(matches);
-};
+const getMatchesByRoundButton = document.getElementById("get-matches-by-round");
+if (getMatchesByRoundButton) {
+  getMatchesByRoundButton.onclick = async function () {
+    let leagueID = selectedLeagues[0];
+    let roundNumber = document.getElementById("roundnr").value;
+    let roundLabel = leagueID != 2 ? `Regular Season - ${roundNumber}` : `League Stage - ${roundNumber}`;
+    console.log(roundLabel);
+    const response = await fetch(`/api/get-matches-by-round?leagueID=${leagueID}&roundNo=${roundLabel}`);
+    const matches = await response.json();
+    matchList(matches, true);
+    addText(matches);
+    buildResults(matches);
+  };
+}
 
-document.getElementById("submit-match-list").onclick = async function () {
-  await submitRequest_matchList();
-};
+const submitMatchListButton = document.getElementById("submit-match-list");
+if (submitMatchListButton) {
+  submitMatchListButton.onclick = async function () {
+    await submitRequest_matchList();
+  };
+}
 
 document.getElementById("update-leagues").onclick = async function () {
   const response = await fetch(
@@ -231,22 +240,28 @@ document.getElementById("update-league-all-seasons").onclick = async function ()
   console.log(data);
 };
 
-document.getElementById("get-match-auto").onclick = async function () {
-  let fixtureID = document.getElementById("fixtureID").value;
-  let match = await downloadMatch(fixtureID);
-  oneFixture(match);
-  addMatchStats(match[0]);
-};
+const getMatchAutoButton = document.getElementById("get-match-auto");
+if (getMatchAutoButton) {
+  getMatchAutoButton.onclick = async function () {
+    let fixtureID = document.getElementById("fixtureID").value;
+    let match = await downloadMatch(fixtureID);
+    oneFixture(match);
+    addMatchStats(match[0]);
+  };
+}
 
-document.getElementById("missing-matches").onclick = async function () {
-  let leagueID = selectedLeagues.join(",");
-  const response = await fetch(`/api/missing-matches?leagueID=${leagueID}`, {
-    method: "GET",
-  });
-  const data = await response.json();
-  if (data.length > 0) matchList(data, true);
-  console.log(data);
-};
+const missingMatchesButton = document.getElementById("missing-matches");
+if (missingMatchesButton) {
+  missingMatchesButton.onclick = async function () {
+    let leagueID = selectedLeagues.join(",");
+    const response = await fetch(`/api/missing-matches?leagueID=${leagueID}`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (data.length > 0) matchList(data, true);
+    console.log(data);
+  };
+}
 
 document.getElementById("get-player-goal-list").onclick = async function () {
   playerGoalList({ big: false, enableStatFilters: false });
@@ -271,39 +286,103 @@ document.getElementById("insert-all-players").onclick = async function () {
   }
 };
 
-document.getElementById("getPlayerStats").onclick = async function () {
-  let player1 = document.getElementById("playerID").value;
-  console.log(await getPlayerStatsFromApi(player1));
-  //playerFromApi = await getLocalPlayerStats(player1);
-  //playerFromApi2 = await getLocalPlayerStats(player2);
-  //addPlayerStats(playerFromApi, playerFromApi2);
+const getPlayerStatsButton = document.getElementById("getPlayerStats");
+if (getPlayerStatsButton) {
+  getPlayerStatsButton.onclick = async function () {
+    const playerID = document.getElementById("playerID").value;
+    if (!playerID) {
+      showToast("Enter a player ID first.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/get-player-stats?playerID=${playerID}`);
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok || !data.success) {
+        showToast(data.message || "Failed to fetch player stats.");
+        return;
+      }
+      showToast(`Got stats for player ${playerID}. See console.`, "success");
+    } catch (error) {
+      console.error("Failed to fetch player stats:", error);
+      showToast(error.message || "Failed to fetch player stats.");
+    }
+  };
+}
+
+document.getElementById("get-player-profile").onclick = async function () {
+  const button = document.getElementById("get-player-profile");
+  const playerID = document.getElementById("playerID").value.trim();
+
+  if (!playerID) {
+    showToast("Enter a player ID first.");
+    return;
+  }
+
+  button.disabled = true;
+
+  try {
+    const response = await fetch(`/api/get-player-profile?playerID=${playerID}`);
+    const data = await response.json();
+    console.log(data);
+    if (!response.ok || !data.success) {
+      showToast(data.message || "Failed to fetch player info.");
+      return;
+    }
+
+    showToast(`Updated Player table for ${data.player?.name || playerID}.`, "success");
+  } catch (error) {
+    console.error("Failed to fetch player info:", error);
+    showToast(error.message || "Failed to fetch player info.");
+  } finally {
+    button.disabled = false;
+  }
 };
 
-document.getElementById("getSquads").onclick = async function () {
-  const leagueID = selectedLeagues[0];
-  if (!leagueID) {
-    showToast("Select a league first.");
+document.getElementById("get-teams-by-player").onclick = async function () {
+  const playerID = document.getElementById("playerID").value;
+  if (!playerID) {
+    showToast("Enter a player ID first.");
     return;
   }
 
   try {
-    const response = await fetch(`/api/get-squads?leagueID=${leagueID}`);
+    const response = await fetch(`/api/get-teams-by-player?playerID=${playerID}`);
     const data = await response.json();
+    console.log(data);
+    if (!response.ok || !data.success) {
+      showToast(data.message || "Failed to fetch player teams.");
+      return;
+    }
+    showToast(`Got teams for player ${playerID}. See console.`, "success");
+  } catch (error) {
+    console.error("Failed to fetch player teams:", error);
+    showToast(error.message || "Failed to fetch player teams.");
+  }
+};
+
+document.getElementById("getSquads").onclick = async function () {
+  const teamID = document.getElementById("teamID").value;
+  if (!teamID) {
+    showToast("Enter a team ID first.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/get-squads?teamID=${teamID}`);
+    const data = await response.json();
+    console.log(data);
 
     if (!response.ok || !data.success) {
-      throw new Error(data?.message || "Failed to fetch squads.");
+      throw new Error(data?.message || "Failed to fetch squad.");
     }
 
     addSquad(data.squads);
-
-    const failedCount = Array.isArray(data.failedTeams) ? data.failedTeams.length : 0;
-    const statusMessage = failedCount > 0
-      ? `Fetched ${data.squads.length} squads. Failed teams: ${failedCount}.`
-      : `Fetched ${data.squads.length} squads.`;
-    showToast(statusMessage, failedCount > 0 ? "warning" : "success");
+    showToast(`Fetched squad for team ${teamID}.`, "success");
   } catch (error) {
-    console.error("Failed to fetch squads:", error);
-    showToast(error.message || "Failed to fetch squads.");
+    console.error("Failed to fetch squad:", error);
+    showToast(error.message || "Failed to fetch squad.");
   }
 };
 
@@ -326,6 +405,28 @@ document.getElementById("get-transfers-by-team").onclick = async function () {
   } catch (error) {
     console.error("Failed to fetch transfers by team:", error);
     showToast(error.message || "Failed to fetch transfers.");
+  }
+};
+
+document.getElementById("get-transfers-by-player").onclick = async function () {
+  const playerID = document.getElementById("playerID").value;
+  if (!playerID) {
+    showToast("Enter a player ID first.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/get-transfers-by-player?playerID=${playerID}`);
+    const data = await response.json();
+    console.log(data);
+    if (!response.ok || !data.success) {
+      showToast(data.message || "Failed to fetch player transfers.");
+      return;
+    }
+    showToast(`Got transfers for player ${playerID}. See console.`, "success");
+  } catch (error) {
+    console.error("Failed to fetch transfers by player:", error);
+    showToast(error.message || "Failed to fetch player transfers.");
   }
 };
 

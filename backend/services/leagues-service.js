@@ -6,9 +6,9 @@ import { lastMatchesFromLeague } from "./matches-service.js";
 import { getTeamById } from "./teams-service.js";
 import { readFile } from "fs/promises";
 import path from "path";
+import { defaultLeagues } from "../../shared/defaults.js";
 
-// Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League
-export const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
+export { defaultLeagues } from "../../shared/defaults.js";
 
 export function parseLeagueIds(leagueQuery, options = {}) {
   const { fallback = defaultLeagues, unique = false } = options;

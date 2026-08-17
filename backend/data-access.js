@@ -871,71 +871,89 @@ export async function saveTransfersToDb(transfersData) {
     )
   `);
 
-  let savedCount = 0;
-
+  const playersByID = new Map();
   for (const playerEntry of players) {
     const playerID = Number(playerEntry?.player?.id);
     if (!Number.isFinite(playerID)) {
       continue;
     }
 
-    const playerName = playerEntry?.player?.name ?? null;
-    const apiUpdatedAt = playerEntry?.update
-      ? new Date(playerEntry.update)
-      : null;
-    const transfers = Array.isArray(playerEntry.transfers) ? playerEntry.transfers : [];
+    playersByID.set(playerID, playerEntry);
+  }
 
-    // The API sometimes reports the exact same real-world transfer twice within a single
-    // response, with the `date` off by a day or two. Collapse those near-duplicates here
-    // (same player, same club pair, dates within DUPLICATE_WINDOW_DAYS) before inserting,
-    // since a date-based UNIQUE KEY can't catch them.
-    const DUPLICATE_WINDOW_DAYS = 3;
-    const dedupedTransfers = [];
-    let skippedNearDuplicates = 0;
+  if (playersByID.size === 0) {
+    return { saved: 0 };
+  }
 
-    for (const transfer of transfers) {
-      const transferDate = transfer?.date || null;
-      const teamInID = transfer?.teams?.in?.id ?? null;
-      const teamOutID = transfer?.teams?.out?.id ?? null;
+  // The API occasionally returns players without a name; fall back to the stored name.
+  const idsMissingName = [...playersByID.entries()]
+    .filter(([, entry]) => !entry?.player?.name)
+    .map(([playerID]) => playerID);
+  const fallbackNames = new Map();
 
-      const isNearDuplicate = dedupedTransfers.some((existing) => {
-        if (existing.teamInID !== teamInID || existing.teamOutID !== teamOutID) {
-          return false;
-        }
-        if (!existing.transferDate || !transferDate) {
-          return existing.transferDate === transferDate;
-        }
-        const diffDays = Math.abs(new Date(existing.transferDate) - new Date(transferDate)) / (1000 * 60 * 60 * 24);
-        return diffDays <= DUPLICATE_WINDOW_DAYS;
-      });
+  if (idsMissingName.length > 0) {
+    const [rows] = await pool.query(
+      `SELECT id, name FROM Player WHERE id IN (${idsMissingName.map(() => "?").join(", ")})`,
+      idsMissingName,
+    );
 
-      if (isNearDuplicate) {
-        skippedNearDuplicates += 1;
+    for (const row of rows) {
+      if (row?.name) {
+        fallbackNames.set(Number(row.id), row.name);
+      }
+    }
+  }
+
+  const connection = await pool.getConnection();
+  let savedCount = 0;
+
+  try {
+    await connection.beginTransaction();
+
+    for (const [playerID, playerEntry] of playersByID) {
+      const playerName = playerEntry?.player?.name || fallbackNames.get(playerID) || null;
+      if (!playerName) {
+        console.warn(`Skipping transfers for player ${playerID}: missing player name.`);
         continue;
       }
+      const apiUpdatedAt = playerEntry?.update
+        ? new Date(playerEntry.update)
+        : null;
+      const transfers = Array.isArray(playerEntry.transfers) ? playerEntry.transfers : [];
+      const transferKeys = new Set();
 
-      dedupedTransfers.push({ transfer, transferDate, teamInID, teamOutID });
-    }
+      await connection.execute("DELETE FROM Player_Transfer WHERE player_id = ?", [playerID]);
 
-    if (skippedNearDuplicates > 0) {
-      console.log(
-        `[saveTransfersToDb] Skipped ${skippedNearDuplicates} near-duplicate transfer(s) for player ${playerID} (${playerName}).`,
-      );
-    }
+      for (const transfer of transfers) {
+        const transferDate = transfer?.date || null;
+        const teamInID = transfer?.teams?.in?.id ?? null;
+        const teamOutID = transfer?.teams?.out?.id ?? null;
+        const transferKey = JSON.stringify([transferDate, teamInID, teamOutID]);
+        if (transferKeys.has(transferKey)) {
+          continue;
+        }
+        transferKeys.add(transferKey);
 
-    for (const { transfer, transferDate, teamInID, teamOutID } of dedupedTransfers) {
-      const type = transfer?.type ?? null;
-      const teamInName = transfer?.teams?.in?.name ?? null;
-      const teamOutName = transfer?.teams?.out?.name ?? null;
+        const type = transfer?.type ?? null;
+        const teamInName = transfer?.teams?.in?.name ?? null;
+        const teamOutName = transfer?.teams?.out?.name ?? null;
 
-      await pool.execute(
-        `INSERT IGNORE INTO Player_Transfer
+        const [result] = await connection.execute(
+          `INSERT INTO Player_Transfer
           (player_id, player_name, transfer_date, type, team_in_id, team_in_name, team_out_id, team_out_name, api_updated_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-        [playerID, playerName, transferDate, type, teamInID, teamInName, teamOutID, teamOutName, apiUpdatedAt],
-      );
-      savedCount += 1;
+          [playerID, playerName, transferDate, type, teamInID, teamInName, teamOutID, teamOutName, apiUpdatedAt],
+        );
+        savedCount += result.affectedRows;
+      }
     }
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
   }
 
   return { saved: savedCount };
