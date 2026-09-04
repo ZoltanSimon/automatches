@@ -1,5 +1,10 @@
 import { playerGoalList } from "../components/player-list.js";
-import { addLeagues, setupLeagueListToggleButtons } from "../common-functions.js";
+import {
+  addLeagues,
+  setupLeagueListToggleButtons,
+  getPageQueryParams,
+  navigateWithUpdatedQuery,
+} from "../common-functions.js";
 
 await playerGoalList({ big: true, enableStatFilters: true });
 addLeagues("pleague");
@@ -31,7 +36,7 @@ document.querySelectorAll('.position-filter-btn[data-position]').forEach((btn) =
     e.preventDefault();
 
     const position = btn.dataset.position;
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = getPageQueryParams();
     const selectedPositions = (urlParams.get('pposition') || '')
       .split(',')
       .map((item) => item.trim().toLowerCase())
@@ -44,12 +49,12 @@ document.querySelectorAll('.position-filter-btn[data-position]').forEach((btn) =
     }
 
     const uniquePositions = [...new Set(selectedPositions)];
-    if (uniquePositions.length) {
-      urlParams.set('pposition', uniquePositions.join(','));
-    } else {
-      urlParams.delete('pposition');
-    }
-
-    window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
+    navigateWithUpdatedQuery((nextUrlParams) => {
+      if (uniquePositions.length) {
+        nextUrlParams.set('pposition', uniquePositions.join(','));
+      } else {
+        nextUrlParams.delete('pposition');
+      }
+    });
   });
 });

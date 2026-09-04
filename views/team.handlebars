@@ -57,13 +57,14 @@
         <div class="table-container" style="grid-column: 1 / 4; width: 100%;">
             {{> player-transfer latestTransfers=teamTransfers}}
         </div>
+        <p class="updated-at-label">Transfers updated at {{#if transferUpdatedAt}}{{formatDateOnly transferUpdatedAt}}{{else}}unknown{{/if}}</p>
     </div>
     <div class="rectangle" style="padding: 8px;">
         <span>{{thisTeam.name}} is a football club which featured in the following competitions this season: {{#each teamStats.[0].leagues}} {{this.name}},
             {{/each}} having {{teamStats.[0].wins}} wins, {{teamStats.[0].draws}} draws, and {{teamStats.[0].losses}} losses. They've scored a total of {{teamStats.[0].total.goals}}, from {{teamStats.[0].total.xG}} expected goals, conceding {{teamStats.[0].total.goalsAgainst}} goals from {{teamStats.[0].total.xGA}} expected goals. <br/><br/>
         If you are interested in the featured competitions, click on the competition icons next to the team's logo and name. You can also click on the matches to see more details about them, or on the players to see their respective pages.   </span>
     </div>
-    <div class="rectangle">
+    <div class="rectangle team-players-rect">
         <h2>Players</h2>
         <div style="display:flex; align-items:center; gap:10px; margin: 0 0 10px 0;">
             {{#if showAllPlayerStats}}
@@ -74,8 +75,9 @@
             <a href="/team?ID={{thisTeam.ID}}&allStats=1">Show all stats</a>
             {{/if}}
         </div>
-        <div id="player-list" class="table-container expanded">
+        <div id="player-list" class="table-container">
             {{> player-list-table big=false}}
         </div>
+        <p class="updated-at-label">Squad updated at {{#if squadUpdatedAt}}{{formatDateOnly squadUpdatedAt}}{{else}}unknown{{/if}}</p>
     </div>
 </div>

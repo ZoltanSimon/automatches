@@ -3,12 +3,178 @@ import {
   removeNewlines,
   adjustColspan,
   sortTable,
+  normalizeSortDirection,
+  getNextSortDirection,
+  getPageQueryParams,
+  navigateWithUpdatedQuery,
+  encodeCompactStatFilters,
+  decodeCompactStatFilters,
+  paginateTable,
+  DEFAULT_TABLE_PAGE_SIZE,
+  TOP_PLAYERS_PAGE_SIZE,
+  revealPageRectangle,
 } from "../common-functions.js";
+import {
+  applyTableStatFilter,
+  registerStatFilterPopover,
+} from "./stat-filter.js";
 
 const tableName = "player-list-table";
 const table = document.getElementById(tableName);
 const statFilterButtons = document.querySelectorAll(".stat-filter-btn");
 const playerStatFiltersStorageKey = "players.activeStatFilters";
+const playersQueryKeys = {
+  sortStat: "psort",
+  sortDirection: "pdir",
+  filters: "pfilters",
+  filterStat: "pfilterStat",
+  filterOperator: "pfilterOperator",
+  filterMin: "pfilterMin",
+  filterMax: "pfilterMax",
+  page: "ppage",
+};
+const defaultPlayersSortStat = "goals";
+const defaultPlayersSortDirection = "desc";
+
+function encodePlayersFilters(filters) {
+  return encodeCompactStatFilters(filters, false);
+}
+
+function decodePlayersFilters(serializedFilters) {
+  return decodeCompactStatFilters(serializedFilters, normalizePlayersFilter, false);
+}
+
+function normalizePlayersFilter(filter) {
+  if (!filter || !filter.stat || !filter.operator) {
+    return null;
+  }
+
+  const min = String(filter.min || "");
+  const max = String(filter.max || "");
+
+  return {
+    stat: String(filter.stat),
+    operator: String(filter.operator),
+    min,
+    max,
+    value: filter.operator === "lte"
+      ? (max || min)
+      : (String(filter.value || min)),
+  };
+}
+
+function parsePlayersFiltersFromUrl(urlParams) {
+  const serializedFilters = urlParams.get(playersQueryKeys.filters);
+  if (serializedFilters) {
+    const decoded = decodePlayersFilters(serializedFilters);
+    if (decoded.length) {
+      return decoded;
+    }
+
+    try {
+      const parsed = JSON.parse(serializedFilters);
+      const normalized = (Array.isArray(parsed) ? parsed : [parsed])
+        .map((filter) => normalizePlayersFilter(filter))
+        .filter(Boolean);
+
+      if (normalized.length) {
+        return normalized;
+      }
+    } catch (error) {
+      // fall through to legacy query fields
+    }
+  }
+
+  const legacyFilter = normalizePlayersFilter({
+    stat: urlParams.get(playersQueryKeys.filterStat),
+    operator: urlParams.get(playersQueryKeys.filterOperator),
+    min: urlParams.get(playersQueryKeys.filterMin) || "",
+    max: urlParams.get(playersQueryKeys.filterMax) || "",
+  });
+
+  return legacyFilter ? [legacyFilter] : [];
+}
+
+function getPlayersServerStateFromUrl() {
+  const urlParams = getPageQueryParams();
+  const statFilters = parsePlayersFiltersFromUrl(urlParams);
+  const sortStat = urlParams.get(playersQueryKeys.sortStat) || defaultPlayersSortStat;
+  const sortDirection = normalizeSortDirection(
+    urlParams.get(playersQueryKeys.sortDirection),
+    defaultPlayersSortDirection,
+  );
+
+  const parsedPage = Number.parseInt(urlParams.get(playersQueryKeys.page), 10);
+
+  return {
+    sortStat,
+    sortDirection,
+    statFilters,
+    page: Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1,
+  };
+}
+
+function persistPlayersPage(page) {
+  const urlParams = getPageQueryParams();
+  if (page <= 1) {
+    urlParams.delete(playersQueryKeys.page);
+  } else {
+    urlParams.set(playersQueryKeys.page, String(page));
+  }
+
+  const nextQuery = urlParams.toString();
+  const nextUrl = nextQuery
+    ? `${window.location.pathname}?${nextQuery}`
+    : window.location.pathname;
+  window.history.replaceState({}, "", nextUrl);
+}
+
+function setPlayersSortState(sortStat, sortDirection) {
+  document.querySelectorAll(`#${tableName} th.sortable`).forEach((header) => {
+    header.classList.remove("asc", "desc");
+    if (header.dataset.stat === sortStat) {
+      header.classList.add(sortDirection);
+      header.setAttribute("data-default-order", sortDirection);
+    }
+  });
+}
+
+function setPlayersSortParams(urlParams, sortStat, sortDirection) {
+  const normalizedSortStat = sortStat || defaultPlayersSortStat;
+  const normalizedDirection = normalizeSortDirection(
+    sortDirection,
+    defaultPlayersSortDirection,
+  );
+
+  if (normalizedSortStat === defaultPlayersSortStat) {
+    urlParams.delete(playersQueryKeys.sortStat);
+  } else {
+    urlParams.set(playersQueryKeys.sortStat, normalizedSortStat);
+  }
+
+  if (normalizedDirection === defaultPlayersSortDirection) {
+    urlParams.delete(playersQueryKeys.sortDirection);
+  } else {
+    urlParams.set(playersQueryKeys.sortDirection, normalizedDirection);
+  }
+}
+
+function setPlayersFilterParams(urlParams, filters) {
+  const normalizedFilters = (Array.isArray(filters) ? filters : [])
+    .map((filter) => normalizePlayersFilter(filter))
+    .filter(Boolean);
+
+  if (normalizedFilters.length) {
+    urlParams.set(playersQueryKeys.filters, encodePlayersFilters(normalizedFilters));
+  } else {
+    urlParams.delete(playersQueryKeys.filters);
+  }
+
+  urlParams.delete(playersQueryKeys.filterStat);
+  urlParams.delete(playersQueryKeys.filterOperator);
+  urlParams.delete(playersQueryKeys.filterMin);
+  urlParams.delete(playersQueryKeys.filterMax);
+}
 
 function saveActiveStats(hasPlayerStatFilters) {
   if (!hasPlayerStatFilters) {
@@ -53,13 +219,12 @@ function restoreActiveStats(hasPlayerStatFilters) {
   }
 }
 
-export function playerGoalList({ big = false, enableStatFilters = false } = {}) {
+export function playerGoalList({ big = false, enableStatFilters = false, pageSize } = {}) {
   const hasPlayerStatFilters = enableStatFilters && statFilterButtons.length > 0;
   const tableBody = table.getElementsByTagName("tbody")[0];
+  const serverSidePlayersTable = big;
+  const serverState = serverSidePlayersTable ? getPlayersServerStateFromUrl() : null;
 
-  window.addEventListener("resize", () =>
-    adjustColspan(table.rows[0].cells[0], 2),
-  );
   adjustColspan(table.rows[0].cells[0], 2);
 
   if (!tableBody) {
@@ -67,8 +232,6 @@ export function playerGoalList({ big = false, enableStatFilters = false } = {}) 
       "Table body not found! Ensure the table has a <tbody> element.",
     );
     return;
-  } else {
-    table.style.visibility = "visible";
   }
 
   const statsFilterSide = document.getElementById("stats-filter-side");
@@ -77,7 +240,33 @@ export function playerGoalList({ big = false, enableStatFilters = false } = {}) 
     restoreActiveStats(hasPlayerStatFilters);
   }
 
-  displayedPlayers.forEach((player) => {
+  if (big) {
+    registerStatFilterPopover({
+      tableId: tableName,
+      headerSelector: "thead th.sortable[data-stat]",
+      rowSelector: "tbody tr",
+      storageKey: "players.stat-filter",
+      serverSide: true,
+      initialFilters: serverState?.statFilters || [],
+      onFilterChange: (filters) => {
+        navigateWithUpdatedQuery((urlParams) => {
+          setPlayersFilterParams(urlParams, filters);
+        });
+      },
+      getColumnIndex: (header, tableElement) => {
+        const headerCells = Array.from(header.parentElement.children);
+        const headerIndex = headerCells.indexOf(header);
+        return headerCells
+          .slice(0, headerIndex)
+          .reduce((sum, th) => sum + (Number(th.colSpan) || 1), 0);
+      },
+    });
+  }
+
+  const listedPlayers = Array.isArray(window.displayedPlayers)
+    ? window.displayedPlayers
+    : [];
+  listedPlayers.forEach((player) => {
     //loadPlayerFace(player.id);
     //loadClubLogo(player.club);
     //loadClubLogo(player.nation);
@@ -85,6 +274,20 @@ export function playerGoalList({ big = false, enableStatFilters = false } = {}) 
 
   document.querySelectorAll(`#${tableName} th.sortable`).forEach((header) => {
     header.addEventListener("click", function () {
+      if (serverSidePlayersTable) {
+        const currentSortStat = serverState?.sortStat || "goals";
+        const currentDirection = normalizeSortDirection(serverState?.sortDirection, defaultPlayersSortDirection);
+        const nextDirection = getNextSortDirection(
+          currentSortStat === this.dataset.stat,
+          currentDirection,
+        );
+
+        navigateWithUpdatedQuery((urlParams) => {
+          setPlayersSortParams(urlParams, String(this.dataset.stat || "goals"), nextDirection);
+        });
+        return;
+      }
+
       const currentOrder = this.getAttribute("data-default-order") || "desc";
       const newOrder = currentOrder === "asc" ? "desc" : "asc";
 
@@ -103,7 +306,7 @@ export function playerGoalList({ big = false, enableStatFilters = false } = {}) 
 
       sortTable(columnIndex, this, table, 1);
 
-      updateTableVisibility(hasPlayerStatFilters);
+      updateTableVisibility(hasPlayerStatFilters, false);
     });
   });
 
@@ -117,49 +320,28 @@ export function playerGoalList({ big = false, enableStatFilters = false } = {}) 
     });
   }
 
-  updateTableVisibility(hasPlayerStatFilters);
+  const resolvedPageSize = Number(pageSize) > 0
+    ? Number(pageSize)
+    : (serverSidePlayersTable ? TOP_PLAYERS_PAGE_SIZE : DEFAULT_TABLE_PAGE_SIZE);
 
-  let rows = document.querySelectorAll(`#${tableName} tbody tr`); // Select all rows inside your table
-  let rowsPerPage = 100;
-  let currentVisible = rowsPerPage;
-
-  rows.forEach((row, index) => {
-    if (index >= rowsPerPage) {
-      row.style.display = "none";
-    }
+  paginateTable(table, {
+    pageSize: resolvedPageSize,
+    initialPage: serverSidePlayersTable ? serverState.page : 1,
+    pagerHost: table.parentNode,
+    isRowEligible: (row) => row.dataset.statFilterHidden !== "true",
+    onPageChange: serverSidePlayersTable ? persistPlayersPage : null,
   });
 
-  if (big && displayedPlayers.length > 99) {
-    let loadMoreBtn = document.createElement("button");
-    loadMoreBtn.innerText = "Load More";
-    loadMoreBtn.style.display = "block";
-    loadMoreBtn.style.margin = "20px auto";
-    loadMoreBtn.style.padding = "10px";
-    loadMoreBtn.style.cursor = "pointer";
-    loadMoreBtn.style.background = "#007bff";
-    loadMoreBtn.style.color = "#fff";
-    loadMoreBtn.style.border = "none";
-    loadMoreBtn.style.borderRadius = "5px";
-    loadMoreBtn.style.fontSize = "16px";
-    loadMoreBtn.style.visibility = "visible";
-
-    loadMoreBtn.addEventListener("click", function () {
-      let newVisible = currentVisible + rowsPerPage;
-      rows.forEach((row, index) => {
-        if (index < newVisible) {
-          row.style.display = "";
-        }
-      });
-
-      currentVisible = newVisible;
-
-      if (currentVisible >= rows.length) {
-        loadMoreBtn.style.display = "none";
-      }
-    });
-
-    document.querySelector("#" + tableName).parentNode.appendChild(loadMoreBtn);
+  updateTableVisibility(hasPlayerStatFilters, serverSidePlayersTable);
+  if (serverSidePlayersTable) {
+    setPlayersSortState(serverState?.sortStat || "goals", serverState?.sortDirection || "desc");
   }
+
+  table.style.visibility = "visible";
+  if (table.parentElement) {
+    table.parentElement.style.visibility = "visible";
+  }
+  revealPageRectangle();
 }
 
 export function playerListToCanvas() {
@@ -250,7 +432,7 @@ export function playerListToCanvas() {
 
 document.addEventListener("DOMContentLoaded", function () {});
 
-function updateTableVisibility(hasPlayerStatFilters) {
+function updateTableVisibility(hasPlayerStatFilters, serverSidePlayersTable = false) {
   if (hasPlayerStatFilters) {
     const activeStats = new Set(
       Array.from(document.querySelectorAll(".stat-filter-btn.active")).map(
@@ -270,7 +452,9 @@ function updateTableVisibility(hasPlayerStatFilters) {
     });
   }
 
-  document.querySelectorAll(`#${tableName} tbody tr`).forEach((row, index) => {
-    row.style.display = index < 200 ? "" : "none";
-  });
+  if (!serverSidePlayersTable) {
+    applyTableStatFilter(tableName);
+  }
+
+  table?._tablePagination?.refresh({ resetPage: !serverSidePlayersTable });
 }

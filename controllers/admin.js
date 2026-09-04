@@ -423,10 +423,33 @@ document.getElementById("get-transfers-by-player").onclick = async function () {
       showToast(data.message || "Failed to fetch player transfers.");
       return;
     }
-    showToast(`Got transfers for player ${playerID}. See console.`, "success");
+    showToast(`Saved ${data.saved ?? 0} transfer row(s) for player ${playerID}.`, "success");
   } catch (error) {
     console.error("Failed to fetch transfers by player:", error);
     showToast(error.message || "Failed to fetch player transfers.");
+  }
+};
+
+document.getElementById("update-squads").onclick = async function () {
+  const button = this;
+  button.disabled = true;
+  showToast("Fetching squads for teams due an update (10s between calls, this can take a while)...", "success");
+
+  try {
+    const response = await fetch("/api/update-squads");
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data?.message || "Failed to fetch squads.");
+    }
+
+    console.log(data.results);
+    showToast(`Processed ${data.teamsProcessed} team(s), saved ${data.totalSaved} squad(s).`, "success");
+  } catch (error) {
+    console.error("Failed to fetch squads:", error);
+    showToast(error.message || "Failed to fetch squads.");
+  } finally {
+    button.disabled = false;
   }
 };
 

@@ -19,15 +19,16 @@ import { fileURLToPath } from "url";
 import {
   getPlayerList,
   getPlayerPageData,
-  parseSelectedPositions,
+  getTopPlayersPageData,
   buildPositionOptions,
 } from "./services/players-service.js";
 import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData, parseLeagueIds, defaultLeagues } from "./services/leagues-service.js";
 import { parseDate, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
-import { getTeamById, getTopTeams, getTeamRouteData } from "./services/teams-service.js";
+import { getTeamById, getTopTeams, getTeamRouteData, getTopTeamsPageData } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
+import { allDBLeagues, setCatalog } from "./catalog.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -40,7 +41,6 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 const partialsPath = path.join(__dirname, "../views/partials");
-export let allDBPlayers, allDBTeams, allDBLeagues;
 
 app.engine(
   "handlebars",
@@ -62,28 +62,20 @@ app.use((req, res, next) => {
 app.use(
   "/api",
   createApiRouter({
-    setAllDbState: ({ players, teams, leagues }) => {
-      allDBPlayers = players;
-      allDBTeams = teams;
-      allDBLeagues = leagues;
-    },
+    setAllDbState: setCatalog,
   })
 );
 app.use("/", createPublicRouter());
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}, loading registry...`);
-  allDBPlayers = await loadPlayers();
-  allDBTeams = await loadTeams();
-  allDBLeagues = await loadLeagues();
+  setCatalog({
+    players: await loadPlayers(),
+    teams: await loadTeams(),
+    leagues: await loadLeagues(),
+  });
   
   await refreshRegistry(); // build it immediately on startup
-  /*const registry = await getRegistry();
-  try {
-    await dumpRegistryOnStartup(registry);
-  } catch (error) {
-    console.error("Failed to write registry startup dump:", error);
-  }*/
   setInterval(() => {
     refreshRegistry().catch((error) => {
       console.error("Scheduled registry refresh failed:", error);
@@ -94,10 +86,10 @@ app.listen(PORT, async () => {
 app.get("/", async (req, res) => {
   try {
     const selectedDate = parseDate(req.query.date);
-    const selectedPlayerLeague = req.query.pleague ? parseLeagueIds(req.query.pleague) : [1];
-    const selectedTeamLeague = req.query.tleague ? parseLeagueIds(req.query.tleague) : [1];
+    const selectedPlayerLeague = req.query.pleague ? parseLeagueIds(req.query.pleague) : defaultLeagues;
+    const selectedTeamLeague = req.query.tleague ? parseLeagueIds(req.query.tleague) : defaultLeagues;
     const parsed = parseFloat(req.query.sleague);
-    const selectedStandingsLeague = isNaN(parsed) ? 71 : parsed;
+    const selectedStandingsLeague = isNaN(parsed) ? 39 : parsed;
     const selectedTransferLeagues = req.query.league ? parseLeagueIds(req.query.league) : [];
     const registry = await getRegistry();
     const playerPageData = getPlayerPageData(registry, null, selectedPlayerLeague);
@@ -131,11 +123,16 @@ app.get("/", async (req, res) => {
 
 app.get("/top-players", async (req, res) => {
   try {
-    const selectedLeague = parseLeagueIds(req.query.pleague);
-    const selectedPositions = parseSelectedPositions(req.query.pposition);
-    const teamQuery = req.query.team;
     const registry = await getRegistry();
-    const players = getPlayerList(registry, 500, teamQuery, selectedLeague, selectedPositions);
+    const {
+      players,
+      selectedLeague,
+      selectedPositions,
+      selectedSortStat,
+      selectedSortDirection,
+      selectedStatFilter,
+      selectedStatFilters,
+    } = getTopPlayersPageData(registry, req.query);
 
     res.render("top-players", {
       title: "Top Players - Football Player Stats & Performance",
@@ -145,6 +142,10 @@ app.get("/top-players", async (req, res) => {
       selectedPLeagues: selectedLeague,
       selectedPPositions: selectedPositions,
       positionOptions: buildPositionOptions(),
+      selectedPSort: selectedSortStat,
+      selectedPOrder: selectedSortDirection,
+      selectedPFilter: selectedStatFilter,
+      selectedPFilters: selectedStatFilters,
     });
   } catch (error) {
     handleError(res, error, "Error fetching players");
@@ -165,7 +166,14 @@ app.get("/top-teams", async (req, res) => {
 
   const registry = await getRegistry();
   
-  const teams = getTopTeams(registry, selectedTeamLeague);
+  const {
+    teams,
+    selectedSortStat,
+    selectedSortDirection,
+    selectedSortColumnIndex,
+    selectedStatFilter,
+    selectedStatFilters,
+  } = getTopTeamsPageData(registry, selectedTeamLeague, req.query);
 
   res.render("top-teams", { 
     title: "Top Teams - Football Team Stats & Matches",
@@ -173,6 +181,11 @@ app.get("/top-teams", async (req, res) => {
     teams: teams.slice(0,150),
     leagues: allDBLeagues.filter(league => league.type === 'league'),
      selectedTLeagues: selectedTeamLeague,
+     selectedTSort: selectedSortStat,
+     selectedTOrder: selectedSortDirection,
+     selectedTColumn: selectedSortColumnIndex,
+     selectedTFilter: selectedStatFilter,
+     selectedTFilters: selectedStatFilters,
   });
 });
 
@@ -211,6 +224,8 @@ app.get("/team", async (req, res) => {
     showAllPlayerStats,
     selectedPlayerStatsLeague,
     selectedPlayerStatsLeagueName,
+    squadUpdatedAt,
+    transferUpdatedAt,
   } = await getTeamRouteData(registry, thisTeam.ID, req.query.allStats);
   const teamTransfers = await getTransfersByTeam(thisTeam.ID, 25);
 
@@ -229,6 +244,8 @@ app.get("/team", async (req, res) => {
     showAllPlayerStats,
     selectedPlayerStatsLeague,
     selectedPlayerStatsLeagueName,
+    squadUpdatedAt,
+    transferUpdatedAt,
   });
 });
 

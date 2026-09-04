@@ -1,6 +1,6 @@
 import {  getLeagueFromDb } from '../data-access.js';
 import { getMatchFromServer } from '../json-reader.js';
-import { allDBLeagues } from '../index.js';
+import { allDBLeagues } from '../catalog.js';
 
 let _registryPromise = null;
 let _registry = null;

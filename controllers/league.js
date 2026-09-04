@@ -1,5 +1,5 @@
 import { playerGoalList } from "../../components/player-list.js";
-import { addShowMoreButtons, applyKnockoutBracketLayout } from "../common-functions.js";
+import { addTablePagination, applyKnockoutBracketLayout, paginateMatchList } from "../common-functions.js";
 
 applyKnockoutBracketLayout();
 
@@ -17,5 +17,6 @@ if (seasonSelect) {
 
 await playerGoalList({ big: false, enableStatFilters: false });
 
-addShowMoreButtons();
+paginateMatchList();
+addTablePagination();
 

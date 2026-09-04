@@ -9,7 +9,7 @@ import {
   updatePlayerProfilesInDb,
 } from "./../data-access.js";
 import { Player } from "./../../classes/player.js";
-import { allDBLeagues, allDBPlayers } from "../index.js";
+import { allDBLeagues, allDBPlayers } from "../catalog.js";
 import { LineupParser } from "../../classes/lineupparser.js";
 import { comparePositionsByDisplayOrder, parseLowercaseStringList, wait } from "../backend-helper.js";
 import { getTeamById } from "./teams-service.js";
@@ -91,6 +91,90 @@ function getMatchesByLeagueFilter(registry, leagueFilter = []) {
     : registry.matches;
 }
 
+const defaultPlayerSortStat = "goals";
+const validStatFilterOperators = new Set(["gte", "lte", "between", "eq", "neq"]);
+
+function normalizeTextValue(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeSortDirection(direction) {
+  return String(direction || "desc").toLowerCase() === "asc" ? "asc" : "desc";
+}
+
+function normalizeSortStat(stat) {
+  return normalizeTextValue(stat) || defaultPlayerSortStat;
+}
+
+function normalizePlayerStatFilter(inputFilter = {}) {
+  const stat = normalizeTextValue(inputFilter.stat);
+  const operator = normalizeTextValue(inputFilter.operator);
+  const min = normalizeTextValue(inputFilter.min);
+  const max = normalizeTextValue(inputFilter.max);
+
+  if (!stat || !validStatFilterOperators.has(operator)) {
+    return null;
+  }
+
+  return {
+    stat,
+    operator,
+    min,
+    max,
+    value: normalizeTextValue(inputFilter.value) || (operator === "lte" ? (max || min) : min),
+  };
+}
+
+function parseCompactTopPlayersStatFilters(serializedFilters) {
+  if (!serializedFilters) {
+    return [];
+  }
+
+  return serializedFilters
+    .split("|")
+    .map((segment) => {
+      const [stat = "", operator = "", min = "", max = ""] = segment.split("~");
+      return normalizePlayerStatFilter({ stat, operator, min, max });
+    })
+    .filter(Boolean);
+}
+
+function parseTopPlayersStatFilter(query = {}) {
+  return normalizePlayerStatFilter({
+    stat: query.pfilterStat,
+    operator: query.pfilterOperator,
+    min: query.pfilterMin,
+    max: query.pfilterMax,
+  });
+}
+
+function parseTopPlayersStatFilters(query = {}) {
+  const serializedFilters = normalizeTextValue(query.pfilters);
+
+  if (serializedFilters) {
+    const compactFilters = parseCompactTopPlayersStatFilters(serializedFilters);
+    if (compactFilters.length) {
+      return compactFilters;
+    }
+
+    try {
+      const parsed = JSON.parse(serializedFilters);
+      const normalized = (Array.isArray(parsed) ? parsed : [parsed])
+        .map((filter) => normalizePlayerStatFilter(filter))
+        .filter(Boolean);
+
+      if (normalized.length) {
+        return normalized;
+      }
+    } catch (error) {
+      // fall back to legacy single filter fields
+    }
+  }
+
+  const legacyFilter = parseTopPlayersStatFilter(query);
+  return legacyFilter ? [legacyFilter] : [];
+}
+
 function createPlayerWithResolvedTeamNames(inputPlayer) {
   const player = new Player(inputPlayer);
   player.clubName = getTeamName(player.club);
@@ -100,6 +184,114 @@ function createPlayerWithResolvedTeamNames(inputPlayer) {
 
 function toPositionList(positionValue = "") {
   return parseLowercaseStringList(positionValue);
+}
+
+function parsePlayerStatValue(value) {
+  if (value === null || value === undefined || value === "") {
+    return Number.NaN;
+  }
+
+  if (typeof value === "number") {
+    return value;
+  }
+
+  const normalized = String(value).replace(/%/g, "").replace(/,/g, "").trim();
+  const numericMatch = normalized.match(/-?\d+(?:\.\d+)?/);
+  if (numericMatch) {
+    return Number.parseFloat(numericMatch[0]);
+  }
+
+  return normalized.toLowerCase();
+}
+
+function comparePlayerStatValues(a, b) {
+  const aIsNumber = Number.isFinite(a);
+  const bIsNumber = Number.isFinite(b);
+
+  if (aIsNumber && bIsNumber) {
+    return a - b;
+  }
+
+  return String(a ?? "").localeCompare(String(b ?? ""), undefined, { sensitivity: "base" });
+}
+
+function getPlayerSortValue(player, statName) {
+  if (!statName) {
+    return parsePlayerStatValue(player.goals);
+  }
+
+  const normalizedStat = String(statName).trim();
+  if (normalizedStat === "name") {
+    return String(player.name || "").toLowerCase();
+  }
+
+  return parsePlayerStatValue(player[normalizedStat]);
+}
+
+function matchesPlayerStatFilter(player, filter) {
+  if (!filter?.stat || !filter.operator) {
+    return true;
+  }
+
+  const value = getPlayerSortValue(player, filter.stat);
+  if (!Number.isFinite(value)) {
+    return false;
+  }
+
+  const min = Number.parseFloat(filter.min);
+  const max = Number.parseFloat(filter.max);
+  const target = Number.parseFloat(filter.value ?? filter.min ?? filter.max);
+
+  switch (filter.operator) {
+    case "gte":
+      return Number.isFinite(min) && value >= min;
+    case "lte":
+      return Number.isFinite(max) ? value <= max : Number.isFinite(min) && value <= min;
+    case "between": {
+      if (!Number.isFinite(min) || !Number.isFinite(max)) {
+        return false;
+      }
+
+      const lower = Math.min(min, max);
+      const upper = Math.max(min, max);
+      return value >= lower && value <= upper;
+    }
+    case "eq":
+      return Number.isFinite(target) && Math.abs(value - target) < 0.0001;
+    case "neq":
+      return Number.isFinite(target) && Math.abs(value - target) >= 0.0001;
+    default:
+      return true;
+  }
+}
+
+function sortPlayersByStat(players, sortStat = "goals", sortDirection = "desc") {
+  const direction = normalizeSortDirection(sortDirection) === "asc" ? 1 : -1;
+  const tieBreakers = sortStat === "goals"
+    ? ["rating", "apps", "name"]
+    : ["goals", "rating", "apps", "name"];
+
+  return [...players].sort((playerA, playerB) => {
+    const sortValueA = getPlayerSortValue(playerA, sortStat);
+    const sortValueB = getPlayerSortValue(playerB, sortStat);
+    const primaryDiff = comparePlayerStatValues(sortValueA, sortValueB);
+
+    if (primaryDiff !== 0) {
+      return primaryDiff * direction;
+    }
+
+    for (const tieBreaker of tieBreakers) {
+      const tieValueA = getPlayerSortValue(playerA, tieBreaker);
+      const tieValueB = getPlayerSortValue(playerB, tieBreaker);
+      const tieDiff = comparePlayerStatValues(tieValueA, tieValueB);
+
+      if (tieDiff !== 0) {
+        return tieDiff * -1;
+      }
+    }
+
+    return String(playerA.name || "").localeCompare(String(playerB.name || ""), undefined, { sensitivity: "base" });
+  });
 }
 
 export function parseSelectedPositions(positionQuery) {
@@ -126,8 +318,18 @@ export function getPlayerList(
   teamFilter = "",
   leagueFilter = [],
   positionFilter = [],
+  options = {},
 ) {
+  const {
+    sortStat = defaultPlayerSortStat,
+    sortDirection = "desc",
+    statFilter = null,
+    statFilters = [],
+    appearedForTeamID = null,
+  } = options;
   const playerMap = new Map();
+  const normalizedAppearedForTeamID = Number(appearedForTeamID);
+  const hasAppearedForTeamFilter = appearedForTeamID != null && appearedForTeamID !== "" && Number.isFinite(normalizedAppearedForTeamID);
 
   const matches = getMatchesByLeagueFilter(registry, leagueFilter);
 
@@ -136,7 +338,11 @@ export function getPlayerList(
     if (!Array.isArray(matchPlayers) || matchPlayers.length < 2) continue;
 
     for (const team of matchPlayers) {
-      for (const player of team.players) {
+      if (hasAppearedForTeamFilter && Number(team?.team?.id) !== normalizedAppearedForTeamID) {
+        continue;
+      }
+
+      for (const player of team.players || []) {
         const playerID = player.player.id;
 
         if (playerMap.has(playerID)) {
@@ -160,7 +366,7 @@ export function getPlayerList(
     .sort((a, b) => b.rating - a.rating)
     .sort((a, b) => b.goals - a.goals);
 
-  if (teamFilter) {
+  if (teamFilter && !hasAppearedForTeamFilter) {
     const normalizedTeamFilter = Number(teamFilter);
     players = players.filter((player) => {
       const clubID = Number(player.club);
@@ -182,7 +388,53 @@ export function getPlayerList(
     });
   }
 
-  return players.slice(0, nr);
+  const selectedStatFilters = Array.isArray(statFilters) && statFilters.length
+    ? statFilters
+    : statFilter?.stat
+      ? [statFilter]
+      : [];
+
+  const filteredPlayers = selectedStatFilters.length
+    ? players.filter((player) => selectedStatFilters.every((filter) => matchesPlayerStatFilter(player, filter)))
+    : players;
+
+  return sortPlayersByStat(
+    filteredPlayers,
+    normalizeSortStat(sortStat),
+    normalizeSortDirection(sortDirection),
+  ).slice(0, nr);
+}
+
+export function getTopPlayersPageData(registry, query = {}) {
+  const selectedLeague = parseLeagueIds(query.pleague);
+  const selectedPositions = parseSelectedPositions(query.pposition);
+  const selectedSortStat = normalizeSortStat(query.psort);
+  const selectedSortDirection = normalizeSortDirection(query.pdir);
+  const selectedStatFilters = parseTopPlayersStatFilters(query);
+  const teamQuery = query.team;
+
+  const players = getPlayerList(
+    registry,
+    500,
+    teamQuery,
+    selectedLeague,
+    selectedPositions,
+    {
+      sortStat: selectedSortStat,
+      sortDirection: selectedSortDirection,
+      statFilters: selectedStatFilters,
+    },
+  );
+
+  return {
+    players,
+    selectedLeague,
+    selectedPositions,
+    selectedSortStat,
+    selectedSortDirection,
+    selectedStatFilter: selectedStatFilters[0] || null,
+    selectedStatFilters,
+  };
 }
 
 function createFallbackPlayerFromSquadEntry(squadEntry, teamID) {
@@ -213,9 +465,14 @@ function createFallbackPlayerFromSquadEntry(squadEntry, teamID) {
 
 export function getTeamPlayerList(registry, teamID, squad = null, nr = 100, leagueFilter = []) {
   const normalizedTeamID = Number(teamID);
-  const playersWithStats = getPlayerList(registry, 1000, normalizedTeamID, leagueFilter);
+  const playersWithStats = getPlayerList(registry, 1000, "", leagueFilter, [], {
+    appearedForTeamID: normalizedTeamID,
+  });
+  const squadPlayers = Array.isArray(squad?.players) && squad.players.length > 0
+    ? squad.players
+    : null;
 
-  if (!Array.isArray(squad?.players) || squad.players.length === 0) {
+  if (!squadPlayers) {
     return playersWithStats.slice(0, nr);
   }
 
@@ -225,7 +482,7 @@ export function getTeamPlayerList(registry, teamID, squad = null, nr = 100, leag
   const mergedPlayers = [];
   const seenPlayerIDs = new Set();
 
-  for (const squadEntry of squad.players) {
+  for (const squadEntry of squadPlayers) {
     const squadPlayerID = Number(squadEntry?.id ?? squadEntry?.player?.id);
     if (!Number.isFinite(squadPlayerID) || seenPlayerIDs.has(squadPlayerID)) {
       continue;

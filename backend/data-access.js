@@ -1,7 +1,7 @@
 import pool, { networkPath } from "./config.js";
 import fs from "fs";
 import path from "path";
-import { allDBLeagues, allDBTeams, allDBPlayers } from "./index.js";
+import { allDBLeagues, allDBTeams, allDBPlayers } from "./catalog.js";
 import { getTeamById } from "./services/teams-service.js";
 import {
   extractPlayerProfile,
@@ -797,6 +797,49 @@ export async function getAllMatchesFromDb() {
   }
 }
 
+function parseStoredSquad(rawSquad) {
+  if (rawSquad == null) {
+    return null;
+  }
+
+  if (typeof rawSquad === "string") {
+    try {
+      return JSON.parse(rawSquad);
+    } catch (error) {
+      console.error("Failed to parse stored squad JSON:", error);
+      return null;
+    }
+  }
+
+  return rawSquad;
+}
+
+function squadHasPlayers(squad) {
+  const candidates = Array.isArray(squad) ? squad : [squad];
+  return candidates.some((entry) => Array.isArray(entry?.players) && entry.players.length > 0);
+}
+
+function normalizeSquadRecord(rawSquad) {
+  const parsed = parseStoredSquad(rawSquad);
+  if (!parsed) {
+    return null;
+  }
+
+  const candidates = Array.isArray(parsed) ? parsed : [parsed];
+  const squadWithPlayers = candidates.find((entry) => Array.isArray(entry?.players) && entry.players.length > 0);
+
+  return squadWithPlayers || null;
+}
+
+export async function markTeamSquadUpdated(teamID) {
+  const normalizedTeamID = Number(teamID);
+  if (!Number.isFinite(normalizedTeamID)) {
+    return;
+  }
+
+  await pool.execute("UPDATE Team SET squad_updated = NOW() WHERE ID = ?", [normalizedTeamID]);
+}
+
 export async function saveSquadToDb(teamID, squad) {
   const normalizedTeamID = Number(teamID);
   if (!Number.isFinite(normalizedTeamID)) {
@@ -807,6 +850,10 @@ export async function saveSquadToDb(teamID, squad) {
     throw new Error("Invalid squad payload provided for squad save.");
   }
 
+  if (!squadHasPlayers(squad)) {
+    throw new Error("Refusing to save empty squad payload.");
+  }
+
   const serializedSquad = JSON.stringify(squad);
 
   await pool.execute("DELETE FROM Squads WHERE team_id = ?", [normalizedTeamID]);
@@ -814,6 +861,7 @@ export async function saveSquadToDb(teamID, squad) {
     "INSERT INTO Squads (team_id, squad) VALUES (?, ?)",
     [normalizedTeamID, serializedSquad],
   );
+  await markTeamSquadUpdated(normalizedTeamID);
 
   return {
     teamID: normalizedTeamID,
@@ -828,23 +876,47 @@ export async function getSquadFromDb(teamID) {
   }
 
   const [rows] = await pool.query(
-    "SELECT squad FROM Squads WHERE team_id = ? ORDER BY id DESC LIMIT 1",
+    `SELECT s.squad, t.squad_updated, t.transfer_updated
+     FROM Team t
+     LEFT JOIN Squads s ON s.team_id = t.ID
+     WHERE t.ID = ?
+     ORDER BY s.id DESC
+     LIMIT 1`,
     [normalizedTeamID],
   );
 
   if (!rows.length) {
-    return null;
+    return { squad: null, squadUpdatedAt: null, transferUpdatedAt: null };
   }
 
-  const rawSquad = rows[0].squad;
-  if (typeof rawSquad === "string") {
-    return JSON.parse(rawSquad);
-  }
-
-  return rawSquad;
+  return {
+    squad: normalizeSquadRecord(rows[0].squad),
+    squadUpdatedAt: rows[0].squad_updated ?? null,
+    transferUpdatedAt: rows[0].transfer_updated ?? null,
+  };
 }
 
-export async function saveTransfersToDb(transfersData) {
+export async function getTeamsDueForSquadUpdate(limit = 150) {
+  const normalizedLimit = Number(limit);
+  const safeLimit = Number.isFinite(normalizedLimit) && normalizedLimit > 0
+    ? Math.floor(normalizedLimit)
+    : 150;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT ID, name FROM Team m
+       ORDER BY (m.squad_updated IS NOT NULL), m.squad_updated ASC
+       LIMIT ${safeLimit}`,
+    );
+
+    return rows;
+  } catch (error) {
+    console.error("Error loading teams due for a squad update:", error);
+    return [];
+  }
+}
+
+export async function saveTransfersToDb(transfersData, { replacePlayerHistory = false } = {}) {
   const players = Array.isArray(transfersData) ? transfersData : [];
 
   if (players.length === 0) {
@@ -922,7 +994,12 @@ export async function saveTransfersToDb(transfersData) {
       const transfers = Array.isArray(playerEntry.transfers) ? playerEntry.transfers : [];
       const transferKeys = new Set();
 
-      await connection.execute("DELETE FROM Player_Transfer WHERE player_id = ?", [playerID]);
+      // Team-level API payloads only include transfers involving that club, not the
+      // player's full history. Replacing all rows would wipe career moves gathered
+      // from other clubs. Only wipe when we have a complete player-level payload.
+      if (replacePlayerHistory) {
+        await connection.execute("DELETE FROM Player_Transfer WHERE player_id = ?", [playerID]);
+      }
 
       for (const transfer of transfers) {
         const transferDate = transfer?.date || null;
@@ -938,10 +1015,22 @@ export async function saveTransfersToDb(transfersData) {
         const teamInName = transfer?.teams?.in?.name ?? null;
         const teamOutName = transfer?.teams?.out?.name ?? null;
 
-        const [result] = await connection.execute(
-          `INSERT INTO Player_Transfer
+        const insertSql = replacePlayerHistory
+          ? `INSERT INTO Player_Transfer
           (player_id, player_name, transfer_date, type, team_in_id, team_in_name, team_out_id, team_out_name, api_updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+          : `INSERT INTO Player_Transfer
+          (player_id, player_name, transfer_date, type, team_in_id, team_in_name, team_out_id, team_out_name, api_updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+            player_name = VALUES(player_name),
+            type = VALUES(type),
+            team_in_name = VALUES(team_in_name),
+            team_out_name = VALUES(team_out_name),
+            api_updated_at = VALUES(api_updated_at);`;
+
+        const [result] = await connection.execute(
+          insertSql,
           [playerID, playerName, transferDate, type, teamInID, teamInName, teamOutID, teamOutName, apiUpdatedAt],
         );
         savedCount += result.affectedRows;

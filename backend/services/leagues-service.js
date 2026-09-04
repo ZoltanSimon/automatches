@@ -1,4 +1,4 @@
-import { allDBLeagues } from "../index.js";
+import { allDBLeagues } from "../catalog.js";
 import { extractTeams } from "./teams-service.js";
 import { getLeagueStandingsFromDb, loadLeagueSeasonRows, loadLeagues } from "../data-access.js";
 import { mergeWorldCupGroupStandings, parseStringList, wait } from "../backend-helper.js";

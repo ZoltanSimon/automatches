@@ -19,8 +19,8 @@
     <tbody>
         {{#each matches}}
         <tr data-round="{{this.league.round}}">
-            <td>
-                <img width=40 class="match-list-comp-logo" src="images/competitions/{{this.league.id}}.png" />
+            <td class="match-list-league-logo-td">
+                <a href="league?id={{this.league.id}}"><img width=40 class="match-list-comp-logo" src="images/competitions/{{this.league.id}}.png" /></a>
             </td>
             <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
                 {{formatDateOnly fixture.date}}

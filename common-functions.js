@@ -1,5 +1,6 @@
 import { matchList } from "./components/match-list.js";
 import { selectedLeagues } from "./local-handler.js";
+import { defaultLeagues } from "./shared/defaults.js";
 
 export const BRACKET_UNIT_PX = 71;
 export const BRACKET_MATCH_CARD_HEIGHT_PX = 63;
@@ -63,6 +64,72 @@ export function htmlDecode(input) {
   return txt.value;
 }
 
+export function parseColumnIndex(value) {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function normalizeSortDirection(value, fallback = "desc") {
+  return String(value || fallback).toLowerCase() === "asc" ? "asc" : "desc";
+}
+
+export function getNextSortDirection(isSameTarget, currentDirection = "desc") {
+  return isSameTarget && currentDirection === "desc" ? "asc" : "desc";
+}
+
+export function getPageQueryParams() {
+  return new URLSearchParams(window.location.search);
+}
+
+export function navigateWithUpdatedQuery(updateParams) {
+  const urlParams = getPageQueryParams();
+  updateParams(urlParams);
+  urlParams.delete("ppage");
+
+  const nextQuery = urlParams.toString();
+  window.location.href = nextQuery
+    ? `${window.location.pathname}?${nextQuery}`
+    : window.location.pathname;
+}
+
+export function encodeCompactStatFilters(filters, includeColumnIndex = false) {
+  return (Array.isArray(filters) ? filters : [])
+    .map((filter) => {
+      const parts = [
+        String(filter?.stat || ""),
+        String(filter?.operator || ""),
+        String(filter?.min || ""),
+        String(filter?.max || ""),
+      ];
+
+      if (includeColumnIndex) {
+        const columnIndex = parseColumnIndex(filter?.columnIndex);
+        parts.push(columnIndex !== null ? String(columnIndex) : "");
+      }
+
+      return parts.join("~");
+    })
+    .join("|");
+}
+
+export function decodeCompactStatFilters(serializedFilters, normalizeFilter, includeColumnIndex = false) {
+  if (!serializedFilters || typeof normalizeFilter !== "function") {
+    return [];
+  }
+
+  return serializedFilters
+    .split("|")
+    .map((segment) => {
+      const [stat = "", operator = "", min = "", max = "", columnIndex = ""] = segment.split("~");
+      return normalizeFilter(
+        includeColumnIndex
+          ? { stat, operator, min, max, columnIndex }
+          : { stat, operator, min, max },
+      );
+    })
+    .filter(Boolean);
+}
+
 export function truncate(str, n) {
   return str.length > n ? str.slice(0, n - 1) + "&hellip;" : str;
 }
@@ -98,26 +165,295 @@ export function copyToClipboard(element) {
   document.getElementById("btn").value = "Copied";
 }
 
-export function addShowMoreButtons(containerSelector = ".table-container") {
-  document.querySelectorAll(containerSelector).forEach((container) => {
-    const needsExpansion = container.scrollHeight > container.clientHeight;
+export const DEFAULT_TABLE_PAGE_SIZE = 10;
+export const TOP_PLAYERS_PAGE_SIZE = 100;
 
-    if (!needsExpansion || container.querySelector(".show-more-btn")) {
+function shouldSkipTablePagination(container) {
+  return Boolean(
+    container.id === "standings"
+    || container.classList.contains("world-cup-panel")
+    || container.querySelector("#league-standings, .knockout-round, .world-cup-group-table"),
+  );
+}
+
+function getPaginationItems(currentPage, totalPages) {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const items = [1];
+  const windowStart = Math.max(2, currentPage - 1);
+  const windowEnd = Math.min(totalPages - 1, currentPage + 1);
+
+  if (windowStart > 2) {
+    items.push("ellipsis");
+  }
+
+  for (let page = windowStart; page <= windowEnd; page += 1) {
+    items.push(page);
+  }
+
+  if (windowEnd < totalPages - 1) {
+    items.push("ellipsis");
+  }
+
+  items.push(totalPages);
+  return items;
+}
+
+function createPaginationButton(label, { current = false, disabled = false } = {}) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  button.disabled = disabled;
+  if (current) {
+    button.setAttribute("aria-current", "page");
+  }
+  return button;
+}
+
+export function paginateTable(root, options = {}) {
+  if (!root) {
+    return null;
+  }
+
+  const pageSize = Number(options.pageSize) > 0 ? Number(options.pageSize) : DEFAULT_TABLE_PAGE_SIZE;
+  const rowSelector = options.rowSelector || "tbody tr";
+  const isRowEligible = typeof options.isRowEligible === "function"
+    ? options.isRowEligible
+    : () => true;
+  const pagerHost = options.pagerHost
+    || root.closest(".table-container")
+    || root.parentElement
+    || root;
+  let currentPage = Math.max(1, Number.parseInt(options.initialPage, 10) || 1);
+
+  const existingPager = root.nextElementSibling?.classList.contains("table-pagination")
+    ? root.nextElementSibling
+    : pagerHost.querySelector(":scope > .table-pagination");
+  let nav = existingPager;
+  if (!nav) {
+    nav = document.createElement("div");
+    nav.className = "table-pagination";
+    nav.setAttribute("role", "navigation");
+    nav.setAttribute("aria-label", "Table pagination");
+  }
+
+  nav.style.visibility = "visible";
+  root.style.visibility = "visible";
+  if (pagerHost !== root) {
+    pagerHost.style.visibility = "visible";
+  }
+
+  if (root.parentNode && root.nextElementSibling !== nav) {
+    root.insertAdjacentElement("afterend", nav);
+  } else if (!nav.parentNode) {
+    pagerHost.appendChild(nav);
+  }
+
+  function getRows() {
+    return Array.from(root.querySelectorAll(rowSelector));
+  }
+
+  function getEligibleRows() {
+    return getRows().filter((row) => isRowEligible(row));
+  }
+
+  function renderPager(totalPages) {
+    nav.replaceChildren();
+
+    if (totalPages <= 1) {
+      nav.hidden = true;
       return;
     }
 
-    container.classList.add("has-overflow");
+    nav.hidden = false;
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "show-more-btn";
-    btn.textContent = "Show More";
-    container.appendChild(btn);
-
-    btn.addEventListener("click", () => {
-      container.classList.toggle("expanded");
-      btn.textContent = container.classList.contains("expanded") ? "Show Less" : "Show More";
+    const prevButton = createPaginationButton("Prev", { disabled: currentPage <= 1 });
+    prevButton.addEventListener("click", () => {
+      if (currentPage > 1) {
+        setPage(currentPage - 1, true);
+      }
     });
+    nav.appendChild(prevButton);
+
+    getPaginationItems(currentPage, totalPages).forEach((item) => {
+      if (item === "ellipsis") {
+        const ellipsis = document.createElement("span");
+        ellipsis.className = "table-pagination-ellipsis";
+        ellipsis.textContent = "…";
+        nav.appendChild(ellipsis);
+        return;
+      }
+
+      const pageButton = createPaginationButton(String(item), { current: item === currentPage });
+      pageButton.addEventListener("click", () => setPage(item, true));
+      nav.appendChild(pageButton);
+    });
+
+    const nextButton = createPaginationButton("Next", { disabled: currentPage >= totalPages });
+    nextButton.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        setPage(currentPage + 1, true);
+      }
+    });
+    nav.appendChild(nextButton);
+  }
+
+  function render() {
+    const rows = getRows();
+    const eligibleRows = getEligibleRows();
+    const totalPages = Math.max(1, Math.ceil(eligibleRows.length / pageSize) || 1);
+
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+    }
+
+    rows.forEach((row) => {
+      row.style.display = "none";
+    });
+
+    eligibleRows.forEach((row, index) => {
+      const pageIndex = Math.floor(index / pageSize) + 1;
+      row.style.display = pageIndex === currentPage ? "" : "none";
+    });
+
+    renderPager(eligibleRows.length ? totalPages : 1);
+  }
+
+  function setPage(page, fromUser = false) {
+    currentPage = Math.max(1, Number.parseInt(page, 10) || 1);
+    render();
+    if (fromUser && typeof options.onPageChange === "function") {
+      options.onPageChange(currentPage);
+    }
+  }
+
+  const controller = {
+    refresh({ resetPage = false } = {}) {
+      if (resetPage) {
+        currentPage = 1;
+      }
+      render();
+    },
+    setPage,
+    getPage: () => currentPage,
+  };
+
+  root._tablePagination = controller;
+  render();
+  return controller;
+}
+
+export function addTablePagination(containerSelector = ".table-container", options = {}) {
+  document.querySelectorAll(containerSelector).forEach((container) => {
+    if (shouldSkipTablePagination(container)) {
+      return;
+    }
+
+    const table = container.querySelector("table");
+    if (!table || table._tablePagination || !table.querySelector("tbody tr")) {
+      return;
+    }
+
+    paginateTable(table, {
+      ...options,
+      pagerHost: options.pagerHost || container,
+    });
+  });
+}
+
+export function paginateMatchList(options = {}) {
+  const table = document.getElementById("match-list");
+  if (!table || table._tablePagination) {
+    return table?._tablePagination || null;
+  }
+
+  const pageSize = options.pageSize || DEFAULT_TABLE_PAGE_SIZE;
+  const isRowEligible = (row) => {
+    const round = table.dataset.roundFilter || "";
+    return !round || row.dataset.round === round;
+  };
+  const eligibleRows = Array.from(table.querySelectorAll("tbody tr")).filter(isRowEligible);
+  const initialPage = options.startOnCurrentMatch
+    ? getPageForCurrentMatch(eligibleRows, pageSize)
+    : (options.initialPage || 1);
+
+  return paginateTable(table, {
+    pageSize,
+    initialPage,
+    pagerHost: table.closest(".table-container") || table.parentElement,
+    isRowEligible,
+  });
+}
+
+const LIVE_MATCH_STATUSES = new Set(["1H", "HT", "2H", "ET", "BT", "P", "LIVE", "INT"]);
+const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN", "AWD", "WO", "CANC", "ABD"]);
+
+function getPageForCurrentMatch(rows, pageSize) {
+  if (!rows.length || pageSize < 1) {
+    return 1;
+  }
+
+  const currentIndex = findCurrentMatchRowIndex(rows);
+  return Math.floor(currentIndex / pageSize) + 1;
+}
+
+function findCurrentMatchRowIndex(rows) {
+  const now = Date.now();
+  const liveIndex = rows.findIndex((row) => LIVE_MATCH_STATUSES.has(row.dataset.status));
+  if (liveIndex >= 0) {
+    return liveIndex;
+  }
+
+  let nextUpcomingIndex = -1;
+  let nextUpcomingTime = Infinity;
+  let lastFinishedIndex = -1;
+  let lastFinishedTime = Number.NEGATIVE_INFINITY;
+
+  rows.forEach((row, index) => {
+    const time = Date.parse(row.dataset.date);
+    const status = row.dataset.status || "";
+    if (!Number.isFinite(time)) {
+      return;
+    }
+
+    const isFinished = FINISHED_MATCH_STATUSES.has(status) || time < now;
+    if (!isFinished && time >= now) {
+      if (time < nextUpcomingTime) {
+        nextUpcomingTime = time;
+        nextUpcomingIndex = index;
+      }
+      return;
+    }
+
+    if (time >= lastFinishedTime) {
+      lastFinishedTime = time;
+      lastFinishedIndex = index;
+    }
+  });
+
+  if (nextUpcomingIndex >= 0) {
+    return nextUpcomingIndex;
+  }
+
+  if (lastFinishedIndex >= 0) {
+    return lastFinishedIndex;
+  }
+
+  return rows.length - 1;
+}
+
+export function revealPageRectangle() {
+  const rectangle = document.querySelector(
+    ".players-page-layout .rectangle, .teams-page-layout .rectangle",
+  );
+  if (!rectangle) {
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    rectangle.classList.add("is-ready");
   });
 }
 
@@ -197,6 +533,12 @@ export function sortTable(n, td, table, startingRow = 1, secondaryColumn = null,
   const tbody = table.querySelector('tbody') || table;
   rowsArray.forEach(row => tbody.appendChild(row));
 
+  document.dispatchEvent(
+    new CustomEvent("gf:table-sorted", {
+      detail: { tableId: table.id, header: td },
+    }),
+  );
+
   // 5. Apply colors to the new positions
   //recolorRows(table, startingRow);
 }
@@ -260,14 +602,11 @@ export function getDate(date) {
 }
 
 export function adjustColspan(headerRow, newSpan) {
-  const screenWidth = window.visualViewport.width;
-  const threshold = 645; // Example: 768px for small screens
-
-  if (screenWidth < threshold) {
-    headerRow.colSpan = newSpan; // Reduce colspan when screen is narrow
-  } else {
-    headerRow.colSpan = newSpan + 1; // Restore colspan when screen is wide
+  if (!headerRow) {
+    return;
   }
+
+  headerRow.colSpan = newSpan + 1;
 }
 
 export function showToast(message, type = "info", duration = 3000) {
@@ -302,7 +641,7 @@ export function showToast(message, type = "info", duration = 3000) {
 
 export function addLeagues(lp, admin = false) {
   // Get league from query param or use default
-  const urlParams = new URLSearchParams(window.location.search);
+  const urlParams = getPageQueryParams();
   const leagueParam = urlParams.get(lp || "pleague");
   const parseUniqueLeagueIds = (value) => {
     if (!value) return [];
@@ -315,7 +654,6 @@ export function addLeagues(lp, admin = false) {
   };
 
   const leagueIDs = parseUniqueLeagueIds(leagueParam);
-  const defaultLeagues = [39, 140, 135, 78, 61, 88, 94];
   const preselectedLeagueIds = Array.from(
     document.querySelectorAll(`.${lp}-league-to-select.selected-league`)
   )
@@ -363,9 +701,9 @@ export function addLeagues(lp, admin = false) {
 
     // Update URL and fetch new data (skip if admin mode)
     if (!admin) {
-      const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set(param, pickedLeagues.join(","));
-      window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
+      navigateWithUpdatedQuery((nextUrlParams) => {
+        nextUrlParams.set(param, pickedLeagues.join(","));
+      });
     }
   }
 
@@ -389,9 +727,9 @@ export function addLeagues(lp, admin = false) {
 
     // Update URL and fetch new data (skip if admin mode)
     if (!admin) {
-      const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set(param, pickedLeagues.join(","));
-      window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
+      navigateWithUpdatedQuery((nextUrlParams) => {
+        nextUrlParams.set(param, pickedLeagues.join(","));
+      });
     }
   }
 }

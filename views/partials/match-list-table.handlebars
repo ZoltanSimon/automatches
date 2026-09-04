@@ -125,7 +125,7 @@
     {{/each}}
     {{else}}
     {{#each matches}}
-    <tr id="{{fixture.id}}" data-round="{{this.league.round}}">
+    <tr id="{{fixture.id}}" data-round="{{this.league.round}}" data-date="{{fixture.date}}" data-status="{{fixture.status.short}}">
       <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
         {{formatDateOnly fixture.date}}<br>{{formatTime fixture.date}}
       </td>

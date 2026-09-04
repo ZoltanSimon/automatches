@@ -167,8 +167,14 @@ export async function getSquad(teamID) {
     }
   );
   const data = await response.json();
-  console.log(data);
-  return data;
+  const limits = {
+    perMinuteLimit: response.headers.get("x-ratelimit-limit"),
+    perMinuteRemaining: response.headers.get("x-ratelimit-remaining"),
+    dailyLimit: response.headers.get("x-ratelimit-requests-limit"),
+    dailyRemaining: response.headers.get("x-ratelimit-requests-remaining"),
+  };
+
+  return { data, limits };
 }
 
 export async function getPlayers(params = {}) {

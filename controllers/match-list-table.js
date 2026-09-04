@@ -1,4 +1,18 @@
 function filterByRound(round) {
+  const table = document.getElementById("match-list");
+  if (table) {
+    if (round) {
+      table.dataset.roundFilter = round;
+    } else {
+      delete table.dataset.roundFilter;
+    }
+  }
+
+  if (table?._tablePagination) {
+    table._tablePagination.refresh({ resetPage: true });
+    return;
+  }
+
   const rows = document.querySelectorAll("#match-list tbody tr");
   rows.forEach((row) => {
     if (!round || row.dataset.round === round) {

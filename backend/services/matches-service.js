@@ -1,6 +1,6 @@
 import { buildMatchRegistry } from "./registry-service.js";
 import { saveMatchesToServer, buildTeamList, matchFileExists } from "../json-reader.js";
-import { allDBLeagues } from "../index.js";
+import { allDBLeagues } from "../catalog.js";
 import { getAllMatchesFromDb } from "../data-access.js";
 import { wait } from "../backend-helper.js";
 

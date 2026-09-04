@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam, getTransfersByPlayer, getPlayerStatsFromApi, getTeamsByPlayer } from "../webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, insertPlayersToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, updatePlayerProfilesInDb } from "../data-access.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, insertPlayersToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, updatePlayerProfilesInDb } from "../data-access.js";
 import { dataDir, getMatchFromServer, matchFileExists, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
 import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
 import { insertAllPlayers, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
@@ -15,6 +15,22 @@ let playersFetchJob = {
 };
 let missingMatchesHydrationJobRunning = false;
 let transfersJobRunning = false;
+let squadsJobRunning = false;
+
+function apiPayloadHasErrors(data) {
+  return Boolean(data?.errors && Object.keys(data.errors).length > 0);
+}
+
+function countSquadPlayers(squads) {
+  if (!Array.isArray(squads)) {
+    return 0;
+  }
+
+  return squads.reduce(
+    (total, entry) => total + (Array.isArray(entry?.players) ? entry.players.length : 0),
+    0,
+  );
+}
 
 export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   const router = Router();
@@ -461,9 +477,33 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     }
 
     try {
-      const responsePayload = await getSquadFromApi(teamID);
-      const squads = Array.isArray(responsePayload?.response) ? responsePayload.response : [];
-      console.log(`[get-squads] teamID=${teamID}, squad:`, JSON.stringify(squads, null, 2));
+      const { data, limits } = await getSquadFromApi(teamID);
+      console.log(`[get-squads] teamID=${teamID}, API limits:`, limits);
+
+      if (apiPayloadHasErrors(data)) {
+        console.error(`[get-squads] API returned errors for teamID=${teamID}:`, data.errors);
+        return response.status(502).json({
+          success: false,
+          teamID,
+          saved: false,
+          message: "API returned errors; existing squad left unchanged",
+          errors: data.errors,
+          limits,
+        });
+      }
+
+      const squads = Array.isArray(data?.response) ? data.response : [];
+      const playerCount = countSquadPlayers(squads);
+      if (playerCount === 0) {
+        console.error(`[get-squads] Empty squad response for teamID=${teamID}; existing squad left unchanged`);
+        return response.status(502).json({
+          success: false,
+          teamID,
+          saved: false,
+          message: "Empty squad response; existing squad left unchanged",
+          limits,
+        });
+      }
 
       await saveSquadToDb(teamID, squads);
 
@@ -472,11 +512,97 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
         teamID,
         saved: true,
         savedCount: squads.length,
+        players: playerCount,
         squads,
       });
     } catch (error) {
       console.error(`[get-squads] Error for teamID=${teamID}:`, error);
       response.status(500).json({ success: false, message: "Error fetching squad" });
+    }
+  });
+
+  router.get("/update-squads", async (request, response) => {
+    if (squadsJobRunning) {
+      return response.status(409).json({
+        success: false,
+        message: "update-squads job is already running.",
+      });
+    }
+
+    const delayMs = 10000;
+    squadsJobRunning = true;
+    const startedAt = Date.now();
+    const logProgress = (message, details) => {
+      if (details !== undefined) {
+        console.log(`[update-squads] ${message}`, details);
+        return;
+      }
+      console.log(`[update-squads] ${message}`);
+    };
+
+    try {
+      const teams = await getTeamsDueForSquadUpdate(150);
+      logProgress(`Found ${teams.length} team(s) to update, ordered by oldest squad_updated first with never-updated teams first.`);
+
+      const results = [];
+      let totalSaved = 0;
+
+      for (let i = 0; i < teams.length; i += 1) {
+        const team = teams[i];
+        const teamID = Number(team.ID);
+        logProgress(`(${i + 1}/${teams.length}) Fetching squad for team ${teamID} (${team.name})...`);
+
+        try {
+          const { data, limits } = await getSquadFromApi(teamID);
+
+          if (apiPayloadHasErrors(data)) {
+            logProgress(`API returned errors for team ${teamID}.`, data.errors);
+            results.push({ teamID, name: team.name, success: false, message: "API returned errors" });
+          } else {
+            const squads = Array.isArray(data?.response) ? data.response : [];
+            const playerCount = countSquadPlayers(squads);
+            if (playerCount === 0) {
+              logProgress(`Empty squad response for team ${teamID}; existing squad left unchanged.`);
+              results.push({ teamID, name: team.name, success: false, message: "Empty squad response" });
+            } else {
+              await saveSquadToDb(teamID, squads);
+              totalSaved += 1;
+
+              logProgress(
+                `Saved squad for team ${teamID} (${squads.length} squad(s), ${playerCount} player(s)). API limits:`,
+                limits,
+              );
+              results.push({ teamID, name: team.name, success: true, squads: squads.length, players: playerCount });
+            }
+          }
+        } catch (error) {
+          console.error(`[update-squads] Failed to process team ${teamID}:`, error);
+          results.push({ teamID, name: team.name, success: false, message: "Request failed" });
+        }
+
+        if (i < teams.length - 1) {
+          await wait(delayMs);
+        }
+      }
+
+      const elapsedMs = Date.now() - startedAt;
+      logProgress(`Done. Processed ${teams.length} team(s), saved ${totalSaved} squad(s) in ${elapsedMs}ms.`);
+
+      response.json({
+        success: true,
+        teamsProcessed: teams.length,
+        totalSaved,
+        elapsedMs,
+        results,
+      });
+    } catch (error) {
+      console.error("[update-squads] Job failed:", error);
+      response.status(500).json({
+        success: false,
+        message: "Failed to fetch squads",
+      });
+    } finally {
+      squadsJobRunning = false;
     }
   });
 
@@ -673,8 +799,10 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
 
     try {
       const { data, limits } = await getTransfersByPlayer(playerID);
-      console.log(`[get-transfers-by-player] playerID=${playerID}, API limits:`, limits);
-      response.json({ success: true, data, limits });
+      const transfers = data?.response ?? [];
+      const { saved } = await saveTransfersToDb(transfers, { replacePlayerHistory: true });
+      console.log(`[get-transfers-by-player] playerID=${playerID}, saved=${saved}, API limits:`, limits);
+      response.json({ success: true, saved, data, limits });
     } catch (error) {
       console.error(`[get-transfers-by-player] Error for playerID=${playerID}:`, error);
       response.status(500).json({ success: false, message: error.message });

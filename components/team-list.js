@@ -1,17 +1,38 @@
-import { tds } from "../common-styles.js";
-
-let addToPage;
-let ths = `<th title="Click to sort" class="list-header sortable">`;
 import {
   sortTable,
   adjustColspan,
   showColumn,
   hideColumn,
+  parseColumnIndex,
+  normalizeSortDirection,
+  getNextSortDirection,
+  getPageQueryParams,
+  navigateWithUpdatedQuery,
+  encodeCompactStatFilters,
+  decodeCompactStatFilters,
+  revealPageRectangle,
 } from "../common-functions.js";
+import {
+  applyTableStatFilter,
+  registerStatFilterPopover,
+} from "./stat-filter.js";
 
 const tableName = "team-list-table";
 const teamStatFilterButtons = document.querySelectorAll(".team-stat-filter-btn");
 const teamStatFiltersStorageKey = "teams.activeStatFilters";
+const teamQueryKeys = {
+  sortStat: "tsort",
+  sortDirection: "tdir",
+  sortColumn: "tcol",
+  filters: "tfilters",
+  filterStat: "tfilterStat",
+  filterOperator: "tfilterOperator",
+  filterMin: "tfilterMin",
+  filterMax: "tfilterMax",
+  filterColumn: "tfilterColumn",
+};
+const defaultTeamsSortStat = "goals";
+const defaultTeamsSortDirection = "desc";
 const hasTeamStatFilters = teamStatFilterButtons.length > 0;
 const defaultVisibleTeamStats = [
   "form",
@@ -24,6 +45,174 @@ const defaultVisibleTeamStats = [
   "fouls",
   "possession",
 ];
+
+function encodeTeamsFilters(filters) {
+  return encodeCompactStatFilters(filters, true);
+}
+
+function normalizeTeamsFilter(filter) {
+  if (!filter || !filter.stat || !filter.operator) {
+    return null;
+  }
+
+  const min = String(filter.min || "");
+  const max = String(filter.max || "");
+  const columnIndex = parseColumnIndex(filter.columnIndex);
+
+  return {
+    stat: String(filter.stat),
+    operator: String(filter.operator),
+    min,
+    max,
+    value: filter.operator === "lte"
+      ? (max || min)
+      : String(filter.value || min),
+    columnIndex: Number.isFinite(columnIndex) ? columnIndex : null,
+  };
+}
+
+function decodeTeamsFilters(serializedFilters) {
+  return decodeCompactStatFilters(serializedFilters, normalizeTeamsFilter, true);
+}
+
+function parseTeamsFiltersFromUrl(urlParams) {
+  const serializedFilters = urlParams.get(teamQueryKeys.filters);
+  if (serializedFilters) {
+    const decoded = decodeTeamsFilters(serializedFilters);
+    if (decoded.length) {
+      return decoded;
+    }
+
+    try {
+      const parsed = JSON.parse(serializedFilters);
+      const normalized = (Array.isArray(parsed) ? parsed : [parsed])
+        .map((filter) => normalizeTeamsFilter(filter))
+        .filter(Boolean);
+
+      if (normalized.length) {
+        return normalized;
+      }
+    } catch (error) {
+      // fall through to legacy query fields
+    }
+  }
+
+  const legacyFilter = normalizeTeamsFilter({
+    stat: urlParams.get(teamQueryKeys.filterStat),
+    operator: urlParams.get(teamQueryKeys.filterOperator),
+    min: urlParams.get(teamQueryKeys.filterMin),
+    max: urlParams.get(teamQueryKeys.filterMax),
+    columnIndex: urlParams.get(teamQueryKeys.filterColumn),
+  });
+
+  return legacyFilter ? [legacyFilter] : [];
+}
+
+function getTeamsServerStateFromUrl() {
+  const urlParams = getPageQueryParams();
+  const sortStat = urlParams.get(teamQueryKeys.sortStat);
+  const sortDirection = normalizeSortDirection(urlParams.get(teamQueryKeys.sortDirection));
+  const sortColumnIndex = parseColumnIndex(urlParams.get(teamQueryKeys.sortColumn));
+
+  return {
+    sortStat: sortStat || null,
+    sortDirection,
+    sortColumnIndex,
+    statFilters: parseTeamsFiltersFromUrl(urlParams),
+  };
+}
+
+function setTeamsSortParams(urlParams, sortStat, sortDirection, sortColumnIndex) {
+  if (!sortStat) {
+    urlParams.delete(teamQueryKeys.sortStat);
+    urlParams.delete(teamQueryKeys.sortDirection);
+    urlParams.delete(teamQueryKeys.sortColumn);
+    return;
+  }
+
+  urlParams.set(teamQueryKeys.sortStat, String(sortStat));
+
+  if (sortDirection === "asc") {
+    urlParams.set(teamQueryKeys.sortDirection, "asc");
+  } else {
+    urlParams.delete(teamQueryKeys.sortDirection);
+  }
+
+  if (Number.isFinite(sortColumnIndex)) {
+    urlParams.set(teamQueryKeys.sortColumn, String(sortColumnIndex));
+  } else {
+    urlParams.delete(teamQueryKeys.sortColumn);
+  }
+}
+
+function setTeamsFilterParams(urlParams, filters) {
+  const normalizedFilters = (Array.isArray(filters) ? filters : [])
+    .map((filter) => normalizeTeamsFilter(filter))
+    .filter(Boolean);
+
+  if (normalizedFilters.length) {
+    urlParams.set(teamQueryKeys.filters, encodeTeamsFilters(normalizedFilters));
+  } else {
+    urlParams.delete(teamQueryKeys.filters);
+  }
+
+  urlParams.delete(teamQueryKeys.filterStat);
+  urlParams.delete(teamQueryKeys.filterOperator);
+  urlParams.delete(teamQueryKeys.filterMin);
+  urlParams.delete(teamQueryKeys.filterMax);
+  urlParams.delete(teamQueryKeys.filterColumn);
+}
+
+function setTeamsSortState(sortStat, sortDirection, sortColumnIndex) {
+  document.querySelectorAll(`#${tableName} th.sortable`).forEach((header) => {
+    header.classList.remove("asc", "desc");
+    const headerColumnIndex = parseColumnIndex(header.dataset.columnIndex);
+    const isActive =
+      header.dataset.stat === sortStat &&
+      headerColumnIndex !== null &&
+      headerColumnIndex === sortColumnIndex;
+
+    if (isActive) {
+      header.classList.add(sortDirection);
+      header.setAttribute("data-default-order", sortDirection);
+    }
+  });
+}
+
+function getTableElements() {
+  const table = document.getElementById(tableName);
+  const tableBody = table?.querySelector("tbody") || null;
+
+  return { table, tableBody };
+}
+
+function getSubHeaderColumnOffset(table) {
+  const firstHeaderRow = table?.querySelector("thead tr:first-child");
+  if (!firstHeaderRow) {
+    return 0;
+  }
+
+  return Array.from(firstHeaderRow.cells).reduce((sum, cell) => {
+    const rowSpan = Number(cell.rowSpan) || 1;
+    if (rowSpan < 2) {
+      return sum;
+    }
+
+    return sum + (Number(cell.colSpan) || 1);
+  }, 0);
+}
+
+function toggleColumnByStat(stat, isVisible) {
+  if (!stat) {
+    return;
+  }
+
+  if (isVisible) {
+    showColumn(stat, tableName);
+  } else {
+    hideColumn(stat, tableName);
+  }
+}
 
 function saveActiveTeamStats() {
   if (!hasTeamStatFilters) {
@@ -74,33 +263,30 @@ export function teamList(
   addMatches = false,
   big = false,
 ) {
-  addMatches = true;
+  void addMatches;
   createTeamsTable(response, onlyTotal, big);
 }
 
 export function createTeamsTable(response, onlyTotal, big) {
-  let toFixed = 1;
-  if (big) {
-    toFixed = 2;
-    ths = `<th title="Click to sort" style="text-align: center; padding:2px; width:7%; border-right:1px solid #F1FAEE" class="sortable"><span class="header-title">`;
-  }
-  addToPage = ""; // Initialize the string to build the table rows
-  let table = document.getElementById("team-list-table");
-  const tableBody = document.querySelector("#team-list-table tbody"); // Target the table body
+  void response;
+  void onlyTotal;
 
-  window.addEventListener("resize", () => adjustColspan(table.rows[0], 1));
-  adjustColspan(table.rows[0].cells[0], 1);
+  const { table, tableBody } = getTableElements();
+  const enableTeamStatFilters = big && hasTeamStatFilters;
+  const serverSideTeamsTable = big;
+  const serverState = serverSideTeamsTable ? getTeamsServerStateFromUrl() : null;
 
-  if (!tableBody) {
+  if (!table || !tableBody) {
     console.error(
-      "Table body not found! Ensure the table has a <tbody> element.",
+      "Table or table body not found! Ensure #team-list-table has a <tbody> element.",
     );
     return;
-  } else {
-    table.style.visibility = "visible";
   }
 
-  if (hasTeamStatFilters) {
+  const firstHeaderCell = table.rows?.[0]?.cells?.[0] || null;
+  adjustColspan(firstHeaderCell, 1);
+
+  if (enableTeamStatFilters) {
     const statsFilterSide = document.getElementById("team-stats-filter-side");
     if (statsFilterSide) {
       statsFilterSide.style.display = "none";
@@ -112,97 +298,133 @@ export function createTeamsTable(response, onlyTotal, big) {
       button.addEventListener("click", () => {
         button.classList.toggle("active");
         saveActiveTeamStats();
-        updateTableVisibility();
+        updateTableVisibility(enableTeamStatFilters);
       });
+    });
+  }
+
+  if (enableTeamStatFilters) {
+    registerStatFilterPopover({
+      tableId: tableName,
+      headerSelector: "thead tr:last-child th.sortable[data-stat]",
+      rowSelector: "tbody tr",
+      storageKey: "teams.stat-filter",
+      serverSide: serverSideTeamsTable,
+      initialFilters: serverState?.statFilters || [],
+      getLabel: (header, tableElement) => {
+        const parentHeader = tableElement.querySelector(
+          `thead tr:first-child th[data-stat="${header.dataset.stat}"]`,
+        );
+        const parentLabel = parentHeader ? parentHeader.innerText.trim() : header.dataset.stat;
+        const subLabel = header.innerText.trim();
+
+        return parentLabel && subLabel && parentLabel !== subLabel
+          ? `${parentLabel} - ${subLabel}`
+          : parentLabel || subLabel || header.dataset.stat;
+      },
+      onFilterChange: (filters) => {
+        if (serverSideTeamsTable) {
+          navigateWithUpdatedQuery((urlParams) => {
+            setTeamsFilterParams(urlParams, filters);
+          });
+          return;
+        }
+
+        updateTableVisibility(enableTeamStatFilters);
+      },
+      getColumnIndex: (header, tableElement) => {
+        const headerRow = header.parentElement;
+        const headerCells = Array.from(headerRow.children);
+        const headerIndex = headerCells.indexOf(header);
+        return getSubHeaderColumnOffset(tableElement) + headerIndex;
+      },
     });
   }
 
   // Fallback for legacy checkbox markup if present
   const checkboxes = document.querySelectorAll("input[name='statSelector']");
   checkboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", updateTableVisibility);
+    checkbox.addEventListener("change", () => updateTableVisibility(enableTeamStatFilters));
   });
 
   // Initial visibility update
-  updateTableVisibility();
+  updateTableVisibility(enableTeamStatFilters);
 
-  // Add sorting functionality to subheader cells
-  let subHeaderLength = table.rows[1].cells.length;
-  let lastRowLength = table.rows[table.rows.length - 1].cells.length;
+  // Add sorting functionality to subheader cells on the full Teams page only
+  if (big) {
+    let subHeaderLength = table.rows[1].cells.length;
+    const subHeaderOffset = getSubHeaderColumnOffset(table);
 
-  for (let i = subHeaderLength - 1; i >= 0; i--) {
-    let subheaderCell = table.rows[1].cells[i];
+    for (let i = subHeaderLength - 1; i >= 0; i--) {
+      let subheaderCell = table.rows[1].cells[i];
+      const columnIndex = subHeaderOffset + i;
+      subheaderCell.dataset.columnIndex = String(columnIndex);
 
-    subheaderCell.addEventListener("click", function () {
-      const currentOrder = this.getAttribute("data-default-order") || "desc";
-      const newOrder = currentOrder === "asc" ? "desc" : "asc";
+      subheaderCell.addEventListener("click", function () {
+        if (serverSideTeamsTable) {
+          const currentSortStat = serverState?.sortStat || null;
+          const currentDirection = normalizeSortDirection(serverState?.sortDirection);
+          const currentColumnIndex = serverState?.sortColumnIndex;
+          const sameSortTarget =
+            currentSortStat === this.dataset.stat &&
+            Number(currentColumnIndex) === columnIndex;
+          const nextDirection = getNextSortDirection(sameSortTarget, currentDirection);
 
-      this.setAttribute("data-default-order", newOrder);
-      document
-        .querySelectorAll(`#${tableName} th.sortable`)
-        .forEach((header) => header.classList.remove("asc", "desc"));
-      this.classList.add(newOrder);
+          navigateWithUpdatedQuery((urlParams) => {
+            setTeamsSortParams(urlParams, String(this.dataset.stat || defaultTeamsSortStat), nextDirection, columnIndex);
+          });
+          return;
+        }
 
-      let index = lastRowLength - subHeaderLength + i;
-      sortTable(index, subheaderCell, table, 2);
-    });
+        const currentOrder = this.getAttribute("data-default-order") || "desc";
+        const newOrder = currentOrder === "asc" ? "desc" : "asc";
+
+        this.setAttribute("data-default-order", newOrder);
+        document
+          .querySelectorAll(`#${tableName} th.sortable`)
+          .forEach((header) => header.classList.remove("asc", "desc"));
+        this.classList.add(newOrder);
+
+        sortTable(columnIndex, subheaderCell, table, 2);
+        table._tablePagination?.refresh({ resetPage: true });
+      });
+    }
+
+    if (serverSideTeamsTable && serverState?.sortStat && Number.isFinite(serverState?.sortColumnIndex)) {
+      setTeamsSortState(serverState.sortStat, serverState.sortDirection, serverState.sortColumnIndex);
+    }
   }
+
+  table.style.visibility = "visible";
+  if (table.parentElement) {
+    table.parentElement.style.visibility = "visible";
+  }
+  revealPageRectangle();
 }
 
-function updateTableVisibility() {
+function updateTableVisibility(applySavedStatFilters = false) {
   document.querySelectorAll(`#${tableName} th`).forEach((el) => {
     if (el.dataset.stat) {
       const button = document.querySelector(
         `.team-stat-filter-btn[data-stat="${el.dataset.stat}"]`,
       );
       if (button) {
-        const isVisible = button.classList.contains("active");
-        if (!isVisible) {
-          hideColumn(el.dataset.stat, tableName);
-        } else {
-          showColumn(el.dataset.stat, tableName);
-        }
+        toggleColumnByStat(el.dataset.stat, button.classList.contains("active"));
         return;
       }
 
       const checkbox = document.getElementById(el.dataset.stat);
       if (checkbox && !checkbox.checked) {
-        hideColumn(el.dataset.stat, tableName);
+        toggleColumnByStat(el.dataset.stat, false);
       } else if (checkbox && checkbox.checked) {
-        showColumn(el.dataset.stat, tableName);
+        toggleColumnByStat(el.dataset.stat, true);
       }
     }
   });
-}
 
-function predictions(homeTeam, awayTeam) {
-  console.log(homeTeam.name);
-  console.log(homeTeam.last5PerGame);
-  console.log(awayTeam.name);
-  console.log(awayTeam.last5PerGame);
-  console.log(getGoal(homeTeam.last5PerGame, awayTeam.last5PerGame));
-  console.log(getGoal(awayTeam.last5PerGame, homeTeam.last5PerGame));
-}
+  if (applySavedStatFilters) {
+    applyTableStatFilter(tableName);
+  }
 
-function getGoal(stat1, stat2) {
-  let plus = 0;
-  let minus = 0;
-  if (stat1.xG > stat1.goals + 0.25) plus += 0.4;
-  if (stat1.xG < 1) minus += 0.25;
-  if (stat1.xG < 0.75) minus += 0.1;
-
-  if (stat1.shotsOnGoal > 2.5) plus += 0.25;
-  if (stat1.shotsOnGoal < stat1.goals * 3) minus += 0.25;
-  if (stat2.shotsOnGoalAgainst > 2.5) plus += 0.25;
-
-  if (stat1.corners > 6) plus += 0.25;
-  if (stat2.cornersAgainst > 6) plus += 0.25;
-
-  return (
-    ((stat1.goals * 2 + stat1.xG) / 3 +
-      (stat2.goalsAgainst * 2 + stat2.xGA) / 3) /
-      2 +
-    plus -
-    minus
-  ).toFixed(1);
+  getTableElements().table?._tablePagination?.refresh({ resetPage: true });
 }

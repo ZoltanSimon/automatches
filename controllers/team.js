@@ -1,7 +1,8 @@
 import { playerGoalList } from "../../components/player-list.js";
-import { addShowMoreButtons } from "../common-functions.js";
+import { addTablePagination, paginateMatchList } from "../common-functions.js";
 
-await playerGoalList({ big: false, enableStatFilters: false });
+await playerGoalList({ big: false, enableStatFilters: false, pageSize: 20 });
 document.getElementById("match-list").style.visibility = "visible";
 
-addShowMoreButtons();
+paginateMatchList({ startOnCurrentMatch: true });
+addTablePagination();
