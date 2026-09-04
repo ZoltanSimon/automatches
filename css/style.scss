@@ -111,6 +111,23 @@ footer {
   p {
     margin: 3px;
   }
+
+  .donate-button {
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: middle;
+    line-height: 0;
+  }
+}
+
+.donate-button {
+  display: inline-block;
+  line-height: 0;
+
+  img {
+    display: block;
+    border: 0;
+  }
 }
 
 .small-container {

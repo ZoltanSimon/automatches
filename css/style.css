@@ -96,6 +96,23 @@ footer p {
   margin: 3px;
 }
 
+footer .donate-button {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.donate-button {
+  display: inline-block;
+  line-height: 0;
+}
+
+.donate-button img {
+  display: block;
+  border: 0;
+}
+
 .small-container {
   display: grid;
   place-items: center;
