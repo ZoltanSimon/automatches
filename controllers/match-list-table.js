@@ -1,3 +1,13 @@
+function syncRoundRefetchButton() {
+  const button = document.getElementById("refetch-round-btn");
+  const select = document.getElementById("round-filter");
+  if (!button || !select) {
+    return;
+  }
+
+  button.disabled = !select.value;
+}
+
 function filterByRound(round) {
   const table = document.getElementById("match-list");
   if (table) {
@@ -7,6 +17,8 @@ function filterByRound(round) {
       delete table.dataset.roundFilter;
     }
   }
+
+  syncRoundRefetchButton();
 
   if (table?._tablePagination) {
     table._tablePagination.refresh({ resetPage: true });
@@ -44,6 +56,47 @@ function navigateRound(direction) {
   }
 }
 
+async function refetchSelectedRound() {
+  const button = document.getElementById("refetch-round-btn");
+  const select = document.getElementById("round-filter");
+  const round = select?.value;
+  const leagueID = button?.dataset.leagueId;
+  const season = button?.dataset.season;
+
+  if (!button || !round || !leagueID || !season) {
+    return;
+  }
+
+  const nextUrl = new URL(window.location.href);
+  nextUrl.searchParams.set("round", round);
+
+  await runRefetch({
+    button,
+    url: `/api/refetch-round?${new URLSearchParams({ leagueID, season, round })}`,
+    nextUrl: nextUrl.toString(),
+    onReset: syncRoundRefetchButton,
+  });
+}
+
+async function refetchSelectedDay() {
+  const button = document.getElementById("refetch-day-btn");
+  const dateInput = document.getElementById("matchDate");
+  const date = dateInput?.value;
+
+  if (!button || !date) {
+    return;
+  }
+
+  const nextUrl = new URL(window.location.href);
+  nextUrl.searchParams.set("date", date);
+
+  await runRefetch({
+    button,
+    url: `/api/refetch-day?${new URLSearchParams({ date })}`,
+    nextUrl: nextUrl.toString(),
+  });
+}
+
 function navigateDate(direction) {
   const input = document.getElementById("matchDate");
   const currentDate = new Date(input.value);
@@ -56,4 +109,3 @@ function navigateDate(direction) {
   input.value = `${year}-${month}-${day}`;
   input.form.submit();
 }
-

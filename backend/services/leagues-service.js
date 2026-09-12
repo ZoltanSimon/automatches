@@ -1,7 +1,7 @@
-import { allDBLeagues } from "../catalog.js";
+import { allDBLeagues } from "../lib/catalog.js";
 import { extractTeams } from "./teams-service.js";
 import { getLeagueStandingsFromDb, loadLeagueSeasonRows, loadLeagues } from "../data-access.js";
-import { mergeWorldCupGroupStandings, parseStringList, wait } from "../backend-helper.js";
+import { mergeWorldCupGroupStandings, parseStringList, wait } from "../lib/backend-helper.js";
 import { lastMatchesFromLeague } from "./matches-service.js";
 import { getTeamById } from "./teams-service.js";
 import { readFile } from "fs/promises";
@@ -164,7 +164,7 @@ function mapRoundLabel(roundName) {
 
 async function loadWorldCupBracketTemplate() {
   if (!worldCupBracketTemplatePromise) {
-    worldCupBracketTemplatePromise = readFile(path.join(process.cwd(), "backend", "wc_brackets.json"), "utf8")
+    worldCupBracketTemplatePromise = readFile(path.join(process.cwd(), "backend", "data", "wc_brackets.json"), "utf8")
       .then((contents) => JSON.parse(contents))
       .catch((error) => {
         console.warn("Failed to load wc_brackets.json:", error.message);

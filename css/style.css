@@ -1222,6 +1222,57 @@ td .form-indicator:last-child {
   margin-top: 8px;
 }
 
+.match-refetch-btn {
+  display: inline-block;
+  margin-top: 8px;
+  margin-left: 8px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f1faee;
+  background: transparent;
+  border: 1px solid #a8dadc;
+  border-radius: 4px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.match-refetch-btn:hover {
+  background: rgba(168, 218, 220, 0.2);
+}
+
+.match-refetch-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.main-table-header .match-refetch-btn,
+.player-page-header .match-refetch-btn {
+  margin-top: 0;
+  margin-left: 8px;
+  height: 24px;
+}
+
+.refetch-call-log {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 1000;
+  max-width: min(720px, calc(100vw - 24px));
+  max-height: 40vh;
+  overflow: auto;
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #f1faee;
+  background: rgba(29, 53, 87, 0.96);
+  border: 1px solid #a8dadc;
+  border-radius: 6px;
+}
+
 .match-tabs {
   display: flex;
   justify-content: center;

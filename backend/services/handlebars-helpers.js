@@ -1,4 +1,4 @@
-import { formatPlayerPosition as formatPlayerPositionLabel } from "../backend-helper.js";
+import { formatPlayerPosition as formatPlayerPositionLabel } from "../lib/backend-helper.js";
 
 export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;

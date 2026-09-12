@@ -3,11 +3,8 @@ import {
   download,
   showToast,
   addLeagues,
-} from "../common-functions.js";
-import {
   selectedLeagues,
-  downloadMatch,
-} from "../local-handler.js";
+} from "../common-functions.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
 import { make_base, fontY } from "../instapics.js";
 import {
@@ -240,13 +237,39 @@ document.getElementById("update-league-all-seasons").onclick = async function ()
   console.log(data);
 };
 
-const getMatchAutoButton = document.getElementById("get-match-auto");
-if (getMatchAutoButton) {
-  getMatchAutoButton.onclick = async function () {
-    let fixtureID = document.getElementById("fixtureID").value;
-    let match = await downloadMatch(fixtureID);
-    oneFixture(match);
-    addMatchStats(match[0]);
+const grabMatchInfoButton = document.getElementById("grab-match-info");
+if (grabMatchInfoButton) {
+  grabMatchInfoButton.onclick = async function () {
+    const matchIDs = document.getElementById("matchIDs").value.trim();
+    if (!matchIDs) {
+      showToast("Enter one or more match IDs first.");
+      return;
+    }
+
+    const response = await fetch(`/api/grab-match-info?matchIDs=${encodeURIComponent(matchIDs)}&includeMatches=1`, {
+      method: "GET",
+    });
+    const result = await response.json();
+
+    if (!response.ok || result.success === false) {
+      showToast(result.message || "Failed to grab match info.");
+      return;
+    }
+
+    const remaining = result.limits
+      ? `${result.limits.dailyRemaining} requests left today, ${result.limits.perMinuteRemaining} left this minute`
+      : "";
+    showToast(`Grabbed ${result.savedCount}/${result.requested} matches ${remaining}`.trim());
+
+    const matches = Array.isArray(result?.match) ? result.match : result?.matches;
+    try {
+      if (Array.isArray(matches) && matches.length > 0) {
+        oneFixture(matches);
+        addMatchStats(matches[0]);
+      }
+    } catch (error) {
+      console.error("Could not render grabbed match:", error);
+    }
   };
 }
 

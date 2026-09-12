@@ -1,61 +1,166 @@
-import { buildMatchRegistry } from "./registry-service.js";
-import { saveMatchesToServer, buildTeamList, matchFileExists } from "../json-reader.js";
-import { allDBLeagues } from "../catalog.js";
-import { getAllMatchesFromDb } from "../data-access.js";
-import { wait } from "../backend-helper.js";
+import { buildMatchRegistry, upsertRegistryMatchIfLoaded } from "./registry-service.js";
+import { saveMatchesToServer, buildTeamList } from "./json-reader.js";
+import { allDBLeagues } from "../lib/catalog.js";
+import { getAllMatchesFromDb, getMatchIdsMissingDetails } from "../data-access.js";
+import { wait } from "../lib/backend-helper.js";
+import { getResults, getFixturesByDate, hasApiErrors } from "../api/webapi-handler.js";
 
 const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
 const UPDATE_MATCHES_DELAY_MS = 3000;
 
-export async function findMissingFinishedMatches(logPrefix) {
-  const data = await getAllMatchesFromDb();
-  const missingMatches = [];
+export function parseMatchIds(rawIds) {
+  const source = rawIds === undefined || rawIds === null
+    ? []
+    : Array.isArray(rawIds)
+      ? rawIds
+      : String(rawIds).split(/[\s,;]+/);
 
-  for (const element of data) {
-    const dbStatus = String(element.fixtureStatus || "").trim().toUpperCase();
-
-    if (!FINISHED_MATCH_STATUSES.has(dbStatus)) {
-      continue;
-    }
-
-    if (!(await matchFileExists(element.fixtureId))) {
-      missingMatches.push(element);
-    }
-  }
-
-  console.log(`${logPrefix} Total missing matches: ${missingMatches.length}`);
-  return missingMatches;
+  return [...new Set(
+    source
+      .map((id) => String(id).trim())
+      .filter(Boolean),
+  )];
 }
 
-export async function hydrateMissingMatches(missingMatches, logPrefix) {
-  const matchesToDownload = missingMatches.length;
-  const batchSize = 20;
+export async function grabMatchesByIds(rawIds, { overwrite = true } = {}) {
+  const ids = parseMatchIds(rawIds);
+  const result = await saveFixtureIds(ids, {
+    overwrite,
+    includeMatches: true,
+  });
+
+  return {
+    ...result,
+    match: result.matches,
+    db: {
+      summary: { importedMatches: 0, skippedFinishedMatches: 0 },
+      details: [],
+    },
+  };
+}
+
+export async function refetchLeagueRound({ leagueID, season, round } = {}) {
+  const roundName = String(round ?? "").trim();
+  const numericLeagueID = Number(leagueID);
+  const numericSeason = Number(season);
+
+  if (!roundName || !Number.isFinite(numericLeagueID) || numericLeagueID <= 0) {
+    throw new Error("leagueID and round are required");
+  }
+
+  if (!Number.isFinite(numericSeason) || numericSeason <= 0) {
+    throw new Error("season is required");
+  }
+
+  const { data, call } = await getResults(numericLeagueID, roundName, numericSeason);
+  if (hasApiErrors(data)) {
+    throw new Error(`API error fetching round: ${JSON.stringify(data.errors)}`);
+  }
+
+  const fixtureIds = (Array.isArray(data?.response) ? data.response : [])
+    .map((match) => match?.fixture?.id)
+    .filter((id) => id != null);
+
+  return saveFixtureIds(fixtureIds, {
+    leagueID: numericLeagueID,
+    season: numericSeason,
+    round: roundName,
+    calls: call ? [call] : [],
+  });
+}
+
+export async function refetchMatchesOnDay({ date } = {}) {
+  const day = String(date ?? "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) {
+    throw new Error("date is required (YYYY-MM-DD)");
+  }
+
+  const { data, call } = await getFixturesByDate(day);
+  if (hasApiErrors(data)) {
+    throw new Error(`API error fetching date: ${JSON.stringify(data.errors)}`);
+  }
+
+  const trackedLeagueIds = new Set(
+    (allDBLeagues || [])
+      .map((league) => Number(league.id))
+      .filter((leagueID) => Number.isFinite(leagueID)),
+  );
+
+  const fixtureIds = (Array.isArray(data?.response) ? data.response : [])
+    .filter((match) => trackedLeagueIds.has(Number(match?.league?.id)))
+    .map((match) => match?.fixture?.id)
+    .filter((id) => id != null);
+
+  return saveFixtureIds(fixtureIds, { date: day, calls: call ? [call] : [] });
+}
+
+async function saveFixtureIds(fixtureIds, extra = {}) {
+  const {
+    calls: existingCalls = [],
+    overwrite = true,
+    includeMatches = false,
+    logPrefix,
+    ...rest
+  } = extra;
+  const calls = [...existingCalls];
+  const ids = (Array.isArray(fixtureIds) ? fixtureIds : [])
+    .map((id) => String(id).trim())
+    .filter(Boolean);
+
+  if (ids.length === 0) {
+    return {
+      success: false,
+      requested: 0,
+      savedCount: 0,
+      saved: [],
+      failed: [],
+      matches: [],
+      calls,
+      ...rest,
+    };
+  }
+
   const saved = [];
   const failed = [];
+  const matches = [];
+  let limits = null;
 
-  for (let i = 0; i < matchesToDownload; i += batchSize) {
-    const batch = missingMatches.slice(i, i + batchSize);
-    const batchIds = [...new Set(batch.map((match) => String(match.fixtureId)))];
-    const remaining = matchesToDownload - (i + batch.length);
-
-    if (batchIds.length === 0) {
-      continue;
-    }
+  for (let i = 0; i < ids.length; i += 20) {
+    const batchIds = ids.slice(i, i + 20);
+    const remaining = ids.length - (i + batchIds.length);
 
     try {
-      const result = await saveMatchesToServer(batchIds);
-      saved.push(...result.saved);
-      failed.push(...result.failed);
+      const result = await saveMatchesToServer(batchIds, { overwrite });
+      saved.push(...(result.saved || []));
+      failed.push(...(result.failed || []));
+      limits = result.limits ?? limits;
+      if (result.call) {
+        calls.push(result.call);
+      }
 
-      console.log(
-        `${logPrefix} Saved ${result.savedCount}/${batchIds.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`,
-      );
+      const savedIds = new Set((result.saved || []).map(String));
+      for (const match of result.matches || []) {
+        const matchId = String(match?.fixture?.id ?? "");
+        if (!savedIds.has(matchId)) {
+          continue;
+        }
 
-      if (result.failed.length > 0) {
-        console.warn(`${logPrefix} Failed matches in batch:`, result.failed);
+        upsertRegistryMatchIfLoaded(match);
+        if (includeMatches) {
+          matches.push(match);
+        }
+      }
+
+      if (logPrefix) {
+        console.log(
+          `${logPrefix} Saved ${result.savedCount}/${batchIds.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`,
+        );
+        if (result.failed.length > 0) {
+          console.warn(`${logPrefix} Failed matches in batch:`, result.failed);
+        }
       }
     } catch (err) {
-      console.error(`${logPrefix} Error saving match batch [${batchIds.join(",")}]`, err);
+      console.error(`${logPrefix || "[saveFixtureIds]"} Error saving match batch [${batchIds.join(",")}]`, err);
       failed.push(...batchIds.map((fixtureID) => ({ fixtureID, error: err.message })));
     }
 
@@ -64,14 +169,56 @@ export async function hydrateMissingMatches(missingMatches, logPrefix) {
     }
   }
 
-  console.log(`${logPrefix} Finished downloading ${matchesToDownload} matches.`);
+  if (logPrefix) {
+    console.log(`${logPrefix} Finished downloading ${ids.length} matches.`);
+  }
 
   return {
-    requested: matchesToDownload,
+    success: failed.length === 0,
+    requested: ids.length,
     savedCount: saved.length,
-    failedCount: failed.length,
     saved,
     failed,
+    matches,
+    calls,
+    limits,
+    ...rest,
+  };
+}
+
+export async function findMissingFinishedMatches(logPrefix) {
+  const [data, missingIds] = await Promise.all([
+    getAllMatchesFromDb(),
+    getMatchIdsMissingDetails(),
+  ]);
+  const missingIdSet = new Set(missingIds.map((id) => Number(id)));
+  const missingMatches = data.filter((element) => {
+    const dbStatus = String(element.fixtureStatus || "").trim().toUpperCase();
+    return FINISHED_MATCH_STATUSES.has(dbStatus) && missingIdSet.has(Number(element.fixtureId));
+  });
+
+  console.log(`${logPrefix} Total missing matches: ${missingMatches.length}`);
+  return missingMatches;
+}
+
+export async function hydrateMissingMatches(missingMatches, logPrefix) {
+  const batchIds = [...new Set(
+    (Array.isArray(missingMatches) ? missingMatches : [])
+      .map((match) => String(match.fixtureId ?? "").trim())
+      .filter(Boolean),
+  )];
+
+  const result = await saveFixtureIds(batchIds, {
+    overwrite: false,
+    logPrefix,
+  });
+
+  return {
+    requested: missingMatches.length,
+    savedCount: result.savedCount,
+    failedCount: result.failed.length,
+    saved: result.saved,
+    failed: result.failed,
   };
 }
 

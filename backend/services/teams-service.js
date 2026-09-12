@@ -1,5 +1,5 @@
-import { buildTeamList } from "./../json-reader.js";
-import { allDBLeagues, allDBTeams } from "../catalog.js";
+import { buildTeamList } from "./json-reader.js";
+import { allDBLeagues, allDBTeams } from "../lib/catalog.js";
 import { allTeamMatches } from "./matches-service.js";
 import { Team } from "../../classes/team.js";
 

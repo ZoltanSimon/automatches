@@ -1,24 +1,21 @@
-import pool, { networkPath } from "./config.js";
-import fs from "fs";
-import path from "path";
-import { allDBLeagues, allDBTeams, allDBPlayers } from "./catalog.js";
+import pool from "./config.js";
+import { allDBTeams, getCatalogLeague } from "./lib/catalog.js";
 import { getTeamById } from "./services/teams-service.js";
 import {
   extractPlayerProfile,
   mergeProfileValue,
-} from "./backend-helper.js";
+} from "./lib/backend-helper.js";
+import {
+  MATCH_DETAILS_COLUMNS,
+  detailsRowToMatchObject,
+  matchObjectToDetailsRow,
+  serializeFixtureDate,
+  unwrapMatchPayload,
+} from "./lib/match-details-mapper.js";
+import { normalizeLeagueConfig, normalizeSeasonValue } from "./lib/league-season.js";
 
 let leagueSeasonTableConfigPromise = null;
 const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
-
-function normalizeSeasonValue(season) {
-  if (season === null || season === undefined || season === "") {
-    return null;
-  }
-
-  const parsedSeason = Number(season);
-  return Number.isNaN(parsedSeason) ? null : parsedSeason;
-}
 
 async function getLeagueSeasonTableConfig() {
   if (!leagueSeasonTableConfigPromise) {
@@ -67,55 +64,6 @@ export async function loadLeagueSeasonRows() {
     .filter((row) => Number.isFinite(row.leagueID) && row.season !== null);
 }
 
-function getLeagueSeasonsFromMetadata(leagueID) {
-  const league = allDBLeagues?.find((item) => Number(item.id) === Number(leagueID));
-
-  if (Array.isArray(league?.seasons) && league.seasons.length > 0) {
-    return league.seasons.map((season) => Number(season)).filter((season) => !Number.isNaN(season));
-  }
-
-  const fallbackSeason = normalizeSeasonValue(league?.season);
-  return fallbackSeason === null ? [] : [fallbackSeason];
-}
-
-export function getLeagueSeasons(leagueID) {
-  return getLeagueSeasonsFromMetadata(leagueID);
-}
-
-export function getLeagueSeason(leagueID, requestedSeason = null) {
-  const normalizedRequestedSeason = normalizeSeasonValue(requestedSeason);
-  const availableSeasons = getLeagueSeasonsFromMetadata(leagueID);
-
-  if (
-    normalizedRequestedSeason !== null &&
-    availableSeasons.includes(normalizedRequestedSeason)
-  ) {
-    return normalizedRequestedSeason;
-  }
-
-  if (availableSeasons.length > 0) {
-    return availableSeasons[0];
-  }
-
-  return normalizeSeasonValue(requestedSeason) ?? new Date().getFullYear();
-}
-
-function normalizeLeagueConfig(input) {
-  if (typeof input === "object" && input !== null) {
-    const leagueID = Number(input.leagueID ?? input.id);
-    return {
-      leagueID,
-      season: getLeagueSeason(leagueID, input.season),
-    };
-  }
-
-  const leagueID = Number(input);
-  return {
-    leagueID,
-    season: getLeagueSeason(leagueID),
-  };
-}
-
 function normalizeNationLookupKey(value) {
   const normalized = String(value || "")
     .normalize("NFD")
@@ -159,6 +107,16 @@ export async function loadPlayers() {
     console.error("Error loading players from the database:", error);
     throw error;
   }
+}
+
+export async function loadPlayerById(playerID) {
+  const normalizedID = Number(playerID);
+  if (!Number.isFinite(normalizedID) || normalizedID <= 0) {
+    return null;
+  }
+
+  const [rows] = await pool.query("SELECT * FROM Player WHERE id = ?", [normalizedID]);
+  return rows[0] ?? null;
 }
 
 export async function loadTeams() {
@@ -253,7 +211,7 @@ export async function getLeagueStandingsFromDb(leagueID, season = null) {
   }
 }
 
-export async function insertPlayersToDb(allPlayers) {
+export async function insertPlayersToDb(allPlayers, { overwritePosition = true } = {}) {
   // Filter out players without valid IDs
   const validPlayers = allPlayers.filter(
     (player) => player.id != null && player.id !== "",
@@ -285,13 +243,17 @@ export async function insertPlayersToDb(allPlayers) {
       const placeholders = batch.map(() => "(?, ?, ?, ?, ?)").join(", ");
       const flatValues = values.flat();
 
+      const positionUpdate = overwritePosition
+        ? "position = VALUES(position)"
+        : "position = IF(position IS NULL OR TRIM(IFNULL(position, '')) = '', VALUES(position), position)";
+
       await pool.execute(
         `INSERT INTO Player (id, name, club, nation, position)
           VALUES ${placeholders}
           ON DUPLICATE KEY UPDATE
           club = IF(VALUES(club) <> 0 AND club <> VALUES(club), VALUES(club), club),
           nation = IF(VALUES(nation) <> 0 AND nation <> VALUES(nation), VALUES(nation), nation),
-          position = VALUES(position);`,
+          ${positionUpdate};`,
         flatValues,
       );
 
@@ -518,23 +480,7 @@ export async function insertTeamsToDb(teams) {
   }
 }
 
-export async function importLeague(fileName) {
-  const filePath = path.join(networkPath, "leagues", fileName);
-
-  const raw = fs.readFileSync(filePath);
-  const json = JSON.parse(raw);
-
-  const matches = Array.isArray(json.response) ? json.response : json;
-
-  if (!Array.isArray(matches) || matches.length === 0) {
-    console.log("❌ No matches found in file");
-    return;
-  }
-
-  const leagueID = matches[0].league.id;
-  const season = matches[0].league.season;
-
-  // Create single table if it doesn't exist
+export async function ensureMatchesTable() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS matches (
       id INT PRIMARY KEY,
@@ -553,17 +499,23 @@ export async function importLeague(fileName) {
       INDEX idx_match_date (match_date)
     )
   `);
+}
 
-  console.log(
-    `✅ Table 'matches' ensured for league ${leagueID} season ${season}`,
-  );
+export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished = false } = {}) {
+  const matches = (Array.isArray(matchPayloads) ? matchPayloads : [matchPayloads])
+    .map((payload) => unwrapMatchPayload(payload))
+    .filter(Boolean);
+
+  if (matches.length === 0) {
+    return { importedMatches: 0, skippedFinishedMatches: 0 };
+  }
 
   const fixtureIDs = matches
     .map((match) => Number(match?.fixture?.id))
     .filter((fixtureID) => Number.isFinite(fixtureID));
   const finishedFixtureIDs = new Set();
 
-  if (fixtureIDs.length > 0) {
+  if (skipExistingFinished && fixtureIDs.length > 0) {
     const [existingFinishedMatches] = await pool.query(
       "SELECT id FROM matches WHERE id IN (?) AND status IN (?)",
       [fixtureIDs, [...FINISHED_MATCH_STATUSES]],
@@ -577,14 +529,13 @@ export async function importLeague(fileName) {
   let importedMatches = 0;
   let skippedFinishedMatches = 0;
 
-  // Insert matches
   for (const match of matches) {
     const fixtureID = Number(match?.fixture?.id);
     if (!Number.isFinite(fixtureID)) {
       continue;
     }
 
-    if (finishedFixtureIDs.has(fixtureID)) {
+    if (skipExistingFinished && finishedFixtureIDs.has(fixtureID)) {
       skippedFinishedMatches += 1;
       continue;
     }
@@ -605,23 +556,21 @@ export async function importLeague(fileName) {
       away_score = VALUES(away_score)`,
       [
         fixtureID,
-        leagueID,
-        season,
-        match.league.round,
-        match.teams.home.id,
-        match.teams.away.id,
-        match.fixture.date.replace("T", " ").slice(0, 19),
-        match.fixture.status.short,
-        match.goals.home,
-        match.goals.away,
+        match.league?.id,
+        match.league?.season,
+        match.league?.round,
+        match.teams?.home?.id,
+        match.teams?.away?.id,
+        String(match.fixture?.date ?? "").replace("T", " ").slice(0, 19),
+        match.fixture?.status?.short,
+        match.goals?.home,
+        match.goals?.away,
       ],
     );
     importedMatches += 1;
   }
 
-  console.log(
-    `✅ Imported ${importedMatches} matches for league ${leagueID} season ${season}. Skipped ${skippedFinishedMatches} finished matches.`,
-  );
+  return { importedMatches, skippedFinishedMatches };
 }
 
 export async function getLeagueFromDb(leagueIDs) {
@@ -654,13 +603,15 @@ export async function getLeagueFromDb(leagueIDs) {
     return rows.map((r) => ({
       fixture: {
         id: r.fixtureId,
-        date: r.match_date,
+        date: serializeFixtureDate(r.match_date),
         status: { short: r.status },
       },
       league: {
         id: r.league_id,
         season: r.season,
         round: r.round,
+        name: getCatalogLeague(r.league_id)?.name ?? null,
+        country: getCatalogLeague(r.league_id)?.country ?? null,
       },
       teams: {
         home: {
@@ -795,6 +746,251 @@ export async function getAllMatchesFromDb() {
     console.error(`❌ Failed to load all matches from DB:`, e);
     return [];
   }
+}
+
+const MATCH_DETAILS_ID_CHUNK_SIZE = 500;
+const MATCH_DETAILS_UPDATE_COLUMNS = MATCH_DETAILS_COLUMNS.filter((column) => column !== "match_id");
+const MATCH_DETAILS_INSERT_PLACEHOLDERS = MATCH_DETAILS_COLUMNS.map(() => "?").join(", ");
+const MATCH_DETAILS_ON_UPDATE = MATCH_DETAILS_UPDATE_COLUMNS
+  .map((column) => `${column} = VALUES(${column})`)
+  .join(", ");
+
+function chunkIds(ids, size) {
+  const chunks = [];
+  for (let i = 0; i < ids.length; i += size) {
+    chunks.push(ids.slice(i, i + size));
+  }
+  return chunks;
+}
+
+function normalizeMatchIds(ids) {
+  const source = ids === undefined || ids === null ? [] : Array.isArray(ids) ? ids : [ids];
+  return [...new Set(source.map((id) => Number(id)).filter((id) => Number.isFinite(id)))];
+}
+
+function detailsRowValues(row) {
+  return MATCH_DETAILS_COLUMNS.map((column) => row[column] ?? null);
+}
+
+function baseFixtureFromDetailsRow(row) {
+  const homeTeamId = Number(row.home_team_id);
+  const awayTeamId = Number(row.away_team_id);
+
+  return {
+    fixture: {
+      id: Number(row.match_id),
+      date: serializeFixtureDate(row.match_date),
+      status: { short: row.match_status },
+    },
+    league: {
+      id: row.league_id,
+      season: row.season,
+      round: row.round,
+      name: getCatalogLeague(row.league_id)?.name ?? null,
+      country: getCatalogLeague(row.league_id)?.country ?? null,
+    },
+    teams: {
+      home: {
+        id: Number.isFinite(homeTeamId) ? homeTeamId : undefined,
+        name: Number.isFinite(homeTeamId) ? getTeamById(homeTeamId)?.name : undefined,
+      },
+      away: {
+        id: Number.isFinite(awayTeamId) ? awayTeamId : undefined,
+        name: Number.isFinite(awayTeamId) ? getTeamById(awayTeamId)?.name : undefined,
+      },
+    },
+    goals: {
+      home: row.home_score,
+      away: row.away_score,
+    },
+  };
+}
+
+export async function getMatchDetailsByIds(ids) {
+  const matchIds = normalizeMatchIds(ids);
+  if (matchIds.length === 0) {
+    return [];
+  }
+
+  const detailsById = new Map();
+
+  for (const idChunk of chunkIds(matchIds, MATCH_DETAILS_ID_CHUNK_SIZE)) {
+    const [rows] = await pool.query(
+      `SELECT d.*,
+              m.home_team_id,
+              m.away_team_id,
+              m.home_score,
+              m.away_score,
+              m.status AS match_status,
+              m.match_date,
+              m.league_id,
+              m.season,
+              m.round
+       FROM match_details d
+       LEFT JOIN matches m ON m.id = d.match_id
+       WHERE d.match_id IN (?)`,
+      [idChunk],
+    );
+
+    for (const row of rows) {
+      const matchObject = detailsRowToMatchObject(row, baseFixtureFromDetailsRow(row));
+      if (matchObject?.fixture?.id != null) {
+        detailsById.set(Number(row.match_id), matchObject);
+      }
+    }
+  }
+
+  return matchIds
+    .map((matchId) => detailsById.get(matchId))
+    .filter(Boolean);
+}
+
+export async function getMatchDetailsById(id) {
+  const [match] = await getMatchDetailsByIds([id]);
+  return match ?? null;
+}
+
+export async function upsertMatchDetails(matchId, matchObject, { overwrite = false } = {}) {
+  const row = matchObjectToDetailsRow(matchPayloadWithId(matchObject, matchId));
+  if (!row) {
+    throw new Error("Invalid match payload provided for match_details save.");
+  }
+
+  const values = detailsRowValues(row);
+
+  if (overwrite) {
+    await pool.query(
+      `INSERT INTO match_details (${MATCH_DETAILS_COLUMNS.join(", ")})
+       VALUES (${MATCH_DETAILS_INSERT_PLACEHOLDERS})
+       ON DUPLICATE KEY UPDATE ${MATCH_DETAILS_ON_UPDATE}`,
+      values,
+    );
+
+    return { matchId: row.match_id, saved: true, skipped: false };
+  }
+
+  const [result] = await pool.query(
+    `INSERT IGNORE INTO match_details (${MATCH_DETAILS_COLUMNS.join(", ")})
+     VALUES (${MATCH_DETAILS_INSERT_PLACEHOLDERS})`,
+    values,
+  );
+
+  const skipped = Number(result?.affectedRows || 0) === 0;
+  return {
+    matchId: row.match_id,
+    saved: !skipped,
+    skipped,
+  };
+}
+
+export async function insertMatchDetailsRows(rows, { overwrite = false } = {}) {
+  const validRows = (Array.isArray(rows) ? rows : []).filter((row) => Number.isFinite(Number(row?.match_id)));
+  if (validRows.length === 0) {
+    return { inserted: 0, skipped: 0 };
+  }
+
+  const placeholders = validRows.map(() => `(${MATCH_DETAILS_INSERT_PLACEHOLDERS})`).join(", ");
+  const values = validRows.flatMap((row) => detailsRowValues(row));
+
+  const sql = overwrite
+    ? `INSERT INTO match_details (${MATCH_DETAILS_COLUMNS.join(", ")})
+       VALUES ${placeholders}
+       ON DUPLICATE KEY UPDATE ${MATCH_DETAILS_ON_UPDATE}`
+    : `INSERT IGNORE INTO match_details (${MATCH_DETAILS_COLUMNS.join(", ")})
+       VALUES ${placeholders}`;
+
+  const [result] = await pool.query(sql, values);
+  const affectedRows = Number(result?.affectedRows || 0);
+
+  if (overwrite) {
+    return { inserted: validRows.length, skipped: 0 };
+  }
+
+  return {
+    inserted: affectedRows,
+    skipped: Math.max(0, validRows.length - affectedRows),
+  };
+}
+
+function matchPayloadWithId(matchObject, matchId) {
+  const numericId = Number(matchId);
+  if (!Number.isFinite(numericId) || !matchObject || typeof matchObject !== "object") {
+    return matchObject;
+  }
+
+  if (Number(matchObject?.fixture?.id) === numericId) {
+    return matchObject;
+  }
+
+  return {
+    ...matchObject,
+    fixture: {
+      ...(matchObject.fixture ?? {}),
+      id: numericId,
+    },
+  };
+}
+
+export async function getMatchIdsMissingDetails(ids) {
+  const matchIds = normalizeMatchIds(ids);
+  const finishedStatuses = [...FINISHED_MATCH_STATUSES];
+
+  if (matchIds.length > 0) {
+    const missing = [];
+
+    for (const idChunk of chunkIds(matchIds, MATCH_DETAILS_ID_CHUNK_SIZE)) {
+      const [rows] = await pool.query(
+        `SELECT m.id AS fixtureId
+         FROM matches m
+         LEFT JOIN match_details d ON d.match_id = m.id
+         WHERE m.id IN (?)
+           AND m.status IN (?)
+           AND d.match_id IS NULL`,
+        [idChunk, finishedStatuses],
+      );
+      missing.push(...rows.map((row) => Number(row.fixtureId)));
+    }
+
+    return missing;
+  }
+
+  const [rows] = await pool.query(
+    `SELECT m.id AS fixtureId
+     FROM matches m
+     LEFT JOIN match_details d ON d.match_id = m.id
+     WHERE m.status IN (?)
+       AND d.match_id IS NULL
+     ORDER BY m.match_date ASC`,
+    [finishedStatuses],
+  );
+
+  return rows.map((row) => Number(row.fixtureId));
+}
+
+export async function getMatchIdsWithoutDetails({ finishedOnly = false, overwrite = false, limit = null } = {}) {
+  const params = [];
+  let sql = overwrite
+    ? `SELECT m.id AS fixtureId FROM matches m`
+    : `SELECT m.id AS fixtureId
+       FROM matches m
+       LEFT JOIN match_details d ON d.match_id = m.id
+       WHERE d.match_id IS NULL`;
+
+  if (finishedOnly) {
+    sql += overwrite ? ` WHERE m.status IN (?)` : ` AND m.status IN (?)`;
+    params.push([...FINISHED_MATCH_STATUSES]);
+  }
+
+  sql += ` ORDER BY m.match_date ASC`;
+
+  const parsedLimit = Number(limit);
+  if (Number.isFinite(parsedLimit) && parsedLimit > 0) {
+    sql += ` LIMIT ?`;
+    params.push(parsedLimit);
+  }
+
+  const [rows] = await pool.query(sql, params);
+  return rows.map((row) => Number(row.fixtureId)).filter((id) => Number.isFinite(id));
 }
 
 function parseStoredSquad(rawSquad) {

@@ -49,6 +49,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 	}
 
+	const refetchButton = document.getElementById("refetch-match-btn");
+	if (refetchButton) {
+		refetchButton.addEventListener("click", () => {
+			const matchId = refetchButton.dataset.matchId;
+			if (!matchId) {
+				return;
+			}
+
+			window.runRefetch({
+				button: refetchButton,
+				url: `/api/grab-match-info?matchID=${encodeURIComponent(matchId)}&omitMatches=1`,
+			});
+		});
+	}
+
 	if (!eventsPanel || !toggleButton) {
 		return;
 	}

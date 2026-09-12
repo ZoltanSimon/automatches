@@ -1,17 +1,21 @@
 import {
     getAllPlayers,
     readPlayersFromFiles,
-  } from "./../json-reader.js";
+    writePlayerToServer,
+  } from "./json-reader.js";
 import {
   getPlayersMissingExtraData,
   getTransferPlayersForInsert,
   insertPlayersToDb,
+  loadPlayerById,
+  saveTransfersToDb,
   updatePlayerProfilesInDb,
-} from "./../data-access.js";
+} from "../data-access.js";
 import { Player } from "./../../classes/player.js";
-import { allDBLeagues, allDBPlayers } from "../catalog.js";
+import { allDBLeagues, allDBPlayers, upsertCatalogPlayer } from "../lib/catalog.js";
+import { getPlayersFromApi, getTransfersByPlayer } from "../api/webapi-handler.js";
 import { LineupParser } from "../../classes/lineupparser.js";
-import { comparePositionsByDisplayOrder, parseLowercaseStringList, wait } from "../backend-helper.js";
+import { comparePositionsByDisplayOrder, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
 import { getTeamById } from "./teams-service.js";
 import { parseLeagueIds } from "./leagues-service.js";
 import * as fs from "fs";
@@ -655,5 +659,132 @@ export function getPlayerPageData(registry, playerID, leagueQuery) {
     details,
     leagues: allDetails.player.competitionList || [],
     selectedLeague,
+  };
+}
+
+function normalizePlayerId(playerID) {
+  const id = Number(playerID);
+  return Number.isFinite(id) && id > 0 ? id : 0;
+}
+
+function emptyPlayerFetchResult() {
+  return {
+    success: false,
+    requested: 0,
+    saved: [],
+    savedCount: 0,
+    failed: [],
+    calls: [],
+  };
+}
+
+function playerRowFromPayload(playerPayload) {
+  const firstStatistic = Array.isArray(playerPayload.statistics)
+    ? playerPayload.statistics.find((stat) => stat?.team?.id)
+    : null;
+
+  return {
+    id: playerPayload.player.id,
+    name: playerPayload.player.name,
+    club: firstStatistic?.team?.id ?? 0,
+    nation: 0,
+    position: [firstStatistic?.games?.position ?? ""],
+  };
+}
+
+export async function persistPlayerProfile(playerID, apiData) {
+  const playerPayload = apiData?.response?.[0] ?? null;
+  if (!playerPayload?.player) {
+    return { saved: false, playerPayload: null };
+  }
+
+  await writePlayerToServer(playerID, apiData);
+  await insertPlayersToDb([playerRowFromPayload(playerPayload)], { overwritePosition: false });
+  const profileUpdate = await updatePlayerProfilesInDb([playerPayload]);
+  const updatedPlayer = await loadPlayerById(playerID);
+  if (updatedPlayer) {
+    upsertCatalogPlayer(updatedPlayer);
+  }
+
+  return {
+    saved: true,
+    playerPayload,
+    playerInsert: { processed: 1 },
+    profileUpdate,
+    player: {
+      id: playerPayload.player.id,
+      name: playerPayload.player.name,
+    },
+  };
+}
+
+export async function fetchAndSavePlayerProfile(playerID) {
+  const id = normalizePlayerId(playerID);
+  if (!id) {
+    return emptyPlayerFetchResult();
+  }
+
+  const { data, call, limits } = await getPlayersFromApi({ playerID: id });
+  const calls = call ? [call] : [];
+  const persisted = await persistPlayerProfile(id, data);
+
+  if (!persisted.saved) {
+    return {
+      success: false,
+      requested: 1,
+      saved: [],
+      savedCount: 0,
+      failed: [{ id, error: `No player profile found for playerID=${id}` }],
+      calls,
+      limits,
+      message: `No player profile found for playerID=${id}`,
+    };
+  }
+
+  return {
+    success: true,
+    requested: 1,
+    saved: [id],
+    savedCount: 1,
+    failed: [],
+    calls,
+    limits,
+    player: persisted.player,
+    playerInsert: persisted.playerInsert,
+    profileUpdate: persisted.profileUpdate,
+  };
+}
+
+export async function fetchAndSavePlayerTransfers(playerID) {
+  const id = normalizePlayerId(playerID);
+  if (!id) {
+    return emptyPlayerFetchResult();
+  }
+
+  const { data, call, limits } = await getTransfersByPlayer(id);
+  const { saved } = await saveTransfersToDb(data?.response ?? [], { replacePlayerHistory: true });
+
+  return {
+    success: true,
+    requested: 1,
+    saved,
+    savedCount: saved,
+    failed: [],
+    calls: call ? [call] : [],
+    limits,
+  };
+}
+
+export async function refetchPlayer({ playerID, includeTransfers = true } = {}) {
+  const profile = await fetchAndSavePlayerProfile(playerID);
+  if (!profile.success || !includeTransfers) {
+    return profile;
+  }
+
+  const transfers = await fetchAndSavePlayerTransfers(playerID);
+  return {
+    ...profile,
+    calls: [...profile.calls, ...transfers.calls],
+    transfersSaved: transfers.savedCount,
   };
 }

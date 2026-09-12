@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam, getTransfersByPlayer, getPlayerStatsFromApi, getTeamsByPlayer } from "../webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, insertPlayersToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, updatePlayerProfilesInDb } from "../data-access.js";
-import { dataDir, getMatchFromServer, matchFileExists, writeLeagueToServer, saveMatchToServer } from "../json-reader.js";
-import { forceRefreshRegistry, getRegistry } from "../services/registry-service.js";
-import { insertAllPlayers, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
-import { localhostOnly, wait } from "../backend-helper.js";
+import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam, getPlayerStatsFromApi, getTeamsByPlayer, hasApiErrors } from "./webapi-handler.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, getMatchDetailsById, getMatchIdsMissingDetails } from "../data-access.js";
+import { dataDir, writeLeagueToServer, saveMatchToServer } from "../services/json-reader.js";
+import { forceRefreshRegistry, getRegistry, upsertRegistryMatchIfLoaded } from "../services/registry-service.js";
+import { fetchAndSavePlayerTransfers, insertAllPlayers, refetchPlayer, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
+import { localhostOnly, wait } from "../lib/backend-helper.js";
 import { parseLeagueIds, updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
-import { findMissingFinishedMatches, hydrateMissingMatches, matchesOnDay, matchesInRound } from "../services/matches-service.js";
+import { findMissingFinishedMatches, grabMatchesByIds, hydrateMissingMatches, matchesOnDay, matchesInRound, refetchLeagueRound, refetchMatchesOnDay } from "../services/matches-service.js";
+import { teamNameFromMatchDetails } from "../lib/match-details-mapper.js";
 
 const MAX_GET_PLAYERS_RUNS = 50;
 let playersFetchJob = {
@@ -18,7 +19,31 @@ let transfersJobRunning = false;
 let squadsJobRunning = false;
 
 function apiPayloadHasErrors(data) {
-  return Boolean(data?.errors && Object.keys(data.errors).length > 0);
+  return hasApiErrors(data);
+}
+
+function respondRefetch(response, result, emptyMessage) {
+  if (result.requested === 0) {
+    return response.status(400).json({
+      success: false,
+      message: emptyMessage,
+      ...result,
+    });
+  }
+
+  return response.json(result);
+}
+
+async function handleRefetchRoute(response, { run, emptyMessage, failLog, failMessage }) {
+  try {
+    return respondRefetch(response, await run(), emptyMessage);
+  } catch (error) {
+    console.error(failLog, error);
+    return response.status(500).json({
+      success: false,
+      message: error.message || failMessage,
+    });
+  }
 }
 
 function countSquadPlayers(squads) {
@@ -305,21 +330,17 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
           continue;
         }
 
-        const savedMatchData = await getMatchFromServer(match.fixtureId);
-        const savedMatch = Array.isArray(savedMatchData)
-          ? savedMatchData[0]
-          : savedMatchData;
+        const savedMatch = await getMatchDetailsById(match.fixtureId);
+        const savedHomeTeamName = teamNameFromMatchDetails(savedMatch, homeTeamID);
+        const savedAwayTeamName = teamNameFromMatchDetails(savedMatch, awayTeamID);
 
-        const savedHomeTeam = savedMatch?.teams?.home;
-        const savedAwayTeam = savedMatch?.teams?.away;
-
-        if (needsHomeTeam && savedHomeTeam?.name) {
-          resolvedTeamNamesByID.set(homeTeamID, String(savedHomeTeam.name).trim());
+        if (needsHomeTeam && savedHomeTeamName) {
+          resolvedTeamNamesByID.set(homeTeamID, savedHomeTeamName);
           pendingTeamIDs.delete(homeTeamID);
         }
 
-        if (needsAwayTeam && savedAwayTeam?.name) {
-          resolvedTeamNamesByID.set(awayTeamID, String(savedAwayTeam.name).trim());
+        if (needsAwayTeam && savedAwayTeamName) {
+          resolvedTeamNamesByID.set(awayTeamID, String(savedAwayTeamName).trim());
           pendingTeamIDs.delete(awayTeamID);
         }
       }
@@ -444,8 +465,72 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   router.get("/save-match", async (request, response) => {
     let matchID = request.query.matchID;
     let savedMatch = await saveMatchToServer(matchID);
+    upsertRegistryMatchIfLoaded(savedMatch?.match);
     console.log(`Saved match with ID: ${matchID}`);
     response.json(savedMatch);
+  });
+
+  router.get("/refetch-day", async (request, response) => {
+    return handleRefetchRoute(response, {
+      run: () => refetchMatchesOnDay({ date: request.query.date }),
+      emptyMessage: "No fixtures returned for this date",
+      failLog: "Error refetching matches on day:",
+      failMessage: "Failed to refetch day",
+    });
+  });
+
+  router.get("/refetch-round", async (request, response) => {
+    return handleRefetchRoute(response, {
+      run: () => refetchLeagueRound({
+        leagueID: request.query.leagueID,
+        season: request.query.season,
+        round: request.query.round,
+      }),
+      emptyMessage: "No fixtures returned for this round",
+      failLog: "Error refetching league round:",
+      failMessage: "Failed to refetch round",
+    });
+  });
+
+  router.get("/refetch-player", async (request, response) => {
+    return handleRefetchRoute(response, {
+      run: () => refetchPlayer({ playerID: request.query.playerID }),
+      emptyMessage: "playerID is required",
+      failLog: "Error refetching player:",
+      failMessage: "Failed to refetch player",
+    });
+  });
+
+  router.get("/grab-match-info", async (request, response) => {
+    const rawIds = request.query.matchIDs ?? request.query.matchID;
+    const includeMatches = String(request.query.includeMatches ?? "") === "1";
+    const omitMatches = String(request.query.omitMatches ?? "") === "1" || !includeMatches;
+
+    try {
+      const savedMatch = await grabMatchesByIds(rawIds, { overwrite: true });
+
+      if (savedMatch.requested === 0) {
+        return response.status(400).json({
+          success: false,
+          message: "matchID or matchIDs is required",
+        });
+      }
+
+      console.log(`Grabbed matches: ${savedMatch.saved.join(",") || "(none)"}`);
+
+      if (omitMatches) {
+        const { matches, match, ...summary } = savedMatch;
+        return response.json(summary);
+      }
+
+      response.json(savedMatch);
+    } catch (error) {
+      console.error("Error grabbing match info:", error);
+      response.status(500).json({
+        success: false,
+        message: "Failed to grab match info",
+      });
+    }
   });
 
   router.get("/insert-all-players", async (request, response) => {
@@ -724,56 +809,15 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   });
 
   router.get("/get-player-profile", async (request, response) => {
-    const playerID = Number(request.query.playerID);
-    if (!Number.isFinite(playerID) || playerID <= 0) {
-      return response.status(400).json({ success: false, message: "Invalid playerID." });
-    }
-
-    try {
-      console.log(`[get-player-profile] Fetching playerID=${playerID} from API-Football.`);
-      const data = await getPlayers({ playerID });
-      const playerPayload = data?.response?.[0] ?? null;
-      let playerInsert = { processed: 0 };
-      let profileUpdate = { processed: 0, updatedRows: 0 };
-
-      if (!playerPayload?.player) {
-        console.warn(`[get-player-profile] No player found for playerID=${playerID}.`, data?.errors);
-        return response.status(404).json({
-          success: false,
-          message: `No player profile found for playerID=${playerID}.`,
-          data,
-        });
-      }
-
-      if (playerPayload.player) {
-        const firstStatistic = Array.isArray(playerPayload.statistics)
-          ? playerPayload.statistics.find((stat) => stat?.team?.id)
-          : null;
-
-        console.log(`[get-player-profile] Upserting basic Player row for playerID=${playerID}.`);
-        await insertPlayersToDb([{
-          id: playerPayload.player.id,
-          name: playerPayload.player.name,
-          club: firstStatistic?.team?.id ?? 0,
-          nation: 0,
-          position: [firstStatistic?.games?.position ?? ""],
-        }]);
-        playerInsert = { processed: 1 };
-        console.log(`[get-player-profile] Updating detailed profile fields for playerID=${playerID}.`);
-        profileUpdate = await updatePlayerProfilesInDb([playerPayload]);
-      }
-
-      response.json({
-        success: true,
-        player: playerPayload?.player ?? null,
-        playerInsert,
-        profileUpdate,
-        data,
-      });
-    } catch (error) {
-      console.error(`[get-player-profile] Error for playerID=${playerID}:`, error);
-      response.status(500).json({ success: false, message: error.message });
-    }
+    return handleRefetchRoute(response, {
+      run: () => refetchPlayer({
+        playerID: request.query.playerID,
+        includeTransfers: false,
+      }),
+      emptyMessage: "playerID is required",
+      failLog: `[get-player-profile] Error for playerID=${request.query.playerID}:`,
+      failMessage: "Failed to fetch player profile",
+    });
   });
 
   router.get("/get-player-stats", async (request, response) => {
@@ -792,21 +836,12 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   });
 
   router.get("/get-transfers-by-player", async (request, response) => {
-    const playerID = Number(request.query.playerID);
-    if (!Number.isFinite(playerID) || playerID <= 0) {
-      return response.status(400).json({ success: false, message: "Invalid playerID." });
-    }
-
-    try {
-      const { data, limits } = await getTransfersByPlayer(playerID);
-      const transfers = data?.response ?? [];
-      const { saved } = await saveTransfersToDb(transfers, { replacePlayerHistory: true });
-      console.log(`[get-transfers-by-player] playerID=${playerID}, saved=${saved}, API limits:`, limits);
-      response.json({ success: true, saved, data, limits });
-    } catch (error) {
-      console.error(`[get-transfers-by-player] Error for playerID=${playerID}:`, error);
-      response.status(500).json({ success: false, message: error.message });
-    }
+    return handleRefetchRoute(response, {
+      run: () => fetchAndSavePlayerTransfers(request.query.playerID),
+      emptyMessage: "playerID is required",
+      failLog: `[get-transfers-by-player] Error for playerID=${request.query.playerID}:`,
+      failMessage: "Failed to fetch player transfers",
+    });
   });
 
   router.get("/missing-matches", async (request, response) => {
@@ -824,12 +859,17 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     for (const leagueID of leagueIDs) {
       let data = await getLeagueFromDb(leagueID);
 
-      console.log(`Checking league ${leagueID} with ${data.length} matches for missing match files...`);
+      console.log(`Checking league ${leagueID} with ${data.length} matches for missing match details...`);
+      const finishedIds = data
+        .filter((element) => ["FT", "AET", "PEN"].includes(element.fixture.status.short))
+        .map((element) => element.fixture.id);
+      const missingIds = new Set(
+        (await getMatchIdsMissingDetails(finishedIds)).map((id) => Number(id)),
+      );
+
       for (const element of data) {
-        if (["FT", "AET", "PEN"].includes(element.fixture.status.short)) {
-          if (!(await matchFileExists(element.fixture.id))) {
-            matchArr.push(element);
-          }
+        if (missingIds.has(Number(element.fixture.id))) {
+          matchArr.push(element);
         }
       }
     }

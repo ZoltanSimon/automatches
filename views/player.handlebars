@@ -1,3 +1,4 @@
+<script src="./../controllers/refetch-ui.js"></script>
 <script type="module" src="./../controllers/player.js"></script>
 <link rel="stylesheet" href="css/league.css" />
 
@@ -6,7 +7,14 @@
         <div class="league player-header-grid">
             <img class="player-face" src="images/player-pictures/{{player.id}}.png" alt="{{player.name}}">
             <div class="league-info player-header-main">
-                <h2>{{player.name}}</h2>
+                <div class="league-title-row">
+                    <h2>{{player.name}}</h2>
+                    {{#if isLocal}}
+                    <button type="button" id="refetch-player-btn" class="match-refetch-btn" data-player-id="{{player.id}}">
+                        Refetch
+                    </button>
+                    {{/if}}
+                </div>
                 <div class="league-nation player-subinfo">
                     <div class="row player-club-row">
                         <img class="club-logo" src="images/logos/{{player.club}}.png" alt="{{player.clubName}}"

@@ -1,6 +1,7 @@
 import { matchList } from "./components/match-list.js";
-import { selectedLeagues } from "./local-handler.js";
 import { defaultLeagues } from "./shared/defaults.js";
+
+export const selectedLeagues = [];
 
 export const BRACKET_UNIT_PX = 71;
 export const BRACKET_MATCH_CARD_HEIGHT_PX = 63;

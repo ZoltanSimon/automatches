@@ -1,4 +1,4 @@
-import { formatPlayerPosition } from "../backend/backend-helper.js";
+import { formatPlayerPosition } from "../backend/lib/backend-helper.js";
 
 export class Player {
   constructor(inputPlayer) {

@@ -1,3 +1,4 @@
+<script src="controllers/refetch-ui.js"></script>
 <script src="controllers/match-list-table.js"></script>
 <table class="gf-table" id="match-list">
   <thead>
@@ -6,13 +7,18 @@
       {{#if groupedMatches}}
       <th colspan="3">Matches on Day</th>
       <th colspan="5">
-        <form method="get" action="/"
-          style="display: flex; align-items: center; height: 100%; margin: 0; padding: 0;">
-          <button type="button" onclick="navigateDate(-1)" class="more-button input-change-arrow left">&#9668;</button>
-          <input type="date" id="matchDate" class="gf-input" name="date" value="{{selectedDate}}"
-            onchange="this.form.submit()" />
-          <button type="button" onclick="navigateDate(1)" class="more-button input-change-arrow right">&#9658;</button>
-        </form>
+        <div style="display: flex; align-items: center; height: 100%;">
+          <form method="get" action="/"
+            style="display: flex; align-items: center; height: 100%; margin: 0; padding: 0;">
+            <button type="button" onclick="navigateDate(-1)" class="more-button input-change-arrow left">&#9668;</button>
+            <input type="date" id="matchDate" class="gf-input" name="date" value="{{selectedDate}}"
+              onchange="this.form.submit()" />
+            <button type="button" onclick="navigateDate(1)" class="more-button input-change-arrow right">&#9658;</button>
+          </form>
+          {{#if isLocal}}
+          <button type="button" id="refetch-day-btn" class="match-refetch-btn" onclick="refetchSelectedDay()">Refetch</button>
+          {{/if}}
+        </div>
       </th>
       {{else}}
       {{#if matches}}
@@ -28,19 +34,30 @@
             {{/each}}
           </select>
           <button type="button" onclick="navigateRound(1)" class="more-button input-change-arrow right">&#9658;</button>
+          {{#if isLocal}}
+          {{#if leagueID}}
+          <button type="button" id="refetch-round-btn" class="match-refetch-btn" data-league-id="{{leagueID}}"
+            data-season="{{selectedSeason}}" onclick="refetchSelectedRound()">Refetch</button>
+          {{/if}}
+          {{/if}}
         </div>
         {{/if}}
       </th>
       {{else}}
       <th colspan="6">Today's Matches</th>
       <th colspan="3">
-        <form method="get" action="/"
-          style="display: flex; justify-content: flex-end; align-items: center; height: 100%; margin: 0; padding: 0;">
-          <button type="button" onclick="navigateDate(-1)" class="more-button input-change-arrow left">&#9668;</button>
-          <input type="date" id="matchDate" class="gf-input" name="date" value="{{selectedDate}}"
-            onchange="this.form.submit()" />
-          <button type="button" onclick="navigateDate(1)" class="more-button input-change-arrow right">&#9658;</button>
-        </form>
+        <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%;">
+          <form method="get" action="/"
+            style="display: flex; justify-content: flex-end; align-items: center; height: 100%; margin: 0; padding: 0;">
+            <button type="button" onclick="navigateDate(-1)" class="more-button input-change-arrow left">&#9668;</button>
+            <input type="date" id="matchDate" class="gf-input" name="date" value="{{selectedDate}}"
+              onchange="this.form.submit()" />
+            <button type="button" onclick="navigateDate(1)" class="more-button input-change-arrow right">&#9658;</button>
+          </form>
+          {{#if isLocal}}
+          <button type="button" id="refetch-day-btn" class="match-refetch-btn" onclick="refetchSelectedDay()">Refetch</button>
+          {{/if}}
+        </div>
       </th>
       {{/if}}
       {{/if}}

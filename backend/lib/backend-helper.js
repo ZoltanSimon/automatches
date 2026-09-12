@@ -1,4 +1,4 @@
-import { buildTeamList } from "./json-reader.js";
+import { buildTeamList } from "../services/json-reader.js";
 
 // Helper function to parse date from query string
 export const parseDate = (dateQuery) => {

@@ -6,13 +6,13 @@ import {
   loadCompLogo,
   leagueBannerBig,
 } from "../instapics.js";
-import { downloadMatch } from "../local-handler.js";
 import {
   imagePath,
   truncate,
   htmlDecode,
   removeNewlines,
   getDate,
+  showToast,
 } from "../common-functions.js";
 
 let imgToAdd = [];
@@ -187,6 +187,21 @@ export function matchesToCanvas(sourceDiv) {
     imgToAdd,
     yPos
   );
+}
+
+async function downloadMatch(fixtureID) {
+  if (fixtureID instanceof PointerEvent) {
+    fixtureID = fixtureID.target.innerHTML;
+  }
+
+  const response = await fetch(`/api/save-match?matchID=${fixtureID}`, {
+    method: "GET",
+  });
+  const { limits } = await response.json();
+
+  showToast(`${fixtureID} match downloaded ${limits.dailyRemaining} requests left today, ${limits.perMinuteRemaining} left this minute`);
+
+  return { limits };
 }
 
 function clickHandler(event) {

@@ -1,10 +1,11 @@
 import { readFile } from "fs/promises";
 import path from "path";
-import { networkPath } from "./config.js";
-import { findOrCreateTeam } from "./services/teams-service.js";
-import { LineupParser } from "./../classes/lineupparser.js";
-import { importLeague } from "./data-access.js";
-import { getResultFromApi, getResultsFromApiByIds } from "./webapi-handler.js";
+import { networkPath } from "../config.js";
+import { findOrCreateTeam } from "./teams-service.js";
+import { LineupParser } from "../../classes/lineupparser.js";
+import { ensureMatchesTable, getMatchDetailsByIds, upsertMatchDetails, upsertMatchSummaries } from "../data-access.js";
+import { unwrapMatchPayload } from "../lib/match-details-mapper.js";
+import { getResultFromApi, getResultsFromApiByIds } from "../api/webapi-handler.js";
 import fs from 'fs/promises';   // For async/await operations
 
 export const matchesDir = path.join(networkPath, "matches");
@@ -107,10 +108,83 @@ export async function writeLeagueToServer(leagueID, dataToWrite, season) {
   let responseToSend = "";
 
   await fs.writeFile(file, JSON.stringify(dataToWrite));
-  await importLeague(filename);
+  await importLeagueFromFile(filename);
 
   responseToSend += `${leagueID} was saved!<br/>`;
   return responseToSend;
+}
+
+export async function importLeagueFromFile(fileName) {
+  const filePath = path.join(leaguesDir, fileName);
+  const raw = await fs.readFile(filePath);
+  const json = JSON.parse(raw);
+  const matches = Array.isArray(json.response) ? json.response : json;
+
+  if (!Array.isArray(matches) || matches.length === 0) {
+    console.log("❌ No matches found in file");
+    return;
+  }
+
+  const leagueID = matches[0].league.id;
+  const season = matches[0].league.season;
+
+  await ensureMatchesTable();
+  console.log(`✅ Table 'matches' ensured for league ${leagueID} season ${season}`);
+
+  const { importedMatches, skippedFinishedMatches } = await upsertMatchSummaries(matches, {
+    skipExistingFinished: true,
+  });
+
+  console.log(
+    `✅ Imported ${importedMatches} matches for league ${leagueID} season ${season}. Skipped ${skippedFinishedMatches} finished matches.`,
+  );
+}
+
+export async function persistDownloadedMatches(matchPayloads, { overwriteDetails = false } = {}) {
+  const matches = (Array.isArray(matchPayloads) ? matchPayloads : [matchPayloads])
+    .map((payload) => unwrapMatchPayload(payload))
+    .filter(Boolean);
+
+  let summary = { importedMatches: 0, skippedFinishedMatches: 0 };
+  try {
+    summary = await upsertMatchSummaries(matches);
+  } catch (error) {
+    console.error("Failed to upsert matches rows:", error);
+    summary = {
+      importedMatches: 0,
+      skippedFinishedMatches: 0,
+      error: error.message,
+    };
+  }
+
+  const details = [];
+
+  for (const match of matches) {
+    const matchId = Number(match?.fixture?.id);
+    try {
+      details.push(await upsertMatchDetails(matchId, match, { overwrite: overwriteDetails }));
+    } catch (error) {
+      console.error(`Failed to upsert match_details for ${matchId}:`, error);
+      details.push({
+        matchId,
+        saved: false,
+        skipped: false,
+        error: error.message,
+      });
+    }
+  }
+
+  return { summary, details };
+}
+
+export async function writePlayerToServer(playerID, dataToWrite) {
+  const id = String(playerID ?? "").trim();
+  if (!id) {
+    throw new Error("playerID is required");
+  }
+
+  await fs.mkdir(playersDir, { recursive: true });
+  await fs.writeFile(path.join(playersDir, `${id}.json`), JSON.stringify(dataToWrite));
 }
 
 export async function getAllPlayers(compList, nationList) {
@@ -148,14 +222,15 @@ export async function getAllPlayers(compList, nationList) {
       const league = JSON.parse(
         await readFile(`${leaguesDir}/${comp.id}.json`)
       );
+      const leagueMatches = Array.isArray(league?.response) ? league.response : Array.isArray(league) ? league : [];
 
-      for (const match of league) {
-        if (match.fixture.status.short !== "FT") continue;
+      const finishedMatches = leagueMatches.filter((match) => match.fixture.status.short === "FT");
+      const detailedMatches = await getMatchDetailsByIds(
+        finishedMatches.map((match) => match.fixture.id),
+      );
 
-        const matchData = await getMatchFromServer(match.fixture.id);
-        if (!matchData?.[0]) continue;
-
-        const { lineups = [], players: matchPlayers = [] } = matchData[0];
+      for (const matchDetail of detailedMatches) {
+        const { lineups = [], players: matchPlayers = [] } = matchDetail;
 
         // Pre-parse lineup positions only once
         const parsedLineupsByTeam = new Map();
@@ -205,14 +280,14 @@ export async function getAllPlayers(compList, nationList) {
   for (const nation of nationList) {
     try {
       const nt = JSON.parse(await readFile(`${leaguesDir}/${nation.id}.json`));
+      const nationMatches = Array.isArray(nt?.response) ? nt.response : Array.isArray(nt) ? nt : [];
 
-      for (const match of nt) {
-        if (match.fixture.status.short !== "FT") continue;
+      const finishedNationMatches = nationMatches.filter((match) => match.fixture.status.short === "FT");
+      const detailedNationMatches = await getMatchDetailsByIds(
+        finishedNationMatches.map((match) => match.fixture.id),
+      );
 
-        const matchData = await getMatchFromServer(match.fixture.id);
-        if (!matchData?.[0]) continue;
-
-        const matchDetail = matchData[0];
+      for (const matchDetail of detailedNationMatches) {
 
         if (matchDetail.players?.length > 0) {
           for (const teamData of matchDetail.players) {
@@ -359,28 +434,39 @@ export function buildTeamList(data) {
   }
 }
 
+async function writeMatchJson(fixtureID, matchPayload, { overwrite = false } = {}) {
+  await ensureMatchFileDirectory(fixtureID);
+  const payload = Array.isArray(matchPayload) ? matchPayload : [matchPayload];
+  try {
+    await fs.writeFile(
+      getMatchFilePath(fixtureID),
+      JSON.stringify(payload),
+      { flag: overwrite ? "w" : "wx" },
+    );
+    return { wrote: true };
+  } catch (error) {
+    if (!overwrite && error?.code === "EEXIST") {
+      return { wrote: false, existed: true };
+    }
+    throw error;
+  }
+}
+
 export async function saveMatchToServer(fixtureID, options = {}) {   
-  console.log(`Saving match with fixture ID: ${fixtureID}`);
   const overwrite = Boolean(options?.overwrite);
   
   try {
-    let { data, limits } = await getResultFromApi(fixtureID);
+    let { data, limits, call } = await getResultFromApi(fixtureID);
+    const matchPayload = data?.response;
+    await writeMatchJson(fixtureID, matchPayload, { overwrite });
+    const db = await persistDownloadedMatches(matchPayload, { overwriteDetails: overwrite });
 
-    await ensureMatchFileDirectory(fixtureID);
-
-    await fs.writeFile(
-      getMatchFilePath(fixtureID),
-      JSON.stringify(data.response),
-      { flag: overwrite ? "w" : "wx" }
-    );
-
-    const resp = {
-      match: data.response,
-      limits: limits,
+    return {
+      match: matchPayload,
+      limits,
+      db,
+      call,
     };
-    
-    console.log(resp);
-    return resp;
     
   } catch (err) {
     console.error("Error saving match:", err);
@@ -404,6 +490,7 @@ export async function saveMatchesToServer(fixtureIDs, options = {}) {
       failed: [],
       limits: null,
       matches: [],
+      call: null,
     };
   }
 
@@ -411,12 +498,13 @@ export async function saveMatchesToServer(fixtureIDs, options = {}) {
     throw new Error("A maximum of 20 fixture IDs can be saved in one batch.");
   }
 
-  const { data, limits } = await getResultsFromApiByIds(ids);
+  const { data, limits, call } = await getResultsFromApiByIds(ids);
   const matches = Array.isArray(data?.response) ? data.response : [];
   const byId = new Map(matches.map((match) => [String(match?.fixture?.id), match]));
 
   const saved = [];
   const failed = [];
+  const matchesToPersist = [];
 
   for (const id of ids) {
     const match = byId.get(String(id));
@@ -426,15 +514,30 @@ export async function saveMatchesToServer(fixtureIDs, options = {}) {
     }
 
     try {
-      await ensureMatchFileDirectory(id);
-      await fs.writeFile(
-        getMatchFilePath(id),
-        JSON.stringify([match]),
-        { flag: overwrite ? "w" : "wx" }
-      );
+      await writeMatchJson(id, [match], { overwrite });
+      matchesToPersist.push(match);
       saved.push(id);
     } catch (error) {
       failed.push({ fixtureID: id, error: error.message });
+    }
+  }
+
+  if (matchesToPersist.length > 0) {
+    try {
+      await persistDownloadedMatches(matchesToPersist, { overwriteDetails: overwrite });
+    } catch (error) {
+      failed.push(...matchesToPersist.map((match) => ({
+        fixtureID: String(match?.fixture?.id ?? ""),
+        error: error.message,
+      })));
+      return {
+        savedCount: 0,
+        saved: [],
+        failed,
+        limits,
+        matches,
+        call,
+      };
     }
   }
 
@@ -444,5 +547,6 @@ export async function saveMatchesToServer(fixtureIDs, options = {}) {
     failed,
     limits,
     matches,
+    call,
   };
 }

@@ -1,3 +1,4 @@
+<script src="./../controllers/refetch-ui.js"></script>
 <script type="module" src="./../controllers/match.js"></script>
 <div class="container match-page">
   {{#if matchInfo}}
@@ -15,6 +16,11 @@
           href="/league?id={{matchInfo.league.id}}">{{headerLeagueName}}</a> - {{matchInfo.league.round}} -
         {{formatDate matchInfo.fixture.date}}</div>
       <span class="status">{{matchInfo.fixture.status.short}}</span>
+      {{#if isLocal}}
+      <button type="button" id="refetch-match-btn" class="match-refetch-btn" data-match-id="{{matchID}}">
+        Refetch
+      </button>
+      {{/if}}
     </div>
 
     <div class="team">

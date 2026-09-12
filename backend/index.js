@@ -5,7 +5,6 @@ import { createApiRouter } from "./api/private.js";
 import { createPublicRouter } from "./api/public.js";
 import {
   getLeagueStandingsFromDb,
-  getLeagueSeason,
   getLatestTransfers,
   getTransfersByPlayer,
   getTransfersByTeam,
@@ -13,6 +12,7 @@ import {
   loadPlayers,
   loadTeams,
 } from "./data-access.js";
+import { getLeagueSeason } from "./lib/league-season.js";
 import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -25,10 +25,10 @@ import {
 import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData, parseLeagueIds, defaultLeagues } from "./services/leagues-service.js";
-import { parseDate, handleError, mergeWorldCupGroupStandings } from "./backend-helper.js";
+import { parseDate, handleError, mergeWorldCupGroupStandings, isLocalRequest } from "./lib/backend-helper.js";
 import { getTeamById, getTopTeams, getTeamRouteData, getTopTeamsPageData } from "./services/teams-service.js";
 import { buildMatchRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
-import { allDBLeagues, setCatalog } from "./catalog.js";
+import { allDBLeagues, setCatalog } from "./lib/catalog.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -57,6 +57,7 @@ app.use(express.static("./"));
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
   res.locals.headerLeagues = allDBLeagues || [];
+  res.locals.isLocal = isLocalRequest(req);
   next();
 });
 app.use(
@@ -304,7 +305,7 @@ app.get("/league", async (req, res) => {
       worldCupGroups,
       knockoutRounds,
       rounds: rounds,
-      currentRound: currentRound,
+      currentRound: rounds.includes(req.query.round) ? req.query.round : currentRound,
       leagueID: selectedLeague,
       leagueName: leagueInfo ? leagueInfo.name : "Unknown League",
       leagueSeasons: leagueInfo?.seasons ?? [selectedSeason],

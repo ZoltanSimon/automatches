@@ -1,6 +1,5 @@
-import {  getLeagueFromDb } from '../data-access.js';
-import { getMatchFromServer } from '../json-reader.js';
-import { allDBLeagues } from '../catalog.js';
+import { getLeagueFromDb, getMatchDetailsById, getMatchDetailsByIds } from '../data-access.js';
+import { allDBLeagues } from '../lib/catalog.js';
 
 let _registryPromise = null;
 let _registry = null;
@@ -74,11 +73,21 @@ export async function forceRefreshRegistry(options = {}) {
 }
 
 function normalizeFixtureAsMatch(fixture) {
+  const catalogLeague = (allDBLeagues || []).find(
+    (league) => Number(league.id) === Number(fixture?.league?.id),
+  );
+  const existingLeagueName = typeof fixture?.league?.name === "string" ? fixture.league.name.trim() : "";
+  const catalogLeagueName = typeof catalogLeague?.name === "string" ? catalogLeague.name.trim() : "";
   const fulltimeHome = fixture?.score?.fulltime?.home ?? fixture?.goals?.home ?? 0;
   const fulltimeAway = fixture?.score?.fulltime?.away ?? fixture?.goals?.away ?? 0;
 
   return {
     ...fixture,
+    league: {
+      ...(fixture?.league ?? {}),
+      name: existingLeagueName || catalogLeagueName || fixture?.league?.name,
+      country: fixture?.league?.country || catalogLeague?.country,
+    },
     score: {
       ...(fixture?.score ?? {}),
       fulltime: {
@@ -93,7 +102,12 @@ function normalizeFixtureAsMatch(fixture) {
 }
 
 function isPlainObject(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return (
+    value !== null
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && Object.getPrototypeOf(value) === Object.prototype
+  );
 }
 
 function deepMergeMatch(baseValue, extensionValue) {
@@ -145,18 +159,12 @@ function extractSavedMatch(payload) {
   return payload;
 }
 
-export async function ensureMatchInRegistry(registry, matchID) {
-  if (!registry || !registry.matchByID || !matchID) {
+export function upsertRegistryMatch(registry, matchPayload) {
+  if (!registry || !registry.matchByID) {
     return null;
   }
 
-  const existingMatch = registry.matchByID.get(matchID) ?? registry.matchByID.get(Number(matchID)) ?? registry.matchByID.get(String(matchID));
-  if (existingMatch) {
-    return existingMatch;
-  }
-
-  const savedMatchPayload = await getMatchFromServer(matchID);
-  const savedMatch = extractSavedMatch(savedMatchPayload);
+  const savedMatch = extractSavedMatch(matchPayload);
   if (!savedMatch?.fixture?.id) {
     return null;
   }
@@ -165,8 +173,14 @@ export async function ensureMatchInRegistry(registry, matchID) {
   const idAsNumber = Number(normalizedMatch.fixture.id);
   const idAsString = String(normalizedMatch.fixture.id);
 
-  const alreadyInRegistry = registry.matchByID.get(idAsNumber) || registry.matchByID.get(idAsString);
-  if (!alreadyInRegistry) {
+  const existingIndex = registry.matches.findIndex((match) => {
+    const matchId = Number(match?.fixture?.id);
+    return matchId === idAsNumber || String(match?.fixture?.id) === idAsString;
+  });
+
+  if (existingIndex >= 0) {
+    registry.matches[existingIndex] = normalizedMatch;
+  } else {
     registry.matches.push(normalizedMatch);
   }
 
@@ -178,6 +192,32 @@ export async function ensureMatchInRegistry(registry, matchID) {
   return normalizedMatch;
 }
 
+export function upsertRegistryMatchIfLoaded(matchPayload) {
+  if (!_registry) {
+    return null;
+  }
+
+  return upsertRegistryMatch(_registry, matchPayload);
+}
+
+export async function ensureMatchInRegistry(registry, matchID) {
+  if (!registry || !registry.matchByID || !matchID) {
+    return null;
+  }
+
+  const existingMatch = registry.matchByID.get(matchID) ?? registry.matchByID.get(Number(matchID)) ?? registry.matchByID.get(String(matchID));
+  if (existingMatch) {
+    return existingMatch;
+  }
+
+  const savedMatch = await getMatchDetailsById(matchID);
+  if (!savedMatch?.fixture?.id) {
+    return null;
+  }
+
+  return upsertRegistryMatch(registry, savedMatch);
+}
+
 export async function buildMatchRegistry(leagueIDs) {
   const allLeagueMatches = await getLeagueFromDb(leagueIDs);
   const baseMatches = allLeagueMatches
@@ -185,31 +225,12 @@ export async function buildMatchRegistry(leagueIDs) {
     .filter((match) => match?.fixture?.id !== undefined && match?.fixture?.id !== null);
   const matchIDs = [...new Set(baseMatches.map(({ fixture }) => fixture.id))];
 
-  const detailedMatchByID = new Map();
-  const batchSize = 150;
-
-  for (let i = 0; i < matchIDs.length; i += batchSize) {
-    const idBatch = matchIDs.slice(i, i + batchSize);
-    const results = await Promise.allSettled(
-      idBatch.map((id) => getMatchFromServer(id)),
-    );
-
-    results.forEach((result, index) => {
-      const fixtureID = idBatch[index];
-
-      if (result.status === "rejected") {
-        console.error(`Failed to read saved match ${fixtureID}:`, result.reason);
-        return;
-      }
-
-      const match = extractSavedMatch(result.value);
-      if (!match?.fixture?.id) {
-        return;
-      }
-
-      detailedMatchByID.set(String(match.fixture.id), match);
-    });
-  }
+  const detailedMatches = await getMatchDetailsByIds(matchIDs);
+  const detailedMatchByID = new Map(
+    detailedMatches
+      .filter((match) => match?.fixture?.id != null)
+      .map((match) => [String(match.fixture.id), match]),
+  );
 
   const mergedMatches = baseMatches.map((baseMatch) => {
     const detailMatch = detailedMatchByID.get(String(baseMatch.fixture.id));
