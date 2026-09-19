@@ -5,6 +5,8 @@
       <th rowspan=2 class="form-column" data-stat="form">Form</td>
       <th rowspan=2 title="Played" class="list-header" data-stat="played"><span class="big-played">Played</span><span
           class="small-played">P</span></th>
+      <th rowspan=2 title="Club Elo rating from the last 5 seasons" class="list-header{{#if big}} sortable{{/if}}" data-stat="elo">Elo{{#if big}}<span
+          class="sort-indicator"></span>{{/if}}</th>
       {{#if big}}
       <th rowspan=2 class="list-header" data-stat="winPercentage">Win %</th>
       <th rowspan=2 class="list-header" data-stat="possession"><span class="big-played">Possession</span><span
@@ -81,6 +83,7 @@
       </td>
       
       <td style="text-align: center;" data-stat="played">{{thisTeam.played}}</td>
+      <td style="text-align: center;" data-stat="elo">{{#if thisTeam.elo}}{{thisTeam.elo}}{{else}}—{{/if}}</td>
 
       {{#if ../big}}
       <td style="text-align: center;" data-stat="winPercentage">{{ thisTeam.total.winPercentage }}</td>

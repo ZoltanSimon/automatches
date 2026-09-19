@@ -11,6 +11,32 @@
       <span id="round-no"></span>
       <button id="clear-results">Clear</button>
       <button id="copy-for-blog">Copy</button>
+      <div id="missing-xg-panel" hidden>
+        <h3>Missing xG <span id="missing-xg-count"></span></h3>
+        <div class="missing-xg-toolbar">
+          <button type="button" id="missing-xg-select-20">Select 20</button>
+          <button type="button" id="missing-xg-clear-selection">Clear selection</button>
+          <button type="button" id="missing-xg-hide-old">Hide older than 6 months</button>
+          <button type="button" id="missing-xg-refetch-selected" disabled>Refetch selected (0)</button>
+          <span id="missing-xg-selection-hint">Max 20</span>
+        </div>
+        <div class="missing-xg-table-wrap">
+          <table class="gf-table missing-xg-table" id="missing-xg-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Date</th>
+                <th>League</th>
+                <th>Match</th>
+                <th>Score</th>
+                <th></th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
       <h3>Results</h3>
       <div id="fixtures-info"></div>
       <div id="results-text"></div>
@@ -90,6 +116,7 @@
           <div class="automatches-row">
             <input type="text" placeholder="Match IDs" id="matchIDs" />
             <button id="grab-match-info">Grab match info</button>
+            <button id="matches-missing-xg">Missing xG (current season)</button>
           </div>
           <div class="automatches-row">
             <input type="number" placeholder="276" id="playerID" />

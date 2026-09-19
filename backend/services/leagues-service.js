@@ -6,9 +6,9 @@ import { lastMatchesFromLeague } from "./matches-service.js";
 import { getTeamById } from "./teams-service.js";
 import { readFile } from "fs/promises";
 import path from "path";
-import { defaultLeagues } from "../../shared/defaults.js";
+import { CURRENT_SEASON, defaultLeagues } from "../../shared/defaults.js";
 
-export { defaultLeagues } from "../../shared/defaults.js";
+export { CURRENT_SEASON, defaultLeagues } from "../../shared/defaults.js";
 
 export function parseLeagueIds(leagueQuery, options = {}) {
   const { fallback = defaultLeagues, unique = false } = options;
@@ -38,7 +38,6 @@ const ROUND_ORDER = [
 
 const WORLD_CUP_LEAGUE_ID = 1;
 const DEFAULT_PLAYER_LIST_LIMIT = 10;
-const CURRENT_SEASON = 2026;
 const UPDATE_LEAGUES_DELAY_MS = 2000;
 
 let worldCupBracketTemplatePromise = null;

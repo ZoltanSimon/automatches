@@ -37,6 +37,7 @@ const hasTeamStatFilters = teamStatFilterButtons.length > 0;
 const defaultVisibleTeamStats = [
   "form",
   "played",
+  "elo",
   "winPercentage",
   "goals",
   "xG",
@@ -202,6 +203,25 @@ function getSubHeaderColumnOffset(table) {
   }, 0);
 }
 
+function getHeaderColumnIndex(header, table) {
+  const firstHeaderRow = table?.querySelector("thead tr:first-child");
+  const headerRow = header?.parentElement;
+
+  if (headerRow && headerRow === firstHeaderRow) {
+    let columnIndex = 0;
+    for (const cell of headerRow.cells) {
+      if (cell === header) {
+        return columnIndex;
+      }
+      columnIndex += Number(cell.colSpan) || 1;
+    }
+    return columnIndex;
+  }
+
+  const headerCells = Array.from(headerRow?.children || []);
+  return getSubHeaderColumnOffset(table) + headerCells.indexOf(header);
+}
+
 function toggleColumnByStat(stat, isVisible) {
   if (!stat) {
     return;
@@ -306,7 +326,7 @@ export function createTeamsTable(response, onlyTotal, big) {
   if (enableTeamStatFilters) {
     registerStatFilterPopover({
       tableId: tableName,
-      headerSelector: "thead tr:last-child th.sortable[data-stat]",
+      headerSelector: "thead th.sortable[data-stat]",
       rowSelector: "tbody tr",
       storageKey: "teams.stat-filter",
       serverSide: serverSideTeamsTable,
@@ -332,12 +352,7 @@ export function createTeamsTable(response, onlyTotal, big) {
 
         updateTableVisibility(enableTeamStatFilters);
       },
-      getColumnIndex: (header, tableElement) => {
-        const headerRow = header.parentElement;
-        const headerCells = Array.from(headerRow.children);
-        const headerIndex = headerCells.indexOf(header);
-        return getSubHeaderColumnOffset(tableElement) + headerIndex;
-      },
+      getColumnIndex: (header, tableElement) => getHeaderColumnIndex(header, tableElement),
     });
   }
 
@@ -355,12 +370,9 @@ export function createTeamsTable(response, onlyTotal, big) {
     let subHeaderLength = table.rows[1].cells.length;
     const subHeaderOffset = getSubHeaderColumnOffset(table);
 
-    for (let i = subHeaderLength - 1; i >= 0; i--) {
-      let subheaderCell = table.rows[1].cells[i];
-      const columnIndex = subHeaderOffset + i;
-      subheaderCell.dataset.columnIndex = String(columnIndex);
-
-      subheaderCell.addEventListener("click", function () {
+    const bindServerSort = (header, columnIndex) => {
+      header.dataset.columnIndex = String(columnIndex);
+      header.addEventListener("click", function () {
         if (serverSideTeamsTable) {
           const currentSortStat = serverState?.sortStat || null;
           const currentDirection = normalizeSortDirection(serverState?.sortDirection);
@@ -382,12 +394,27 @@ export function createTeamsTable(response, onlyTotal, big) {
         this.setAttribute("data-default-order", newOrder);
         document
           .querySelectorAll(`#${tableName} th.sortable`)
-          .forEach((header) => header.classList.remove("asc", "desc"));
+          .forEach((item) => item.classList.remove("asc", "desc"));
         this.classList.add(newOrder);
 
-        sortTable(columnIndex, subheaderCell, table, 2);
+        sortTable(columnIndex, header, table, 2);
         table._tablePagination?.refresh({ resetPage: true });
       });
+    };
+
+    let firstRowColumnIndex = 0;
+    Array.from(table.rows[0].cells).forEach((cell) => {
+      const span = Number(cell.colSpan) || 1;
+      if (cell.classList.contains("sortable") && cell.dataset.stat) {
+        bindServerSort(cell, firstRowColumnIndex);
+      }
+      firstRowColumnIndex += span;
+    });
+
+    for (let i = subHeaderLength - 1; i >= 0; i--) {
+      let subheaderCell = table.rows[1].cells[i];
+      const columnIndex = subHeaderOffset + i;
+      bindServerSort(subheaderCell, columnIndex);
     }
 
     if (serverSideTeamsTable && serverState?.sortStat && Number.isFinite(serverState?.sortColumnIndex)) {

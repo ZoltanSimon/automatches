@@ -21,6 +21,16 @@
             <span class="per-game pts-per">{{teamStats.[0].perGame.points}} pts/game</span>
         </div>
         <div class="stat">
+            <div class="label">Elo last month</div>
+            {{#if eloMonthChange}}
+            <div class="value elo-change {{eloMonthChange.direction}}">{{eloMonthChange.display}}</div>
+            <div class="per-game">{{eloMonthChange.current}} now</div>
+            {{else}}
+            <div class="value">—</div>
+            <div class="per-game">last 30 days</div>
+            {{/if}}
+        </div>
+        <div class="stat">
             <div class="label">Goals</div>
             <div class="value">{{teamStats.[0].total.goals}} - {{teamStats.[0].total.goalsAgainst}}</div>
             <div class="per-game">{{teamStats.[0].perGame.goals}} - {{teamStats.[0].perGame.goalsAgainst}}/game</div>

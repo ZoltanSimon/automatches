@@ -1,7 +1,9 @@
 import { buildMatchRegistry, upsertRegistryMatchIfLoaded } from "./registry-service.js";
 import { saveMatchesToServer, buildTeamList } from "./json-reader.js";
+import { applyEloForFinishedMatches } from "./elo-service.js";
 import { allDBLeagues } from "../lib/catalog.js";
-import { getAllMatchesFromDb, getMatchIdsMissingDetails } from "../data-access.js";
+import { getAllMatchesFromDb, getMatchIdsMissingDetails, getMatchEloByMatchId } from "../data-access.js";
+import { formatEloDelta } from "../lib/elo.js";
 import { wait } from "../lib/backend-helper.js";
 import { getResults, getFixturesByDate, hasApiErrors } from "../api/webapi-handler.js";
 
@@ -130,7 +132,7 @@ async function saveFixtureIds(fixtureIds, extra = {}) {
     const remaining = ids.length - (i + batchIds.length);
 
     try {
-      const result = await saveMatchesToServer(batchIds, { overwrite });
+      const result = await saveMatchesToServer(batchIds, { overwrite, applyElo: false });
       saved.push(...(result.saved || []));
       failed.push(...(result.failed || []));
       limits = result.limits ?? limits;
@@ -151,13 +153,12 @@ async function saveFixtureIds(fixtureIds, extra = {}) {
         }
       }
 
-      if (logPrefix) {
-        console.log(
-          `${logPrefix} Saved ${result.savedCount}/${batchIds.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`,
-        );
-        if (result.failed.length > 0) {
-          console.warn(`${logPrefix} Failed matches in batch:`, result.failed);
-        }
+      const prefix = logPrefix || "[saveFixtureIds]";
+      console.log(
+        `${prefix} Saved ${result.savedCount}/${batchIds.length} matches in batch [${batchIds.join(",")}] (${remaining} left)`,
+      );
+      if (result.failed.length > 0) {
+        console.warn(`${prefix} Failed matches in batch:`, result.failed);
       }
     } catch (err) {
       console.error(`${logPrefix || "[saveFixtureIds]"} Error saving match batch [${batchIds.join(",")}]`, err);
@@ -166,6 +167,14 @@ async function saveFixtureIds(fixtureIds, extra = {}) {
 
     if (remaining > 0) {
       await wait(UPDATE_MATCHES_DELAY_MS);
+    }
+  }
+
+  if (saved.length > 0) {
+    try {
+      await applyEloForFinishedMatches(saved);
+    } catch (error) {
+      console.error(`${logPrefix || "[saveFixtureIds]"} Failed to apply Elo after save:`, error);
     }
   }
 
@@ -305,11 +314,19 @@ export async function getMatchPageData(registry, currentMatch) {
     ? allDBLeagues.find((league) => league.id == currentMatch.league.id)?.name || ""
     : "";
   const leagueName = matchLeagueName || dbLeagueName || "Unknown League";
+  const matchEloRow = await getMatchEloByMatchId(currentMatch?.fixture?.id ?? currentMatch?.id);
+  const matchElo = matchEloRow
+    ? {
+        home: formatEloDelta(matchEloRow.home_elo_after, matchEloRow.home_elo_before),
+        away: formatEloDelta(matchEloRow.away_elo_after, matchEloRow.away_elo_before),
+      }
+    : null;
 
   return {
     teamList,
     matchStatistics,
     leagueName,
+    matchElo,
   };
 }
 

@@ -1,3 +1,4 @@
+import { CURRENT_SEASON } from "../shared/defaults.js";
 import pool from "./config.js";
 import { allDBTeams, getCatalogLeague } from "./lib/catalog.js";
 import { getTeamById } from "./services/teams-service.js";
@@ -16,6 +17,21 @@ import { normalizeLeagueConfig, normalizeSeasonValue } from "./lib/league-season
 
 let leagueSeasonTableConfigPromise = null;
 const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
+
+function matchNeutralValue(match) {
+  const value = match?.fixture?.neutral;
+  if (value === true || value === 1 || value === "1" || value === "true") {
+    return 1;
+  }
+  if (value === false || value === 0 || value === "0" || value === "false") {
+    return 0;
+  }
+  return null;
+}
+
+function dbQuery(conn) {
+  return conn ?? pool;
+}
 
 async function getLeagueSeasonTableConfig() {
   if (!leagueSeasonTableConfigPromise) {
@@ -162,7 +178,7 @@ export async function loadLeagues() {
   }
 }
 
-export async function saveLeagueStandingsToDb(leagueID, standings, season = 2026) {
+export async function saveLeagueStandingsToDb(leagueID, standings, season = CURRENT_SEASON) {
   try {
     await pool.execute(
       "INSERT INTO `League_Standing` (league_id, standings, season) VALUES (?, ?, ?)",
@@ -480,6 +496,29 @@ export async function insertTeamsToDb(teams) {
   }
 }
 
+let matchesNeutralColumnPromise = null;
+
+export async function ensureMatchesNeutralColumn() {
+  if (!matchesNeutralColumnPromise) {
+    matchesNeutralColumnPromise = (async () => {
+      try {
+        await pool.query("ALTER TABLE matches ADD COLUMN neutral TINYINT(1) NULL DEFAULT NULL");
+      } catch (error) {
+        const duplicateColumn = error?.code === "ER_DUP_FIELDNAME" || error?.errno === 1060;
+        const missingTable = error?.code === "ER_NO_SUCH_TABLE" || error?.errno === 1146;
+        if (!duplicateColumn) {
+          matchesNeutralColumnPromise = null;
+        }
+        if (!duplicateColumn && !missingTable) {
+          throw error;
+        }
+      }
+    })();
+  }
+
+  return matchesNeutralColumnPromise;
+}
+
 export async function ensureMatchesTable() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS matches (
@@ -493,12 +532,14 @@ export async function ensureMatchesTable() {
       status VARCHAR(20) NOT NULL,
       home_score INT,
       away_score INT,
+      neutral TINYINT(1) NULL DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_league_season (league_id, season),
       INDEX idx_match_date (match_date)
     )
   `);
+  await ensureMatchesNeutralColumn();
 }
 
 export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished = false } = {}) {
@@ -509,6 +550,8 @@ export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished
   if (matches.length === 0) {
     return { importedMatches: 0, skippedFinishedMatches: 0 };
   }
+
+  await ensureMatchesNeutralColumn();
 
   const fixtureIDs = matches
     .map((match) => Number(match?.fixture?.id))
@@ -542,8 +585,8 @@ export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished
 
     await pool.query(
       `INSERT INTO matches
-    (id, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (id, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score, neutral)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE
       league_id = VALUES(league_id),
       season = VALUES(season),
@@ -553,7 +596,8 @@ export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished
       match_date = VALUES(match_date),
       status = VALUES(status),
       home_score = VALUES(home_score),
-      away_score = VALUES(away_score)`,
+      away_score = VALUES(away_score),
+      neutral = VALUES(neutral)`,
       [
         fixtureID,
         match.league?.id,
@@ -565,6 +609,7 @@ export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished
         match.fixture?.status?.short,
         match.goals?.home,
         match.goals?.away,
+        matchNeutralValue(match),
       ],
     );
     importedMatches += 1;
@@ -965,6 +1010,58 @@ export async function getMatchIdsMissingDetails(ids) {
   );
 
   return rows.map((row) => Number(row.fixtureId));
+}
+
+export async function getFinishedMatchesMissingXg(season = CURRENT_SEASON) {
+  const normalizedSeason = normalizeSeasonValue(season) ?? CURRENT_SEASON;
+  const finishedStatuses = [...FINISHED_MATCH_STATUSES];
+
+  const [rows] = await pool.query(
+    `SELECT m.id AS fixtureId,
+            m.league_id,
+            m.season,
+            m.round,
+            m.home_team_id,
+            m.away_team_id,
+            m.match_date,
+            m.status,
+            m.home_score,
+            m.away_score,
+            d.home_xg,
+            d.away_xg,
+            d.match_id IS NULL AS missing_details
+     FROM matches m
+     INNER JOIN League l ON l.id = m.league_id
+     LEFT JOIN match_details d ON d.match_id = m.id
+     WHERE m.season = ?
+       AND l.type IN ('league', 'cup')
+       AND m.status IN (?)
+       AND (d.match_id IS NULL OR (d.home_xg IS NULL AND d.away_xg IS NULL))
+     ORDER BY m.match_date DESC`,
+    [normalizedSeason, finishedStatuses],
+  );
+
+  const teamNameById = new Map((allDBTeams || []).map((team) => [team.ID, team.name]));
+
+  return rows.map((row) => {
+    const league = getCatalogLeague(row.league_id);
+    return {
+      fixtureId: Number(row.fixtureId),
+      fixtureDate: row.match_date,
+      fixtureStatus: row.status,
+      leagueId: Number(row.league_id),
+      leagueName: league?.name ?? String(row.league_id),
+      leagueSeason: row.season,
+      leagueRound: row.round,
+      homeTeamId: row.home_team_id,
+      homeTeamName: teamNameById.get(row.home_team_id) || "Unknown",
+      awayTeamId: row.away_team_id,
+      awayTeamName: teamNameById.get(row.away_team_id) || "Unknown",
+      homeGoals: row.home_score,
+      awayGoals: row.away_score,
+      missingDetails: Boolean(row.missing_details),
+    };
+  });
 }
 
 export async function getMatchIdsWithoutDetails({ finishedOnly = false, overwrite = false, limit = null } = {}) {
@@ -1419,5 +1516,446 @@ export async function markTeamTransfersUpdated(teamID) {
   }
 
   await pool.execute("UPDATE Team SET transfer_updated = NOW() WHERE ID = ?", [normalizedTeamID]);
+}
+
+let eloTablesPromise = null;
+
+export async function ensureEloTables() {
+  if (!eloTablesPromise) {
+    eloTablesPromise = (async () => {
+      try {
+        await ensureMatchesNeutralColumn();
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS team_elo (
+          team_id INT NOT NULL,
+          scope ENUM('club', 'nt') NOT NULL,
+          elo DECIMAL(10, 4) NOT NULL DEFAULT 1500,
+          matches_played INT NOT NULL DEFAULT 0,
+          last_match_id INT NULL,
+          last_match_date DATETIME NULL,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (team_id, scope)
+        )
+      `);
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS match_elo (
+          match_id INT PRIMARY KEY,
+          scope ENUM('club', 'nt') NOT NULL,
+          home_elo_before DECIMAL(10, 4) NOT NULL,
+          away_elo_before DECIMAL(10, 4) NOT NULL,
+          home_elo_after DECIMAL(10, 4) NOT NULL,
+          away_elo_after DECIMAL(10, 4) NOT NULL,
+          k_factor DECIMAL(6, 2) NOT NULL,
+          importance_band VARCHAR(40) NOT NULL,
+          home_advantage DECIMAL(6, 2) NOT NULL,
+          neutral TINYINT(1) NOT NULL DEFAULT 0,
+          expected_home DECIMAL(8, 6) NOT NULL,
+          match_date DATETIME NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          INDEX idx_match_elo_scope_date (scope, match_date)
+        )
+      `);
+      } catch (error) {
+        eloTablesPromise = null;
+        throw error;
+      }
+    })();
+  }
+
+  return eloTablesPromise;
+}
+
+export async function getFinishedMatchesForElo({ seasonFloor, scope = null, matchIds = null } = {}) {
+  await ensureEloTables();
+  const where = [
+    "m.status IN (?)",
+    "m.home_score IS NOT NULL",
+    "m.away_score IS NOT NULL",
+  ];
+  const params = [[...FINISHED_MATCH_STATUSES]];
+
+  if (Number.isFinite(Number(seasonFloor))) {
+    where.push("m.season >= ?");
+    params.push(Number(seasonFloor));
+  }
+
+  if (scope === "nt") {
+    where.push("l.type = 'nt'");
+  } else if (scope === "club") {
+    where.push("l.type IN ('league', 'cup')");
+  }
+
+  if (Array.isArray(matchIds) && matchIds.length > 0) {
+    where.push("m.id IN (?)");
+    params.push(matchIds.map((id) => Number(id)).filter(Number.isFinite));
+  }
+
+  const [rows] = await pool.query(
+    `SELECT
+       m.id,
+       m.league_id,
+       m.season,
+       m.round,
+       m.home_team_id,
+       m.away_team_id,
+       m.match_date,
+       m.status,
+       m.home_score,
+       m.away_score,
+       m.neutral,
+       l.type AS league_type,
+       l.name AS league_name
+     FROM matches m
+     INNER JOIN League l ON l.id = m.league_id
+     WHERE ${where.join(" AND ")}
+     ORDER BY m.match_date ASC, m.id ASC`,
+    params,
+  );
+
+  return rows;
+}
+
+export async function getProcessedEloMatchIds(matchIds) {
+  const rowsById = await getMatchEloRowsByIds(matchIds);
+  return new Set(rowsById.keys());
+}
+
+export async function getMatchEloRowsByIds(matchIds) {
+  const ids = (Array.isArray(matchIds) ? matchIds : [])
+    .map((id) => Number(id))
+    .filter(Number.isFinite);
+  if (ids.length === 0) {
+    return new Map();
+  }
+
+  await ensureEloTables();
+  const [rows] = await pool.query(
+    `SELECT match_id, home_elo_before, away_elo_before, home_elo_after, away_elo_after,
+            k_factor, home_advantage
+     FROM match_elo WHERE match_id IN (?)`,
+    [ids],
+  );
+  return new Map(rows.map((row) => [Number(row.match_id), row]));
+}
+
+export async function getUnprocessedFinishedEloMatchIds({ seasonFloor, scope = null } = {}) {
+  await ensureEloTables();
+  const where = [
+    "m.status IN (?)",
+    "m.home_score IS NOT NULL",
+    "m.away_score IS NOT NULL",
+    "e.match_id IS NULL",
+  ];
+  const params = [[...FINISHED_MATCH_STATUSES]];
+
+  if (Number.isFinite(Number(seasonFloor))) {
+    where.push("m.season >= ?");
+    params.push(Number(seasonFloor));
+  }
+
+  if (scope === "nt") {
+    where.push("l.type = 'nt'");
+  } else if (scope === "club") {
+    where.push("l.type IN ('league', 'cup')");
+  }
+
+  const [rows] = await pool.query(
+    `SELECT m.id
+     FROM matches m
+     INNER JOIN League l ON l.id = m.league_id
+     LEFT JOIN match_elo e ON e.match_id = m.id
+     WHERE ${where.join(" AND ")}
+     ORDER BY m.match_date ASC, m.id ASC`,
+    params,
+  );
+  return rows.map((row) => Number(row.id)).filter(Number.isFinite);
+}
+
+export async function getMaxMatchEloDate(scope) {
+  const [rows] = await pool.query(
+    "SELECT MAX(match_date) AS max_date FROM match_elo WHERE scope = ?",
+    [scope],
+  );
+  return rows[0]?.max_date ?? null;
+}
+
+export async function loadTeamEloRows(scope = null) {
+  await ensureEloTables();
+  if (scope) {
+    const [rows] = await pool.query(
+      "SELECT team_id, scope, elo, matches_played, last_match_id, last_match_date FROM team_elo WHERE scope = ?",
+      [scope],
+    );
+    return rows;
+  }
+
+  const [rows] = await pool.query(
+    "SELECT team_id, scope, elo, matches_played, last_match_id, last_match_date FROM team_elo",
+  );
+  return rows;
+}
+
+export async function getTeamEloMap() {
+  const rows = await loadTeamEloRows();
+  const byTeam = new Map();
+
+  for (const row of rows) {
+    const teamId = Number(row.team_id);
+    const existing = byTeam.get(teamId) ?? { club: null, nt: null };
+    const elo = Number(row.elo);
+    existing[row.scope] = Number.isFinite(elo) ? elo : null;
+    byTeam.set(teamId, existing);
+  }
+
+  return byTeam;
+}
+
+export async function getTeamEloForTeam(teamID) {
+  const teamId = Number(teamID);
+  if (!Number.isFinite(teamId)) {
+    return { club: null, nt: null };
+  }
+
+  const [rows] = await pool.query(
+    "SELECT scope, elo, matches_played, last_match_id, last_match_date FROM team_elo WHERE team_id = ?",
+    [teamId],
+  );
+  const result = { club: null, nt: null };
+  for (const row of rows) {
+    result[row.scope] = {
+      elo: Number(row.elo),
+      matchesPlayed: Number(row.matches_played),
+      lastMatchId: row.last_match_id,
+      lastMatchDate: row.last_match_date,
+    };
+  }
+  return result;
+}
+
+function sideElo(row, teamId, phase) {
+  const isHome = Number(row.home_team_id) === Number(teamId);
+  const before = isHome ? row.home_elo_before : row.away_elo_before;
+  const after = isHome ? row.home_elo_after : row.away_elo_after;
+  return Number(phase === "before" ? before : after);
+}
+
+export async function getMatchEloByMatchId(matchID) {
+  const matchId = Number(matchID);
+  if (!Number.isFinite(matchId)) {
+    return null;
+  }
+
+  await ensureEloTables();
+  const [rows] = await pool.query(
+    `SELECT e.match_id, e.scope, e.home_elo_before, e.away_elo_before,
+            e.home_elo_after, e.away_elo_after, e.match_date,
+            m.home_team_id, m.away_team_id
+     FROM match_elo e
+     INNER JOIN matches m ON m.id = e.match_id
+     WHERE e.match_id = ?
+     LIMIT 1`,
+    [matchId],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getTeamEloMonthChange(teamID, scope = "club") {
+  const teamId = Number(teamID);
+  const normalizedScope = scope === "nt" ? "nt" : "club";
+  if (!Number.isFinite(teamId)) {
+    return null;
+  }
+
+  await ensureEloTables();
+  const ratings = await getTeamEloForTeam(teamId);
+  const current = Number(ratings?.[normalizedScope]?.elo);
+  if (!Number.isFinite(current)) {
+    return null;
+  }
+
+  const [beforeRows] = await pool.query(
+    `SELECT e.home_elo_before, e.away_elo_before, e.home_elo_after, e.away_elo_after,
+            m.home_team_id, m.away_team_id
+     FROM match_elo e
+     INNER JOIN matches m ON m.id = e.match_id
+     WHERE e.scope = ?
+       AND (m.home_team_id = ? OR m.away_team_id = ?)
+       AND e.match_date <= DATE_SUB(NOW(), INTERVAL 30 DAY)
+     ORDER BY e.match_date DESC, e.match_id DESC
+     LIMIT 1`,
+    [normalizedScope, teamId, teamId],
+  );
+
+  let baseline = null;
+  if (beforeRows[0]) {
+    baseline = sideElo(beforeRows[0], teamId, "after");
+  } else {
+    const [windowRows] = await pool.query(
+      `SELECT e.home_elo_before, e.away_elo_before, e.home_elo_after, e.away_elo_after,
+              m.home_team_id, m.away_team_id
+       FROM match_elo e
+       INNER JOIN matches m ON m.id = e.match_id
+       WHERE e.scope = ?
+         AND (m.home_team_id = ? OR m.away_team_id = ?)
+         AND e.match_date > DATE_SUB(NOW(), INTERVAL 30 DAY)
+       ORDER BY e.match_date ASC, e.match_id ASC
+       LIMIT 1`,
+      [normalizedScope, teamId, teamId],
+    );
+    if (windowRows[0]) {
+      baseline = sideElo(windowRows[0], teamId, "before");
+    }
+  }
+
+  if (!Number.isFinite(baseline)) {
+    return null;
+  }
+
+  return {
+    scope: normalizedScope,
+    current,
+    previous: baseline,
+  };
+}
+
+export async function getEloRankings(scope, limit = 50) {
+  const normalizedScope = scope === "nt" ? "nt" : "club";
+  const take = Math.min(Math.max(Number(limit) || 50, 1), 500);
+  const [rows] = await pool.query(
+    `SELECT e.team_id, e.scope, e.elo, e.matches_played, t.name
+     FROM team_elo e
+     LEFT JOIN Team t ON t.ID = e.team_id
+     WHERE e.scope = ?
+     ORDER BY e.elo DESC
+     LIMIT ?`,
+    [normalizedScope, take],
+  );
+  return rows;
+}
+
+export async function clearEloTables(scope = null, conn = null) {
+  await ensureEloTables();
+  const db = dbQuery(conn);
+  if (scope === "club" || scope === "nt") {
+    await db.query("DELETE FROM match_elo WHERE scope = ?", [scope]);
+    await db.query("DELETE FROM team_elo WHERE scope = ?", [scope]);
+    return;
+  }
+
+  await db.query("DELETE FROM match_elo");
+  await db.query("DELETE FROM team_elo");
+}
+
+export async function replaceEloResults({ teamRows, matchRows }, conn = null) {
+  await ensureEloTables();
+  if (!conn) {
+    const owned = await pool.getConnection();
+    try {
+      await owned.beginTransaction();
+      await replaceEloResults({ teamRows, matchRows }, owned);
+      await owned.commit();
+    } catch (error) {
+      try {
+        await owned.rollback();
+      } catch {
+        // The original error is more useful if rollback also fails.
+      }
+      throw error;
+    } finally {
+      owned.release();
+    }
+    return;
+  }
+
+  const db = dbQuery(conn);
+
+  const teams = Array.isArray(teamRows) ? teamRows : [];
+  const matches = Array.isArray(matchRows) ? matchRows : [];
+
+  for (const chunk of chunkRows(teams, 200)) {
+    const placeholders = chunk.map(() => "(?, ?, ?, ?, ?, ?)").join(", ");
+    const params = chunk.flatMap((row) => [
+      row.team_id,
+      row.scope,
+      row.elo,
+      row.matches_played,
+      row.last_match_id,
+      row.last_match_date,
+    ]);
+    await db.query(
+      `INSERT INTO team_elo
+        (team_id, scope, elo, matches_played, last_match_id, last_match_date)
+       VALUES ${placeholders}
+       ON DUPLICATE KEY UPDATE
+         elo = VALUES(elo),
+         matches_played = VALUES(matches_played),
+         last_match_id = VALUES(last_match_id),
+         last_match_date = VALUES(last_match_date)`,
+      params,
+    );
+  }
+
+  for (const chunk of chunkRows(matches, 200)) {
+    const placeholders = chunk.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(", ");
+    const params = chunk.flatMap((row) => [
+      row.match_id,
+      row.scope,
+      row.home_elo_before,
+      row.away_elo_before,
+      row.home_elo_after,
+      row.away_elo_after,
+      row.k_factor,
+      row.importance_band,
+      row.home_advantage,
+      row.neutral,
+      row.expected_home,
+      row.match_date,
+    ]);
+    await db.query(
+      `INSERT INTO match_elo
+        (match_id, scope, home_elo_before, away_elo_before, home_elo_after, away_elo_after,
+         k_factor, importance_band, home_advantage, neutral, expected_home, match_date)
+       VALUES ${placeholders}
+       ON DUPLICATE KEY UPDATE
+         home_elo_before = VALUES(home_elo_before),
+         away_elo_before = VALUES(away_elo_before),
+         home_elo_after = VALUES(home_elo_after),
+         away_elo_after = VALUES(away_elo_after),
+         k_factor = VALUES(k_factor),
+         importance_band = VALUES(importance_band),
+         home_advantage = VALUES(home_advantage),
+         neutral = VALUES(neutral),
+         expected_home = VALUES(expected_home),
+         match_date = VALUES(match_date)`,
+      params,
+    );
+  }
+}
+
+export async function replaceEloScopeResults({ scope = null, teamRows, matchRows }) {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    await clearEloTables(scope, conn);
+    await replaceEloResults({ teamRows, matchRows }, conn);
+    await conn.commit();
+  } catch (error) {
+    try {
+      await conn.rollback();
+    } catch {
+      // The original error is more useful if rollback also fails.
+    }
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
+
+function chunkRows(items, size) {
+  const chunks = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
 }
 

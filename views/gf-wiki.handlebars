@@ -1,0 +1,78 @@
+<div class="small-container">
+  <div class="rectangle">
+    <div class="content">
+      <h2>GF Wiki</h2>
+      <p>
+        This page explains the metrics Generation Football uses alongside
+        traditional results: Expected Points (xPts) and Elo ratings.
+      </p>
+      <p>
+        <a href="#xpoints">Expected Points (xPts)</a>
+        ·
+        <a href="#elo">Elo ratings</a>
+      </p>
+
+      <h2 id="xpoints">Expected Points (xPts)</h2>
+      <p>
+        Expected Points estimate how many points a team
+        <em>deserved</em> from a match based on chance quality rather than the
+        final score. A team that creates better chances can finish with a high
+        xPts total even if the scoreboard does not go their way — and the
+        reverse is also true.
+      </p>
+      <p>
+        For each match we take the team’s expected goals (xG) and the
+        opponent’s expected goals against them (xGA). We then use a Poisson
+        probability model to estimate how likely every realistic scoreline is,
+        treating each side’s goals as independent and considering totals from
+        0 to 6 goals.
+      </p>
+      <p>
+        Those scoreline probabilities add up to the chances of a win, a draw,
+        or a loss. Expected Points are then:
+        (win probability × 3) + (draw probability × 1).
+      </p>
+      <p>
+        Season and last-five-match xPts figures are the sum of those match
+        values. League tables are still ranked by real points; xPts is there
+        to show which teams are over- or under-performing relative to the
+        chances they created and conceded.
+      </p>
+
+      <h2 id="elo">Elo ratings</h2>
+      <p>
+        Elo is a running strength rating for teams. We keep
+        <strong>club</strong> and <strong>national team</strong> ratings
+        separate, so a club’s rating is not mixed with its country’s, and
+        matches between clubs and national teams are skipped.
+      </p>
+      <p>
+        Every team starts at 1500. Ratings use results from the last five
+        seasons. Before a match we calculate how likely each side is to take
+        points, using the classic Elo formula. Home teams get a +100 rating
+        boost, except on designated neutral fixtures (World Cup, Euros and
+        similar tournaments, plus club finals), where that advantage is 0.
+      </p>
+      <p>
+        After the match, the result is scored as 1 for a win, 0.5 for a draw,
+        and 0 for a loss. Penalty shootouts use the score after extra time, so
+        they count as draws. A margin factor then scales the update: 1 for a
+        draw or one-goal win, 1.5 for a two-goal win, and
+        (11 + goal difference) / 8 for larger margins. The rating change is
+        K × margin factor × (actual result − expected result).
+      </p>
+      <p>
+        K depends on how important the match is: 20 for friendlies, 30 for
+        domestic league and cup games, 40 for qualifiers and major club
+        competitions, 50 for major national-team tournaments, and 60 for the
+        World Cup final.
+      </p>
+      <p>
+        On the site, club Elo is the tie-breaker on the
+        <a href="/top-teams">Top Teams</a> list after recent form. Team pages
+        show the last month of Elo movement, and match pages show how much
+        each side gained or lost from that fixture.
+      </p>
+    </div>
+  </div>
+</div>

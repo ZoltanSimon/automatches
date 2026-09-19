@@ -43,6 +43,28 @@ function factorial(n) {
 }
 
 // Poisson probability: P(k goals | lambda = xG)
-function poissonProbability(k, lambda) {
-  return (Math.exp(-lambda) * Math.pow(lambda, k)) / factorial(k);
+export function poissonProbability(k, lambda) {
+  const safeLambda = Math.max(Number(lambda) || 0, 0.05);
+  return (Math.exp(-safeLambda) * Math.pow(safeLambda, k)) / factorial(k);
+}
+
+/** Most probable scoreline under independent Poisson scoring. */
+export function mostLikelyScore(lambdaHome, lambdaAway, maxGoals = 6) {
+  let bestHome = 0;
+  let bestAway = 0;
+  let bestP = -1;
+
+  for (let home = 0; home <= maxGoals; home++) {
+    const pHome = poissonProbability(home, lambdaHome);
+    for (let away = 0; away <= maxGoals; away++) {
+      const p = pHome * poissonProbability(away, lambdaAway);
+      if (p > bestP) {
+        bestP = p;
+        bestHome = home;
+        bestAway = away;
+      }
+    }
+  }
+
+  return { home: bestHome, away: bestAway };
 }

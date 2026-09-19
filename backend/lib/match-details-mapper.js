@@ -416,3 +416,19 @@ export function detailsRowToMatchObject(row, baseFixture = null) {
     ],
   };
 }
+
+export function extractExpectedGoals(matchPayload) {
+  const row = matchObjectToDetailsRow(matchPayload);
+  if (!row) {
+    return { hasXg: false, home: null, away: null };
+  }
+
+  const home = row.home_xg;
+  const away = row.away_xg;
+
+  return {
+    hasXg: home != null || away != null,
+    home,
+    away,
+  };
+}

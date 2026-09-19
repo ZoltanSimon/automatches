@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam, getPlayerStatsFromApi, getTeamsByPlayer, hasApiErrors } from "./webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, getMatchDetailsById, getMatchIdsMissingDetails } from "../data-access.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, getMatchDetailsById, getMatchIdsMissingDetails, getFinishedMatchesMissingXg, getTeamEloForTeam, getEloRankings } from "../data-access.js";
 import { dataDir, writeLeagueToServer, saveMatchToServer } from "../services/json-reader.js";
 import { forceRefreshRegistry, getRegistry, upsertRegistryMatchIfLoaded } from "../services/registry-service.js";
 import { fetchAndSavePlayerTransfers, insertAllPlayers, refetchPlayer, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
 import { localhostOnly, wait } from "../lib/backend-helper.js";
-import { parseLeagueIds, updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
+import { CURRENT_SEASON, parseLeagueIds, updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
 import { findMissingFinishedMatches, grabMatchesByIds, hydrateMissingMatches, matchesOnDay, matchesInRound, refetchLeagueRound, refetchMatchesOnDay } from "../services/matches-service.js";
-import { teamNameFromMatchDetails } from "../lib/match-details-mapper.js";
+import { extractExpectedGoals, teamNameFromMatchDetails } from "../lib/match-details-mapper.js";
+import { replayElo } from "../services/elo-service.js";
 
 const MAX_GET_PLAYERS_RUNS = 50;
 let playersFetchJob = {
@@ -17,6 +18,7 @@ let playersFetchJob = {
 let missingMatchesHydrationJobRunning = false;
 let transfersJobRunning = false;
 let squadsJobRunning = false;
+let eloBackfillJobRunning = false;
 
 function apiPayloadHasErrors(data) {
   return hasApiErrors(data);
@@ -64,7 +66,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
   
   router.get("/test-standings", async (request, response) => {
     const leagueID = Number(request.query.leagueID ?? 1);
-    const season = Number(request.query.season ?? 2026);
+    const season = Number(request.query.season ?? CURRENT_SEASON);
 
     if (Number.isNaN(leagueID) || leagueID <= 0) {
       return response.status(400).json({
@@ -518,12 +520,17 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
 
       console.log(`Grabbed matches: ${savedMatch.saved.join(",") || "(none)"}`);
 
+      const xg = (savedMatch.matches || []).map((match) => ({
+        matchId: Number(match?.fixture?.id),
+        ...extractExpectedGoals(match),
+      }));
+
       if (omitMatches) {
         const { matches, match, ...summary } = savedMatch;
-        return response.json(summary);
+        return response.json({ ...summary, xg });
       }
 
-      response.json(savedMatch);
+      response.json({ ...savedMatch, xg });
     } catch (error) {
       console.error("Error grabbing match info:", error);
       response.status(500).json({
@@ -844,6 +851,32 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     });
   });
 
+  router.get("/matches-missing-xg", async (request, response) => {
+    const season = Number(request.query.season ?? CURRENT_SEASON);
+    if (!Number.isFinite(season) || season <= 0) {
+      return response.status(400).json({
+        success: false,
+        message: "Invalid season",
+      });
+    }
+
+    try {
+      const matches = await getFinishedMatchesMissingXg(season);
+      response.json({
+        success: true,
+        season,
+        count: matches.length,
+        matches,
+      });
+    } catch (error) {
+      console.error("Error loading matches missing xG:", error);
+      response.status(500).json({
+        success: false,
+        message: error.message || "Failed to load matches missing xG",
+      });
+    }
+  });
+
   router.get("/missing-matches", async (request, response) => {
     //if the request parameter is empty, get all leagues from the database
     let leagueIDs = parseLeagueIds(request.query.leagueID, {
@@ -875,6 +908,63 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
     }
     console.log(`Total missing matches across leagues ${leagueIDs.join(", ")}: ${matchArr.length}`);
     response.json(matchArr);
+  });
+
+  router.post("/backfill-elo", async (request, response) => {
+    if (eloBackfillJobRunning) {
+      return response.status(409).json({
+        success: false,
+        message: "elo backfill is already running",
+      });
+    }
+
+    const payload = request.body && typeof request.body === "object" ? request.body : {};
+    const dryRunRaw = payload.dryRun ?? request.query.dryRun ?? "";
+    const dryRun = String(dryRunRaw) === "1" || String(dryRunRaw).toLowerCase() === "true";
+    const scopeArg = String(payload.scope ?? request.query.scope ?? "").toLowerCase();
+    const scope = scopeArg === "nt" || scopeArg === "club" ? scopeArg : null;
+
+    eloBackfillJobRunning = true;
+    try {
+      const result = await replayElo({ scope, dryRun });
+      response.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Elo backfill failed:", error);
+      response.status(500).json({
+        success: false,
+        message: error.message || "Failed to backfill Elo",
+      });
+    } finally {
+      eloBackfillJobRunning = false;
+    }
+  });
+
+  router.get("/team-elo", async (request, response) => {
+    const teamID = Number(request.query.teamID);
+    if (!Number.isFinite(teamID) || teamID <= 0) {
+      return response.status(400).json({ success: false, message: "Invalid teamID" });
+    }
+
+    try {
+      const elo = await getTeamEloForTeam(teamID);
+      response.json({ success: true, teamID, elo });
+    } catch (error) {
+      console.error("Failed to load team Elo:", error);
+      response.status(500).json({ success: false, message: "Failed to load team Elo" });
+    }
+  });
+
+  router.get("/elo-rankings", async (request, response) => {
+    const scope = String(request.query.scope ?? "club").toLowerCase() === "nt" ? "nt" : "club";
+    const limit = Number(request.query.limit ?? 50);
+
+    try {
+      const rankings = await getEloRankings(scope, limit);
+      response.json({ success: true, scope, rankings });
+    } catch (error) {
+      console.error("Failed to load Elo rankings:", error);
+      response.status(500).json({ success: false, message: "Failed to load Elo rankings" });
+    }
   });
 
   return router;

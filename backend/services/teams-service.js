@@ -6,6 +6,7 @@ import { Team } from "../../classes/team.js";
 const defaultTeamSortDirection = "desc";
 const validTeamSortStats = new Set([
   "played",
+  "elo",
   "winPercentage",
   "possession",
   "goals",
@@ -20,6 +21,7 @@ const validTeamSortStats = new Set([
 const validTeamStatFilterOperators = new Set(["gte", "lte", "between", "eq", "neq"]);
 const simpleTeamStatReaders = {
   played: (team) => team.played,
+  elo: (team) => team.elo,
   winPercentage: (team) => team.total?.winPercentage,
   possession: (team) => team.perGame?.possession,
 };
@@ -34,22 +36,22 @@ const pairedTeamStatReaders = {
   offsides: { for: (team) => team.total?.offsides, against: (team) => team.total?.offsidesAgainst },
 };
 const teamColumnStatMap = new Map([
-  [6, { stat: "goals", isAgainst: false }],
-  [7, { stat: "goals", isAgainst: true }],
-  [8, { stat: "xG", isAgainst: false }],
-  [9, { stat: "xG", isAgainst: true }],
-  [10, { stat: "corners", isAgainst: false }],
-  [11, { stat: "corners", isAgainst: true }],
-  [12, { stat: "shotsOnGoal", isAgainst: false }],
-  [13, { stat: "shotsOnGoal", isAgainst: true }],
-  [14, { stat: "fouls", isAgainst: false }],
-  [15, { stat: "fouls", isAgainst: true }],
-  [16, { stat: "yellowCards", isAgainst: false }],
-  [17, { stat: "yellowCards", isAgainst: true }],
-  [18, { stat: "redCards", isAgainst: false }],
-  [19, { stat: "redCards", isAgainst: true }],
-  [20, { stat: "offsides", isAgainst: false }],
-  [21, { stat: "offsides", isAgainst: true }],
+  [7, { stat: "goals", isAgainst: false }],
+  [8, { stat: "goals", isAgainst: true }],
+  [9, { stat: "xG", isAgainst: false }],
+  [10, { stat: "xG", isAgainst: true }],
+  [11, { stat: "corners", isAgainst: false }],
+  [12, { stat: "corners", isAgainst: true }],
+  [13, { stat: "shotsOnGoal", isAgainst: false }],
+  [14, { stat: "shotsOnGoal", isAgainst: true }],
+  [15, { stat: "fouls", isAgainst: false }],
+  [16, { stat: "fouls", isAgainst: true }],
+  [17, { stat: "yellowCards", isAgainst: false }],
+  [18, { stat: "yellowCards", isAgainst: true }],
+  [19, { stat: "redCards", isAgainst: false }],
+  [20, { stat: "redCards", isAgainst: true }],
+  [21, { stat: "offsides", isAgainst: false }],
+  [22, { stat: "offsides", isAgainst: true }],
 ]);
 
 function normalizeTextValue(value) {
@@ -351,6 +353,44 @@ export function extractTeams(
   return buildTeamList(matches);
 }
 
+function attachClubElo(teams, eloByTeamId) {
+  if (!Array.isArray(teams)) {
+    return teams;
+  }
+
+  for (const team of teams) {
+    const ratings = eloByTeamId instanceof Map
+      ? eloByTeamId.get(Number(team.id))
+      : null;
+    const elo = Number(ratings?.club);
+    team.elo = Number.isFinite(elo) ? Math.round(elo) : null;
+  }
+
+  return teams;
+}
+
+function compareTopTeams(a, b) {
+  const pointsA = Number(a.last5?.points) || 0;
+  const pointsB = Number(b.last5?.points) || 0;
+  if (pointsA !== pointsB) {
+    return pointsB - pointsA;
+  }
+
+  const eloA = Number(a.elo);
+  const eloB = Number(b.elo);
+  const aHasElo = Number.isFinite(eloA);
+  const bHasElo = Number.isFinite(eloB);
+
+  if (aHasElo && bHasElo && eloA !== eloB) {
+    return eloB - eloA;
+  }
+  if (aHasElo !== bHasElo) {
+    return aHasElo ? -1 : 1;
+  }
+
+  return String(a?.name || "").localeCompare(String(b?.name || ""));
+}
+
 export function getTopTeams(registry, leagues, options = {}) {
   const {
     sortStat = null,
@@ -358,6 +398,7 @@ export function getTopTeams(registry, leagues, options = {}) {
     sortColumnIndex = null,
     statFilter = null,
     statFilters = [],
+    eloByTeamId = null,
   } = options;
   const leagueIds = Array.isArray(leagues)
     ? leagues.map((id) => Number(id)).filter(Number.isFinite)
@@ -375,13 +416,8 @@ export function getTopTeams(registry, leagues, options = {}) {
     thisToPTeams = extractTeams(registry, null, leagueIds, null, false, true);
   }
 
-  thisToPTeams.sort((a, b) =>
-    a.last5PerGame.points < b.last5PerGame.points
-      ? 1
-      : b.last5PerGame.points < a.last5PerGame.points
-        ? -1
-        : 0,
-  );
+  attachClubElo(thisToPTeams, eloByTeamId);
+  thisToPTeams.sort(compareTopTeams);
 
   const selectedStatFilters = normalizeSelectedTeamFilters(statFilters, statFilter);
 
@@ -392,7 +428,7 @@ export function getTopTeams(registry, leagues, options = {}) {
   return sortTeamsByStat(filteredTeams, sortStat, sortDirection, sortColumnIndex);
 }
 
-export function getTopTeamsPageData(registry, selectedLeague = [], query = {}) {
+export function getTopTeamsPageData(registry, selectedLeague = [], query = {}, eloByTeamId = null) {
   const selectedSortStat = normalizeTeamSortStat(query.tsort);
   const selectedSortDirection = normalizeTeamSortDirection(query.tdir);
   const selectedSortColumnIndex = parseColumnIndex(query.tcol);
@@ -403,6 +439,7 @@ export function getTopTeamsPageData(registry, selectedLeague = [], query = {}) {
     sortDirection: selectedSortDirection,
     sortColumnIndex: selectedSortColumnIndex,
     statFilters: selectedStatFilters,
+    eloByTeamId,
   });
 
   return {
@@ -454,8 +491,9 @@ function parseShowAllPlayerStats(allStatsQuery) {
 }
 
 export async function getTeamRouteData(registry, teamID, allStatsQuery) {
-  const { getSquadFromDb } = await import("../data-access.js");
+  const { getSquadFromDb, getTeamEloMonthChange } = await import("../data-access.js");
   const { getTeamPlayerList } = await import("./players-service.js");
+  const { eloScopeFromTeam, formatEloDelta } = await import("../lib/elo.js");
 
   const { matches, teamStats } = await getTeamPageData(registry, teamID);
   const { squad: savedSquad, squadUpdatedAt, transferUpdatedAt } = await getSquadFromDb(teamID);
@@ -482,6 +520,17 @@ export async function getTeamRouteData(registry, teamID, allStatsQuery) {
     playerLeagueFilter,
   );
 
+  const team = getTeamById(teamID);
+  const eloScope = eloScopeFromTeam(team);
+  const monthElo = await getTeamEloMonthChange(teamID, eloScope);
+  const eloMonthChange = monthElo
+    ? {
+        ...formatEloDelta(monthElo.current, monthElo.previous),
+        current: Math.round(monthElo.current),
+        scope: eloScope,
+      }
+    : null;
+
   return {
     matches,
     teamStats,
@@ -491,5 +540,6 @@ export async function getTeamRouteData(registry, teamID, allStatsQuery) {
     selectedPlayerStatsLeagueName,
     squadUpdatedAt,
     transferUpdatedAt,
+    eloMonthChange,
   };
 }

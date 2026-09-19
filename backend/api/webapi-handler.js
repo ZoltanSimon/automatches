@@ -1,7 +1,6 @@
+import { CURRENT_SEASON } from "../../shared/defaults.js";
 import { RAPID_API_HOST, RAPID_API_KEY } from "../config.js";
 import { parseStringList } from "../lib/backend-helper.js";
-
-let season = 2024;
 
 function getApiHeaders() {
   return {
@@ -96,14 +95,14 @@ export async function getResultsFromApiByIds(matchIDs) {
   return fetchFootballApi(`https://v3.football.api-sports.io/fixtures?ids=${ids.join("-")}`);
 }
 
-export async function getStandingsFromApi(leagueID, season = 2026) {
+export async function getStandingsFromApi(leagueID, season = CURRENT_SEASON) {
   const { data } = await fetchFootballApi(
     `https://v3.football.api-sports.io/standings?league=${leagueID}&season=${season}`,
   );
   return data;
 }
 
-export async function getResults(leagueID, round, seasonYear = season) {
+export async function getResults(leagueID, round, seasonYear = CURRENT_SEASON) {
   const roundName = encodeURIComponent(String(round ?? "").trim());
   return fetchFootballApi(
     `https://v3.football.api-sports.io/fixtures?league=${leagueID}&season=${seasonYear}&round=${roundName}`,
@@ -130,28 +129,28 @@ export async function getResultsDate(leagueID, season, from, to) {
 
 export async function getTopScorer(leagueID) {
   const { data } = await fetchFootballApi(
-    `https://v3.football.api-sports.io/players/topscorers?league=${leagueID}&season=${season}`,
+    `https://v3.football.api-sports.io/players/topscorers?league=${leagueID}&season=${CURRENT_SEASON}`,
   );
   return data;
 }
 
 export async function getTopAssists(leagueID) {
   const { data } = await fetchFootballApi(
-    `https://v3.football.api-sports.io/players/topassists?league=${leagueID}&season=${season}`,
+    `https://v3.football.api-sports.io/players/topassists?league=${leagueID}&season=${CURRENT_SEASON}`,
   );
   return data;
 }
 
 export async function getCurrentRound(leagueID) {
   const { data } = await fetchFootballApi(
-    `https://v3.football.api-sports.io/fixtures/rounds?league=${leagueID}&season=${season}&current=true`,
+    `https://v3.football.api-sports.io/fixtures/rounds?league=${leagueID}&season=${CURRENT_SEASON}&current=true`,
   );
   return data;
 }
 
 export async function getPlayerStatsFromApi(playerID) {
   const { data } = await fetchFootballApi(
-    `https://v3.football.api-sports.io/players?id=${playerID}&season=${season}`,
+    `https://v3.football.api-sports.io/players?id=${playerID}&season=${CURRENT_SEASON}`,
   );
   return data;
 }

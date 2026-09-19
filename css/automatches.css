@@ -157,3 +157,71 @@ table tr:nth-of-type(2n) td {
 .my-canvas {
   position: relative;
 }
+
+#missing-xg-panel {
+  margin: 8px 0 16px;
+}
+
+.missing-xg-table-wrap {
+  max-height: 420px;
+  overflow: auto;
+  background: #fff;
+}
+
+#missing-xg-count {
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.missing-xg-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+
+#missing-xg-selection-hint {
+  font-size: 12px;
+  color: #1d3557;
+}
+
+.missing-xg-table {
+  font-size: 13px;
+}
+
+.missing-xg-table th:first-child,
+.missing-xg-table td:first-child {
+  width: 28px;
+  text-align: center;
+}
+
+.missing-xg-table th,
+.missing-xg-table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+}
+
+.missing-xg-table button {
+  white-space: nowrap;
+}
+
+.missing-xg-status {
+  font-size: 12px;
+}
+
+.missing-xg-status.is-loading {
+  color: #457b9d;
+}
+
+.missing-xg-status.is-success {
+  color: #1d7a3a;
+}
+
+.missing-xg-status.is-warn {
+  color: #b35c00;
+}
+
+.missing-xg-status.is-error {
+  color: #c1121f;
+}

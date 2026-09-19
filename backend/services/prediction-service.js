@@ -1,27 +1,36 @@
 import { getRegistry } from "./registry-service.js";
-import { calculateXPts } from "./poisson-model.js";
+import { calculateXPts, mostLikelyScore } from "./poisson-model.js";
 import { getMatchById } from "./matches-service.js";
+
+const FINISHED_STATUSES = new Set(["FT", "AET", "PEN"]);
 
 // ─── PREDICTION SETTINGS ─────────────────────────────────────────────────────
 // All weights are in the range 0–1 unless noted otherwise.
 
 const SETTINGS = {
-  LAST_N_MATCHES: 5,
-  LAST_N_WEIGHT: 0.65,
+  LAST_N_MATCHES: 6,
+  LAST_N_WEIGHT: 0.40,
 
-  SCORE_GOALS_RECENCY: 0.85,
-  HOME_ADVANTAGE_GOALS: 0.25,        // raised from 0.15
-  REFERENCE_GOALS_FALLBACK: 1.10,    // lowered from 1.35 → inflates lambdas
+  SCORE_GOALS_RECENCY: 0.40,
+  HOME_ADVANTAGE_GOALS: 0.12,
+  REFERENCE_GOALS_FALLBACK: 1.35,
 
-  XG_VS_GOALS_BLEND: 0.75,
-  HOME_ADVANTAGE_XG: 0.15,           // raised from 0.10
-  REFERENCE_XG_FALLBACK: 1.10,       // lowered from 1.35
+  XG_VS_GOALS_BLEND: 0.70,
+  HOME_ADVANTAGE_XG: 0.10,
+  REFERENCE_XG_FALLBACK: 1.35,
 
-  CORNERS_RECENCY:    0.60,
-  SHOTS_RECENCY:      0.60,
-  POSSESSION_RECENCY: 0.45,
+  CORNERS_RECENCY:    0.50,
+  SHOTS_RECENCY:      0.50,
+  POSSESSION_RECENCY: 0.40,
 
-  FORM_MULTIPLIER_STRENGTH: 0.20,    // new — how much form shifts lambda (±20%)
+  // Form is already partly in recency-weighted averages; keep this small.
+  FORM_MULTIPLIER_STRENGTH: 0.08,
+
+  // Pull noisy attack/defence rates toward the league mean before multiplying.
+  MEAN_REVERSION: 0.35,
+
+  LAMBDA_MIN: 0.45,
+  LAMBDA_MAX: 2.70,
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -40,7 +49,9 @@ function extractMatchStatsForTeam(match, teamId) {
   const myStats  = myEntry?.statistics;
   const oppStats = oppEntry?.statistics;
 
-  if (!myStats || !oppStats) return null;
+  if (!Array.isArray(myStats) || !Array.isArray(oppStats) || myStats.length === 0 || oppStats.length === 0) {
+    return null;
+  }
 
   const get = (arr, idx) => {
     const v = arr?.[idx]?.value;
@@ -61,8 +72,14 @@ function extractMatchStatsForTeam(match, teamId) {
   };
 }
 
-function getTeamMatchStats(registry, teamId) {
+function isFinishedMatch(match) {
+  return FINISHED_STATUSES.has(match?.fixture?.status?.short);
+}
+
+function getTeamMatchStats(registry, teamId, excludeMatchId) {
   return registry.matches
+    .filter((m) => isFinishedMatch(m))
+    .filter((m) => m.fixture?.id !== excludeMatchId)
     .filter((m) => m.teams.home.id === teamId || m.teams.away.id === teamId)
     .sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date))
     .map((m) => extractMatchStatsForTeam(m, teamId))
@@ -75,6 +92,7 @@ function computeReferenceXG(registry) {
   let total = 0;
   let count = 0;
   for (const match of registry.matches) {
+    if (!isFinishedMatch(match)) continue;
     for (const teamStats of (match.statistics ?? [])) {
       const xgVal = parseFloat(teamStats?.statistics?.[16]?.value);
       if (!Number.isNaN(xgVal) && xgVal > 0) {
@@ -91,14 +109,23 @@ function computeReferenceGoals(registry) {
   let total = 0;
   let count = 0;
   for (const match of registry.matches) {
+    if (!isFinishedMatch(match)) continue;
     const h = match.score?.fulltime?.home;
     const a = match.score?.fulltime?.away;
-    if (h !== null && h !== undefined && a !== null && a !== undefined) {
+    if (Number.isFinite(h) && Number.isFinite(a)) {
       total += h + a;
       count += 2;
     }
   }
   return count > 10 ? total / count : SETTINGS.REFERENCE_GOALS_FALLBACK;
+}
+
+function shrinkTowardMean(value, mean, weight) {
+  return value * (1 - weight) + mean * weight;
+}
+
+function clampLambda(value) {
+  return Math.min(SETTINGS.LAMBDA_MAX, Math.max(SETTINGS.LAMBDA_MIN, value));
 }
 
 // Returns a multiplier in range [1 - strength, 1 + strength]
@@ -162,8 +189,9 @@ export async function getPredictionForMatch(matchID) {
   }
 
   const { home, away } = match.teams;
-  const homeStats = getTeamMatchStats(registry, home.id);
-  const awayStats = getTeamMatchStats(registry, away.id);
+  const excludeMatchId = match.fixture?.id;
+  const homeStats = getTeamMatchStats(registry, home.id, excludeMatchId);
+  const awayStats = getTeamMatchStats(registry, away.id, excludeMatchId);
 
   if (!homeStats.length || !awayStats.length) {
     throw new Error(`Insufficient match history to predict match ${matchID}`);
@@ -172,10 +200,9 @@ export async function getPredictionForMatch(matchID) {
   const homeAvg = computeTeamAverages(homeStats);
   const awayAvg = computeTeamAverages(awayStats);
 
-  // ── Score prediction (actual goals, high recency) ──────────────────────────
-  // Uses actual goals scored/conceded rather than xG. xG is a compressed metric
-  // that regresses toward the mean — it cannot produce high-scoring predictions.
-  // Heavy recency weight reflects current form (hot streak, injury crisis, etc.).
+  // ── Score prediction (actual goals, modest recency) ────────────────────────
+  // Attack × opponent defence / league average, shrunk toward the mean and clamped
+  // so a couple of 4–5 thrillers cannot produce basketball scorelines.
   const recG = SETTINGS.SCORE_GOALS_RECENCY;
   const recentHome = homeStats.slice(-SETTINGS.LAST_N_MATCHES);
   const recentAway = awayStats.slice(-SETTINGS.LAST_N_MATCHES);
@@ -185,15 +212,22 @@ export async function getPredictionForMatch(matchID) {
   const awayGoalAttack  = avg(recentAway, "goalsFor")      * recG + avg(awayStats, "goalsFor")      * (1 - recG);
   const awayGoalDefense = avg(recentAway, "goalsAgainst")  * recG + avg(awayStats, "goalsAgainst")  * (1 - recG);
 
-  const referenceGoals   = computeReferenceGoals(registry);
-  const homeGoalLambda   = (homeGoalAttack * awayGoalDefense) / referenceGoals + SETTINGS.HOME_ADVANTAGE_GOALS;
-  const awayGoalLambda   = (awayGoalAttack * homeGoalDefense) / referenceGoals;
+  const referenceGoals = computeReferenceGoals(registry);
+  const revert = SETTINGS.MEAN_REVERSION;
+  const homeAttack = shrinkTowardMean(homeGoalAttack, referenceGoals, revert);
+  const homeDefense = shrinkTowardMean(homeGoalDefense, referenceGoals, revert);
+  const awayAttack = shrinkTowardMean(awayGoalAttack, referenceGoals, revert);
+  const awayDefense = shrinkTowardMean(awayGoalDefense, referenceGoals, revert);
 
   const homeFormMult = computeFormMultiplier(homeStats);
   const awayFormMult = computeFormMultiplier(awayStats);
 
-  const homeGoalLambdaFinal = homeGoalLambda * homeFormMult;
-  const awayGoalLambdaFinal = awayGoalLambda * awayFormMult;
+  const homeGoalLambdaFinal = clampLambda(
+    ((homeAttack * awayDefense) / referenceGoals + SETTINGS.HOME_ADVANTAGE_GOALS) * homeFormMult,
+  );
+  const awayGoalLambdaFinal = clampLambda(
+    ((awayAttack * homeDefense) / referenceGoals) * awayFormMult,
+  );
 
   // ── xG prediction (for probabilities and xG stat) ───────────────────────────
   // xG stays separate: blended with actual goals but at lower recency.
@@ -204,9 +238,15 @@ export async function getPredictionForMatch(matchID) {
   const awayXgAttack  = awayAvg.xG * xgBlend + awayAvg.goals        * (1 - xgBlend);
   const awayXgDefense = awayAvg.xGA * xgBlend + awayAvg.goalsAgainst * (1 - xgBlend);
 
-  const referenceXG      = computeReferenceXG(registry);
-  const homeXgPredicted  = (homeXgAttack * awayXgDefense) / referenceXG + SETTINGS.HOME_ADVANTAGE_XG;
-  const awayXgPredicted  = (awayXgAttack * homeXgDefense) / referenceXG;
+  const referenceXG = computeReferenceXG(registry);
+  const homeXgPredicted = clampLambda(
+    (shrinkTowardMean(homeXgAttack, referenceXG, revert) *
+      shrinkTowardMean(awayXgDefense, referenceXG, revert)) / referenceXG + SETTINGS.HOME_ADVANTAGE_XG,
+  );
+  const awayXgPredicted = clampLambda(
+    (shrinkTowardMean(awayXgAttack, referenceXG, revert) *
+      shrinkTowardMean(homeXgDefense, referenceXG, revert)) / referenceXG,
+  );
 
   const probabilities = calculateXPts(homeXgPredicted, awayXgPredicted);
 
@@ -234,35 +274,33 @@ export async function getPredictionForMatch(matchID) {
   const awayRecentConcede = r1(avg(recentAway, "goalsAgainst"));
 
   const formDesc = (mult) => {
-    if (mult >= 1.12) return "excellent recent form";
-    if (mult >= 1.04) return "good recent form";
-    if (mult <= 0.88) return "poor recent form";
-    if (mult <= 0.96) return "below-par recent form";
+    if (mult >= 1.06) return "excellent recent form";
+    if (mult >= 1.025) return "good recent form";
+    if (mult <= 0.94) return "poor recent form";
+    if (mult <= 0.975) return "below-par recent form";
     return "average recent form";
   };
 
-  let reasoning =
-    `${home.name} score ${homeRecentGoals} goals/game in their last ${SETTINGS.LAST_N_MATCHES} matches ` +
+  const homeRecentCount = recentHome.length || SETTINGS.LAST_N_MATCHES;
+  const awayRecentCount = recentAway.length || SETTINGS.LAST_N_MATCHES;
+
+  const reasoning =
+    `${home.name} score ${homeRecentGoals} goals/game in their last ${homeRecentCount} matches ` +
     `while conceding ${homeRecentConcede}/game — ${formDesc(homeFormMult)}. ` +
     `Against ${away.name}'s defensive record, with home advantage and form applied, ` +
     `their predicted scoring rate is ${round2(homeGoalLambdaFinal)} goals. ` +
-    `${away.name} score ${awayRecentGoals} goals/game while conceding ${awayRecentConcede}/game — ` +
+    `${away.name} score ${awayRecentGoals} goals/game in their last ${awayRecentCount} matches ` +
+    `while conceding ${awayRecentConcede}/game — ` +
     `${formDesc(awayFormMult)}. ` +
     `Their predicted scoring rate is ${round2(awayGoalLambdaFinal)} goals. ` +
     `xG-based Poisson model gives ${home.name} a ${pct(probabilities.winProb)}% chance to win, ` +
     `${pct(probabilities.drawProb)}% draw, ${pct(probabilities.lossProb)}% ${away.name} win.`;
 
-
-  reasoning = "";
-
   return {
     matchID:  match.fixture.id,
     homeTeam: home.name,
     awayTeam: away.name,
-    score: {
-      home: Math.round(homeGoalLambdaFinal),
-      away: Math.round(awayGoalLambdaFinal),
-    },
+    score: mostLikelyScore(homeGoalLambdaFinal, awayGoalLambdaFinal),
     probabilities: {
       homeWin: probabilities.winProb,
       draw:    probabilities.drawProb,

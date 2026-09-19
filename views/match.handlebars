@@ -8,6 +8,9 @@
         title="{{matchInfo.teams.home.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'" />
       <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'">
         {{matchInfo.teams.home.name}}</div>
+      <div class="elo-change-line {{#if matchElo.home}}{{matchElo.home.direction}}{{/if}}" title="Elo change for this match">
+        Elo {{#if matchElo.home}}{{matchElo.home.display}}{{else}}—{{/if}}
+      </div>
     </div>
 
     <div class="score-section">
@@ -28,6 +31,9 @@
         title="{{matchInfo.teams.away.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'" />
       <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'">
         {{matchInfo.teams.away.name}}</div>
+      <div class="elo-change-line {{#if matchElo.away}}{{matchElo.away.direction}}{{/if}}" title="Elo change for this match">
+        Elo {{#if matchElo.away}}{{matchElo.away.display}}{{else}}—{{/if}}
+      </div>
     </div>
   </div>
   {{/if}}

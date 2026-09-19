@@ -11,6 +11,8 @@ import {
   loadLeagues,
   loadPlayers,
   loadTeams,
+  getTeamEloMap,
+  ensureEloTables,
 } from "./data-access.js";
 import { getLeagueSeason } from "./lib/league-season.js";
 import { createRequire } from "module";
@@ -75,6 +77,7 @@ app.listen(PORT, async () => {
     teams: await loadTeams(),
     leagues: await loadLeagues(),
   });
+  await ensureEloTables();
   
   await refreshRegistry(); // build it immediately on startup
   setInterval(() => {
@@ -93,10 +96,11 @@ app.get("/", async (req, res) => {
     const selectedStandingsLeague = isNaN(parsed) ? 39 : parsed;
     const selectedTransferLeagues = req.query.league ? parseLeagueIds(req.query.league) : [];
     const registry = await getRegistry();
+    const eloByTeamId = await getTeamEloMap();
     const playerPageData = getPlayerPageData(registry, null, selectedPlayerLeague);
     const players = playerPageData?.players || [];
     const matches = await matchesOnDay(registry, selectedDate);
-    const teams = getTopTeams(registry, selectedTeamLeague);
+    const teams = getTopTeams(registry, selectedTeamLeague, { eloByTeamId });
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
     const latestTransfers = await getLatestTransfers(10, selectedTransferLeagues);
 
@@ -166,6 +170,7 @@ app.get("/top-teams", async (req, res) => {
   }
 
   const registry = await getRegistry();
+  const eloByTeamId = await getTeamEloMap();
   
   const {
     teams,
@@ -174,7 +179,7 @@ app.get("/top-teams", async (req, res) => {
     selectedSortColumnIndex,
     selectedStatFilter,
     selectedStatFilters,
-  } = getTopTeamsPageData(registry, selectedTeamLeague, req.query);
+  } = getTopTeamsPageData(registry, selectedTeamLeague, req.query, eloByTeamId);
 
   res.render("top-teams", { 
     title: "Top Teams - Football Team Stats & Matches",
@@ -227,6 +232,7 @@ app.get("/team", async (req, res) => {
     selectedPlayerStatsLeagueName,
     squadUpdatedAt,
     transferUpdatedAt,
+    eloMonthChange,
   } = await getTeamRouteData(registry, thisTeam.ID, req.query.allStats);
   const teamTransfers = await getTransfersByTeam(thisTeam.ID, 25);
 
@@ -247,6 +253,7 @@ app.get("/team", async (req, res) => {
     selectedPlayerStatsLeagueName,
     squadUpdatedAt,
     transferUpdatedAt,
+    eloMonthChange,
   });
 });
 
@@ -342,7 +349,7 @@ app.get("/match", async (request, response) => {
     });
   }
 
-  const { teamList, matchStatistics, leagueName } = await getMatchPageData(registry, currentMatch);
+  const { teamList, matchStatistics, leagueName, matchElo } = await getMatchPageData(registry, currentMatch);
   const headerLeagueName = typeof currentMatch?.league?.name === "string" && currentMatch.league.name.trim()
     ? currentMatch.league.name.trim()
     : leagueName;
@@ -355,6 +362,7 @@ app.get("/match", async (request, response) => {
     matchInfo: currentMatch,
     headerLeagueName,
     matchStatistics,
+    matchElo,
   });
 });
 
@@ -406,6 +414,14 @@ app.get("/privacy-policy", (req, res) => {
 app.get("/about", (req, res) => {
   res.render("about", { title: "About Page - Generation Football", description: "Learn more about Generation Football, our mission, and the team behind the platform." });
 });
+
+app.get("/gf-wiki", (req, res) => {
+  res.render("gf-wiki", {
+    title: "GF Wiki - Generation Football",
+    description: "Learn how Generation Football calculates Expected Points (xPts) and Elo ratings.",
+  });
+});
+
 
 app.get("/compare-players", (req, res) => {
   res.render("compare-players", { title: "Compare Players - Generation Football", description: "Compare detailed stats, performance metrics, and league performance for multiple football players on Generation Football's Compare Players page." });

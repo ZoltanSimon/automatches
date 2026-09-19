@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node backend/index.js"
+    "start": "node backend/index.js",
+    "migrate:matches": "node scripts/migrate-match-files.js",
+    "backfill:match-details": "node scripts/backfill-match-details.js",
+    "backfill:elo": "node scripts/backfill-elo.js"
   },
   "author": "Zoltan Simon",
   "license": "ISC",

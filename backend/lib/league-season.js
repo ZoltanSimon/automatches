@@ -1,4 +1,5 @@
 import { allDBLeagues } from "./catalog.js";
+import { CURRENT_SEASON } from "../../shared/defaults.js";
 
 export function normalizeSeasonValue(season) {
   if (season === null || season === undefined || season === "") {
@@ -39,7 +40,7 @@ export function getLeagueSeason(leagueID, requestedSeason = null) {
     return availableSeasons[0];
   }
 
-  return normalizeSeasonValue(requestedSeason) ?? new Date().getFullYear();
+  return normalizeSeasonValue(requestedSeason) ?? CURRENT_SEASON;
 }
 
 export function normalizeLeagueConfig(input) {

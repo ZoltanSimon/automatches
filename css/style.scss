@@ -158,6 +158,10 @@ footer {
   margin-top: -4px;
 }
 
+#top-team-list .sortable.has-stat-filter-trigger .sort-indicator::after {
+  margin-top: 0;
+}
+
 .sortable.asc .sort-indicator::after {
   content: "▲";
   color: $lightest-blue;
@@ -179,7 +183,7 @@ footer {
 
 .stat-filter-trigger {
   position: absolute;
-  left: calc(50% + 2px);
+  left: 50%;
   bottom: 2px;
   min-width: 18px;
   width: 18px;
@@ -187,8 +191,9 @@ footer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 0;
-  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px solid rgba($lightest-blue, 0.55);
+  border-radius: 0 4px 4px 0;
   background: rgba($lightest-blue, 0.16);
   color: $lightest-blue;
   opacity: 0.45;
@@ -196,8 +201,8 @@ footer {
 
   &::before {
     content: "";
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background-color: currentColor;
     -webkit-mask: $filter-icon-mask center / contain no-repeat;
     mask: $filter-icon-mask center / contain no-repeat;
@@ -206,7 +211,7 @@ footer {
 
 .sortable.has-stat-filter-trigger .sort-indicator {
   position: absolute;
-  left: calc(50% - 20px);
+  left: calc(50% - 18px);
   bottom: 2px;
   width: 18px;
   height: 18px;
@@ -214,7 +219,10 @@ footer {
   align-items: center;
   justify-content: center;
   line-height: 1;
-  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px solid rgba($lightest-blue, 0.55);
+  border-right: 0;
+  border-radius: 4px 0 0 4px;
   background: rgba($lightest-blue, 0.16);
   color: $lightest-blue;
   opacity: 0.45;
@@ -222,6 +230,8 @@ footer {
 
 .sortable.has-stat-filter-trigger .sort-indicator::after {
   color: inherit;
+  margin-top: 0;
+  line-height: 1;
 }
 
 .sortable:hover .stat-filter-trigger,
@@ -1665,6 +1675,40 @@ a.event-player-link {
 .stat .per-game {
   font-size: 14px;
   color: $red;
+}
+
+.elo-change.up,
+.elo-change-line.up {
+  color: $green;
+}
+
+.elo-change.down,
+.elo-change-line.down {
+  color: $red;
+}
+
+.elo-change.flat,
+.elo-change-line.flat {
+  color: $dark-blue;
+}
+
+.match-header .elo-change-line {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: $light-blue;
+}
+
+.match-header .elo-change-line.up {
+  color: lighten($green, 18%);
+}
+
+.match-header .elo-change-line.down {
+  color: lighten($red, 18%);
+}
+
+.match-header .elo-change-line.flat {
+  color: $light-blue;
 }
 
 .last5 {

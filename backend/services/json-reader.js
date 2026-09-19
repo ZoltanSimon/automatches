@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 import path from "path";
 import { networkPath } from "../config.js";
+import { CURRENT_SEASON } from "../../shared/defaults.js";
 import { findOrCreateTeam } from "./teams-service.js";
 import { LineupParser } from "../../classes/lineupparser.js";
 import { ensureMatchesTable, getMatchDetailsByIds, upsertMatchDetails, upsertMatchSummaries } from "../data-access.js";
@@ -14,6 +15,11 @@ export const playersDir = path.join(networkPath, "players");
 export const dataDir = networkPath;
 
 const MATCH_SHARD_BUCKET_COUNT = 1000;
+
+async function applyEloForMatchPayloads(matches) {
+  const { applyEloForMatchPayloads: applyElo } = await import("./elo-service.js");
+  return applyElo(matches);
+}
 
 function normalizeFixtureID(fixtureID) {
   return String(fixtureID ?? "").trim();
@@ -101,7 +107,7 @@ export async function getLeagueFromServer(leagueID) {
 
 export async function writeLeagueToServer(leagueID, dataToWrite, season) {
   let filename = `${leagueID}.json`;
-  if (season != 2026) {
+  if (season != CURRENT_SEASON) {
     filename = `${leagueID}_${season}.json`;
   }
   let file = path.join(leaguesDir, filename);
@@ -138,9 +144,20 @@ export async function importLeagueFromFile(fileName) {
   console.log(
     `✅ Imported ${importedMatches} matches for league ${leagueID} season ${season}. Skipped ${skippedFinishedMatches} finished matches.`,
   );
+
+  await applyEloForMatchPayloads(matches);
 }
 
-export async function persistDownloadedMatches(matchPayloads, { overwriteDetails = false } = {}) {
+function matchHasTeamStatistics(match) {
+  return (Array.isArray(match?.statistics) ? match.statistics : []).some(
+    (entry) => Array.isArray(entry?.statistics) && entry.statistics.length > 0,
+  );
+}
+
+export async function persistDownloadedMatches(
+  matchPayloads,
+  { overwriteDetails = false, applyElo = true } = {},
+) {
   const matches = (Array.isArray(matchPayloads) ? matchPayloads : [matchPayloads])
     .map((payload) => unwrapMatchPayload(payload))
     .filter(Boolean);
@@ -157,12 +174,17 @@ export async function persistDownloadedMatches(matchPayloads, { overwriteDetails
     };
   }
 
+  if (applyElo) {
+    await applyEloForMatchPayloads(matches);
+  }
+
   const details = [];
 
   for (const match of matches) {
     const matchId = Number(match?.fixture?.id);
+    const overwrite = overwriteDetails && matchHasTeamStatistics(match);
     try {
-      details.push(await upsertMatchDetails(matchId, match, { overwrite: overwriteDetails }));
+      details.push(await upsertMatchDetails(matchId, match, { overwrite }));
     } catch (error) {
       console.error(`Failed to upsert match_details for ${matchId}:`, error);
       details.push({
@@ -452,6 +474,15 @@ async function writeMatchJson(fixtureID, matchPayload, { overwrite = false } = {
   }
 }
 
+async function writeMatchJsonWithRetry(fixtureID, matchPayload, { overwrite = false } = {}) {
+  try {
+    return await writeMatchJson(fixtureID, matchPayload, { overwrite });
+  } catch (error) {
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    return writeMatchJson(fixtureID, matchPayload, { overwrite });
+  }
+}
+
 export async function saveMatchToServer(fixtureID, options = {}) {   
   const overwrite = Boolean(options?.overwrite);
   
@@ -459,7 +490,10 @@ export async function saveMatchToServer(fixtureID, options = {}) {
     let { data, limits, call } = await getResultFromApi(fixtureID);
     const matchPayload = data?.response;
     await writeMatchJson(fixtureID, matchPayload, { overwrite });
-    const db = await persistDownloadedMatches(matchPayload, { overwriteDetails: overwrite });
+    const db = await persistDownloadedMatches(matchPayload, {
+      overwriteDetails: overwrite,
+      applyElo: true,
+    });
 
     return {
       match: matchPayload,
@@ -476,6 +510,7 @@ export async function saveMatchToServer(fixtureID, options = {}) {
 
 export async function saveMatchesToServer(fixtureIDs, options = {}) {
   const overwrite = Boolean(options?.overwrite);
+  const applyElo = options.applyElo !== false;
   const ids = Array.isArray(fixtureIDs)
     ? fixtureIDs.map((id) => String(id).trim()).filter(Boolean)
     : String(fixtureIDs || "")
@@ -513,31 +548,27 @@ export async function saveMatchesToServer(fixtureIDs, options = {}) {
       continue;
     }
 
+    matchesToPersist.push(match);
+
     try {
-      await writeMatchJson(id, [match], { overwrite });
-      matchesToPersist.push(match);
-      saved.push(id);
+      await writeMatchJsonWithRetry(id, [match], { overwrite });
     } catch (error) {
-      failed.push({ fixtureID: id, error: error.message });
+      console.warn(`[saveMatchesToServer] JSON write failed for ${id}:`, error.message);
     }
   }
 
   if (matchesToPersist.length > 0) {
     try {
-      await persistDownloadedMatches(matchesToPersist, { overwriteDetails: overwrite });
+      await persistDownloadedMatches(matchesToPersist, {
+        overwriteDetails: overwrite,
+        applyElo,
+      });
+      saved.push(...matchesToPersist.map((match) => String(match?.fixture?.id ?? "")).filter(Boolean));
     } catch (error) {
       failed.push(...matchesToPersist.map((match) => ({
         fixtureID: String(match?.fixture?.id ?? ""),
         error: error.message,
       })));
-      return {
-        savedCount: 0,
-        saved: [],
-        failed,
-        limits,
-        matches,
-        call,
-      };
     }
   }
 
