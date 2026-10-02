@@ -1,4 +1,5 @@
 import { formatPlayerPosition as formatPlayerPositionLabel } from "../lib/backend-helper.js";
+import { formatTeamXg } from "../lib/match-xg.js";
 
 export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;
@@ -20,16 +21,6 @@ export const formatTime = (datestamp) => {
     minute: "2-digit",
     hour12: false,
     timeZone: "Europe/Berlin" // CET/CEST
-  });
-};
-
-export const currentDate = () => {
-  const now = new Date();
-  return now.toLocaleDateString("en-GB", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "Europe/Berlin"
   });
 };
 
@@ -72,14 +63,6 @@ export const increment = (nr) => {
   return parseInt(nr) + 1;
 }
 
-export const splitString = (value, separator = "") => {
-  if (value === null || value === undefined || value === "") {
-    return [];
-  }
-
-  return String(value).split(separator);
-}
-
 export const perGame = (total, games) => {
   const g = Number(games);
   if (!g || g === 0) return 0;
@@ -94,8 +77,8 @@ export const zeroDefault = (value) => {
 }
 
 export const ratingClass = (rating) => {
-  const r = parseFloat(rating);
-  if (isNaN(r)) return '';
+  const r = positiveRating(rating);
+  if (r == null) return '';
   if (r >= 8) return 'rating-dark-green';
   if (r >= 7) return 'rating-green';
   if (r >= 6) return 'rating-yellow';
@@ -103,7 +86,70 @@ export const ratingClass = (rating) => {
   return 'rating-red';
 }
 
-export const lineupPlayerRating = (matchPlayers, teamID, playerID) => {
+function positiveRating(value) {
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+  return parsed;
+}
+
+export const displayRating = (value) => {
+  const parsed = positiveRating(value);
+  return parsed == null ? "" : parsed.toFixed(1);
+}
+
+function fotmobNameTokens(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean);
+}
+
+function fotmobNamesMatch(left, right) {
+  const a = fotmobNameTokens(left);
+  const b = fotmobNameTokens(right);
+  if (a.length === 0 || b.length === 0) {
+    return false;
+  }
+  if (a.join(" ") === b.join(" ")) {
+    return true;
+  }
+  const aLast = a[a.length - 1];
+  const bLast = b[b.length - 1];
+  if (aLast.length < 3 || aLast !== bLast) {
+    return false;
+  }
+  return a[0][0] === b[0][0];
+}
+
+function findFotmobPlayer(fotmob, side, name, shirt) {
+  const players = (Array.isArray(fotmob?.players) ? fotmob.players : [])
+    .filter((player) => player?.side === side);
+  const shirtNumber = Number(shirt);
+  if (Number.isFinite(shirtNumber)) {
+    const byShirt = players.filter((player) => Number(player.shirt) === shirtNumber);
+    if (byShirt.length === 1) {
+      return byShirt[0];
+    }
+  }
+
+  return players.find((player) => fotmobNamesMatch(player.name, name)) ?? null;
+}
+
+function formatFotmobDecimal(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return "";
+  }
+  return numeric.toFixed(2);
+}
+
+function lineupPlayerRating(matchPlayers, teamID, playerID) {
   if (!Array.isArray(matchPlayers)) return "";
 
   const targetTeamID = Number(teamID);
@@ -117,27 +163,94 @@ export const lineupPlayerRating = (matchPlayers, teamID, playerID) => {
   const playerData = teamData.players.find(
     (entry) => Number(entry?.player?.id) === targetPlayerID
   );
-  const rating = playerData?.statistics?.[0]?.games?.rating;
-  if (rating === null || rating === undefined || rating === "") return "";
-
-  const parsed = Number.parseFloat(rating);
-  return Number.isNaN(parsed) ? "" : parsed.toFixed(1);
+  return displayRating(playerData?.statistics?.[0]?.games?.rating);
 }
 
-export const teamAverageRating = (matchPlayers, teamID) => {
-  if (!Array.isArray(matchPlayers)) return "";
+function fotmobSide(teamId, homeTeamId) {
+  return Number(teamId) === Number(homeTeamId) ? "home" : "away";
+}
 
-  const targetTeamID = Number(teamID);
-  const teamData = matchPlayers.find(
-    (entry) => Number(entry?.team?.id) === targetTeamID
-  );
-  if (!teamData?.players) return "";
+export const matchLineupRating = (matchPlayers, teamID, playerID, playerName, shirt, fotmob, homeTeamId) => {
+  const apiRating = lineupPlayerRating(matchPlayers, teamID, playerID);
+  if (apiRating) {
+    return apiRating;
+  }
 
-  const ratings = teamData.players
-    .map((entry) => Number.parseFloat(entry?.statistics?.[0]?.games?.rating))
-    .filter((value) => !Number.isNaN(value));
+  const fotmobPlayer = findFotmobPlayer(fotmob, fotmobSide(teamID, homeTeamId), playerName, shirt);
+  return displayRating(fotmobPlayer?.rating);
+}
 
-  if (ratings.length === 0) return "";
+export const matchLineupStat = (fotmob, homeTeamId, teamID, playerName, shirt, field) => {
+  const fotmobPlayer = findFotmobPlayer(fotmob, fotmobSide(teamID, homeTeamId), playerName, shirt);
+  return formatFotmobDecimal(fotmobPlayer?.[field]);
+}
+
+export const fotmobTeamStatSum = (fotmob, teamId, homeTeamId, field) => {
+  const side = fotmobSide(teamId, homeTeamId);
+  const values = (Array.isArray(fotmob?.players) ? fotmob.players : [])
+    .filter((player) => player?.side === side)
+    .map((player) => Number(player?.[field]))
+    .filter((value) => Number.isFinite(value));
+
+  if (values.length === 0) {
+    return "";
+  }
+
+  return formatFotmobDecimal(values.reduce((total, value) => total + value, 0));
+}
+
+export const fotmobTeamXgFor = (fotmob, teamId, homeTeamId) => {
+  const value = fotmobSide(teamId, homeTeamId) === "away" ? fotmob?.awayXg : fotmob?.homeXg;
+  return formatFotmobDecimal(value);
+}
+
+function hasNumericStat(value) {
+  if (value === null || value === undefined || value === "") {
+    return false;
+  }
+  return Number.isFinite(Number(value));
+}
+
+function fotmobPlayersHaveStat(fotmob, field) {
+  return (Array.isArray(fotmob?.players) ? fotmob.players : [])
+    .some((player) => hasNumericStat(player?.[field]));
+}
+
+export function fotmobHasLineupStat(fotmob, field) {
+  const key = String(field ?? "").toLowerCase();
+  if (key === "xg") {
+    return hasNumericStat(fotmob?.homeXg) || hasNumericStat(fotmob?.awayXg) || fotmobPlayersHaveStat(fotmob, "xg");
+  }
+  if (key === "xgot" || key === "xa") {
+    return fotmobPlayersHaveStat(fotmob, key);
+  }
+  return false;
+}
+
+export function lineupColspan(fotmob) {
+  const statColumns = ["xg", "xgot", "xa"].filter((field) => fotmobHasLineupStat(fotmob, field)).length;
+  return 3 + statColumns;
+}
+
+export const matchTeamAverageRating = (lineup, matchPlayers, fotmob, homeTeamId) => {
+  const side = fotmobSide(lineup?.team?.id, homeTeamId);
+  const people = [...(lineup?.startXI || []), ...(lineup?.substitutes || [])];
+  const ratings = people
+    .map((entry) => positiveRating(matchLineupRating(
+      matchPlayers,
+      lineup?.team?.id,
+      entry?.player?.id,
+      entry?.player?.name,
+      entry?.player?.number,
+      fotmob,
+      homeTeamId,
+    )))
+    .filter((value) => value != null);
+
+  if (ratings.length === 0) {
+    const teamRating = side === "away" ? fotmob?.awayRating : fotmob?.homeRating;
+    return displayRating(teamRating);
+  }
 
   const sum = ratings.reduce((acc, value) => acc + value, 0);
   return (sum / ratings.length).toFixed(1);
@@ -153,17 +266,4 @@ export const isGoalEvent = (eventType, eventDetail = "") => {
   return type === "goal" || detail.includes("goal");
 }
 
-export const expectedGoalsForTeam = (match, teamID) => {
-  const stats = Array.isArray(match?.statistics) ? match.statistics : [];
-  if (stats.length === 0) return "";
-
-  const numericTeamID = Number(teamID);
-  const teamStats = stats.find((entry) => Number(entry?.team?.id) === numericTeamID)?.statistics
-    ?? [];
-
-  const byType = teamStats.find((entry) => entry?.type === "expected_goals")?.value;
-  const fallback = teamStats?.[16]?.value;
-  const value = byType ?? fallback;
-
-  return value === null || value === undefined || value === "" ? "" : value;
-}
+export const expectedGoalsForTeam = (match, teamID) => formatTeamXg(match, teamID);

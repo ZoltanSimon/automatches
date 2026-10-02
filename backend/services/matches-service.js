@@ -1,11 +1,12 @@
-import { buildMatchRegistry, upsertRegistryMatchIfLoaded } from "./registry-service.js";
-import { saveMatchesToServer, buildTeamList } from "./json-reader.js";
+import { buildMatchRegistry, getLoadedRegistry, upsertRegistryMatchIfLoaded } from "./registry-service.js";
+import { saveMatchesToServer, buildTeamList, getMatchFromServer } from "./json-reader.js";
 import { applyEloForFinishedMatches } from "./elo-service.js";
 import { allDBLeagues } from "../lib/catalog.js";
-import { getAllMatchesFromDb, getMatchIdsMissingDetails, getMatchEloByMatchId } from "../data-access.js";
+import { getAllMatchesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, setMatchExpectedGoals } from "../data-access.js";
 import { formatEloDelta } from "../lib/elo.js";
 import { wait } from "../lib/backend-helper.js";
 import { getResults, getFixturesByDate, hasApiErrors } from "../api/webapi-handler.js";
+import { applyExpectedGoalsToMatch, parseExpectedGoalsValue, unwrapMatchPayload } from "../lib/match-details-mapper.js";
 
 const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
 const UPDATE_MATCHES_DELAY_MS = 3000;
@@ -22,6 +23,37 @@ export function parseMatchIds(rawIds) {
       .map((id) => String(id).trim())
       .filter(Boolean),
   )];
+}
+
+export async function setManualMatchXg(rawMatchId, rawHomeXg, rawAwayXg) {
+  const matchId = Number(rawMatchId);
+  const homeXg = parseExpectedGoalsValue(rawHomeXg);
+  const awayXg = parseExpectedGoalsValue(rawAwayXg);
+
+  if (!Number.isFinite(matchId) || matchId <= 0) {
+    throw new Error("matchID is required");
+  }
+
+  if (!Number.isFinite(homeXg) || !Number.isFinite(awayXg)) {
+    throw new Error("homeXg and awayXg must be numbers between 0 and 20");
+  }
+
+  const saved = await setMatchExpectedGoals(matchId, homeXg, awayXg);
+  const registry = getLoadedRegistry();
+  const existingMatch = registry?.matchByID?.get(matchId)
+    ?? registry?.matchByID?.get(String(matchId))
+    ?? null;
+  const filePayload = await getMatchFromServer(matchId);
+  const fileMatch = unwrapMatchPayload(filePayload);
+  const detailsMatch = await getMatchDetailsById(matchId);
+  const sourceMatch = existingMatch || fileMatch || detailsMatch;
+
+  if (sourceMatch) {
+    const patched = applyExpectedGoalsToMatch(sourceMatch, homeXg, awayXg);
+    upsertRegistryMatchIfLoaded(patched);
+  }
+
+  return saved;
 }
 
 export async function grabMatchesByIds(rawIds, { overwrite = true } = {}) {
@@ -348,9 +380,31 @@ export function buildMatchStatistics(currentMatch) {
   const statDisplayNames = { expected_goals: "Expected Goals", goals_prevented: "Goals Prevented" };
   const formatStat = v => (v === null || v === undefined || v === "" ? "-" : v);
 
-  return [...new Set([...homeByType.keys(), ...awayByType.keys()])].map(type => ({
+  const rows = [...new Set([...homeByType.keys(), ...awayByType.keys()])].map(type => ({
     type: statDisplayNames[type] ?? type,
     homeValue: formatStat(homeByType.get(type)),
     awayValue: formatStat(awayByType.get(type)),
   }));
+
+  const fotmob = currentMatch?.fotmob;
+  if (fotmob && (fotmob.homeXg != null || fotmob.awayXg != null)) {
+    const formatXg = (value) => (value == null || value === "" ? "-" : value);
+    const expectedGoals = rows.find((row) => row.type === "Expected Goals");
+    if (!expectedGoals) {
+      rows.unshift({
+        type: "Expected Goals",
+        homeValue: formatXg(fotmob.homeXg),
+        awayValue: formatXg(fotmob.awayXg),
+      });
+    } else {
+      if (expectedGoals.homeValue === "-") {
+        expectedGoals.homeValue = formatXg(fotmob.homeXg);
+      }
+      if (expectedGoals.awayValue === "-") {
+        expectedGoals.awayValue = formatXg(fotmob.awayXg);
+      }
+    }
+  }
+
+  return rows;
 }

@@ -52,6 +52,7 @@ export const MATCH_DETAILS_COLUMNS = [
   "lineups",
   "players",
   "statistics_extra",
+  "fotmob",
 ];
 
 function normalizeStatType(value) {
@@ -293,6 +294,7 @@ export function matchObjectToDetailsRow(matchPayload) {
     statistics_extra: serializeJsonColumn(
       homeExtra.length || awayExtra.length ? { home: homeExtra, away: awayExtra } : null,
     ),
+    fotmob: serializeJsonColumn(match?.fotmob ?? null),
   };
 
   for (const spec of STATISTIC_SPECS) {
@@ -396,6 +398,7 @@ export function detailsRowToMatchObject(row, baseFixture = null) {
     events: parseJsonColumn(row.events) ?? [],
     lineups: parseJsonColumn(row.lineups) ?? [],
     players: parseJsonColumn(row.players) ?? [],
+    fotmob: parseJsonColumn(row.fotmob),
     statistics: [
       {
         team: {
@@ -431,4 +434,73 @@ export function extractExpectedGoals(matchPayload) {
     home,
     away,
   };
+}
+
+export function parseExpectedGoalsValue(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric < 0 || numeric > 20) {
+    return NaN;
+  }
+
+  return Math.round(numeric * 100) / 100;
+}
+
+function setExpectedGoalsOnTeamBlock(block, xgValue) {
+  if (!block || typeof block !== "object") {
+    return;
+  }
+
+  if (!Array.isArray(block.statistics)) {
+    block.statistics = [];
+  }
+
+  const existing = block.statistics.find((entry) => STAT_TYPE_TO_SPEC.get(normalizeStatType(entry?.type))?.column === "xg");
+  const formatted = xgValue == null ? null : String(xgValue);
+
+  if (existing) {
+    existing.type = "expected_goals";
+    existing.value = formatted;
+    return;
+  }
+
+  block.statistics.push({ type: "expected_goals", value: formatted });
+}
+
+export function applyExpectedGoalsToMatch(matchPayload, homeXg, awayXg) {
+  const match = unwrapMatchPayload(matchPayload);
+  if (!match) {
+    return null;
+  }
+
+  const homeId = Number(match?.teams?.home?.id);
+  const awayId = Number(match?.teams?.away?.id);
+  const statistics = Array.isArray(match.statistics) ? [...match.statistics] : [];
+
+  let homeBlock = statistics.find((entry) => Number(entry?.team?.id) === homeId);
+  let awayBlock = statistics.find((entry) => Number(entry?.team?.id) === awayId);
+
+  if (!homeBlock) {
+    homeBlock = {
+      team: { id: Number.isFinite(homeId) ? homeId : undefined, name: match?.teams?.home?.name },
+      statistics: [],
+    };
+    statistics.push(homeBlock);
+  }
+
+  if (!awayBlock) {
+    awayBlock = {
+      team: { id: Number.isFinite(awayId) ? awayId : undefined, name: match?.teams?.away?.name },
+      statistics: [],
+    };
+    statistics.push(awayBlock);
+  }
+
+  setExpectedGoalsOnTeamBlock(homeBlock, homeXg);
+  setExpectedGoalsOnTeamBlock(awayBlock, awayXg);
+  match.statistics = statistics;
+  return match;
 }

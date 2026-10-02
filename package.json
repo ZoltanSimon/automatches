@@ -9,7 +9,8 @@
     "start": "node backend/index.js",
     "migrate:matches": "node scripts/migrate-match-files.js",
     "backfill:match-details": "node scripts/backfill-match-details.js",
-    "backfill:elo": "node scripts/backfill-elo.js"
+    "backfill:elo": "node scripts/backfill-elo.js",
+    "backfill:fotmob": "node scripts/backfill-fotmob.js"
   },
   "author": "Zoltan Simon",
   "license": "ISC",

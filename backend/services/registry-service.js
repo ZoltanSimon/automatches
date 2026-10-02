@@ -22,6 +22,10 @@ async function getRegistryLeagueSeasonConfigs() {
     .filter(({ leagueID, season }) => Number.isFinite(leagueID) && Number.isFinite(season));
 }
 
+export function getLoadedRegistry() {
+  return _registry;
+}
+
 export async function getRegistry() {
   if (_registry) {
     return _registry;
@@ -190,6 +194,21 @@ export function upsertRegistryMatch(registry, matchPayload) {
   registry.matchByID.set(idAsString, normalizedMatch);
 
   return normalizedMatch;
+}
+
+export function patchLoadedMatch(matchId, patch) {
+  if (!_registry?.matchByID || !patch) {
+    return null;
+  }
+
+  const id = Number(matchId);
+  const match = _registry.matchByID.get(id) ?? _registry.matchByID.get(String(matchId));
+  if (!match) {
+    return null;
+  }
+
+  Object.assign(match, patch);
+  return match;
 }
 
 export function upsertRegistryMatchIfLoaded(matchPayload) {

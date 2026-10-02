@@ -474,6 +474,10 @@ async function writeMatchJson(fixtureID, matchPayload, { overwrite = false } = {
   }
 }
 
+export async function writeMatchJsonOverwrite(fixtureID, matchPayload) {
+  return writeMatchJson(fixtureID, matchPayload, { overwrite: true });
+}
+
 async function writeMatchJsonWithRetry(fixtureID, matchPayload, { overwrite = false } = {}) {
   try {
     return await writeMatchJson(fixtureID, matchPayload, { overwrite });

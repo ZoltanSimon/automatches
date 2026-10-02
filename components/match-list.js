@@ -14,18 +14,10 @@ import {
   getDate,
   showToast,
 } from "../common-functions.js";
+import { formatTeamXg } from "../backend/lib/match-xg.js";
 
 let imgToAdd = [];
 let yPos = 220;
-
-function getExpectedGoals(match, teamID, fallbackIndex) {
-  const stats = Array.isArray(match?.statistics) ? match.statistics : [];
-  const byTeam = stats.find((entry) => Number(entry?.team?.id) === Number(teamID));
-  const teamStats = byTeam?.statistics ?? stats?.[fallbackIndex]?.statistics ?? [];
-  const byType = teamStats.find((entry) => entry?.type === "expected_goals")?.value;
-  const fallback = teamStats?.[16]?.value;
-  return byType ?? fallback ?? "";
-}
 
  export function matchList(fixtures, showID = false) {
   let addToPage, date;
@@ -61,8 +53,8 @@ function getExpectedGoals(match, teamID, fallbackIndex) {
 
     let homeTeam = element.teams.home;
     let awayTeam = element.teams.away;
-    const homeXg = getExpectedGoals(element, homeTeam.id, 0);
-    const awayXg = getExpectedGoals(element, awayTeam.id, 1);
+    const homeXg = formatTeamXg(element, homeTeam.id);
+    const awayXg = formatTeamXg(element, awayTeam.id);
 
     loadClubLogo(homeTeam.id);
     loadClubLogo(awayTeam.id);

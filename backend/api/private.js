@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFromApi, getTransfersByTeam, getPlayerStatsFromApi, getTeamsByPlayer, hasApiErrors } from "./webapi-handler.js";
-import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, getMatchDetailsById, getMatchIdsMissingDetails, getFinishedMatchesMissingXg, getTeamEloForTeam, getEloRankings } from "../data-access.js";
+import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, getMatchDetailsById, getMatchIdsMissingDetails, getFinishedMatchesMissingXg, getTeamEloForTeam, getEloRankings, setMatchFotmob } from "../data-access.js";
 import { dataDir, writeLeagueToServer, saveMatchToServer } from "../services/json-reader.js";
-import { forceRefreshRegistry, getRegistry, upsertRegistryMatchIfLoaded } from "../services/registry-service.js";
+import { forceRefreshRegistry, getRegistry, patchLoadedMatch, upsertRegistryMatchIfLoaded } from "../services/registry-service.js";
 import { fetchAndSavePlayerTransfers, insertAllPlayers, refetchPlayer, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
 import { localhostOnly, wait } from "../lib/backend-helper.js";
 import { CURRENT_SEASON, parseLeagueIds, updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
-import { findMissingFinishedMatches, grabMatchesByIds, hydrateMissingMatches, matchesOnDay, matchesInRound, refetchLeagueRound, refetchMatchesOnDay } from "../services/matches-service.js";
+import { findMissingFinishedMatches, grabMatchesByIds, hydrateMissingMatches, matchesOnDay, matchesInRound, refetchLeagueRound, refetchMatchesOnDay, setManualMatchXg } from "../services/matches-service.js";
+import { fetchExternalMatchXg, fetchFotmobMatchById } from "../services/xg-lookup-service.js";
 import { extractExpectedGoals, teamNameFromMatchDetails } from "../lib/match-details-mapper.js";
 import { replayElo } from "../services/elo-service.js";
 
@@ -136,7 +137,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
 
     try {
       logProgress("Job started.");
-      logProgress("Updating current season leagues from API...");
+      logProgress(`Updating leagues for season ${CURRENT_SEASON} or newer from API...`);
       const { leagues, ...leagueUpdate } = await updateCurrentSeasonLeagues(leaguesCache, {
         getResultsDateFn: getResultsDate,
         writeLeagueToServerFn: writeLeagueToServer,
@@ -849,6 +850,71 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       failLog: `[get-transfers-by-player] Error for playerID=${request.query.playerID}:`,
       failMessage: "Failed to fetch player transfers",
     });
+  });
+
+  router.post("/fetch-xg", async (request, response) => {
+    const rawIds = request.body?.matchIDs ?? request.body?.matchIds ?? request.body?.matchID ?? request.query.matchIDs;
+    const ids = Array.isArray(rawIds)
+      ? rawIds
+      : String(rawIds ?? "").split(/[\s,;]+/).filter(Boolean);
+    const fotmobInput = String(request.body?.fotmobID ?? request.body?.fotmobId ?? request.query.fotmobID ?? "").trim();
+
+    if (ids.length === 0) {
+      return response.status(400).json({
+        success: false,
+        message: "matchID or matchIDs is required",
+      });
+    }
+    if (fotmobInput && ids.length !== 1) {
+      return response.status(400).json({
+        success: false,
+        message: "A FotMob ID can only be used with a single match",
+      });
+    }
+
+    try {
+      const results = fotmobInput
+        ? [await fetchFotmobMatchById(ids[0], fotmobInput)]
+        : await fetchExternalMatchXg(ids.slice(0, 20));
+      for (const entry of results) {
+        if (!entry.fotmob) {
+          continue;
+        }
+        await setMatchFotmob(entry.matchId, entry.fotmob);
+        patchLoadedMatch(entry.matchId, { fotmob: entry.fotmob });
+        entry.fotmobSaved = true;
+        delete entry.fotmob;
+      }
+      response.json({
+        success: true,
+        count: results.length,
+        found: results.filter((entry) => entry.ok).length,
+        results,
+      });
+    } catch (error) {
+      console.error("Error fetching external xG:", error);
+      response.status(500).json({
+        success: false,
+        message: error.message || "Failed to fetch xG",
+      });
+    }
+  });
+
+  router.post("/set-match-xg", async (request, response) => {
+    const matchID = request.body?.matchID ?? request.body?.matchId ?? request.query.matchID;
+    const homeXg = request.body?.homeXg ?? request.body?.home_xg ?? request.query.homeXg;
+    const awayXg = request.body?.awayXg ?? request.body?.away_xg ?? request.query.awayXg;
+
+    try {
+      const saved = await setManualMatchXg(matchID, homeXg, awayXg);
+      response.json({ success: true, ...saved });
+    } catch (error) {
+      console.error("Error setting match xG:", error);
+      response.status(400).json({
+        success: false,
+        message: error.message || "Failed to set match xG",
+      });
+    }
   });
 
   router.get("/matches-missing-xg", async (request, response) => {

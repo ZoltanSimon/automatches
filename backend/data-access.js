@@ -797,8 +797,33 @@ const MATCH_DETAILS_ID_CHUNK_SIZE = 500;
 const MATCH_DETAILS_UPDATE_COLUMNS = MATCH_DETAILS_COLUMNS.filter((column) => column !== "match_id");
 const MATCH_DETAILS_INSERT_PLACEHOLDERS = MATCH_DETAILS_COLUMNS.map(() => "?").join(", ");
 const MATCH_DETAILS_ON_UPDATE = MATCH_DETAILS_UPDATE_COLUMNS
-  .map((column) => `${column} = VALUES(${column})`)
+  .map((column) => column === "fotmob"
+    ? "fotmob = COALESCE(VALUES(fotmob), fotmob)"
+    : `${column} = VALUES(${column})`)
   .join(", ");
+
+let matchDetailsFotmobColumnPromise = null;
+
+export async function ensureMatchDetailsFotmobColumn() {
+  if (!matchDetailsFotmobColumnPromise) {
+    matchDetailsFotmobColumnPromise = (async () => {
+      try {
+        await pool.query("ALTER TABLE match_details ADD COLUMN fotmob JSON NULL");
+      } catch (error) {
+        const duplicateColumn = error?.code === "ER_DUP_FIELDNAME" || error?.errno === 1060;
+        const missingTable = error?.code === "ER_NO_SUCH_TABLE" || error?.errno === 1146;
+        if (!duplicateColumn) {
+          matchDetailsFotmobColumnPromise = null;
+        }
+        if (!duplicateColumn && !missingTable) {
+          throw error;
+        }
+      }
+    })();
+  }
+
+  return matchDetailsFotmobColumnPromise;
+}
 
 function chunkIds(ids, size) {
   const chunks = [];
@@ -896,6 +921,7 @@ export async function getMatchDetailsById(id) {
 }
 
 export async function upsertMatchDetails(matchId, matchObject, { overwrite = false } = {}) {
+  await ensureMatchDetailsFotmobColumn();
   const row = matchObjectToDetailsRow(matchPayloadWithId(matchObject, matchId));
   if (!row) {
     throw new Error("Invalid match payload provided for match_details save.");
@@ -929,6 +955,7 @@ export async function upsertMatchDetails(matchId, matchObject, { overwrite = fal
 }
 
 export async function insertMatchDetailsRows(rows, { overwrite = false } = {}) {
+  await ensureMatchDetailsFotmobColumn();
   const validRows = (Array.isArray(rows) ? rows : []).filter((row) => Number.isFinite(Number(row?.match_id)));
   if (validRows.length === 0) {
     return { inserted: 0, skipped: 0 };
@@ -1013,6 +1040,7 @@ export async function getMatchIdsMissingDetails(ids) {
 }
 
 export async function getFinishedMatchesMissingXg(season = CURRENT_SEASON) {
+  await ensureMatchDetailsFotmobColumn();
   const normalizedSeason = normalizeSeasonValue(season) ?? CURRENT_SEASON;
   const finishedStatuses = [...FINISHED_MATCH_STATUSES];
 
@@ -1037,10 +1065,47 @@ export async function getFinishedMatchesMissingXg(season = CURRENT_SEASON) {
        AND l.type IN ('league', 'cup')
        AND m.status IN (?)
        AND (d.match_id IS NULL OR (d.home_xg IS NULL AND d.away_xg IS NULL))
+       AND (d.fotmob IS NULL OR COALESCE(JSON_TYPE(JSON_EXTRACT(d.fotmob, '$.homeXg')), 'NULL') = 'NULL')
      ORDER BY m.match_date DESC`,
     [normalizedSeason, finishedStatuses],
   );
 
+  return mapMatchXgLookupRows(rows);
+}
+
+export async function getFinishedMatchIdsMissingFotmob({
+  season = CURRENT_SEASON,
+  domesticLeagueIds,
+  europeanLeagueIds,
+} = {}) {
+  await ensureMatchDetailsFotmobColumn();
+  const normalizedSeason = normalizeSeasonValue(season) ?? CURRENT_SEASON;
+  const finishedStatuses = [...FINISHED_MATCH_STATUSES];
+  const [rows] = await pool.query(
+    `SELECT m.id AS fixtureId
+     FROM matches m
+     LEFT JOIN match_details d ON d.match_id = m.id
+     WHERE m.season = ?
+       AND m.status IN (?)
+       AND d.fotmob IS NULL
+       AND (
+         m.league_id IN (?)
+         OR (
+           m.league_id IN (?)
+           AND (
+             LOWER(m.round) LIKE '%league stage%'
+             OR LOWER(m.round) LIKE '%group stage%'
+           )
+         )
+       )
+     ORDER BY m.match_date ASC`,
+    [normalizedSeason, finishedStatuses, domesticLeagueIds, europeanLeagueIds],
+  );
+
+  return rows.map((row) => Number(row.fixtureId));
+}
+
+function mapMatchXgLookupRows(rows) {
   const teamNameById = new Map((allDBTeams || []).map((team) => [team.ID, team.name]));
 
   return rows.map((row) => {
@@ -1062,6 +1127,78 @@ export async function getFinishedMatchesMissingXg(season = CURRENT_SEASON) {
       missingDetails: Boolean(row.missing_details),
     };
   });
+}
+
+export async function getMatchesForXgLookup(ids) {
+  const matchIds = normalizeMatchIds(ids);
+  if (matchIds.length === 0) {
+    return [];
+  }
+
+  const [rows] = await pool.query(
+    `SELECT m.id AS fixtureId,
+            m.league_id,
+            m.season,
+            m.round,
+            m.home_team_id,
+            m.away_team_id,
+            m.match_date,
+            m.status,
+            m.home_score,
+            m.away_score,
+            d.home_xg,
+            d.away_xg,
+            d.match_id IS NULL AS missing_details
+     FROM matches m
+     LEFT JOIN match_details d ON d.match_id = m.id
+     WHERE m.id IN (?)`,
+    [matchIds],
+  );
+
+  const byId = new Map(mapMatchXgLookupRows(rows).map((row) => [row.fixtureId, row]));
+  return matchIds.map((id) => byId.get(id)).filter(Boolean);
+}
+
+export async function setMatchExpectedGoals(matchId, homeXg, awayXg) {
+  const id = Number(matchId);
+  if (!Number.isFinite(id) || id <= 0) {
+    throw new Error("matchId is required");
+  }
+
+  const [matches] = await pool.query(
+    `SELECT id FROM matches WHERE id = ? LIMIT 1`,
+    [id],
+  );
+  if (!matches.length) {
+    throw new Error(`Match ${id} was not found`);
+  }
+
+  await pool.query(
+    `INSERT INTO match_details (match_id, home_xg, away_xg)
+     VALUES (?, ?, ?)
+     ON DUPLICATE KEY UPDATE home_xg = VALUES(home_xg), away_xg = VALUES(away_xg)`,
+    [id, homeXg, awayXg],
+  );
+
+  return { matchId: id, home: homeXg, away: awayXg, hasXg: homeXg != null || awayXg != null };
+}
+
+export async function setMatchFotmob(matchId, fotmob) {
+  const id = Number(matchId);
+  if (!Number.isFinite(id) || id <= 0) {
+    throw new Error("matchId is required");
+  }
+
+  await ensureMatchDetailsFotmobColumn();
+  const payload = fotmob == null ? null : JSON.stringify(fotmob);
+  await pool.query(
+    `INSERT INTO match_details (match_id, fotmob)
+     VALUES (?, ?)
+     ON DUPLICATE KEY UPDATE fotmob = VALUES(fotmob)`,
+    [id, payload],
+  );
+
+  return { matchId: id, saved: true };
 }
 
 export async function getMatchIdsWithoutDetails({ finishedOnly = false, overwrite = false, limit = null } = {}) {

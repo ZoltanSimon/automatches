@@ -60,10 +60,17 @@
         <table class="gf-table lineup-table">
           <thead>
             <tr class="lineup-title-row">
-              <th colspan="3">Home Lineup</th>
+              <th colspan="{{lineupColspan ../matchInfo.fotmob}}">Home Lineup</th>
+            </tr>
+            <tr class="lineup-stat-header-row">
+              <th colspan="2"></th>
+              {{#if (fotmobHasLineupStat ../matchInfo.fotmob "xg")}}<th>xG</th>{{/if}}
+              {{#if (fotmobHasLineupStat ../matchInfo.fotmob "xgot")}}<th>xGOT</th>{{/if}}
+              {{#if (fotmobHasLineupStat ../matchInfo.fotmob "xa")}}<th>xA</th>{{/if}}
+              <th>Rtg</th>
             </tr>
             <tr class="lineup-section-row">
-              <th colspan="3">Starting 11</th>
+              <th colspan="{{lineupColspan ../matchInfo.fotmob}}">Starting 11</th>
             </tr>
           </thead>
           <tbody>
@@ -72,43 +79,52 @@
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
                   href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               <td
-                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
-                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                class="lineup-rating-td {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}<span
                   class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
             </tr>
             {{/each}}
             {{#if this.substitutes.length}}
             <tr class="lineup-section-row">
-              <th colspan="3">Substitutes</th>
+              <th colspan="{{lineupColspan ../matchInfo.fotmob}}">Substitutes</th>
             </tr>
             {{#each this.substitutes}}
             <tr class="lineup-player-row lineup-sub-row">
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
                   href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               <td
-                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
-                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                class="lineup-rating-td {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}<span
                   class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
             </tr>
             {{/each}}
             {{/if}}
-            {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
+            {{#with (matchTeamAverageRating this ../matchInfo.players ../matchInfo.fotmob ../matchInfo.teams.home.id) as |avgRating|}}
             <tr class="lineup-footer-row lineup-avg-row">
               <td colspan="2">Team Avg Rating</td>
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="Team xG">{{#with (fotmobTeamXgFor ../../matchInfo.fotmob ../team.id ../../matchInfo.teams.home.id) as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="Team xGOT">{{#with (fotmobTeamStatSum ../../matchInfo.fotmob ../team.id ../../matchInfo.teams.home.id "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="Team xA">{{#with (fotmobTeamStatSum ../../matchInfo.fotmob ../team.id ../../matchInfo.teams.home.id "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if
                   avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
             </tr>
             {{/with}}
             {{#if this.formation}}
             <tr class="lineup-footer-row lineup-meta-row">
-              <td colspan="3">Formation: {{this.formation}}</td>
+              <td colspan="{{lineupColspan ../matchInfo.fotmob}}">Formation: {{this.formation}}</td>
             </tr>
             {{/if}}
             {{#if this.coach.name}}
             <tr class="lineup-footer-row lineup-meta-row">
-              <td colspan="3">Manager: {{this.coach.name}}</td>
+              <td colspan="{{lineupColspan ../matchInfo.fotmob}}">Manager: {{this.coach.name}}</td>
             </tr>
             {{/if}}
           </tbody>
@@ -191,10 +207,17 @@
         <table class="gf-table lineup-table">
           <thead>
             <tr class="lineup-title-row">
-              <th colspan="3">Away Lineup</th>
+              <th colspan="{{lineupColspan ../matchInfo.fotmob}}">Away Lineup</th>
+            </tr>
+            <tr class="lineup-stat-header-row">
+              <th colspan="2"></th>
+              {{#if (fotmobHasLineupStat ../matchInfo.fotmob "xg")}}<th>xG</th>{{/if}}
+              {{#if (fotmobHasLineupStat ../matchInfo.fotmob "xgot")}}<th>xGOT</th>{{/if}}
+              {{#if (fotmobHasLineupStat ../matchInfo.fotmob "xa")}}<th>xA</th>{{/if}}
+              <th>Rtg</th>
             </tr>
             <tr class="lineup-section-row">
-              <th colspan="3">Starting 11</th>
+              <th colspan="{{lineupColspan ../matchInfo.fotmob}}">Starting 11</th>
             </tr>
           </thead>
           <tbody>
@@ -203,43 +226,52 @@
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
                   href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               <td
-                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
-                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                class="lineup-rating-td {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}<span
                   class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
             </tr>
             {{/each}}
             {{#if this.substitutes.length}}
             <tr class="lineup-section-row">
-              <th colspan="3">Substitutes</th>
+              <th colspan="{{lineupColspan ../matchInfo.fotmob}}">Substitutes</th>
             </tr>
             {{#each this.substitutes}}
             <tr class="lineup-player-row lineup-sub-row">
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
                   href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               <td
-                class="lineup-rating-td {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}{{ratingClass rating}}{{/with}}">
-                {{#with (lineupPlayerRating ../../matchInfo.players ../team.id this.player.id) as |rating|}}<span
+                class="lineup-rating-td {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}{{ratingClass rating}}{{/with}}">
+                {{#with (matchLineupRating ../../matchInfo.players ../team.id this.player.id this.player.name this.player.number ../../matchInfo.fotmob ../../matchInfo.teams.home.id) as |rating|}}<span
                   class="lineup-rating">{{#if rating}}{{rating}}{{else}}-{{/if}}</span>{{/with}}</td>
             </tr>
             {{/each}}
             {{/if}}
-            {{#with (teamAverageRating ../matchInfo.players this.team.id) as |avgRating|}}
+            {{#with (matchTeamAverageRating this ../matchInfo.players ../matchInfo.fotmob ../matchInfo.teams.home.id) as |avgRating|}}
             <tr class="lineup-footer-row lineup-avg-row">
               <td colspan="2">Team Avg Rating</td>
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="Team xG">{{#with (fotmobTeamXgFor ../../matchInfo.fotmob ../team.id ../../matchInfo.teams.home.id) as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="Team xGOT">{{#with (fotmobTeamStatSum ../../matchInfo.fotmob ../team.id ../../matchInfo.teams.home.id "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
+              {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="Team xA">{{#with (fotmobTeamStatSum ../../matchInfo.fotmob ../team.id ../../matchInfo.teams.home.id "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               <td class="lineup-rating-td {{ratingClass avgRating}}"><span class="lineup-rating">{{#if
                   avgRating}}{{avgRating}}{{else}}-{{/if}}</span></td>
             </tr>
             {{/with}}
             {{#if this.formation}}
             <tr class="lineup-footer-row lineup-meta-row">
-              <td colspan="3">Formation: {{this.formation}}</td>
+              <td colspan="{{lineupColspan ../matchInfo.fotmob}}">Formation: {{this.formation}}</td>
             </tr>
             {{/if}}
             {{#if this.coach.name}}
             <tr class="lineup-footer-row lineup-meta-row">
-              <td colspan="3">Manager: {{this.coach.name}}</td>
+              <td colspan="{{lineupColspan ../matchInfo.fotmob}}">Manager: {{this.coach.name}}</td>
             </tr>
             {{/if}}
           </tbody>

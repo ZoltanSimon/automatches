@@ -59,8 +59,8 @@
             <td class="center-td">{{this.statistics.games.minutes}}</td>
             <td class="center-td">{{zeroDefault this.statistics.goals.total}}</td>
             <td class="center-td">{{zeroDefault this.statistics.goals.assists}}</td>
-            <td class="center-td {{ratingClass this.statistics.games.rating}}">
-                {{this.statistics.games.rating}}
+            <td class="center-td {{ratingClass (displayRating this.statistics.games.rating)}}">
+                {{#with (displayRating this.statistics.games.rating) as |rating|}}{{#if rating}}{{rating}}{{else}}-{{/if}}{{/with}}
             </td>
         </tr>
         {{/each}}

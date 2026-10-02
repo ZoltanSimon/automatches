@@ -73,29 +73,49 @@ export async function updateCurrentSeasonLeagues(leaguesCache, {
     .map((league) => Number(league.id))
     .filter((leagueID) => Number.isFinite(leagueID) && leagueID > 0);
   const leagueSeasonRows = await loadLeagueSeasonRows();
-  const currentSeasonLeagueIDs = new Set(
-    leagueSeasonRows
-      .filter((row) => Number(row.season) === CURRENT_SEASON)
-      .map((row) => Number(row.leagueID)),
-  );
+  const seasonsByLeague = new Map();
 
-  const updates = [];
-  const skippedLeagues = [];
-
-  for (const leagueID of leagueIDs) {
-    if (!currentSeasonLeagueIDs.has(leagueID)) {
-      console.log(`Current season ${CURRENT_SEASON} not available in LeagueSeason for league ${leagueID}.`);
-      skippedLeagues.push({ leagueID, season: CURRENT_SEASON });
+  for (const row of leagueSeasonRows) {
+    const leagueID = Number(row.leagueID);
+    const season = Number(row.season);
+    if (!Number.isFinite(season) || season < CURRENT_SEASON) {
       continue;
     }
 
-    const result = await updateLeagueSeasonData(leagueID, CURRENT_SEASON, {
+    const seasons = seasonsByLeague.get(leagueID) ?? [];
+    if (!seasons.includes(season)) {
+      seasons.push(season);
+    }
+    seasonsByLeague.set(leagueID, seasons);
+  }
+
+  const updates = [];
+  const skippedLeagues = [];
+  const jobs = [];
+
+  for (const leagueID of leagueIDs) {
+    const seasons = seasonsByLeague.get(leagueID);
+    if (!seasons || seasons.length === 0) {
+      console.log(`No season ${CURRENT_SEASON} or newer in LeagueSeason for league ${leagueID}.`);
+      skippedLeagues.push({ leagueID, minSeason: CURRENT_SEASON });
+      continue;
+    }
+
+    seasons.sort((a, b) => a - b);
+    for (const season of seasons) {
+      jobs.push({ leagueID, season });
+    }
+  }
+
+  for (let index = 0; index < jobs.length; index += 1) {
+    const { leagueID, season } = jobs[index];
+    const result = await updateLeagueSeasonData(leagueID, season, {
       getResultsDateFn,
       writeLeagueToServerFn,
     });
-    updates.push({ leagueID, season: CURRENT_SEASON, result });
+    updates.push({ leagueID, season, result });
 
-    if (updates.length + skippedLeagues.length < leagueIDs.length) {
+    if (index < jobs.length - 1) {
       await wait(UPDATE_LEAGUES_DELAY_MS);
     }
   }
@@ -104,7 +124,8 @@ export async function updateCurrentSeasonLeagues(leaguesCache, {
     leagues,
     season: CURRENT_SEASON,
     delayMs: UPDATE_LEAGUES_DELAY_MS,
-    updatedLeagues: updates.length,
+    updatedLeagues: new Set(updates.map((update) => update.leagueID)).size,
+    updatedSeasons: updates.length,
     skippedLeagues,
     updates,
   };

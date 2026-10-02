@@ -18,6 +18,7 @@
           <button type="button" id="missing-xg-clear-selection">Clear selection</button>
           <button type="button" id="missing-xg-hide-old">Hide older than 6 months</button>
           <button type="button" id="missing-xg-refetch-selected" disabled>Refetch selected (0)</button>
+          <button type="button" id="missing-xg-fetch-xg-selected" disabled>Fetch xG selected (0)</button>
           <span id="missing-xg-selection-hint">Max 20</span>
         </div>
         <div class="missing-xg-table-wrap">
@@ -29,6 +30,9 @@
                 <th>League</th>
                 <th>Match</th>
                 <th>Score</th>
+                <th>Home xG</th>
+                <th>Away xG</th>
+                <th>FotMob URL/ID</th>
                 <th></th>
                 <th>Status</th>
               </tr>
@@ -53,7 +57,7 @@
   </div>
   <div class="control-panel child-div">
     <div class="floating-buttons">
-      <div class="row" style="display: flex">
+      <div class="row admin-league-toolbar">
         <div id="league-list">
           <div id="league-list-league">
             {{#each leagues}}
@@ -82,6 +86,9 @@
           <div type="text" id="calendar"></div>
         </div>
 
+        <button id="select-all-leagues" type="button">
+          Select all
+        </button>
         <div class="admin-season-panel">
           <label class="admin-season-label" for="league-season-select">Season</label>
           <select id="league-season-select" disabled>
@@ -89,10 +96,6 @@
           </select>
           <div id="league-season-target" class="admin-season-target">No league selected</div>
         </div>
-
-        <button id="select-all-leagues" style="height: 30px">
-          Select all
-        </button>
         <!--input id="datepicker-input" type="date" /-->
       </div>
 
@@ -117,6 +120,11 @@
             <input type="text" placeholder="Match IDs" id="matchIDs" />
             <button id="grab-match-info">Grab match info</button>
             <button id="matches-missing-xg">Missing xG (current season)</button>
+          </div>
+          <div class="automatches-row">
+            <input type="number" placeholder="Match ID" id="fotmob-link-match-id" />
+            <input type="text" placeholder="FotMob match URL or ID" id="fotmob-link-input" />
+            <button id="fotmob-link-fetch">Fetch FotMob by ID</button>
           </div>
           <div class="automatches-row">
             <input type="number" placeholder="276" id="playerID" />

@@ -1,6 +1,7 @@
 import { getRegistry } from "./registry-service.js";
 import { calculateXPts, mostLikelyScore } from "./poisson-model.js";
 import { getMatchById } from "./matches-service.js";
+import { getHomeAwayXg } from "../lib/match-xg.js";
 
 const FINISHED_STATUSES = new Set(["FT", "AET", "PEN"]);
 
@@ -59,11 +60,12 @@ function extractMatchStatsForTeam(match, teamId) {
   };
 
   const isHome = match.teams.home.id === teamId;
+  const matchXg = getHomeAwayXg(match);
   return {
     goalsFor:           match.score.fulltime[isHome ? "home" : "away"] ?? 0,
     goalsAgainst:       match.score.fulltime[isHome ? "away" : "home"] ?? 0,
-    xG:                 parseFloat(get(myStats,  16)) || 0,
-    xGA:                parseFloat(get(oppStats, 16)) || 0,
+    xG:                 (isHome ? matchXg.home : matchXg.away) ?? 0,
+    xGA:                (isHome ? matchXg.away : matchXg.home) ?? 0,
     shotsOnGoal:        Number(get(myStats,  0)) || 0,
     shotsOnGoalAgainst: Number(get(oppStats, 0)) || 0,
     corners:            Number(get(myStats,  7)) || 0,
@@ -93,9 +95,9 @@ function computeReferenceXG(registry) {
   let count = 0;
   for (const match of registry.matches) {
     if (!isFinishedMatch(match)) continue;
-    for (const teamStats of (match.statistics ?? [])) {
-      const xgVal = parseFloat(teamStats?.statistics?.[16]?.value);
-      if (!Number.isNaN(xgVal) && xgVal > 0) {
+    const matchXg = getHomeAwayXg(match);
+    for (const xgVal of [matchXg.home, matchXg.away]) {
+      if (xgVal !== null && xgVal > 0) {
         total += xgVal;
         count++;
       }

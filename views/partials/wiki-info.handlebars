@@ -1,0 +1,26 @@
+<span class="wiki-info">
+  <button type="button" class="wiki-info__button" aria-expanded="false" aria-label="{{lead}} GF Wiki">i</button>
+  <span class="wiki-info__popup" role="tooltip">{{lead}} <a href="/gf-wiki#player-icons">GF Wiki</a>.</span>
+</span>
+<script>
+  if (!window.__wikiInfoBound) {
+    window.__wikiInfoBound = true;
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest(".wiki-info__button");
+      var info = event.target.closest(".wiki-info");
+      document.querySelectorAll(".wiki-info.is-open").forEach(function (openInfo) {
+        if (openInfo !== info) {
+          openInfo.classList.remove("is-open");
+          var openButton = openInfo.querySelector(".wiki-info__button");
+          if (openButton) openButton.setAttribute("aria-expanded", "false");
+        }
+      });
+      if (!button) return;
+      var parent = button.closest(".wiki-info");
+      var open = !parent.classList.contains("is-open");
+      parent.classList.toggle("is-open", open);
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) button.blur();
+    });
+  }
+</script>

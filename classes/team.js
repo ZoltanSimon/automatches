@@ -1,5 +1,6 @@
 import { Match } from "./match.js";
 import { calculateXPts } from "../backend/services/poisson-model.js";
+import { getHomeAwayXg } from "../backend/lib/match-xg.js";
 export class Team {
   #stats;
   constructor(team) {
@@ -78,6 +79,9 @@ export class Team {
   extractStats(match, teamIndex, opponentIndex) {
     const tStats = match.statistics[teamIndex].statistics;
     const oStats = match.statistics[opponentIndex].statistics;
+    const matchXg = getHomeAwayXg(match);
+    const teamXg = teamIndex === 0 ? matchXg.home : matchXg.away;
+    const opponentXg = teamIndex === 0 ? matchXg.away : matchXg.home;
     this.#stats.push({
       goalsFor: match.score.fulltime[teamIndex === 0 ? "home" : "away"],
       goalsAgainst: match.score.fulltime[teamIndex === 0 ? "away" : "home"],
@@ -85,8 +89,8 @@ export class Team {
       cornersAgainst: oStats[7]?.value ?? 0,
       shotsOnGoal: tStats[0]?.value ?? 0,
       shotsOnGoalAgainst: oStats[0]?.value ?? 0,
-      xG: parseFloat(tStats[16]?.value ?? 0),
-      xGA: parseFloat(oStats[16]?.value ?? 0),
+      xG: teamXg ?? 0,
+      xGA: opponentXg ?? 0,
       fouls: tStats[4]?.value ?? 0,
       foulsAgainst: oStats[4]?.value ?? 0,
       possession: parseInt(tStats[9]?.value ?? 0),
@@ -106,8 +110,8 @@ export class Team {
         cornersAway: aStats[7]?.value ?? 0,
         shotsOnGoalHome: hStats[0]?.value ?? 0,
         shotsOnGoalAway: aStats[0]?.value ?? 0,
-        xGHome: parseFloat(hStats[16]?.value ?? 0),
-        xGAway: parseFloat(aStats[16]?.value ?? 0),
+        xGHome: matchXg.home ?? 0,
+        xGAway: matchXg.away ?? 0,
       }
       thisMatch.stats = thisStats;
       this.matches.push(thisMatch);

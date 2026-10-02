@@ -17,6 +17,9 @@
       </div>
     {{/if}}
   </div>
+  {{#if wikiInfo}}
+    {{> wiki-info lead=wikiInfo}}
+  {{/if}}
   <div class="rect-league-list" id="league-list-league">
     {{#each leagues}}
     <button type="button" id="img-{{this.id}}" title="{{this.name}}" class="league-option {{../leaguepar}}-league-to-select{{#if (includesID ../selectedLeagues this.id)}} selected-league{{/if}}">

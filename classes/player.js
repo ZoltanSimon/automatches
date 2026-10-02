@@ -19,6 +19,7 @@ export class Player {
     this.goals = 0;
     this.assists = 0;
     this.apps = 0;
+    this.ratedApps = 0;
     this.avRating = 0;
     this.blocks = 0;
     this.captainApps = 0;
@@ -140,7 +141,11 @@ export class Player {
     }
     this.minutes += minutes;
     if (penalty.scored) this.penalties += penalty.scored;
-    if (games.rating) this.rating += parseFloat(games.rating);
+    const parsedRating = Number.parseFloat(games.rating);
+    if (Number.isFinite(parsedRating) && parsedRating > 0) {
+      this.rating += parsedRating;
+      this.ratedApps++;
+    }
     if (games.position && !this.exactPositions.includes(games.position)) {
       this.exactPositions.push(games.position);
       if (!this.position || (Array.isArray(this.position) && this.position.length === 0)) {
@@ -186,7 +191,7 @@ export class Player {
     this.dribbles = `${this.dribblesSucc} / ${this.dribblesAttempts}`;
     this.duels = `${this.duelsWon} / ${this.duelsTotal}`;
     this.competitions = this.competitionList.map((comp) => comp.name).join(", ");
-    this.avRating = this.apps > 0 ? (this.rating / this.apps).toFixed(2) : "0.00";
+    this.avRating = this.ratedApps > 0 ? (this.rating / this.ratedApps).toFixed(2) : "0.00";
     this.npg = this.goals - this.penalties;
     this.passAccuracy = this.passes > 0 ? `${((this.passesAccurate / this.passes) * 100).toFixed(0)}%` : "0%";
     this.matchPositions = this.exactPositions.join(", ");

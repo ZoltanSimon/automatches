@@ -4,12 +4,17 @@
       <h2>GF Wiki</h2>
       <p>
         This page explains the metrics Generation Football uses alongside
-        traditional results: Expected Points (xPts) and Elo ratings.
+        traditional results: Expected Points (xPts), Elo ratings, the
+        icons in player tables, and the abbreviations used in those tables.
       </p>
       <p>
         <a href="#xpoints">Expected Points (xPts)</a>
         ·
         <a href="#elo">Elo ratings</a>
+        ·
+        <a href="#player-icons">Player table icons</a>
+        ·
+        <a href="#abbreviations">Abbreviations</a>
       </p>
 
       <h2 id="xpoints">Expected Points (xPts)</h2>
@@ -73,6 +78,105 @@
         show the last month of Elo movement, and match pages show how much
         each side gained or lost from that fixture.
       </p>
+
+      <h2 id="player-icons">Player table icons</h2>
+      <p>
+        The <a href="/top-players">Top Players</a> table uses icons in the
+        column headers. The same icons appear beside the matching statistic
+        on a player’s page. Appearances, goals, assists, goals plus assists,
+        and rating are on by default. The rest show when that statistic is
+        switched on in the filters.
+      </p>
+      <ul class="wiki-icon-list">
+        <li>
+          {{> stat-icon name="apps"}}
+          <span><strong>Appearances</strong> — matches the player has played in.</span>
+        </li>
+        <li>
+          {{> stat-icon name="goals"}}
+          <span><strong>Goals</strong> — goals scored.</span>
+        </li>
+        <li>
+          {{> stat-icon name="assists"}}
+          <span><strong>Assists</strong> — goals the player directly set up.</span>
+        </li>
+        <li>
+          {{> stat-icon name="ga"}}
+          <span><strong>Goals + Assists</strong> — goals and assists added together.</span>
+        </li>
+        <li>
+          {{> stat-icon name="rating"}}
+          <span><strong>Average rating</strong> — the player’s average match rating.</span>
+        </li>
+        <li>
+          {{> stat-icon name="minutes"}}
+          <span><strong>Minutes</strong> — minutes played.</span>
+        </li>
+        <li>
+          {{> stat-icon name="pens"}}
+          <span><strong>Penalties scored</strong> — penalties the player converted.</span>
+        </li>
+        <li>
+          {{> stat-icon name="penaltiesMissed"}}
+          <span><strong>Penalties missed</strong> — penalties the player failed to score. The red line marks a miss.</span>
+        </li>
+        <li>
+          {{> stat-icon name="shotsOn"}}
+          <span><strong>Shots on target</strong> — shots that were on goal.</span>
+        </li>
+        <li>
+          <span class="yellow-card"></span>
+          <span><strong>Yellow cards</strong>.</span>
+        </li>
+        <li>
+          <span class="red-card"></span>
+          <span><strong>Red cards</strong>.</span>
+        </li>
+      </ul>
+
+      <h2 id="abbreviations">Abbreviations</h2>
+      <p>
+        Short labels in table headers. Hovering a player-table header still
+        shows the full name.
+      </p>
+
+      <h3>Players</h3>
+      <ul class="wiki-abbr-list">
+        <li><strong>NPG</strong> — non-penalty goals. Goals from open play, excluding penalties.</li>
+        <li><strong>GA/90</strong> — goals plus assists per 90 minutes. Narrow screens show this as GA90.</li>
+        <li><strong>No.</strong> — shirt number.</li>
+        <li><strong>Sub Apps</strong> — substitute appearances.</li>
+        <li><strong>Pens Won</strong> — penalties won.</li>
+        <li><strong>Pens Com.</strong> — penalties committed.</li>
+        <li><strong>Pens Saved</strong> — penalties saved by a goalkeeper.</li>
+        <li><strong>Drib. Succ</strong> — successful dribbles.</li>
+        <li><strong>Drib. Past</strong> — times an opponent dribbled past the player.</li>
+        <li><strong>Acc. Passes</strong> — accurate passes.</li>
+        <li><strong>Pass %</strong> — pass accuracy.</li>
+        <li><strong>Interc.</strong> — interceptions.</li>
+        <li><strong>GC</strong> — goals conceded.</li>
+      </ul>
+
+      <h3>League and team tables</h3>
+      <ul class="wiki-abbr-list">
+        <li><strong>P</strong> — played.</li>
+        <li><strong>W</strong> — wins.</li>
+        <li><strong>D</strong> — draws.</li>
+        <li><strong>L</strong> — losses.</li>
+        <li><strong>GD</strong> — goal difference.</li>
+        <li><strong>Pts</strong> — points.</li>
+        <li><strong>Ag</strong> — against. Team tables pair this with For, for goals, expected goals, and the other split stats.</li>
+        <li><strong>Rtg</strong> — rating, on match lineups.</li>
+      </ul>
+
+      <h3>Expected stats</h3>
+      <ul class="wiki-abbr-list">
+        <li><strong>xG</strong> — expected goals. The goals a team or player would be expected to score from the quality of the chances they had.</li>
+        <li><strong>xGA</strong> — expected goals against. The same measure for chances conceded.</li>
+        <li><strong>xGOT</strong> — expected goals on target. Expected goals from shots that were on target.</li>
+        <li><strong>xA</strong> — expected assists.</li>
+        <li><strong>xPts</strong> — expected points. How many points a team deserved from chance quality. See <a href="#xpoints">Expected Points</a>.</li>
+      </ul>
     </div>
   </div>
 </div>

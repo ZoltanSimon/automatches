@@ -50,8 +50,36 @@ table tr:nth-of-type(2n) td {
 }
 
 .floating-buttons {
-  width: 690px;
+  width: 780px;
   background-color: #a8dadc;
+}
+
+.admin-league-toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.admin-league-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1px;
+  margin-bottom: 2px;
+}
+
+.select-league-row {
+  height: 26px;
+  margin-left: 4px;
+  padding: 0 6px;
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 1;
+}
+
+#select-all-leagues {
+  height: 30px;
+  flex: 0 0 auto;
 }
 
 .admin-season-panel {
@@ -59,7 +87,7 @@ table tr:nth-of-type(2n) td {
   flex-direction: column;
   gap: 4px;
   min-width: 160px;
-  margin: 0 8px;
+  margin: 0;
 }
 
 .admin-season-label {
@@ -96,7 +124,7 @@ table tr:nth-of-type(2n) td {
 
 .control-panel {
   padding-left: 10px;
-  width: 700px;
+  width: 800px;
   float: left;
   margin-right: 3px;
 }
@@ -108,7 +136,8 @@ table tr:nth-of-type(2n) td {
 
 #league-list {
   cursor: pointer;
-  width: 500px;
+  width: auto;
+  flex: 0 0 auto;
 }
 
 .selected-league {
@@ -204,6 +233,22 @@ table tr:nth-of-type(2n) td {
 
 .missing-xg-table button {
   white-space: nowrap;
+}
+
+.missing-xg-table .missing-xg-input {
+  width: 64px;
+  padding: 2px 4px;
+}
+
+.missing-xg-table .missing-xg-fotmob-input {
+  width: 140px;
+  padding: 2px 4px;
+}
+
+.missing-xg-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 .missing-xg-status {

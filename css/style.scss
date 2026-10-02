@@ -141,6 +141,106 @@ footer {
   padding: 20px;
 }
 
+.wiki-icon-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 16px;
+  display: grid;
+  gap: 12px;
+  color: $dark-blue;
+  --stat-icon-primary: #{$dark-blue};
+  --stat-icon-secondary: #{$lightest-blue};
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  svg,
+  .yellow-card,
+  .red-card {
+    flex: 0 0 auto;
+  }
+}
+
+.wiki-abbr-list {
+  margin: 8px 0 16px;
+  padding-left: 1.2em;
+
+  li {
+    margin: 6px 0;
+  }
+}
+
+.wiki-info {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.wiki-info__button {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid $dark-blue;
+  border-radius: 50%;
+  background: $lightest-blue;
+  color: $dark-blue;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: $dark-blue;
+    color: $lightest-blue;
+    outline: none;
+  }
+}
+
+.wiki-info__popup {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  width: max-content;
+  max-width: min(260px, 70vw);
+  padding: 8px 10px;
+  background: $dark-blue;
+  color: $lightest-blue;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-style: normal;
+  line-height: 1.35;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 8px;
+  }
+
+  a {
+    color: $lightest-blue;
+    text-decoration: underline;
+  }
+}
+
+.wiki-info:hover .wiki-info__popup,
+.wiki-info:focus-within .wiki-info__popup,
+.wiki-info.is-open .wiki-info__popup {
+  display: block;
+}
+
 .sortable {
   cursor: pointer;
   position: relative;
@@ -470,10 +570,19 @@ footer {
     grid-column: 1 / 2;
     grid-row: 1;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .rect-expand {
     grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .rect-header > .wiki-info {
+    grid-column: 3;
     grid-row: 1;
     justify-self: start;
   }
@@ -1498,6 +1607,21 @@ td .form-indicator {
   .lineup-rating-td {
     text-align: right;
     width: 46px;
+  }
+
+  .lineup-xg-td {
+    text-align: center;
+    width: 42px;
+    font-size: 12px;
+    color: $dark-blue;
+  }
+
+  .lineup-stat-header-row th {
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    padding: 2px 0;
+    background: $light-blue;
   }
 }
 

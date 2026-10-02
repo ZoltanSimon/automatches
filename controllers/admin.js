@@ -142,23 +142,102 @@ async function submitRequest_matchList() {
   });
 }
 
-document.getElementById("select-all-leagues").onclick = function () {
-  const allTheLeagues = document
-    .getElementById("league-list")
-    .querySelectorAll("img");
+function selectLeagueElements(leagueElements) {
+  document.querySelectorAll("#league-list .admin-league-to-select").forEach((element) => {
+    element.classList.remove("selected-league");
+  });
+
   selectedLeagues.length = 0;
-  for (let i = 0; i < 10; i++) {
-    let league = allTheLeagues[i];
+  for (const league of leagueElements) {
     league.classList.add("selected-league");
     const leagueID = Number(league.id.split("img-")[1]);
+    if (!Number.isFinite(leagueID)) {
+      continue;
+    }
     selectedLeagues.push(leagueID);
     getStoredSeason(leagueID);
   }
+
   setActiveLeague(selectedLeagues[0] ?? null);
   const missingXgPanel = document.getElementById("missing-xg-panel");
   if (missingXgPanel && !missingXgPanel.hidden) {
     applyMissingXgFilters();
   }
+}
+
+function groupImagesIntoRows(images) {
+  const rows = [];
+  for (const image of images) {
+    const top = image.getBoundingClientRect().top;
+    const existing = rows.find((row) => Math.abs(row.top - top) <= 8);
+    if (existing) {
+      existing.images.push(image);
+      continue;
+    }
+    rows.push({ top, images: [image] });
+  }
+  return rows;
+}
+
+function addLeagueRowSelectButtons() {
+  const containers = ["league-list-league", "league-list-cup", "league-list-nt"]
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+  const iconRowWidth = 450;
+
+  for (const container of containers) {
+    container.style.width = `${iconRowWidth}px`;
+  }
+  document.getElementById("league-list")?.getBoundingClientRect();
+
+  const plans = containers.map((container) => ({
+    container,
+    rows: groupImagesIntoRows([...container.querySelectorAll("img.admin-league-to-select")]),
+  }));
+
+  for (const { container, rows } of plans) {
+    container.style.width = "";
+    const rowElements = rows
+      .filter((row) => row.images.length > 0)
+      .map((row) => {
+        const rowEl = document.createElement("div");
+        rowEl.className = "admin-league-row";
+        rowEl.append(...row.images);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "select-league-row";
+        button.textContent = "Select";
+        button.title = "Select this row";
+        button.addEventListener("click", () => {
+          selectLeagueElements(row.images);
+        });
+        rowEl.append(button);
+        return rowEl;
+      });
+
+    container.replaceChildren(...rowElements);
+  }
+}
+
+await Promise.all(
+  [...document.querySelectorAll("#league-list img.admin-league-to-select")].map((img) => {
+    if (img.complete) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      img.addEventListener("load", resolve, { once: true });
+      img.addEventListener("error", resolve, { once: true });
+    });
+  }),
+);
+addLeagueRowSelectButtons();
+
+document.getElementById("select-all-leagues").onclick = function () {
+  const allTheLeagues = document
+    .getElementById("league-list")
+    .querySelectorAll("img");
+  selectLeagueElements([...allTheLeagues].slice(0, 10));
 };
 
 document.getElementById("submit-league-info").onclick = async function () {
@@ -315,11 +394,17 @@ function applyMissingXgFilters() {
 function updateMissingXgSelectionUi() {
   const selectedCount = getSelectedMissingXgIds().length;
   const refetchSelectedButton = document.getElementById("missing-xg-refetch-selected");
+  const fetchXgSelectedButton = document.getElementById("missing-xg-fetch-xg-selected");
   const hint = document.getElementById("missing-xg-selection-hint");
 
   if (refetchSelectedButton) {
     refetchSelectedButton.textContent = `Refetch selected (${selectedCount})`;
     refetchSelectedButton.disabled = selectedCount === 0;
+  }
+
+  if (fetchXgSelectedButton) {
+    fetchXgSelectedButton.textContent = `Fetch xG selected (${selectedCount})`;
+    fetchXgSelectedButton.disabled = selectedCount === 0;
   }
 
   if (hint) {
@@ -329,10 +414,145 @@ function updateMissingXgSelectionUi() {
   }
 }
 
+function markMissingXgRowComplete(row, homeXg, awayXg) {
+  const statusCell = row?.querySelector(".missing-xg-status");
+  const refetchButton = row?.querySelector("button[data-action='refetch']");
+  const saveButton = row?.querySelector("button[data-action='save-xg']");
+  const checkbox = row?.querySelector("input[type='checkbox'][data-match-id]");
+  const homeInput = row?.querySelector("input[data-side='home']");
+  const awayInput = row?.querySelector("input[data-side='away']");
+
+  if (statusCell) {
+    setMissingXgStatus(
+      statusCell,
+      `Saved · xG ${formatXgValue(homeXg)}–${formatXgValue(awayXg)}`,
+      "success",
+    );
+  }
+  if (refetchButton) {
+    refetchButton.textContent = "Done";
+    refetchButton.disabled = true;
+  }
+  const fetchButton = row?.querySelector("button[data-action='fetch-xg']");
+  if (fetchButton) {
+    fetchButton.disabled = true;
+  }
+  if (saveButton) {
+    saveButton.disabled = true;
+  }
+  if (checkbox) {
+    checkbox.checked = false;
+    checkbox.disabled = true;
+  }
+  if (homeInput) {
+    homeInput.value = formatXgValue(homeXg);
+    homeInput.disabled = true;
+  }
+  if (awayInput) {
+    awayInput.value = formatXgValue(awayXg);
+    awayInput.disabled = true;
+  }
+}
+
+async function saveManualMissingXg(row, matchId) {
+  const homeInput = row?.querySelector("input[data-side='home']");
+  const awayInput = row?.querySelector("input[data-side='away']");
+  const homeXg = homeInput?.value;
+  const awayXg = awayInput?.value;
+
+  const response = await fetch("/api/set-match-xg", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ matchID: matchId, homeXg, awayXg }),
+  });
+  const result = await response.json();
+
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message || "Failed to save xG.");
+  }
+
+  markMissingXgRowComplete(row, result.home, result.away);
+  return result;
+}
+
+function applyExternalXgResult(row, result) {
+  const statusCell = row?.querySelector(".missing-xg-status");
+  const refetchButton = row?.querySelector("button[data-action='refetch']");
+  const fetchButton = row?.querySelector("button[data-action='fetch-xg']");
+  const saveButton = row?.querySelector("button[data-action='save-xg']");
+  const homeInput = row?.querySelector("input[data-side='home']");
+  const awayInput = row?.querySelector("input[data-side='away']");
+
+  if (fetchButton) {
+    fetchButton.disabled = false;
+  }
+  if (saveButton && saveButton.textContent !== "Done") {
+    saveButton.disabled = false;
+  }
+  if (refetchButton && refetchButton.textContent !== "Done") {
+    refetchButton.disabled = false;
+  }
+
+  if (!result?.ok) {
+    if (statusCell) {
+      setMissingXgStatus(statusCell, result?.error || "No xG found", "warn");
+    }
+    return { found: false };
+  }
+
+  if (homeInput) {
+    homeInput.value = formatXgValue(result.home);
+  }
+  if (awayInput) {
+    awayInput.value = formatXgValue(result.away);
+  }
+  if (statusCell) {
+    setMissingXgStatus(
+      statusCell,
+      result.fotmobSaved
+        ? `FotMob xG saved · ${formatXgValue(result.home)}–${formatXgValue(result.away)}`
+        : `FotMob ${formatXgValue(result.home)}–${formatXgValue(result.away)} · review & Save`,
+      "success",
+    );
+  }
+  if (result.fotmobSaved) {
+    const checkbox = row?.querySelector("input[type='checkbox'][data-match-id]");
+    if (checkbox) {
+      checkbox.checked = false;
+      checkbox.disabled = true;
+    }
+    if (fetchButton) {
+      fetchButton.disabled = true;
+    }
+  }
+  return { found: true };
+}
+
+async function fetchExternalXgMatches(matchIds, fotmobID = "") {
+  const ids = [...new Set((matchIds || []).map(String).filter(Boolean))].slice(0, MISSING_XG_MAX_SELECTION);
+  if (ids.length === 0) {
+    throw new Error("Select at least one match.");
+  }
+
+  const response = await fetch("/api/fetch-xg", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(fotmobID ? { matchIDs: ids, fotmobID } : { matchIDs: ids }),
+  });
+  const result = await response.json();
+
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message || "Failed to fetch xG.");
+  }
+
+  return result;
+}
+
 function applyMissingXgGrabResult(row, result, matchId) {
   const statusCell = row?.querySelector(".missing-xg-status");
-  const refetchButton = row?.querySelector("button[data-match-id]");
-  const checkbox = row?.querySelector("input[type='checkbox'][data-match-id]");
+  const refetchButton = row?.querySelector("button[data-action='refetch']");
+  const fetchButton = row?.querySelector("button[data-action='fetch-xg']");
+  const saveButton = row?.querySelector("button[data-action='save-xg']");
   if (!statusCell) {
     return { saved: false, hasXg: false };
   }
@@ -350,29 +570,29 @@ function applyMissingXgGrabResult(row, result, matchId) {
     if (refetchButton) {
       refetchButton.disabled = false;
     }
+    if (saveButton) {
+      saveButton.disabled = false;
+    }
+    if (fetchButton) {
+      fetchButton.disabled = false;
+    }
     return { saved: false, hasXg: false };
   }
 
   if (hasXg) {
-    setMissingXgStatus(
-      statusCell,
-      `Saved · xG ${formatXgValue(xgInfo.home)}–${formatXgValue(xgInfo.away)}`,
-      "success",
-    );
-    if (refetchButton) {
-      refetchButton.textContent = "Done";
-      refetchButton.disabled = true;
-    }
-    if (checkbox) {
-      checkbox.checked = false;
-      checkbox.disabled = true;
-    }
+    markMissingXgRowComplete(row, xgInfo.home, xgInfo.away);
     return { saved: true, hasXg: true };
   }
 
   setMissingXgStatus(statusCell, "Saved · still no xG", "warn");
   if (refetchButton) {
     refetchButton.disabled = false;
+  }
+  if (saveButton) {
+    saveButton.disabled = false;
+  }
+  if (fetchButton) {
+    fetchButton.disabled = false;
   }
   return { saved: true, hasXg: false };
 }
@@ -410,7 +630,7 @@ function renderMissingXgMatches(matches) {
 
   if (rows.length === 0) {
     const emptyRow = document.createElement("tr");
-    emptyRow.innerHTML = `<td colspan="7">No finished current-season matches are missing xG.</td>`;
+    emptyRow.innerHTML = `<td colspan="9">No finished current-season matches are missing xG.</td>`;
     tbody.append(emptyRow);
     updateMissingXgSelectionUi();
     return;
@@ -445,12 +665,55 @@ function renderMissingXgMatches(matches) {
     scoreTd.textContent = `${match.homeGoals ?? ""}–${match.awayGoals ?? ""}`;
     scoreTd.style.textAlign = "center";
 
+    const homeXgTd = document.createElement("td");
+    const homeXgInput = document.createElement("input");
+    homeXgInput.type = "number";
+    homeXgInput.min = "0";
+    homeXgInput.max = "20";
+    homeXgInput.step = "0.01";
+    homeXgInput.className = "missing-xg-input";
+    homeXgInput.dataset.side = "home";
+    homeXgInput.setAttribute("aria-label", `Home xG for match ${matchId}`);
+    homeXgTd.append(homeXgInput);
+
+    const awayXgTd = document.createElement("td");
+    const awayXgInput = document.createElement("input");
+    awayXgInput.type = "number";
+    awayXgInput.min = "0";
+    awayXgInput.max = "20";
+    awayXgInput.step = "0.01";
+    awayXgInput.className = "missing-xg-input";
+    awayXgInput.dataset.side = "away";
+    awayXgInput.setAttribute("aria-label", `Away xG for match ${matchId}`);
+    awayXgTd.append(awayXgInput);
+
+    const fotmobTd = document.createElement("td");
+    const fotmobInput = document.createElement("input");
+    fotmobInput.type = "text";
+    fotmobInput.className = "missing-xg-fotmob-input";
+    fotmobInput.dataset.role = "fotmob-id";
+    fotmobInput.placeholder = "auto";
+    fotmobInput.setAttribute("aria-label", `FotMob match URL or ID for match ${matchId}`);
+    fotmobTd.append(fotmobInput);
+
     const actionTd = document.createElement("td");
+    actionTd.className = "missing-xg-actions";
     const refetchButton = document.createElement("button");
     refetchButton.type = "button";
     refetchButton.textContent = "Refetch";
     refetchButton.dataset.matchId = String(matchId);
-    actionTd.append(refetchButton);
+    refetchButton.dataset.action = "refetch";
+    const saveButton = document.createElement("button");
+    saveButton.type = "button";
+    saveButton.textContent = "Save xG";
+    saveButton.dataset.matchId = String(matchId);
+    saveButton.dataset.action = "save-xg";
+    const fetchButton = document.createElement("button");
+    fetchButton.type = "button";
+    fetchButton.textContent = "Fetch xG";
+    fetchButton.dataset.matchId = String(matchId);
+    fetchButton.dataset.action = "fetch-xg";
+    actionTd.append(refetchButton, fetchButton, saveButton);
 
     const statusTd = document.createElement("td");
     setMissingXgStatus(
@@ -458,7 +721,7 @@ function renderMissingXgMatches(matches) {
       match.missingDetails ? "No details yet" : "No xG yet",
     );
 
-    tr.append(selectTd, dateTd, leagueTd, matchTd, scoreTd, actionTd, statusTd);
+    tr.append(selectTd, dateTd, leagueTd, matchTd, scoreTd, homeXgTd, awayXgTd, fotmobTd, actionTd, statusTd);
     tbody.append(tr);
   }
 
@@ -485,6 +748,39 @@ if (matchesMissingXgButton) {
       showToast(error.message || "Failed to load matches missing xG.");
     } finally {
       matchesMissingXgButton.disabled = false;
+    }
+  };
+}
+
+const fotmobLinkButton = document.getElementById("fotmob-link-fetch");
+if (fotmobLinkButton) {
+  fotmobLinkButton.onclick = async function () {
+    const matchId = document.getElementById("fotmob-link-match-id")?.value.trim();
+    const fotmobID = document.getElementById("fotmob-link-input")?.value.trim();
+    if (!matchId || !fotmobID) {
+      showToast("Enter both the match ID and the FotMob match URL or ID.");
+      return;
+    }
+
+    fotmobLinkButton.disabled = true;
+    try {
+      const result = await fetchExternalXgMatches([matchId], fotmobID);
+      const lookup = (result.results || [])[0];
+      const label = lookup?.sourceMatch ? ` (${lookup.sourceMatch})` : "";
+      if (!lookup?.fotmobSaved) {
+        showToast(lookup?.error || `Nothing saved for match ${matchId}.`);
+      } else if (lookup.warning) {
+        showToast(`Saved, but ${lookup.warning.toLowerCase()}${label}`);
+      } else if (lookup.ok) {
+        showToast(`Saved FotMob data for match ${matchId}${label}: xG ${formatXgValue(lookup.home)}–${formatXgValue(lookup.away)}`, "success");
+      } else {
+        showToast(`Saved FotMob player data for match ${matchId}${label}, but ${lookup.error.toLowerCase()}`);
+      }
+    } catch (error) {
+      console.error("Failed to fetch FotMob by ID:", error);
+      showToast(error.message || "Failed to fetch FotMob data.");
+    } finally {
+      fotmobLinkButton.disabled = false;
     }
   };
 }
@@ -518,16 +814,44 @@ if (missingXgTable) {
       return;
     }
 
+    const action = button.dataset.action || "refetch";
     button.disabled = true;
-    setMissingXgStatus(statusCell, "Refetching…", "loading");
+    const statusText = action === "save-xg"
+      ? "Saving xG…"
+      : action === "fetch-xg"
+        ? "Fetching xG…"
+        : "Refetching…";
+    setMissingXgStatus(statusCell, statusText, "loading");
 
     try {
+      if (action === "save-xg") {
+        await saveManualMissingXg(row, matchId);
+        showToast(`Saved xG for match ${matchId}.`, "success");
+        return;
+      }
+
+      if (action === "fetch-xg") {
+        const fotmobID = row?.querySelector("input[data-role='fotmob-id']")?.value.trim() || "";
+        const result = await fetchExternalXgMatches([matchId], fotmobID);
+        const lookup = (result.results || []).find((entry) => String(entry.matchId) === String(matchId));
+        applyExternalXgResult(row, lookup);
+        if (lookup?.warning) {
+          showToast(`${lookup.warning}: ${lookup.sourceMatch || "unknown teams"}`);
+        } else if (lookup?.ok) {
+          showToast(`Saved FotMob xG for match ${matchId}.`, "success");
+        } else {
+          showToast(lookup?.error || `No xG found for match ${matchId}.`);
+        }
+        return;
+      }
+
       const result = await refetchMissingXgMatches([matchId]);
       applyMissingXgGrabResult(row, result, matchId);
     } catch (error) {
-      console.error(`Failed to refetch match ${matchId}:`, error);
-      setMissingXgStatus(statusCell, error.message || "Refetch failed", "error");
-      showToast(error.message || `Failed to refetch match ${matchId}.`);
+      const verb = action === "save-xg" ? "save xG" : action === "fetch-xg" ? "fetch xG" : "refetch";
+      console.error(`Failed to ${verb} match ${matchId}:`, error);
+      setMissingXgStatus(statusCell, error.message || `${verb} failed`, "error");
+      showToast(error.message || `Failed to ${verb} match ${matchId}.`);
       button.disabled = false;
     } finally {
       updateMissingXgSelectionUi();
@@ -580,9 +904,17 @@ document.getElementById("missing-xg-refetch-selected")?.addEventListener("click"
     const row = document.querySelector(`#missing-xg-table tbody tr[data-match-id="${matchId}"]`);
     rowsById.set(String(matchId), row);
     const statusCell = row?.querySelector(".missing-xg-status");
-    const refetchButton = row?.querySelector("button[data-match-id]");
+    const refetchButton = row?.querySelector("button[data-action='refetch']");
+    const fetchButton = row?.querySelector("button[data-action='fetch-xg']");
+    const saveButton = row?.querySelector("button[data-action='save-xg']");
     if (refetchButton) {
       refetchButton.disabled = true;
+    }
+    if (fetchButton) {
+      fetchButton.disabled = true;
+    }
+    if (saveButton) {
+      saveButton.disabled = true;
     }
     if (statusCell) {
       setMissingXgStatus(statusCell, "Refetching…", "loading");
@@ -609,12 +941,75 @@ document.getElementById("missing-xg-refetch-selected")?.addEventListener("click"
     for (const matchId of ids) {
       const row = rowsById.get(String(matchId));
       const statusCell = row?.querySelector(".missing-xg-status");
-      const refetchButton = row?.querySelector("button[data-match-id]");
+      const refetchButton = row?.querySelector("button[data-action='refetch']");
+      const fetchButton = row?.querySelector("button[data-action='fetch-xg']");
+      const saveButton = row?.querySelector("button[data-action='save-xg']");
       if (statusCell) {
         setMissingXgStatus(statusCell, error.message || "Refetch failed", "error");
       }
       if (refetchButton && refetchButton.textContent !== "Done") {
         refetchButton.disabled = false;
+      }
+      if (fetchButton) {
+        fetchButton.disabled = false;
+      }
+      if (saveButton && refetchButton?.textContent !== "Done") {
+        saveButton.disabled = false;
+      }
+    }
+  } finally {
+    updateMissingXgSelectionUi();
+  }
+});
+
+document.getElementById("missing-xg-fetch-xg-selected")?.addEventListener("click", async (event) => {
+  const button = event.currentTarget;
+  const ids = getSelectedMissingXgIds();
+  if (ids.length === 0) {
+    showToast("Select at least one match.");
+    return;
+  }
+
+  button.disabled = true;
+  const rowsById = new Map();
+  for (const matchId of ids) {
+    const row = document.querySelector(`#missing-xg-table tbody tr[data-match-id="${matchId}"]`);
+    rowsById.set(String(matchId), row);
+    const statusCell = row?.querySelector(".missing-xg-status");
+    const fetchButton = row?.querySelector("button[data-action='fetch-xg']");
+    if (fetchButton) {
+      fetchButton.disabled = true;
+    }
+    if (statusCell) {
+      setMissingXgStatus(statusCell, "Fetching xG…", "loading");
+    }
+  }
+  [...rowsById.values()].find(Boolean)?.scrollIntoView({ block: "center", behavior: "smooth" });
+  showToast(`Fetching FotMob xG for ${ids.length} match(es), about ${ids.length * 4}s…`, "success");
+
+  try {
+    const result = await fetchExternalXgMatches(ids);
+    let foundCount = 0;
+    for (const matchId of ids) {
+      const lookup = (result.results || []).find((entry) => String(entry.matchId) === String(matchId));
+      const outcome = applyExternalXgResult(rowsById.get(String(matchId)), lookup);
+      if (outcome.found) {
+        foundCount += 1;
+      }
+    }
+    showToast(`Saved FotMob xG for ${foundCount}/${ids.length}.`, foundCount > 0 ? "success" : undefined);
+  } catch (error) {
+    console.error("Failed to fetch selected xG:", error);
+    showToast(error.message || "Failed to fetch selected xG.");
+    for (const matchId of ids) {
+      const row = rowsById.get(String(matchId));
+      const statusCell = row?.querySelector(".missing-xg-status");
+      const fetchButton = row?.querySelector("button[data-action='fetch-xg']");
+      if (statusCell) {
+        setMissingXgStatus(statusCell, error.message || "Fetch failed", "error");
+      }
+      if (fetchButton) {
+        fetchButton.disabled = false;
       }
     }
   } finally {
@@ -630,7 +1025,7 @@ document.getElementById("update-leagues").onclick = async function () {
     }
   );
   const data = await response.json();
-  showToast(`Updated ${data.updatedLeagues} leagues for season ${data.season}.`, 'success');
+  showToast(`Updated ${data.updatedSeasons} seasons across ${data.updatedLeagues} leagues (season ${data.season} or newer).`, 'success');
   console.log(data);
 };
 
