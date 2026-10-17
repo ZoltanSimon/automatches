@@ -1,5 +1,7 @@
 import { buildMatchRegistry, getLoadedRegistry, upsertRegistryMatchIfLoaded } from "./registry-service.js";
 import { saveMatchesToServer, buildTeamList, getMatchFromServer } from "./json-reader.js";
+import { getAllCompetitionTeam } from "./teams-service.js";
+import { memoizeRegistryStat } from "./registry-stats.js";
 import { applyEloForFinishedMatches } from "./elo-service.js";
 import { allDBLeagues } from "../lib/catalog.js";
 import { getAllMatchesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, setMatchExpectedGoals } from "../data-access.js";
@@ -265,10 +267,16 @@ export async function hydrateMissingMatches(missingMatches, logPrefix) {
 
 export async function matchesOnDay(registry, dateToCheck) {
   const checkDate = new Date(dateToCheck) || new Date();
-  return registry.matches.filter(({ fixture }) => {
-    const matchDate = new Date(fixture.date);
-    return matchDate.toDateString() === checkDate.toDateString();
+  const matchesByDay = memoizeRegistryStat(registry, "matches:by-day", () => {
+    const byDay = new Map();
+    for (const match of registry.matches) {
+      const day = new Date(match.fixture.date).toDateString();
+      if (!byDay.has(day)) byDay.set(day, []);
+      byDay.get(day).push(match);
+    }
+    return byDay;
   });
+  return [...(matchesByDay.get(checkDate.toDateString()) ?? [])];
 }
 
 export async function matchesInRound(roundNr, leagueID) {
@@ -326,10 +334,13 @@ export function getMatchById(registry, matchID) {
 
 export async function getMatchPageData(registry, currentMatch) {
   const { home, away } = currentMatch.teams;
-  const allMatches = await allTeamMatches(registry, home.id, away.id);
-  const matchesForTeamList = allMatches.length > 0 ? allMatches : [currentMatch];
-  const teamList = buildTeamList(matchesForTeamList)
-    .filter((team) => team.id === home.id || team.id === away.id)
+  const registryTeams = [home.id, away.id]
+    .map((teamID) => getAllCompetitionTeam(registry, teamID))
+    .filter(Boolean);
+  const teams = registryTeams.length > 0
+    ? registryTeams
+    : buildTeamList([currentMatch]).filter((team) => team.id === home.id || team.id === away.id);
+  const teamList = teams
     .sort((a, b) => (a.id === home.id ? -1 : b.id === home.id ? 1 : 0))
     .map((team) => ({
       ...team,

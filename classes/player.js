@@ -1,5 +1,14 @@
 import { formatPlayerPosition } from "../backend/lib/backend-helper.js";
 
+// Every field getPlayerStats sums; addCounters relies on this list staying complete.
+const COUNTER_FIELDS = [
+  "goals", "ga", "assists", "apps", "starts", "substituteApps", "captainApps", "minutes",
+  "rating", "ratedApps", "shotsOn", "shotsTotal", "dribblesAttempts", "dribblesSucc", "dribblesPast",
+  "duelsWon", "duelsTotal", "keyPasses", "passes", "passesAccurate", "foulsAgainst", "foulsCommited",
+  "offsides", "goalsConceded", "goalkeeperSaves", "tackles", "blocks", "interceptions",
+  "yellowCards", "redCards", "penalties", "penaltiesWon", "penaltiesCommitted", "penaltiesMissed", "penaltiesSaved",
+];
+
 export class Player {
   constructor(inputPlayer) {
     const birthDate = inputPlayer.birth_date || inputPlayer.birthdate || "";
@@ -66,6 +75,7 @@ export class Player {
     this.height = height;
     this.age = Number(inputPlayer.age) || this.calculateAgeFromBirthDate(birthDate);
     this.exactPositions = [];
+    this.lineupRoleCounts = {};
     this.shirtNumber = inputPlayer.shirtNumber || inputPlayer.shirt_number || "";
     this.shirtNumbers = this.shirtNumber;
   }
@@ -183,6 +193,15 @@ export class Player {
     }
 
     this.getGAper90();
+  }
+
+  addCounters(otherPlayer) {
+    for (const field of COUNTER_FIELDS) {
+      this[field] += otherPlayer[field];
+    }
+    for (const [role, count] of Object.entries(otherPlayer.lineupRoleCounts || {})) {
+      this.lineupRoleCounts[role] = (this.lineupRoleCounts[role] || 0) + count;
+    }
   }
 
   getGAper90() {

@@ -1,7 +1,7 @@
 import { CURRENT_SEASON } from "../shared/defaults.js";
 import pool from "./config.js";
 import { allDBTeams, getCatalogLeague } from "./lib/catalog.js";
-import { getTeamById } from "./services/teams-service.js";
+import { getTeamById, isAgeGroupNationalSide } from "./services/teams-service.js";
 import {
   extractPlayerProfile,
   mergeProfileValue,
@@ -98,7 +98,7 @@ function buildNationIdResolver() {
     const key = normalizeNationLookupKey(team?.name);
     const teamID = Number(team?.ID);
 
-    if (!key || !Number.isFinite(teamID) || nationIdByName.has(key)) {
+    if (!key || !Number.isFinite(teamID) || nationIdByName.has(key) || isAgeGroupNationalSide(team?.name)) {
       continue;
     }
 
@@ -113,6 +113,20 @@ function buildNationIdResolver() {
 
     return nationIdByName.get(key) ?? null;
   };
+}
+
+function withoutAgeGroupNation(rows) {
+  return rows.map((row) => {
+    if (!isAgeGroupNationalSide(row?.player_nation_name)) {
+      return row;
+    }
+
+    return {
+      ...row,
+      player_nation: 0,
+      player_nation_name: "",
+    };
+  });
 }
 
 export async function loadPlayers() {
@@ -1534,7 +1548,7 @@ export async function getLatestTransfers(limit = 10, leagueIDs = []) {
       teamParams,
     );
 
-    return rows;
+    return withoutAgeGroupNation(rows);
   } catch (error) {
     console.error("Error loading latest transfers:", error);
     return [];
@@ -1569,7 +1583,7 @@ export async function getTransfersByPlayer(playerID) {
       [normalizedPlayerID],
     );
 
-    return rows;
+    return withoutAgeGroupNation(rows);
   } catch (error) {
     if (error?.code === "ER_NO_SUCH_TABLE") {
       return [];
@@ -1614,7 +1628,7 @@ export async function getTransfersByTeam(teamID, limit = 25) {
       [normalizedTeamID, normalizedTeamID],
     );
 
-    return rows;
+    return withoutAgeGroupNation(rows);
   } catch (error) {
     if (error?.code === "ER_NO_SUCH_TABLE") {
       return [];

@@ -4,7 +4,6 @@ import { PORT } from "./config.js";
 import { createApiRouter } from "./api/private.js";
 import { createPublicRouter } from "./api/public.js";
 import {
-  getLeagueStandingsFromDb,
   getLatestTransfers,
   getTransfersByPlayer,
   getTransfersByTeam,
@@ -22,14 +21,13 @@ import {
   getPlayerList,
   getPlayerPageData,
   getTopPlayersPageData,
-  buildPositionOptions,
 } from "./services/players-service.js";
 import { matchesOnDay, matchesInRound, getMatchById, getMatchPageData } from "./services/matches-service.js";
 import * as helpers from "./services/handlebars-helpers.js";
 import { groupByLeague, getLeagueStandings, getLeagueById, getLeaguePageData, parseLeagueIds, defaultLeagues } from "./services/leagues-service.js";
-import { parseDate, handleError, mergeWorldCupGroupStandings, isLocalRequest } from "./lib/backend-helper.js";
+import { parseDate, handleError, isLocalRequest } from "./lib/backend-helper.js";
 import { getTeamById, getTopTeams, getTeamRouteData, getTopTeamsPageData } from "./services/teams-service.js";
-import { buildMatchRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
+import { getLeagueSeasonRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
 import { allDBLeagues, setCatalog } from "./lib/catalog.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
@@ -97,8 +95,7 @@ app.get("/", async (req, res) => {
     const selectedTransferLeagues = req.query.league ? parseLeagueIds(req.query.league) : [];
     const registry = await getRegistry();
     const eloByTeamId = await getTeamEloMap();
-    const playerPageData = getPlayerPageData(registry, null, selectedPlayerLeague);
-    const players = playerPageData?.players || [];
+    const players = getPlayerList(registry, 10, "", selectedPlayerLeague);
     const matches = await matchesOnDay(registry, selectedDate);
     const teams = getTopTeams(registry, selectedTeamLeague, { eloByTeamId });
     const standings = getLeagueStandings(registry, selectedStandingsLeague);
@@ -132,7 +129,6 @@ app.get("/top-players", async (req, res) => {
     const {
       players,
       selectedLeague,
-      selectedPositions,
       selectedSortStat,
       selectedSortDirection,
       selectedStatFilter,
@@ -145,8 +141,6 @@ app.get("/top-players", async (req, res) => {
       players,
       leagues: allDBLeagues.filter((league) => league.type === "league"),
       selectedPLeagues: selectedLeague,
-      selectedPPositions: selectedPositions,
-      positionOptions: buildPositionOptions(),
       selectedPSort: selectedSortStat,
       selectedPOrder: selectedSortDirection,
       selectedPFilter: selectedStatFilter,
@@ -289,9 +283,7 @@ app.get("/league", async (req, res) => {
     const selectedSeason = getLeagueSeason(selectedLeague, req.query.season);
     const defaultSeason = getLeagueSeason(selectedLeague);
     const leagueInfo = getLeagueById(selectedLeague);
-    const registry = await buildMatchRegistry([
-      { leagueID: selectedLeague, season: selectedSeason },
-    ]);
+    const registry = await getLeagueSeasonRegistry(selectedLeague, selectedSeason);
     const {
       leagueNation,
       players,

@@ -2,7 +2,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { networkPath } from "../config.js";
 import { CURRENT_SEASON } from "../../shared/defaults.js";
-import { findOrCreateTeam } from "./teams-service.js";
+import { findOrCreateTeam, getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
 import { LineupParser } from "../../classes/lineupparser.js";
 import { ensureMatchesTable, getMatchDetailsByIds, upsertMatchDetails, upsertMatchSummaries } from "../data-access.js";
 import { unwrapMatchPayload } from "../lib/match-details-mapper.js";
@@ -57,8 +57,52 @@ export function getMatchFilePath(fixtureID) {
   );
 }
 
+const TRANSIENT_SHARE_ERROR_CODES = new Set([
+  "UNKNOWN",
+  "ECONNRESET",
+  "EBUSY",
+  "EIO",
+  "ETIMEDOUT",
+]);
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function retryOnTransientShareError(operation, attempts = 5) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      if (!TRANSIENT_SHARE_ERROR_CODES.has(error?.code) || attempt === attempts) {
+        throw error;
+      }
+      console.warn(
+        `Share ${error.code} while writing player data (attempt ${attempt}/${attempts}), retrying...`,
+      );
+      await delay(500 * attempt);
+    }
+  }
+
+  throw lastError;
+}
+
+async function ensureDirectory(directory) {
+  try {
+    // { recursive: true } on \\ZOLIMINIPC\data2 returns UNKNOWN, even when the folder exists.
+    await fs.mkdir(directory);
+  } catch (error) {
+    if (error?.code !== "EEXIST") {
+      throw error;
+    }
+  }
+}
+
 export async function ensureMatchFileDirectory(fixtureID) {
-  await fs.mkdir(path.dirname(getMatchFilePath(fixtureID)), { recursive: true });
+  await ensureDirectory(path.dirname(getMatchFilePath(fixtureID)));
 }
 
 export async function matchFileExists(fixtureID) {
@@ -205,8 +249,13 @@ export async function writePlayerToServer(playerID, dataToWrite) {
     throw new Error("playerID is required");
   }
 
-  await fs.mkdir(playersDir, { recursive: true });
-  await fs.writeFile(path.join(playersDir, `${id}.json`), JSON.stringify(dataToWrite));
+  const filePath = path.join(playersDir, `${id}.json`);
+  const body = JSON.stringify(dataToWrite);
+
+  await retryOnTransientShareError(async () => {
+    await ensureDirectory(playersDir);
+    await fs.writeFile(filePath, body);
+  });
 }
 
 export async function getAllPlayers(compList, nationList) {
@@ -313,7 +362,7 @@ export async function getAllPlayers(compList, nationList) {
 
         if (matchDetail.players?.length > 0) {
           for (const teamData of matchDetail.players) {
-            const nationId = teamData.team.id;
+            const nationId = nationalSideId(teamData.team);
 
             for (const playerData of teamData.players || []) {
               addOrUpdatePlayer({
@@ -325,7 +374,7 @@ export async function getAllPlayers(compList, nationList) {
           }
         } else if (matchDetail.lineups?.length > 0) {
           for (const lineup of matchDetail.lineups) {
-            const nationId = lineup.team.id;
+            const nationId = nationalSideId(lineup.team);
 
             const allLineupPlayers = [
               ...(lineup.startXI || []),
@@ -349,6 +398,16 @@ export async function getAllPlayers(compList, nationList) {
   }
 
   return Array.from(playerMap.values());
+}
+
+function nationalSideId(team) {
+  const id = Number(team?.id);
+  if (!Number.isFinite(id) || id <= 0) {
+    return 0;
+  }
+
+  const name = team?.name || getTeamById(id)?.name || "";
+  return isAgeGroupNationalSide(name) ? 0 : id;
 }
 
 export async function readPlayersFromFiles() {

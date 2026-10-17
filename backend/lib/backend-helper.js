@@ -1,4 +1,11 @@
 import { buildTeamList } from "../services/json-reader.js";
+import { memoizeRegistryStat } from "../services/registry-stats.js";
+export {
+  abbreviatePlayerPosition,
+  comparePositionsByDisplayOrder,
+  formatPlayerPosition,
+  getPositionGroupOrder,
+} from "../../classes/player-positions.js";
 
 // Helper function to parse date from query string
 export const parseDate = (dateQuery) => {
@@ -57,43 +64,6 @@ export function parseStringList(value) {
 export function parseLowercaseStringList(value, unique = false) {
   const normalized = parseStringList(value).map((item) => item.toLowerCase());
   return unique ? [...new Set(normalized)] : normalized;
-}
-
-const PLAYER_POSITION_LABELS = {
-  g: "Goalkeeper",
-  gk: "Goalkeeper",
-  d: "Defender",
-  m: "Midfielder",
-  f: "Forward",
-};
-
-function normalizePlayerPositionToken(position) {
-  const trimmed = toTrimmedString(position);
-  if (!trimmed) {
-    return "";
-  }
-
-  return PLAYER_POSITION_LABELS[trimmed.toLowerCase()] || trimmed;
-}
-
-export function formatPlayerPosition(positionValue) {
-  if (Array.isArray(positionValue)) {
-    return positionValue
-      .map((position) => normalizePlayerPositionToken(position))
-      .filter(Boolean)
-      .join(", ");
-  }
-
-  const trimmed = toTrimmedString(positionValue);
-  if (!trimmed) {
-    return "";
-  }
-
-  return trimmed
-    .split(",")
-    .map((position) => normalizePlayerPositionToken(position))
-    .filter(Boolean)
-    .join(", ");
 }
 
 export function toShirtNumber(value) {
@@ -168,79 +138,6 @@ export function extractPlayerProfile(playerPayload, options = {}) {
   };
 }
 
-export function getPositionGroupOrder(position) {
-  const normalized = String(position || "").toLowerCase();
-
-  if (normalized.includes("goalkeeper")) return 0;
-
-  const isDefender =
-    normalized.includes("back") ||
-    normalized.includes("center back") ||
-    normalized.includes("defender");
-  if (isDefender) return 1;
-
-  const isMidfielder = normalized.includes("midfielder");
-  if (isMidfielder) return 2;
-
-  const isAttacker =
-    normalized.includes("striker") ||
-    normalized.includes("winger") ||
-    normalized.includes("forward");
-  if (isAttacker) return 3;
-
-  return 4;
-}
-
-function getSideOrder(position) {
-  const normalized = String(position || "").toLowerCase();
-
-  if (normalized.includes("right")) return 0;
-  if (normalized.includes("center") || normalized.includes("centre") || normalized.includes("central") || normalized.includes("striker") || normalized.includes("forward")) return 1;
-  if (normalized.includes("left")) return 2;
-
-  return 1;
-}
-
-function getMidfielderSubtypeOrder(position) {
-  const normalized = String(position || "").toLowerCase();
-
-  if (normalized.includes("defensive midfielder")) return 0;
-  if (normalized.includes("central midfielder")) return 1;
-  if (normalized.includes("attacking midfielder")) return 2;
-
-  return 3;
-}
-
-function getPositionDetailOrder(position) {
-  const group = getPositionGroupOrder(position);
-
-  if (group === 2) {
-    // Midfielders: defensive -> central -> attacking, then side priority.
-    return getMidfielderSubtypeOrder(position) * 10 + getSideOrder(position);
-  }
-
-  if (group === 1 || group === 3) {
-    // Defenders and attackers: right -> center -> left.
-    return getSideOrder(position);
-  }
-
-  return 0;
-}
-
-export function comparePositionsByDisplayOrder(a, b) {
-  const groupDiff = getPositionGroupOrder(a) - getPositionGroupOrder(b);
-  if (groupDiff !== 0) {
-    return groupDiff;
-  }
-
-  const detailDiff = getPositionDetailOrder(a) - getPositionDetailOrder(b);
-  if (detailDiff !== 0) {
-    return detailDiff;
-  }
-
-  return a.localeCompare(b);
-}
-
 function isWorldCupGroupMatch(match) {
   const roundName = String(match?.league?.round || "").toLowerCase();
   return (
@@ -255,13 +152,15 @@ export function mergeWorldCupGroupStandings(baseGroups, registry) {
     return [];
   }
 
-  const completedGroupMatches = registry.matches
-    .filter(isWorldCupGroupMatch)
-    .filter((match) => match?.teams?.home && match?.teams?.away);
+  const computedTeams = memoizeRegistryStat(registry, "teams:world-cup-groups", () => {
+    const completedGroupMatches = registry.matches
+      .filter(isWorldCupGroupMatch)
+      .filter((match) => match?.teams?.home && match?.teams?.away);
 
-  const computedTeams = new Map(
-    buildTeamList(completedGroupMatches).map((team) => [Number(team.id), team]),
-  );
+    return new Map(
+      buildTeamList(completedGroupMatches).map((team) => [Number(team.id), team]),
+    );
+  });
 
   return baseGroups.map((group) => {
     if (!Array.isArray(group) || group.length === 0) {
@@ -339,39 +238,4 @@ export function mergeWorldCupGroupStandings(baseGroups, registry) {
       rank: index + 1,
     }));
   });
-}
-
-export async function dumpRegistryOnStartup(registry) {
-  const dumpPath = path.join(__dirname, "../data/registry-startup.json");
-  const fileHandle = await open(dumpPath, "w");
-
-  const writeChunk = async (chunk) => {
-    await fileHandle.write(chunk);
-  };
-
-  try {
-    await writeChunk("{\n");
-    await writeChunk(`  \"generatedAt\": ${JSON.stringify(new Date().toISOString())},\n`);
-
-    await writeChunk("  \"matches\": [\n");
-    for (let i = 0; i < registry.matches.length; i += 1) {
-      const suffix = i < registry.matches.length - 1 ? ",\n" : "\n";
-      await writeChunk(`    ${JSON.stringify(registry.matches[i])}${suffix}`);
-    }
-    await writeChunk("  ],\n");
-
-    const matchEntries = [...registry.matchByID.entries()];
-    await writeChunk("  \"matchByID\": {\n");
-    for (let i = 0; i < matchEntries.length; i += 1) {
-      const [matchID, match] = matchEntries[i];
-      const suffix = i < matchEntries.length - 1 ? ",\n" : "\n";
-      await writeChunk(`    ${JSON.stringify(String(matchID))}: ${JSON.stringify(match)}${suffix}`);
-    }
-    await writeChunk("  }\n");
-    await writeChunk("}\n");
-  } finally {
-    await fileHandle.close();
-  }
-
-  console.log(`Registry startup dump written to ${dumpPath}`);
 }

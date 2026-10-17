@@ -1,46 +1,47 @@
 export class LineupParser {
   static playerPositionCounts = {}; // { playerName: { role: count } }
 
+  // Top to bottom, right to left within each row. Shared with starter role counts.
+  static orderedGridPlayers(players) {
+    const gridPlayers = players
+      .filter((player) => player.grid)
+      .map((player) => {
+        const [row, col] = String(player.grid).split(":").map(Number);
+        return { ...player, row, col };
+      });
+
+    gridPlayers.sort((a, b) => a.row - b.row || a.col - b.col);
+
+    const rowMap = {};
+    gridPlayers.forEach((player) => {
+      if (!rowMap[player.row]) rowMap[player.row] = [];
+      rowMap[player.row].push(player);
+    });
+
+    return Object.keys(rowMap)
+      .sort((a, b) => a - b)
+      .flatMap((row) => rowMap[row].sort((a, b) => b.col - a.col));
+  }
+
   static parseLineups(lineups, clubId = null) {
     const result = {};
 
     lineups.forEach((team) => {
       const formation = team.formation;
-      const players = team.startXI.map((p) => p.player);
-
-      const gridPlayers = players
-        .filter((p) => p.grid)
-        .map((p) => {
-          const [row, col] = p.grid.split(":").map(Number);
-          return { ...p, row, col };
-        });
-
-      gridPlayers.sort((a, b) => a.row - b.row || a.col - b.col);
+      const orderedPlayers = LineupParser.orderedGridPlayers(team.startXI.map((p) => p.player));
 
       const formationEntry = LineupParser.formations.find(
         (f) => f.formation === formation,
       );
       const positions = formationEntry?.positions;
 
-      if (!positions || positions.length !== gridPlayers.length) {
+      if (!positions || positions.length !== orderedPlayers.length) {
         console.warn(
-          `Formation mismatch or undefined: ${formation} with ${gridPlayers.length} players.`,
+          `Formation mismatch or undefined: ${formation} with ${orderedPlayers.length} players.`,
         );
       }
 
       const teamResult = {};
-
-      // Group players by row
-      const rowMap = {};
-      gridPlayers.forEach((player) => {
-        if (!rowMap[player.row]) rowMap[player.row] = [];
-        rowMap[player.row].push(player);
-      });
-
-      // Rebuild ordered list with mirrored cols (right to left per row)
-      const orderedPlayers = Object.keys(rowMap)
-        .sort((a, b) => a - b) // top to bottom
-        .flatMap((row) => rowMap[row].sort((a, b) => b.col - a.col)); // mirror: right to left
 
       orderedPlayers.forEach((player, i) => {
         const role = positions?.[i] || "Unknown";
@@ -84,6 +85,36 @@ export class LineupParser {
     }
 
     return result;
+  }
+
+  static starterRolesByPlayerId(lineups = []) {
+    const roles = new Map();
+    if (!Array.isArray(lineups)) {
+      return roles;
+    }
+
+    for (const lineup of lineups) {
+      const formationEntry = LineupParser.formations.find(
+        (formation) => formation.formation === lineup?.formation,
+      );
+      const positions = formationEntry?.positions;
+      const starters = Array.isArray(lineup?.startXI) ? lineup.startXI : [];
+      const orderedPlayers = LineupParser.orderedGridPlayers(
+        starters.map((entry) => entry?.player).filter(Boolean),
+      );
+
+      orderedPlayers.forEach((player, index) => {
+        const role = positions?.[index] || "Unknown";
+        const playerId = Number(player.id);
+        if (role === "Unknown" || !Number.isFinite(playerId)) {
+          return;
+        }
+
+        roles.set(playerId, role);
+      });
+    }
+
+    return roles;
   }
 
   static formations = [

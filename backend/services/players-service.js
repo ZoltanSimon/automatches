@@ -15,9 +15,10 @@ import { Player } from "./../../classes/player.js";
 import { allDBLeagues, allDBPlayers, upsertCatalogPlayer } from "../lib/catalog.js";
 import { getPlayersFromApi, getTransfersByPlayer } from "../api/webapi-handler.js";
 import { LineupParser } from "../../classes/lineupparser.js";
-import { comparePositionsByDisplayOrder, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
-import { getTeamById } from "./teams-service.js";
+import { abbreviatePlayerPosition, comparePositionsByDisplayOrder, formatPlayerPosition, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
+import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
 import { parseLeagueIds } from "./leagues-service.js";
+import { memoizeRegistryStat } from "./registry-stats.js";
 import * as fs from "fs";
 
 export function startPlayerFetchJob(playersFetchJob, {
@@ -29,7 +30,13 @@ export function startPlayerFetchJob(playersFetchJob, {
 }) {
   const playersDir = `${dataDir}players`;
   if (!fs.existsSync(playersDir)) {
-    fs.mkdirSync(playersDir, { recursive: true });
+    try {
+      fs.mkdirSync(playersDir);
+    } catch (error) {
+      if (error?.code !== "EEXIST") {
+        throw error;
+      }
+    }
   }
 
   console.log(
@@ -89,14 +96,8 @@ function getTeamName(id) {
   return getTeamById(id)?.name || "";
 }
 
-function getMatchesByLeagueFilter(registry, leagueFilter = []) {
-  return leagueFilter.length > 0
-    ? registry.matches.filter((match) => leagueFilter.includes(match.league.id))
-    : registry.matches;
-}
-
 const defaultPlayerSortStat = "goals";
-const validStatFilterOperators = new Set(["gte", "lte", "between", "eq", "neq"]);
+const validStatFilterOperators = new Set(["gte", "lte", "between", "eq", "neq", "in"]);
 
 function normalizeTextValue(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -182,12 +183,14 @@ function parseTopPlayersStatFilters(query = {}) {
 function createPlayerWithResolvedTeamNames(inputPlayer) {
   const player = new Player(inputPlayer);
   player.clubName = getTeamName(player.club);
-  player.nationName = getTeamName(player.nation);
+  const nationName = getTeamName(player.nation);
+  if (isAgeGroupNationalSide(nationName)) {
+    player.nation = 0;
+    player.nationName = "";
+  } else {
+    player.nationName = nationName;
+  }
   return player;
-}
-
-function toPositionList(positionValue = "") {
-  return parseLowercaseStringList(positionValue);
 }
 
 function parsePlayerStatValue(value) {
@@ -232,9 +235,338 @@ function getPlayerSortValue(player, statName) {
   return parsePlayerStatValue(player[normalizedStat]);
 }
 
+const textPositionStats = new Set(["position", "secondaryPosition"]);
+const starterRoleCache = new WeakMap();
+
+function starterRolesForMatch(match) {
+  if (!match || typeof match !== "object") {
+    return new Map();
+  }
+
+  if (starterRoleCache.has(match)) {
+    return starterRoleCache.get(match);
+  }
+
+  const roles = LineupParser.starterRolesByPlayerId(match.lineups);
+  starterRoleCache.set(match, roles);
+  return roles;
+}
+
+function splitPositionNames(positionValue) {
+  return formatPlayerPosition(positionValue)
+    .split(",")
+    .map((position) => position.trim())
+    .filter(Boolean);
+}
+
+function finalizePlayerPositions(player) {
+  const storedParts = splitPositionNames(player.position);
+  let primary = storedParts[0] || "";
+  let secondary = storedParts[1] || "";
+
+  if (!primary) {
+    const fallback = (player.exactPositions || [])
+      .map((position) => formatPlayerPosition(position))
+      .filter(Boolean);
+    primary = fallback[0] || "";
+    if (!secondary) {
+      secondary = fallback[1] || "";
+    }
+  }
+
+  if (!secondary) {
+    const primaryKey = primary.toLowerCase();
+    const rankedRoles = Object.entries(player.lineupRoleCounts || {})
+      .filter(([role, count]) => role && role !== "Unknown" && count > 0)
+      .sort((roleA, roleB) => roleB[1] - roleA[1] || comparePositionsByDisplayOrder(roleA[0], roleB[0]));
+    const nextRole = rankedRoles.find(([role]) => formatPlayerPosition(role).toLowerCase() !== primaryKey)?.[0] || "";
+    secondary = formatPlayerPosition(nextRole);
+  }
+
+  if (secondary.toLowerCase() === primary.toLowerCase()) {
+    secondary = "";
+  }
+
+  player.position = primary;
+  player.secondaryPosition = secondary;
+  player.positionName = primary;
+  player.secondaryPositionName = secondary;
+  player.displayPosition = abbreviatePlayerPosition(primary);
+  player.displaySecondaryPosition = abbreviatePlayerPosition(secondary);
+}
+
+function recordLineupRole(player, role) {
+  if (!player || !role || role === "Unknown") {
+    return;
+  }
+
+  player.lineupRoleCounts[role] = (player.lineupRoleCounts[role] || 0) + 1;
+}
+
+function copyPlayer(player, overrides = {}) {
+  return Object.assign(Object.create(Object.getPrototypeOf(player)), player, {
+    exactPositions: [...player.exactPositions],
+    lineupRoleCounts: { ...player.lineupRoleCounts },
+    competitionList: [...player.competitionList],
+    ...overrides,
+  });
+}
+
+function createPlayerCell(basePlayer, playerID, leagueID, teamID, matchIndex) {
+  return {
+    playerID,
+    leagueID,
+    teamID,
+    firstMatchIndex: matchIndex,
+    // Registry match indexes, so merged cells keep the order a single match walk would produce.
+    positionMatchIndexes: [],
+    competitionMatchIndex: -1,
+    shirtNumberMatchIndex: -1,
+    // Float sums depend on order; merged ratings are re-added in match order to round like a single walk.
+    ratings: [],
+    player: copyPlayer(basePlayer),
+  };
+}
+
+function addAppearanceToCell(cell, playerEntry, match, matchIndex, starterRoles) {
+  const { player } = cell;
+  const positionCount = player.exactPositions.length;
+  const competitionCount = player.competitionList.length;
+  const ratedAppsCount = player.ratedApps;
+
+  player.getPlayerStats(playerEntry, match.league);
+
+  if (player.ratedApps > ratedAppsCount) {
+    cell.ratings.push({ matchIndex, rating: Number.parseFloat(playerEntry.statistics[0].games.rating) });
+  }
+  if (player.exactPositions.length > positionCount) {
+    cell.positionMatchIndexes.push(matchIndex);
+  }
+  if (player.competitionList.length > competitionCount) {
+    cell.competitionMatchIndex = matchIndex;
+  }
+  if (playerEntry.statistics?.[0]?.games?.number) {
+    cell.shirtNumberMatchIndex = matchIndex;
+  }
+
+  recordLineupRole(player, starterRoles.get(Number(cell.playerID)));
+}
+
+/**
+ * One pass over the registry: per-(player, league, team) stat cells for player lists,
+ * and per-player appearance rows for player pages.
+ */
+function buildPlayerIndex(registry) {
+  const catalogPlayers = new Map(allDBPlayers.map((player) => [Number(player.id), player]));
+  const basePlayers = new Map();
+  const cells = [];
+  const cellsByKey = new Map();
+  const cellsByLeague = new Map();
+  const cellsByTeam = new Map();
+  const appearancesByPlayer = new Map();
+
+  const getBasePlayer = (playerID) => {
+    const key = Number(playerID);
+    if (!basePlayers.has(key)) {
+      const inputPlayer = catalogPlayers.get(key);
+      basePlayers.set(key, inputPlayer ? createPlayerWithResolvedTeamNames(inputPlayer) : null);
+    }
+    return basePlayers.get(key);
+  };
+
+  const getCell = (basePlayer, playerID, leagueID, teamID, matchIndex) => {
+    const key = `${playerID}|${leagueID}|${teamID}`;
+    let cell = cellsByKey.get(key);
+    if (!cell) {
+      cell = createPlayerCell(basePlayer, playerID, leagueID, teamID, matchIndex);
+      cellsByKey.set(key, cell);
+      cells.push(cell);
+      if (!cellsByLeague.has(leagueID)) cellsByLeague.set(leagueID, []);
+      cellsByLeague.get(leagueID).push(cell);
+      if (!cellsByTeam.has(teamID)) cellsByTeam.set(teamID, []);
+      cellsByTeam.get(teamID).push(cell);
+    }
+    return cell;
+  };
+
+  registry.matches.forEach((match, matchIndex) => {
+    const matchPlayers = Array.isArray(match.players) ? match.players : [];
+    if (!matchPlayers.length) {
+      return;
+    }
+
+    const hasBothTeams = matchPlayers.length >= 2;
+    const starterRoles = hasBothTeams ? starterRolesForMatch(match) : null;
+
+    for (const team of matchPlayers) {
+      const teamID = Number(team?.team?.id);
+
+      for (const playerEntry of team.players || []) {
+        const playerID = playerEntry.player.id;
+
+        if (Number(playerEntry.statistics?.[0]?.games?.minutes || 0) > 0) {
+          const appearanceKey = Number(playerID);
+          if (!appearancesByPlayer.has(appearanceKey)) appearancesByPlayer.set(appearanceKey, []);
+          appearancesByPlayer.get(appearanceKey).push({
+            playerEntry,
+            match: {
+              fixture: match.fixture,
+              league: match.league,
+              teams: match.teams,
+              goals: match.goals,
+              statistics: playerEntry.statistics[0],
+            },
+          });
+        }
+
+        if (!hasBothTeams) {
+          continue;
+        }
+
+        const basePlayer = getBasePlayer(playerID);
+        if (!basePlayer) {
+          continue;
+        }
+
+        const cell = getCell(basePlayer, playerID, match.league.id, teamID, matchIndex);
+        addAppearanceToCell(cell, playerEntry, match, matchIndex, starterRoles);
+      }
+    }
+  });
+
+  return { basePlayers, cells, cellsByLeague, cellsByTeam, appearancesByPlayer };
+}
+
+function getPlayerIndex(registry) {
+  return memoizeRegistryStat(registry, "players:index", () => buildPlayerIndex(registry), { pin: true });
+}
+
+function mergePlayerCells(basePlayer, playerCells) {
+  const merged = copyPlayer(basePlayer);
+  const positions = [];
+  const competitions = [];
+  const ratings = [];
+  let shirtNumberMatchIndex = -1;
+
+  for (const cell of playerCells) {
+    merged.addCounters(cell.player);
+    ratings.push(...cell.ratings);
+    cell.player.exactPositions.forEach((position, index) => {
+      positions.push({ position, matchIndex: cell.positionMatchIndexes[index] });
+    });
+    if (cell.competitionMatchIndex >= 0) {
+      competitions.push({ competition: cell.player.competitionList[0], matchIndex: cell.competitionMatchIndex });
+    }
+    if (cell.shirtNumberMatchIndex > shirtNumberMatchIndex) {
+      shirtNumberMatchIndex = cell.shirtNumberMatchIndex;
+      merged.shirtNumber = cell.player.shirtNumber;
+    }
+  }
+
+  const byMatchOrder = (a, b) => a.matchIndex - b.matchIndex;
+  if (playerCells.length > 1) {
+    merged.rating = ratings.sort(byMatchOrder).reduce((sum, { rating }) => sum + rating, 0);
+  }
+  for (const { position } of positions.sort(byMatchOrder)) {
+    if (!merged.exactPositions.includes(position)) {
+      merged.exactPositions.push(position);
+    }
+  }
+  for (const { competition } of competitions.sort(byMatchOrder)) {
+    if (!merged.competitionList.some((comp) => Number(comp.id) === Number(competition.id))) {
+      merged.competitionList.push(competition);
+    }
+  }
+
+  const hasStoredPosition = merged.position && !(Array.isArray(merged.position) && merged.position.length === 0);
+  if (!hasStoredPosition && merged.exactPositions.length) {
+    merged.position = merged.exactPositions[0];
+    merged.displayPosition = formatPlayerPosition(merged.position);
+  }
+
+  merged.getGAper90();
+  return merged;
+}
+
+/**
+ * Season totals for every player matching the league/team filter, finalized and pre-sorted.
+ * Shared across requests: callers must copy before mutating.
+ */
+function mergedPlayersKey(leagueFilter, appearedForTeamID) {
+  return `players:list:${JSON.stringify([...new Set(leagueFilter)].sort())}:${appearedForTeamID ?? ""}`;
+}
+
+function getMergedPlayers(registry, leagueFilter, appearedForTeamID) {
+  const leagueIDs = [...new Set(leagueFilter)];
+
+  return memoizeRegistryStat(registry, mergedPlayersKey(leagueIDs, appearedForTeamID), () => {
+    const index = getPlayerIndex(registry);
+    const source = appearedForTeamID !== null
+      ? index.cellsByTeam.get(appearedForTeamID) ?? []
+      : leagueIDs.length
+        ? leagueIDs.flatMap((leagueID) => index.cellsByLeague.get(leagueID) ?? [])
+        : index.cells;
+    const selectedCells = appearedForTeamID !== null && leagueIDs.length
+      ? source.filter((cell) => leagueIDs.includes(cell.leagueID))
+      : source;
+
+    const cellsByPlayer = new Map();
+    for (const cell of selectedCells) {
+      if (!cellsByPlayer.has(cell.playerID)) cellsByPlayer.set(cell.playerID, []);
+      cellsByPlayer.get(cell.playerID).push(cell);
+    }
+
+    const players = [...cellsByPlayer.values()]
+      .map((playerCells) => ({
+        firstMatchIndex: Math.min(...playerCells.map((cell) => cell.firstMatchIndex)),
+        player: mergePlayerCells(index.basePlayers.get(Number(playerCells[0].playerID)), playerCells),
+      }))
+      .filter(({ player }) => player.apps >= 1)
+      .sort((a, b) => a.firstMatchIndex - b.firstMatchIndex)
+      .map(({ player }) => player)
+      .sort((a, b) => b.rating - a.rating)
+      .sort((a, b) => b.goals - a.goals);
+
+    players.forEach(finalizePlayerPositions);
+    return players;
+  });
+}
+
+function parsePositionFilterValues(filter) {
+  return String(filter?.value || filter?.min || "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 function matchesPlayerStatFilter(player, filter) {
   if (!filter?.stat || !filter.operator) {
     return true;
+  }
+
+  if (textPositionStats.has(filter.stat)) {
+    const playerValue = String(player[filter.stat] || "").trim().toLowerCase();
+    const selected = parsePositionFilterValues(filter);
+    if (!selected.length) {
+      return true;
+    }
+
+    const isMatch = selected.includes(playerValue);
+    if (filter.operator === "neq") {
+      return !isMatch;
+    }
+
+    return isMatch;
+  }
+
+  if (filter.stat === "nation") {
+    const selected = String(filter.value || filter.min || "").trim();
+    if (!selected) {
+      return true;
+    }
+
+    const isMatch = String(player.nation) === selected;
+    return filter.operator === "neq" ? !isMatch : isMatch;
   }
 
   const value = getPlayerSortValue(player, filter.stat);
@@ -276,12 +608,38 @@ function sortPlayersByStat(players, sortStat = "goals", sortDirection = "desc") 
     : ["goals", "rating", "apps", "name"];
 
   return [...players].sort((playerA, playerB) => {
-    const sortValueA = getPlayerSortValue(playerA, sortStat);
-    const sortValueB = getPlayerSortValue(playerB, sortStat);
-    const primaryDiff = comparePlayerStatValues(sortValueA, sortValueB);
+    let primaryDiff = 0;
+
+    if (textPositionStats.has(String(sortStat || ""))) {
+      const positionA = String(playerA[sortStat] || "").trim();
+      const positionB = String(playerB[sortStat] || "").trim();
+      const positionDiff = !positionA && !positionB
+        ? 0
+        : !positionA
+          ? 1
+          : !positionB
+            ? -1
+            : comparePositionsByDisplayOrder(positionA, positionB);
+      primaryDiff = !positionA || !positionB ? positionDiff : positionDiff * direction;
+    } else if (String(sortStat || "") === "nation") {
+      const nameA = String(playerA.nationName || "").trim();
+      const nameB = String(playerB.nationName || "").trim();
+      const nameDiff = !nameA && !nameB
+        ? 0
+        : !nameA
+          ? 1
+          : !nameB
+            ? -1
+            : nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+      primaryDiff = !nameA || !nameB ? nameDiff : nameDiff * direction;
+    } else {
+      const sortValueA = getPlayerSortValue(playerA, sortStat);
+      const sortValueB = getPlayerSortValue(playerB, sortStat);
+      primaryDiff = comparePlayerStatValues(sortValueA, sortValueB) * direction;
+    }
 
     if (primaryDiff !== 0) {
-      return primaryDiff * direction;
+      return primaryDiff;
     }
 
     for (const tieBreaker of tieBreakers) {
@@ -296,24 +654,6 @@ function sortPlayersByStat(players, sortStat = "goals", sortDirection = "desc") 
 
     return String(playerA.name || "").localeCompare(String(playerB.name || ""), undefined, { sensitivity: "base" });
   });
-}
-
-export function parseSelectedPositions(positionQuery) {
-  if (!positionQuery) {
-    return [];
-  }
-
-  return parseLowercaseStringList(positionQuery, true);
-}
-
-export function buildPositionOptions() {
-  const allPositions = LineupParser.formations.flatMap((formation) => formation.positions);
-  const uniquePositions = [...new Set(allPositions)].sort(comparePositionsByDisplayOrder);
-
-  return uniquePositions.map((position) => ({
-    value: position.toLowerCase(),
-    label: position,
-  }));
 }
 
 export function getPlayerList(
@@ -331,44 +671,29 @@ export function getPlayerList(
     statFilters = [],
     appearedForTeamID = null,
   } = options;
-  const playerMap = new Map();
   const normalizedAppearedForTeamID = Number(appearedForTeamID);
   const hasAppearedForTeamFilter = appearedForTeamID != null && appearedForTeamID !== "" && Number.isFinite(normalizedAppearedForTeamID);
+  const leagueIDs = leagueFilter || [];
+  const mergedTeamID = hasAppearedForTeamFilter ? normalizedAppearedForTeamID : null;
+  const selectedSortStat = normalizeSortStat(sortStat);
+  const selectedSortDirection = normalizeSortDirection(sortDirection);
+  const selectedStatFilters = Array.isArray(statFilters) && statFilters.length
+    ? statFilters
+    : statFilter?.stat
+      ? [statFilter]
+      : [];
+  const hasRequestFilters = (teamFilter && !hasAppearedForTeamFilter) || positionFilter.length || selectedStatFilters.length;
 
-  const matches = getMatchesByLeagueFilter(registry, leagueFilter);
-
-  for (const match of matches) {
-    const { players: matchPlayers } = match;
-    if (!Array.isArray(matchPlayers) || matchPlayers.length < 2) continue;
-
-    for (const team of matchPlayers) {
-      if (hasAppearedForTeamFilter && Number(team?.team?.id) !== normalizedAppearedForTeamID) {
-        continue;
-      }
-
-      for (const player of team.players || []) {
-        const playerID = player.player.id;
-
-        if (playerMap.has(playerID)) {
-          playerMap.get(playerID).getPlayerStats(player, match.league);
-        } else {
-          const inputPlayer = getPlayerByID(playerID);
-          if (!inputPlayer) {
-            //console.error(`Player with ID ${playerID} not found.`);
-            continue;
-          }
-          const thisPlayer = createPlayerWithResolvedTeamNames(inputPlayer);
-          thisPlayer.getPlayerStats(player, match.league);
-          playerMap.set(playerID, thisPlayer);
-        }
-      }
-    }
+  if (!hasRequestFilters) {
+    const sortedKey = `${mergedPlayersKey(leagueIDs, mergedTeamID)}:sorted:${selectedSortStat}:${selectedSortDirection}`;
+    return memoizeRegistryStat(registry, sortedKey, () => sortPlayersByStat(
+      getMergedPlayers(registry, leagueIDs, mergedTeamID),
+      selectedSortStat,
+      selectedSortDirection,
+    )).slice(0, nr).map(copyPlayer);
   }
 
-  let players = [...playerMap.values()]
-    .filter(p => p.apps >= 1)
-    .sort((a, b) => b.rating - a.rating)
-    .sort((a, b) => b.goals - a.goals);
+  let players = getMergedPlayers(registry, leagueIDs, mergedTeamID);
 
   if (teamFilter && !hasAppearedForTeamFilter) {
     const normalizedTeamFilter = Number(teamFilter);
@@ -387,31 +712,22 @@ export function getPlayerList(
   if (positionFilter.length) {
     const selectedPositions = parseLowercaseStringList(positionFilter);
     players = players.filter((player) => {
-      const playerPositions = toPositionList(player.position);
+      const playerPositions = [player.position, player.secondaryPosition]
+        .map((position) => String(position || "").trim().toLowerCase())
+        .filter(Boolean);
       return playerPositions.some((position) => selectedPositions.includes(position));
     });
   }
-
-  const selectedStatFilters = Array.isArray(statFilters) && statFilters.length
-    ? statFilters
-    : statFilter?.stat
-      ? [statFilter]
-      : [];
 
   const filteredPlayers = selectedStatFilters.length
     ? players.filter((player) => selectedStatFilters.every((filter) => matchesPlayerStatFilter(player, filter)))
     : players;
 
-  return sortPlayersByStat(
-    filteredPlayers,
-    normalizeSortStat(sortStat),
-    normalizeSortDirection(sortDirection),
-  ).slice(0, nr);
+  return sortPlayersByStat(filteredPlayers, selectedSortStat, selectedSortDirection).slice(0, nr).map(copyPlayer);
 }
 
 export function getTopPlayersPageData(registry, query = {}) {
   const selectedLeague = parseLeagueIds(query.pleague);
-  const selectedPositions = parseSelectedPositions(query.pposition);
   const selectedSortStat = normalizeSortStat(query.psort);
   const selectedSortDirection = normalizeSortDirection(query.pdir);
   const selectedStatFilters = parseTopPlayersStatFilters(query);
@@ -422,7 +738,7 @@ export function getTopPlayersPageData(registry, query = {}) {
     500,
     teamQuery,
     selectedLeague,
-    selectedPositions,
+    [],
     {
       sortStat: selectedSortStat,
       sortDirection: selectedSortDirection,
@@ -433,7 +749,6 @@ export function getTopPlayersPageData(registry, query = {}) {
   return {
     players,
     selectedLeague,
-    selectedPositions,
     selectedSortStat,
     selectedSortDirection,
     selectedStatFilter: selectedStatFilters[0] || null,
@@ -589,58 +904,21 @@ export function getPlayerDetails(registry, playerID, leagueFilter = []) {
 
   const playerObj = createPlayerWithResolvedTeamNames(inputPlayer);
 
-  const filteredMatches = getMatchesByLeagueFilter(registry, leagueFilter);
+  const appearances = (getPlayerIndex(registry).appearancesByPlayer.get(Number(playerID)) ?? [])
+    .filter(({ match }) => leagueFilter.length === 0 || leagueFilter.includes(match.league.id));
 
-  const matches = [];
-
-  for (const match of filteredMatches) {
-    const matchPlayers = Array.isArray(match.players) ? match.players : [];
-    if (!matchPlayers.length) {
-      continue;
-    }
-
-    // each match has two teams in match.players when player statistics are available
-    for (const team of matchPlayers) {
-      for (const p of team.players) {
-        if (p.player.id == playerID) {
-          const minutesPlayed = Number(p.statistics?.[0]?.games?.minutes || 0);
-          if (minutesPlayed <= 0) {
-            break;
-          }
-
-          playerObj.getPlayerStats(p, match.league);
-          // Only keep fixture, league, teams, goals, and statistics of the given player
-          matches.push({
-            fixture: match.fixture,
-            league: match.league,
-            teams: match.teams,
-            goals: match.goals,
-            statistics: p.statistics[0]
-          });
-          // break out once we found the player in this match
-          break;
-        }
-      }
-    }
+  for (const { playerEntry, match } of appearances) {
+    playerObj.getPlayerStats(playerEntry, match.league);
   }
 
-  matches.sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+  const matches = appearances
+    .map(({ match }) => match)
+    .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
 
   return { player: playerObj, matches };
 }
 
 export function getPlayerPageData(registry, playerID, leagueQuery) {
-  const hasPlayerID = playerID !== undefined && playerID !== null && String(playerID).trim() !== "";
-
-  if (!hasPlayerID) {
-    const selectedLeague = parseLeagueIds(leagueQuery, { fallback: [], unique: false });
-
-    return {
-      players: getPlayerList(registry, 10, "", selectedLeague),
-      selectedLeague,
-    };
-  }
-
   const allDetails = getPlayerDetails(registry, playerID, []);
   if (!allDetails) {
     return null;

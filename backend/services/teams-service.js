@@ -2,6 +2,7 @@ import { buildTeamList } from "./json-reader.js";
 import { allDBLeagues, allDBTeams } from "../lib/catalog.js";
 import { allTeamMatches } from "./matches-service.js";
 import { Team } from "../../classes/team.js";
+import { memoizeRegistryStat } from "./registry-stats.js";
 
 const defaultTeamSortDirection = "desc";
 const validTeamSortStats = new Set([
@@ -305,7 +306,23 @@ function toStatsMatch(matchOrFixture) {
   };
 }
 
-export function extractTeams(
+function copyStats(stats) {
+  return stats ? Object.assign(Object.create(Object.getPrototypeOf(stats)), stats) : stats;
+}
+
+export function copyTeam(team) {
+  return Object.assign(Object.create(Object.getPrototypeOf(team)), team, {
+    total: copyStats(team.total),
+    perGame: copyStats(team.perGame),
+    last5: copyStats(team.last5),
+    last5PerGame: copyStats(team.last5PerGame),
+    leagues: new Map(team.leagues),
+    matches: [...team.matches],
+    formArray: [...(team.formArray || [])],
+  });
+}
+
+function getSharedTeams(
   registry,
   date,
   leagueIDs = [],
@@ -313,6 +330,56 @@ export function extractTeams(
   includeGroupStageOnly = false,
   includeAllRounds = false,
   seasonByLeague = null,
+) {
+  const key = `teams:${JSON.stringify([
+    date ?? null,
+    [...leagueIDs].sort(),
+    teamID,
+    Boolean(includeGroupStageOnly),
+    Boolean(includeAllRounds),
+    seasonByLeague instanceof Map ? [...seasonByLeague] : null,
+  ])}`;
+
+  return memoizeRegistryStat(registry, key, () => buildTeamsFromRegistry(
+    registry,
+    date,
+    leagueIDs,
+    teamID,
+    includeGroupStageOnly,
+    includeAllRounds,
+    seasonByLeague,
+  ));
+}
+
+export function extractTeams(...args) {
+  return getSharedTeams(...args).map(copyTeam);
+}
+
+// Shared across requests: read through getAllCompetitionTeam, which returns a copy.
+export function getAllCompetitionTeamsByID(registry) {
+  return memoizeRegistryStat(registry, "teams:all-competitions", () => new Map(
+    getSharedTeams(registry, null, [], null, false, true).map((team) => [Number(team.id), team]),
+  ));
+}
+
+export function getAllCompetitionTeam(registry, teamID) {
+  const normalizedTeamID = Number(teamID);
+  if (!Number.isFinite(normalizedTeamID)) {
+    return null;
+  }
+
+  const team = getAllCompetitionTeamsByID(registry).get(normalizedTeamID);
+  return team ? copyTeam(team) : null;
+}
+
+function buildTeamsFromRegistry(
+  registry,
+  date,
+  leagueIDs,
+  teamID,
+  includeGroupStageOnly,
+  includeAllRounds,
+  seasonByLeague,
 ) {
   const filterDate = date ? new Date(date) : new Date(2000, 0, 1);
 
@@ -452,14 +519,20 @@ export function getTopTeamsPageData(registry, selectedLeague = [], query = {}, e
   };
 }
 
+const ageGroupNationalSidePattern = /(?:^|\s)U\d{2}(?:\s|$)/i;
+
+export function isAgeGroupNationalSide(name) {
+  return ageGroupNationalSidePattern.test(String(name || "").trim());
+}
+
 export function getTeamById(teamID) {
   return allDBTeams.find((team) => Number(team.ID) === Number(teamID)) || null;
 }
 
 export async function getTeamPageData(registry, teamID) {
   const selectedTeamID = Number(teamID);
-  const fullTeamList = extractTeams(registry, null, [], selectedTeamID);
-  let teamStats = fullTeamList.filter((team) => Number(team.id) === selectedTeamID);
+  const allCompetitionTeam = getAllCompetitionTeam(registry, selectedTeamID);
+  let teamStats = allCompetitionTeam ? [allCompetitionTeam] : [];
   const matches = (await allTeamMatches(registry, selectedTeamID, null, false))
     .sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
 

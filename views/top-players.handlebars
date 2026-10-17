@@ -20,6 +20,9 @@
       <h3>Statistics</h3>
       <div id="statCheckboxes">
         <h4>General</h4>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="nation">Nation</button>
+        <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="position">Position</button>
+        <button type="button" class="position-filter-btn stat-filter-btn" data-stat="secondaryPosition">Secondary Pos</button>
         <button type="button" class="position-filter-btn stat-filter-btn active" data-stat="apps">Appearances</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="minutes">Minutes</button>
         <button type="button" class="position-filter-btn stat-filter-btn" data-stat="starts">Starts</button>
@@ -68,14 +71,5 @@
         <button type="button" class="position-filter-btn stat-filter-btn stat-filter-btn-wide" data-stat="penaltiesSaved">Penalties Saved</button>
       </div>
     </div>
-
-    <aside class="position-filter-side side-filter-panel">
-      <h3>Position</h3>
-      <div class="position-filter-list">
-        {{#each positionOptions}}
-        <a href="#" class="position-filter-btn{{#if (includesID ../selectedPPositions this.value)}} active{{/if}}" data-position="{{this.value}}">{{this.label}}</a>
-        {{/each}}
-      </div>
-    </aside>
   </div>
 </div>

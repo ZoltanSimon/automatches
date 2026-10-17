@@ -39,7 +39,9 @@
                 <div class="player-meta-row">
                     <span class="player-meta-label">Nationality:</span>
                     <span class="player-meta-value player-meta-value-with-flag">
+                        {{#if player.nation}}
                         <img class="nation-flag" src="images/logos/{{player.nation}}.png" alt="{{player.nationName}}">
+                        {{/if}}
                         <span>{{player.nationName}}</span>
                     </span>
                 </div>
@@ -250,7 +252,7 @@
     </div>
     {{> player-transfers playerTransfers=playerTransfers}}
     <div class="rectangle" style="padding: 8px;">
-        <span>{{player.fullName}} is a football player, aged {{player.age}}, representing the country of {{player.nationName}}. He was born on {{formatDateOnly player.birthdate}}, in {{player.birthLocation}}. {{player.name}} plays for <a
+        <span>{{player.fullName}} is a football player, aged {{player.age}}{{#if player.nationName}}, representing the country of {{player.nationName}}{{/if}}. He was born on {{formatDateOnly player.birthdate}}, in {{player.birthLocation}}. {{player.name}} plays for <a
             href="team?ID={{player.club}}">{{player.clubName}}</a>, mainly as a {{player.displayPosition}}. He has made
             {{player.apps}} appearances and has scored {{player.goals}} goals, providing {{player.assists}} assists in
             all competitions this season, for club and country.<br /><br />

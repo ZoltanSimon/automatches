@@ -1,5 +1,7 @@
 import { getLeagueFromDb, getMatchDetailsById, getMatchDetailsByIds } from '../data-access.js';
-import { allDBLeagues } from '../lib/catalog.js';
+import { allDBLeagues, getCatalogLeague } from '../lib/catalog.js';
+import { defaultLeagues } from '../../shared/defaults.js';
+import { clearRegistryStats, createRegistryStats, memoizeRegistryStat } from './registry-stats.js';
 
 let _registryPromise = null;
 let _registry = null;
@@ -7,7 +9,43 @@ let _refreshPromise = null;
 
 async function buildRegistryFromCurrentLeagues() {
   const leagueConfigs = await getRegistryLeagueSeasonConfigs();
-  return buildMatchRegistry(leagueConfigs);
+  const registry = await buildMatchRegistry(leagueConfigs);
+  await warmRegistryStats(registry);
+  return registry;
+}
+
+// Precomputes the stats the home, standings and top-list pages read, so requests hit the cache.
+async function warmRegistryStats(registry) {
+  const [
+    { getPlayerList },
+    { getAllCompetitionTeamsByID, getTopTeams },
+    { getLeagueStandings },
+    { matchesOnDay },
+  ] = await Promise.all([
+    import("./players-service.js"),
+    import("./teams-service.js"),
+    import("./leagues-service.js"),
+    import("./matches-service.js"),
+  ]);
+
+  const startedAt = Date.now();
+  try {
+    await matchesOnDay(registry, new Date());
+    getPlayerList(registry, 10, "", [...defaultLeagues]);
+    getTopTeams(registry, [...defaultLeagues]);
+    getAllCompetitionTeamsByID(registry);
+    for (const league of allDBLeagues || []) {
+      const leagueID = Number(league.id);
+      if (!Number.isFinite(leagueID)) {
+        continue;
+      }
+      getLeagueStandings(registry, leagueID);
+      getTopTeams(registry, [leagueID]);
+    }
+    console.log(`Registry stats warmed in ${Date.now() - startedAt}ms`);
+  } catch (error) {
+    console.error("Registry stats warm-up failed:", error);
+  }
 }
 
 async function getRegistryLeagueSeasonConfigs() {
@@ -192,6 +230,7 @@ export function upsertRegistryMatch(registry, matchPayload) {
     registry.matchByID.set(idAsNumber, normalizedMatch);
   }
   registry.matchByID.set(idAsString, normalizedMatch);
+  clearRegistryStats(registry);
 
   return normalizedMatch;
 }
@@ -208,6 +247,7 @@ export function patchLoadedMatch(matchId, patch) {
   }
 
   Object.assign(match, patch);
+  clearRegistryStats(_registry);
   return match;
 }
 
@@ -257,10 +297,14 @@ export async function buildMatchRegistry(leagueIDs) {
     return normalizeFixtureAsMatch(merged);
   });
 
-  const matchByID = new Map(mergedMatches.map((match) => [match.fixture.id, match]));
+  return createRegistry(mergedMatches);
+}
+
+function createRegistry(matches) {
+  const matchByID = new Map(matches.map((match) => [match.fixture.id, match]));
 
   // Add string/number aliases to avoid lookup misses when route query IDs and JSON IDs use different types.
-  for (const match of mergedMatches) {
+  for (const match of matches) {
     const idAsNumber = Number(match.fixture.id);
     const idAsString = String(match.fixture.id);
 
@@ -271,9 +315,28 @@ export async function buildMatchRegistry(leagueIDs) {
   }
 
   return {
-    matches: mergedMatches,
+    matches,
     get matchByID() {
       return matchByID;
     },
+    stats: createRegistryStats(),
   };
+}
+
+/**
+ * Registry limited to one league season, served from the loaded registry when it holds that season
+ * and loaded from the database otherwise.
+ */
+export async function getLeagueSeasonRegistry(leagueID, season) {
+  const registrySeason = Number(getCatalogLeague(leagueID)?.season);
+  if (!Number.isFinite(registrySeason) || registrySeason !== Number(season)) {
+    return buildMatchRegistry([{ leagueID, season }]);
+  }
+
+  const registry = await getRegistry();
+  return memoizeRegistryStat(registry, `registry:league:${leagueID}:${season}`, () => createRegistry(
+    registry.matches.filter((match) => (
+      Number(match.league?.id) === Number(leagueID) && Number(match.league?.season) === registrySeason
+    )),
+  ));
 }

@@ -1,7 +1,24 @@
+{{#if big}}
+<div id="active-view-bar" class="active-view-bar" hidden></div>
+{{/if}}
 <table class="gf-table" id="player-list-table">
   <thead>
     <tr class="main-table-header">
-      <th colspan="3" class="list-header" title="Player">Player</th>
+      <th colspan="2" class="list-header" title="Player">Player</th>
+      <th class="list-header sortable player-pos-header" data-stat="nation" data-filter-type="nation" title="Nation">
+        Nat
+        <span class="sort-indicator"></span>
+      </th>
+      <th class="list-header sortable player-pos-header" data-stat="position" data-filter-type="select" title="Position">
+        Pos
+        <span class="sort-indicator"></span>
+      </th>
+      {{#if big}}
+      <th class="list-header sortable player-pos-header" data-stat="secondaryPosition" data-filter-type="select" title="Secondary position">
+        SecPos
+        <span class="sort-indicator"></span>
+      </th>
+      {{/if}}
       <th width="50" class="list-header player-country" title="Team">Team</th>
       <th class="list-header sortable" data-stat="apps" title="Appearances">
         {{> stat-icon name="apps"}}
@@ -173,13 +190,18 @@ Shots
             onerror="this.onerror=null; this.src='images/player-pictures/default-player.png';" />
         </a>
       </td>
-      <td id={{this.nation}} class="player-country">
-        <img height="30" src="images/logos/{{this.nation}}.png" alt="{{this.nationName}}" title="{{this.nationName}}" />
-      </td>
       <td class="sec-stats">
         <div class="player-name"><a href="/player?id={{this.id}}">{{this.name}}</a></div>
-        <div class="player-position">{{this.displayPosition}}</div>
       </td>
+      <td id={{this.nation}} class="stat-td player-country" data-stat="nation" title="{{this.nationName}}">
+        {{#if this.nation}}
+        <img height="30" src="images/logos/{{this.nation}}.png" alt="{{this.nationName}}" title="{{this.nationName}}" />
+        {{/if}}
+      </td>
+      <td class="stat-td player-pos-cell" data-stat="position" title="{{this.positionName}}">{{this.displayPosition}}</td>
+      {{#if ../big}}
+      <td class="stat-td player-pos-cell" data-stat="secondaryPosition" title="{{this.secondaryPositionName}}">{{this.displaySecondaryPosition}}</td>
+      {{/if}}
       <td class="stat-td player-club" id={{this.club}}>
         <a href="/team?ID={{this.club}}"><img class="logo-picture" src="images/logos/{{this.club}}.png"
             alt="{{this.clubName}}" title="{{this.clubName}}" /></a>
@@ -246,3 +268,5 @@ Shots
 
   window.displayedPlayers = [...allPlayers];
 </script>
+<script type="application/json" id="player-position-options">{{{json (positionFilterOptions)}}}</script>
+<script type="application/json" id="player-nation-options">{{{json (nationFilterOptions)}}}</script>

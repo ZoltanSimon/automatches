@@ -2,6 +2,12 @@ export let allDBPlayers = [];
 export let allDBTeams = [];
 export let allDBLeagues = [];
 
+let catalogVersion = 0;
+
+export function getCatalogVersion() {
+  return catalogVersion;
+}
+
 export function setCatalog({ players, teams, leagues } = {}) {
   if (players !== undefined) {
     allDBPlayers = players;
@@ -12,6 +18,7 @@ export function setCatalog({ players, teams, leagues } = {}) {
   if (leagues !== undefined) {
     allDBLeagues = leagues;
   }
+  catalogVersion += 1;
 }
 
 export function getCatalogLeague(leagueId) {
@@ -23,6 +30,7 @@ export function upsertCatalogPlayer(player) {
     return;
   }
 
+  catalogVersion += 1;
   const playerID = Number(player.id);
   const index = allDBPlayers.findIndex((row) => Number(row.id) === playerID);
   if (index >= 0) {

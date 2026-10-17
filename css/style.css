@@ -28,11 +28,13 @@ h2 {
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .gf-table {
-  border-collapse: collapse;
   border: 3px solid #1d3557;
 }
 
@@ -49,8 +51,20 @@ td {
 
 th,
 td {
+  border-left-width: 0;
+  border-top-width: 0;
   padding: 0.5em;
   text-align: left;
+}
+
+th:last-child,
+td:last-child {
+  border-right-width: 0;
+}
+
+tr:last-child > th,
+tr:last-child > td {
+  border-bottom-width: 0;
 }
 
 th {
@@ -329,10 +343,19 @@ footer .donate-button {
   width: 280px;
   padding: 12px;
   border: 1px solid rgba(168, 218, 220, 0.55);
-  border-radius: 10px;
+  border-radius: 8px;
   background: #1d3557;
   color: #f1faee;
   box-shadow: 0 18px 36px rgba(29, 53, 87, 0.28);
+}
+.stat-filter-popover [hidden] {
+  display: none !important;
+}
+.stat-filter-popover--positions {
+  width: 360px;
+}
+.stat-filter-popover--nations {
+  width: 320px;
 }
 
 .stat-filter-popover__header {
@@ -369,7 +392,7 @@ footer .donate-button {
 .stat-filter-popover__field input {
   width: 100%;
   border: 1px solid rgba(241, 250, 238, 0.22);
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 6px 8px;
   background: #f1faee;
   color: #1d3557;
@@ -380,6 +403,142 @@ footer .donate-button {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+.stat-filter-popover__positions {
+  margin-bottom: 10px;
+}
+
+.stat-filter-popover__position-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(360px, 100vh - 160px);
+  overflow-y: auto;
+}
+
+.position-group {
+  display: grid;
+  gap: 6px;
+}
+
+.position-group__title {
+  display: block;
+  width: -moz-fit-content;
+  width: fit-content;
+  max-width: 100%;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #f1faee;
+  cursor: pointer;
+  padding: 0 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-align: left;
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+.position-group__title:hover, .position-group__title:focus-visible {
+  color: #a8dadc;
+  border-bottom-color: currentColor;
+}
+.position-group__title.selected-group {
+  color: #E63946;
+  border-bottom-color: #E63946;
+}
+
+.position-group__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 6px;
+}
+
+.position-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  border: 1px solid #f1faee;
+  border-radius: 4px;
+  background: #f1faee;
+  color: #1d3557;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+.position-option.selected-position {
+  border: 4px solid #E63946;
+  padding: 1px 3px;
+}
+
+.stat-filter-popover__nation-input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid rgba(168, 218, 220, 0.7);
+  border-radius: 4px;
+  padding: 0 12px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-family: "Source Sans 3", sans-serif;
+  box-sizing: border-box;
+}
+.stat-filter-popover__nation-input:focus {
+  outline: none;
+  border-color: #E63946;
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.15);
+}
+
+.stat-filter-popover__nation-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.nation-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(29, 53, 87, 0.16);
+  background: #f1faee;
+  color: #1d3557;
+  cursor: pointer;
+  padding: 7px 8px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+  box-sizing: border-box;
+}
+.nation-option:hover, .nation-option:focus-visible, .nation-option.selected-nation {
+  background: rgba(168, 218, 220, 0.45);
+}
+.nation-option.selected-nation {
+  box-shadow: inset 0 0 0 2px #E63946;
+}
+.nation-option:last-child {
+  border-bottom: 0;
+}
+
+.nation-option__flag {
+  width: 22px;
+  height: 22px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  flex-shrink: 0;
+}
+
+.stat-filter-popover__nation-empty {
+  padding: 10px 8px;
+  color: #f1faee;
+  font-weight: 700;
 }
 
 .stat-filter-popover__actions {
@@ -467,8 +626,10 @@ footer .donate-button {
 }
 
 @media (max-width: 900px) {
-  .stat-filter-popover {
-    width: min(280px, 100vw - 16px);
+  .stat-filter-popover,
+  .stat-filter-popover--positions,
+  .stat-filter-popover--nations {
+    width: min(360px, 100vw - 16px);
   }
   .home-page-layout-grid {
     grid-template-columns: 1fr;
@@ -713,7 +874,7 @@ footer .donate-button {
 
 .side-filter-panel {
   border: 1px solid rgba(29, 53, 87, 0.2);
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 8px;
   background: rgba(241, 250, 238, 0.5);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -725,33 +886,6 @@ footer .donate-button {
   color: #1d3557;
   font-size: 14px;
   line-height: 1.2;
-}
-
-.position-filter-side {
-  display: block;
-  width: 180px;
-  position: absolute;
-  left: calc(100% + var(--side-filter-gap));
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-.players-page-layout.filters-open .position-filter-side,
-.position-filter-side.open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.position-filter-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 65vh;
-  overflow-y: auto;
-  padding-right: 2px;
 }
 
 .position-filter-btn {
@@ -832,28 +966,6 @@ footer .donate-button {
   #team-stats-filter-side .team-stat-filter-btn {
     font-size: 12px;
     flex: 1 1 auto;
-  }
-  .position-filter-side {
-    order: 2;
-    display: none;
-    position: static;
-    grid-column: 1;
-    width: 100%;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-  .players-page-layout.filters-open .position-filter-side,
-  .position-filter-side.open {
-    display: block;
-  }
-  .position-filter-list {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: none;
-    overflow-y: visible;
-    padding-right: 0;
   }
 }
 .more-button {
@@ -956,6 +1068,91 @@ footer .donate-button {
   font-weight: 600;
 }
 
+.active-view-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 14px;
+  padding: 12px;
+  background: #1d3557;
+  border: 1px solid #1d3557;
+  border-radius: 8px;
+}
+.active-view-bar[hidden] {
+  display: none !important;
+}
+
+.active-view-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid #1d3557;
+  border-radius: 8px;
+  background: #a8dadc;
+  color: #1d3557;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.35;
+  box-shadow: 0 1px 2px rgba(29, 53, 87, 0.08);
+}
+
+.active-view-chip__text {
+  min-width: 0;
+}
+
+.active-view-chip__logos {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.active-view-chip__logos img {
+  width: 24px;
+  height: 24px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.active-view-chip__remove,
+.active-view-clear {
+  border: 0;
+  background: transparent;
+  color: #1d3557;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.active-view-chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(29, 53, 87, 0.08);
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.active-view-chip__remove:hover, .active-view-chip__remove:focus-visible {
+  background: #E63946;
+  color: #f1faee;
+}
+
+.active-view-clear {
+  margin-left: auto;
+  padding: 6px 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #E63946;
+}
+.active-view-clear:hover, .active-view-clear:focus-visible {
+  text-decoration: underline;
+}
+
 #player-list,
 #top-team-list,
 #match-list,
@@ -1017,7 +1214,9 @@ footer .donate-button {
 }
 
 .player-country {
-  width: 32px;
+  width: 30px;
+  padding: 4px;
+  text-align: center;
 }
 
 .player-club {
@@ -1061,7 +1260,7 @@ td .form-indicator:last-child {
 .list-header2 {
   text-align: center;
   padding: 2px;
-  border-right: 1px solid #f1faee;
+  border-right: 1px solid #000000;
 }
 
 .list-header {
@@ -1194,6 +1393,15 @@ td .form-indicator:last-child {
   font-size: 0.85em;
   color: #1d3557;
   margin-top: 2px;
+}
+
+.player-pos-header,
+.player-pos-cell {
+  width: 42px;
+  min-width: 42px;
+  max-width: 48px;
+  text-align: center;
+  font-weight: 700;
 }
 
 #player-transfer-table .transfer-player-face {
@@ -1474,7 +1682,6 @@ td .form-indicator:last-child {
 
 .match-stats-table {
   width: 100%;
-  border-collapse: collapse;
   background-color: #a8dadc;
 }
 .match-stats-table th {
@@ -1526,17 +1733,17 @@ td .form-indicator:last-child {
 
 .lineup-panel {
   border: 3px solid #1d3557;
+  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .lineup-table {
   width: 100%;
-  border-collapse: collapse;
 }
 .lineup-table th,
 .lineup-table td {
-  border: 1px solid #1d3557;
+  border-color: #1d3557;
   padding: 6px 8px;
 }
 .lineup-table .lineup-title-row th {
@@ -1945,6 +2152,7 @@ tr td.match-list-center-td + td.match-list-center-td {
 }
 .match-list-logo-td.right {
   border-right: 0px;
+  border-left: 1px solid #1d3557;
 }
 
 .match-list-team-name-td {
@@ -2298,10 +2506,6 @@ tr td.match-list-center-td + td.match-list-center-td {
   }
   #player-list {
     grid-row: 2;
-  }
-  .position-filter-side {
-    order: 2;
-    width: 100%;
   }
   #pageExplainerContainer {
     position: relative;

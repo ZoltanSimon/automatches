@@ -1,5 +1,8 @@
 import { formatPlayerPosition as formatPlayerPositionLabel } from "../lib/backend-helper.js";
+import { buildPositionFilterOptions } from "../../classes/player-positions.js";
+import { allDBLeagues, allDBPlayers } from "../lib/catalog.js";
 import { formatTeamXg } from "../lib/match-xg.js";
+import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
 
 export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;
@@ -49,6 +52,37 @@ export const transferFee = (type) => {
 }
 
 export const formatPlayerPosition = (position) => formatPlayerPositionLabel(position);
+export const positionFilterOptions = () => buildPositionFilterOptions();
+
+export const nationFilterOptions = () => {
+  const ids = new Set();
+
+  for (const player of allDBPlayers || []) {
+    const id = Number(player.nation);
+    if (Number.isFinite(id) && id > 0) {
+      ids.add(id);
+    }
+  }
+
+  for (const league of allDBLeagues || []) {
+    if (league.type !== "nt") {
+      continue;
+    }
+
+    const id = Number(league.nation);
+    if (Number.isFinite(id) && id > 0) {
+      ids.add(id);
+    }
+  }
+
+  return [...ids]
+    .map((id) => ({
+      id: String(id),
+      name: getTeamById(id)?.name || "",
+    }))
+    .filter((nation) => nation.name && !isAgeGroupNationalSide(nation.name))
+    .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base" }));
+};
 
 export const percentage = (wins, played) => {
   return ((wins / played) * 100).toFixed(1);
