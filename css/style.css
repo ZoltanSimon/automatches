@@ -204,7 +204,7 @@ footer .donate-button {
   padding: 8px 10px;
   background: #1d3557;
   color: #f1faee;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 13px;
   font-weight: 600;
   font-style: normal;
@@ -343,7 +343,7 @@ footer .donate-button {
   width: 280px;
   padding: 12px;
   border: 1px solid rgba(168, 218, 220, 0.55);
-  border-radius: 8px;
+  border-radius: 4px;
   background: #1d3557;
   color: #f1faee;
   box-shadow: 0 18px 36px rgba(29, 53, 87, 0.28);
@@ -1077,10 +1077,36 @@ footer .donate-button {
   padding: 12px;
   background: #1d3557;
   border: 1px solid #1d3557;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 .active-view-bar[hidden] {
   display: none !important;
+}
+
+.rectangle .player-stats-header,
+#left .player-stats-header,
+#right .player-stats-header {
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+}
+.rectangle .player-stats-header > .wiki-info,
+#left .player-stats-header > .wiki-info,
+#right .player-stats-header > .wiki-info {
+  grid-column: 2;
+}
+.rectangle .player-stats-header > .active-view-bar--inline,
+#left .player-stats-header > .active-view-bar--inline,
+#right .player-stats-header > .active-view-bar--inline {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
 }
 
 .active-view-chip {
@@ -1090,7 +1116,7 @@ footer .donate-button {
   max-width: 100%;
   padding: 8px 10px 8px 14px;
   border: 1px solid #1d3557;
-  border-radius: 8px;
+  border-radius: 4px;
   background: #a8dadc;
   color: #1d3557;
   font-size: 17px;
@@ -1955,6 +1981,39 @@ a.event-player-link:hover {
 .stat .per-game {
   font-size: 14px;
   color: #E63946;
+}
+
+.player-stats-table {
+  grid-column: 1 / 4;
+  width: 100%;
+  --stat-icon-primary: #1d3557;
+  --stat-icon-secondary: #f1faee;
+}
+.player-stats-table .player-stat-name svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: -3px;
+}
+.player-stats-table .player-stat-rate {
+  color: #E63946;
+  font-weight: 650;
+}
+.player-stats-table .player-stat-trend {
+  display: inline-block;
+  min-width: 3.4em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.player-stats-table .player-stat-trend.is-better {
+  background: #279b65;
+  color: #fff;
+}
+.player-stats-table .player-stat-trend.is-worse {
+  background: #E63946;
+  color: #fff;
 }
 
 .elo-change.up,

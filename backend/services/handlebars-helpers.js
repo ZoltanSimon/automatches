@@ -1,4 +1,4 @@
-import { formatPlayerPosition as formatPlayerPositionLabel } from "../lib/backend-helper.js";
+import { abbreviatePlayerPosition as abbreviatePlayerPositionLabel, formatPlayerPosition as formatPlayerPositionLabel } from "../lib/backend-helper.js";
 import { buildPositionFilterOptions } from "../../classes/player-positions.js";
 import { allDBLeagues, allDBPlayers } from "../lib/catalog.js";
 import { formatTeamXg } from "../lib/match-xg.js";
@@ -52,6 +52,7 @@ export const transferFee = (type) => {
 }
 
 export const formatPlayerPosition = (position) => formatPlayerPositionLabel(position);
+export const abbreviatePlayerPosition = (position) => abbreviatePlayerPositionLabel(position);
 export const positionFilterOptions = () => buildPositionFilterOptions();
 
 export const nationFilterOptions = () => {
@@ -103,6 +104,18 @@ export const perGame = (total, games) => {
   const t = Number(total);
   if (Number.isNaN(t)) return 0;
   return (t / g).toFixed(2);
+}
+
+export const rateTrend = (recent, season, direction) => {
+  const recentValue = Number.parseFloat(recent);
+  const seasonValue = Number.parseFloat(season);
+  if (!Number.isFinite(recentValue) || !Number.isFinite(seasonValue) || recentValue === seasonValue) {
+    return "";
+  }
+
+  const lowerIsBetter = direction === "lower";
+  const improved = lowerIsBetter ? recentValue < seasonValue : recentValue > seasonValue;
+  return improved ? "is-better" : "is-worse";
 }
 
 export const zeroDefault = (value) => {

@@ -396,7 +396,7 @@ function buildPlayerIndex(registry) {
     }
 
     const hasBothTeams = matchPlayers.length >= 2;
-    const starterRoles = hasBothTeams ? starterRolesForMatch(match) : null;
+    const starterRoles = starterRolesForMatch(match);
 
     for (const team of matchPlayers) {
       const teamID = Number(team?.team?.id);
@@ -415,6 +415,7 @@ function buildPlayerIndex(registry) {
               teams: match.teams,
               goals: match.goals,
               statistics: playerEntry.statistics[0],
+              matchPosition: starterRoles.get(Number(playerID)) || "",
             },
           });
         }
@@ -898,6 +899,25 @@ export function getPlayerByID(playerID) {
  * Return aggregated stats for a single player plus list of matches where he appeared.
  * leagueFilter may be an array of league IDs to restrict the registry.
  */
+const LAST_FIVE_GAMES = 5;
+
+function statsForAppearances(inputPlayer, appearances) {
+  const summary = createPlayerWithResolvedTeamNames(inputPlayer);
+  for (const { playerEntry, match } of appearances) {
+    summary.getPlayerStats(playerEntry, match.league);
+  }
+  if (!appearances.length) {
+    summary.getGAper90();
+  }
+  return summary;
+}
+
+function lastFiveAppearances(appearances) {
+  return [...appearances]
+    .sort((left, right) => new Date(right.match.fixture.date) - new Date(left.match.fixture.date))
+    .slice(0, LAST_FIVE_GAMES);
+}
+
 export function getPlayerDetails(registry, playerID, leagueFilter = []) {
   const inputPlayer = getPlayerByID(playerID);
   if (!inputPlayer) return null;
@@ -910,6 +930,8 @@ export function getPlayerDetails(registry, playerID, leagueFilter = []) {
   for (const { playerEntry, match } of appearances) {
     playerObj.getPlayerStats(playerEntry, match.league);
   }
+
+  playerObj.last5 = statsForAppearances(inputPlayer, lastFiveAppearances(appearances));
 
   const matches = appearances
     .map(({ match }) => match)

@@ -434,14 +434,14 @@ function sortPlayerRows(columnIndex, direction, compareValues) {
   rows.forEach((row) => body.appendChild(row));
 }
 
-export function renderActiveViewChips() {
+export function renderActiveViewChips({ leaguesOnly = false } = {}) {
   const bar = document.getElementById(activeViewBarId);
   if (!bar) {
     return;
   }
 
   bindActiveViewChips(bar);
-  const chips = buildActiveViewChips(getPlayersServerStateFromUrl());
+  const chips = buildActiveViewChips(getPlayersServerStateFromUrl(), { leaguesOnly });
   bar.replaceChildren();
   if (!chips.length) {
     bar.hidden = true;
@@ -502,15 +502,15 @@ function removeActiveViewConstraint(urlParams, chip) {
   }
 }
 
-function buildActiveViewChips(state) {
+function buildActiveViewChips(state, { leaguesOnly = false } = {}) {
   const filters = orderedStatFilters(state.statFilters);
   const sortIsDefault = isDefaultPlayersSort(state.sortStat, state.sortDirection);
   const leaguesExplicit = getPageQueryParams().has(playersQueryKeys.league);
-  if (sortIsDefault && !filters.length && !leaguesExplicit) {
-    return [];
+  const chips = leagueChips(selectedLeagues(), leaguesExplicit);
+  if (leaguesOnly || (sortIsDefault && !filters.length && !leaguesExplicit)) {
+    return chips;
   }
 
-  const chips = leagueChips(selectedLeagues(), leaguesExplicit);
   chips.push({
     kind: "sort",
     text: sortChipText(state.sortStat, state.sortDirection),

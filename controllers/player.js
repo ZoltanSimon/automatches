@@ -1,6 +1,9 @@
-import { addLeagues, addTablePagination } from "../common-functions.js";
+import { renderActiveViewChips } from "../components/player-list.js";
+import { addLeagues, addTablePagination, setupLeagueListToggleButtons } from "../common-functions.js";
 
 addLeagues("pleague");
+renderActiveViewChips({ leaguesOnly: true });
+setupLeagueListToggleButtons();
 document.getElementById("match-list").style.visibility = "visible";
 
 addTablePagination();

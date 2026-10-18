@@ -66,182 +66,244 @@
         {{#if error}}
         <div class="error-message">{{error}}</div>
         {{else}}
-        <div class="rect-header" style="grid-template-columns: auto 1fr;">
-            <div class="rect-title">
-                <h2>Stats</h2>
-                {{> wiki-info lead="These icons are explained on the"}}
-            </div>
-            <div class="rect-league-list"
-                style="display: flex; position: static; opacity: 1; pointer-events: auto; margin-left: auto; grid-column: 2; grid-row: 1; justify-self: end; flex-wrap: nowrap; white-space: nowrap; gap: 8px; max-width: none; max-height: none; width: max-content; overflow: visible;">
-                {{#each leagues}}
-                <img width="30" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}"
-                    title="{{this.name}}"
-                    class="pleague-league-to-select{{#if (includesID ../selectedPLeagues this.id)}} selected-league{{/if}}" />
-                {{/each}}
-            </div>
-        </div>
-        <div class="stats"
-            style="grid-column: 1 / 4; width: 100%; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); --stat-icon-primary: #1D3557; --stat-icon-secondary: #F1FAEE; --stat-icon-danger: #E63946;">
-            <div class="stat">
-                <div class="label">{{> stat-icon name="apps"}} Appearances</div>
-                <div class="value">{{player.apps}}</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="goals"}} Goals</div>
-                <div class="value">{{player.goals}}</div>
-                <div class="per-game">{{perGame player.goals player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="assists"}} Assists</div>
-                <div class="value">{{player.assists}}</div>
-                <div class="per-game">{{perGame player.assists player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="ga"}} Goals + Assists</div>
-                <div class="value">{{player.ga}}</div>
-                <div class="per-game">{{perGame player.ga player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">GA / 90</div>
-                <div class="value">{{player.gap90}}</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="rating"}} Rating</div>
-                <div class="value">{{player.avRating}}</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="minutes"}} Minutes</div>
-                <div class="value">{{player.minutes}}</div>
-                <div class="per-game">{{perGame player.minutes player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Starts</div>
-                <div class="value">{{player.starts}}</div>
-                <div class="per-game">{{perGame player.starts player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Substitute Apps</div>
-                <div class="value">{{player.substituteApps}}</div>
-                <div class="per-game">{{perGame player.substituteApps player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Captain Apps</div>
-                <div class="value">{{player.captainApps}}</div>
-                <div class="per-game">{{perGame player.captainApps player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="pens"}} Penalties</div>
-                <div class="value">{{player.penalties}}</div>
-                <div class="per-game">{{perGame player.penalties player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Penalties Won</div>
-                <div class="value">{{player.penaltiesWon}}</div>
-                <div class="per-game">{{perGame player.penaltiesWon player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Penalties Committed</div>
-                <div class="value">{{player.penaltiesCommitted}}</div>
-                <div class="per-game">{{perGame player.penaltiesCommitted player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="penaltiesMissed"}} Pens Missed</div>
-                <div class="value">{{player.penaltiesMissed}}</div>
-                <div class="per-game">{{perGame player.penaltiesMissed player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Penalties Saved</div>
-                <div class="value">{{player.penaltiesSaved}}</div>
-                <div class="per-game">{{perGame player.penaltiesSaved player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">{{> stat-icon name="shotsOn"}} Shots (On / Total)</div>
-                <div class="value">{{player.shots}}</div>
-                <div class="per-game">{{perGame player.shotsOn player.apps}} / {{perGame player.shotsTotal player.apps}}
-                    per game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Offsides</div>
-                <div class="value">{{player.offsides}}</div>
-                <div class="per-game">{{perGame player.offsides player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Dribbles (Succ / Att)</div>
-                <div class="value">{{player.dribbles}}</div>
-                <div class="per-game">{{perGame player.dribblesSucc player.apps}} / {{perGame player.dribblesAttempts
-                    player.apps}} per game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Duels (Won/Total)</div>
-                <div class="value">{{player.duels}}</div>
-                <div class="per-game">{{perGame player.duelsWon player.apps}} / {{perGame player.duelsTotal
-                    player.apps}} per game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Key Passes</div>
-                <div class="value">{{player.keyPasses}}</div>
-                <div class="per-game">{{perGame player.keyPasses player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Passes</div>
-                <div class="value">{{player.passes}}</div>
-                <div class="per-game">{{perGame player.passes player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Accurate Passes</div>
-                <div class="value">{{player.passesAccurate}}</div>
-                <div class="per-game">{{perGame player.passesAccurate player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Pass Accuracy</div>
-                <div class="value">{{player.passAccuracy}}</div>
-            </div>
-            <div class="stat">
-                <div class="label">Tackles</div>
-                <div class="value">{{player.tackles}}</div>
-                <div class="per-game">{{perGame player.tackles player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Interceptions</div>
-                <div class="value">{{player.interceptions}}</div>
-                <div class="per-game">{{perGame player.interceptions player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Blocks</div>
-                <div class="value">{{player.blocks}}</div>
-                <div class="per-game">{{perGame player.blocks player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Fouls Committed</div>
-                <div class="value">{{player.foulsCommited}}</div>
-                <div class="per-game">{{perGame player.foulsCommited player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Fouls Against</div>
-                <div class="value">{{player.foulsAgainst}}</div>
-                <div class="per-game">{{perGame player.foulsAgainst player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Yellow Cards</div>
-                <div class="value">{{player.yellowCards}}</div>
-                <div class="per-game">{{perGame player.yellowCards player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Red Cards</div>
-                <div class="value">{{player.redCards}}</div>
-                <div class="per-game">{{perGame player.redCards player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Goals Conceded</div>
-                <div class="value">{{player.goalsConceded}}</div>
-                <div class="per-game">{{perGame player.goalsConceded player.apps}}/game</div>
-            </div>
-            <div class="stat">
-                <div class="label">Goalkeeper Saves</div>
-                <div class="value">{{player.goalkeeperSaves}}</div>
-                <div class="per-game">{{perGame player.goalkeeperSaves player.apps}}/game</div>
-            </div>
-        </div>
+        {{> rect-header title="Stats" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" wikiInfo="These icons are explained on the" hideExpand=true headerClass="player-stats-header" showLeagueChip=true}}
+        <table class="gf-table player-stats-table">
+            <thead>
+                <tr class="main-table-header">
+                    <th>Stat</th>
+                    <th class="center-td">Total</th>
+                    <th class="center-td">Per game</th>
+                    <th class="center-td" title="Last 5 games">Last 5</th>
+                    <th class="center-td" title="Last 5 games, per game">Last 5 / game</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="apps"}} Appearances</td>
+                    <td class="center-td">{{player.apps}}</td>
+                    <td class="center-td player-stat-rate">-</td>
+                    <td class="center-td">{{player.last5.apps}}</td>
+                    <td class="center-td">-</td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="goals"}} Goals</td>
+                    <td class="center-td">{{player.goals}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.goals player.apps}}</td>
+                    <td class="center-td">{{player.last5.goals}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.goals player.last5.apps) (perGame player.goals player.apps)}}">{{perGame player.last5.goals player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="assists"}} Assists</td>
+                    <td class="center-td">{{player.assists}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.assists player.apps}}</td>
+                    <td class="center-td">{{player.last5.assists}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.assists player.last5.apps) (perGame player.assists player.apps)}}">{{perGame player.last5.assists player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="ga"}} Goals + Assists</td>
+                    <td class="center-td">{{player.ga}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.ga player.apps}}</td>
+                    <td class="center-td">{{player.last5.ga}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.ga player.last5.apps) (perGame player.ga player.apps)}}">{{perGame player.last5.ga player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">GA / 90</td>
+                    <td class="center-td">{{player.gap90}}</td>
+                    <td class="center-td player-stat-rate">-</td>
+                    <td class="center-td">{{player.last5.gap90}}</td>
+                    <td class="center-td">-</td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="rating"}} Rating</td>
+                    <td class="center-td">{{player.avRating}}</td>
+                    <td class="center-td player-stat-rate">-</td>
+                    <td class="center-td">{{player.last5.avRating}}</td>
+                    <td class="center-td">-</td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="minutes"}} Minutes</td>
+                    <td class="center-td">{{player.minutes}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.minutes player.apps}}</td>
+                    <td class="center-td">{{player.last5.minutes}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.minutes player.last5.apps) (perGame player.minutes player.apps)}}">{{perGame player.last5.minutes player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Starts</td>
+                    <td class="center-td">{{player.starts}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.starts player.apps}}</td>
+                    <td class="center-td">{{player.last5.starts}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.starts player.last5.apps) (perGame player.starts player.apps)}}">{{perGame player.last5.starts player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Substitute Apps</td>
+                    <td class="center-td">{{player.substituteApps}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.substituteApps player.apps}}</td>
+                    <td class="center-td">{{player.last5.substituteApps}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.substituteApps player.last5.apps) (perGame player.substituteApps player.apps) "lower"}}">{{perGame player.last5.substituteApps player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Captain Apps</td>
+                    <td class="center-td">{{player.captainApps}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.captainApps player.apps}}</td>
+                    <td class="center-td">{{player.last5.captainApps}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.captainApps player.last5.apps) (perGame player.captainApps player.apps)}}">{{perGame player.last5.captainApps player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="pens"}} Penalties</td>
+                    <td class="center-td">{{player.penalties}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.penalties player.apps}}</td>
+                    <td class="center-td">{{player.last5.penalties}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.penalties player.last5.apps) (perGame player.penalties player.apps)}}">{{perGame player.last5.penalties player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Penalties Won</td>
+                    <td class="center-td">{{player.penaltiesWon}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.penaltiesWon player.apps}}</td>
+                    <td class="center-td">{{player.last5.penaltiesWon}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.penaltiesWon player.last5.apps) (perGame player.penaltiesWon player.apps)}}">{{perGame player.last5.penaltiesWon player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Penalties Committed</td>
+                    <td class="center-td">{{player.penaltiesCommitted}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.penaltiesCommitted player.apps}}</td>
+                    <td class="center-td">{{player.last5.penaltiesCommitted}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.penaltiesCommitted player.last5.apps) (perGame player.penaltiesCommitted player.apps) "lower"}}">{{perGame player.last5.penaltiesCommitted player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="penaltiesMissed"}} Pens Missed</td>
+                    <td class="center-td">{{player.penaltiesMissed}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.penaltiesMissed player.apps}}</td>
+                    <td class="center-td">{{player.last5.penaltiesMissed}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.penaltiesMissed player.last5.apps) (perGame player.penaltiesMissed player.apps) "lower"}}">{{perGame player.last5.penaltiesMissed player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Penalties Saved</td>
+                    <td class="center-td">{{player.penaltiesSaved}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.penaltiesSaved player.apps}}</td>
+                    <td class="center-td">{{player.last5.penaltiesSaved}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.penaltiesSaved player.last5.apps) (perGame player.penaltiesSaved player.apps)}}">{{perGame player.last5.penaltiesSaved player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">{{> stat-icon name="shotsOn"}} Shots (On / Total)</td>
+                    <td class="center-td">{{player.shots}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.shotsOn player.apps}} / {{perGame player.shotsTotal player.apps}}</td>
+                    <td class="center-td">{{player.last5.shots}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.shotsOn player.last5.apps) (perGame player.shotsOn player.apps)}}">{{perGame player.last5.shotsOn player.last5.apps}} / {{perGame player.last5.shotsTotal player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Offsides</td>
+                    <td class="center-td">{{player.offsides}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.offsides player.apps}}</td>
+                    <td class="center-td">{{player.last5.offsides}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.offsides player.last5.apps) (perGame player.offsides player.apps) "lower"}}">{{perGame player.last5.offsides player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Dribbles (Succ / Att)</td>
+                    <td class="center-td">{{player.dribbles}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.dribblesSucc player.apps}} / {{perGame player.dribblesAttempts player.apps}}</td>
+                    <td class="center-td">{{player.last5.dribbles}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.dribblesSucc player.last5.apps) (perGame player.dribblesSucc player.apps)}}">{{perGame player.last5.dribblesSucc player.last5.apps}} / {{perGame player.last5.dribblesAttempts player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Duels (Won / Total)</td>
+                    <td class="center-td">{{player.duels}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.duelsWon player.apps}} / {{perGame player.duelsTotal player.apps}}</td>
+                    <td class="center-td">{{player.last5.duels}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.duelsWon player.last5.apps) (perGame player.duelsWon player.apps)}}">{{perGame player.last5.duelsWon player.last5.apps}} / {{perGame player.last5.duelsTotal player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Key Passes</td>
+                    <td class="center-td">{{player.keyPasses}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.keyPasses player.apps}}</td>
+                    <td class="center-td">{{player.last5.keyPasses}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.keyPasses player.last5.apps) (perGame player.keyPasses player.apps)}}">{{perGame player.last5.keyPasses player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Passes</td>
+                    <td class="center-td">{{player.passes}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.passes player.apps}}</td>
+                    <td class="center-td">{{player.last5.passes}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.passes player.last5.apps) (perGame player.passes player.apps)}}">{{perGame player.last5.passes player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Accurate Passes</td>
+                    <td class="center-td">{{player.passesAccurate}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.passesAccurate player.apps}}</td>
+                    <td class="center-td">{{player.last5.passesAccurate}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.passesAccurate player.last5.apps) (perGame player.passesAccurate player.apps)}}">{{perGame player.last5.passesAccurate player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Pass Accuracy</td>
+                    <td class="center-td">{{player.passAccuracy}}</td>
+                    <td class="center-td player-stat-rate">-</td>
+                    <td class="center-td">{{player.last5.passAccuracy}}</td>
+                    <td class="center-td">-</td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Tackles</td>
+                    <td class="center-td">{{player.tackles}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.tackles player.apps}}</td>
+                    <td class="center-td">{{player.last5.tackles}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.tackles player.last5.apps) (perGame player.tackles player.apps)}}">{{perGame player.last5.tackles player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Interceptions</td>
+                    <td class="center-td">{{player.interceptions}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.interceptions player.apps}}</td>
+                    <td class="center-td">{{player.last5.interceptions}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.interceptions player.last5.apps) (perGame player.interceptions player.apps)}}">{{perGame player.last5.interceptions player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Blocks</td>
+                    <td class="center-td">{{player.blocks}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.blocks player.apps}}</td>
+                    <td class="center-td">{{player.last5.blocks}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.blocks player.last5.apps) (perGame player.blocks player.apps)}}">{{perGame player.last5.blocks player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Fouls Committed</td>
+                    <td class="center-td">{{player.foulsCommited}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.foulsCommited player.apps}}</td>
+                    <td class="center-td">{{player.last5.foulsCommited}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.foulsCommited player.last5.apps) (perGame player.foulsCommited player.apps) "lower"}}">{{perGame player.last5.foulsCommited player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Fouls Against</td>
+                    <td class="center-td">{{player.foulsAgainst}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.foulsAgainst player.apps}}</td>
+                    <td class="center-td">{{player.last5.foulsAgainst}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.foulsAgainst player.last5.apps) (perGame player.foulsAgainst player.apps)}}">{{perGame player.last5.foulsAgainst player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Yellow Cards</td>
+                    <td class="center-td">{{player.yellowCards}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.yellowCards player.apps}}</td>
+                    <td class="center-td">{{player.last5.yellowCards}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.yellowCards player.last5.apps) (perGame player.yellowCards player.apps) "lower"}}">{{perGame player.last5.yellowCards player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Red Cards</td>
+                    <td class="center-td">{{player.redCards}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.redCards player.apps}}</td>
+                    <td class="center-td">{{player.last5.redCards}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.redCards player.last5.apps) (perGame player.redCards player.apps) "lower"}}">{{perGame player.last5.redCards player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Goals Conceded</td>
+                    <td class="center-td">{{player.goalsConceded}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.goalsConceded player.apps}}</td>
+                    <td class="center-td">{{player.last5.goalsConceded}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.goalsConceded player.last5.apps) (perGame player.goalsConceded player.apps) "lower"}}">{{perGame player.last5.goalsConceded player.last5.apps}}</span></td>
+                </tr>
+                <tr>
+                    <td class="player-stat-name">Goalkeeper Saves</td>
+                    <td class="center-td">{{player.goalkeeperSaves}}</td>
+                    <td class="center-td player-stat-rate">{{perGame player.goalkeeperSaves player.apps}}</td>
+                    <td class="center-td">{{player.last5.goalkeeperSaves}}</td>
+                    <td class="center-td"><span class="player-stat-trend {{rateTrend (perGame player.last5.goalkeeperSaves player.last5.apps) (perGame player.goalkeeperSaves player.apps)}}">{{perGame player.last5.goalkeeperSaves player.last5.apps}}</span></td>
+                </tr>
+            </tbody>
+        </table>
         {{/if}}
 
     </div>
