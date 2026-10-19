@@ -46,6 +46,7 @@ export class Team {
 
   calculateLast5() {
     const last5Stats = this.#stats.slice(-5);
+    const games = last5Stats.length;
     let last5Wins = 0;
     last5Stats.forEach((stat) => {
       this.last5.addStats(stat);
@@ -54,8 +55,10 @@ export class Team {
         last5Wins++;
       }
     });
-    this.last5.winPercentage = parseFloat(((last5Wins / last5Stats.length) * 100).toFixed(2));
-    this.last5PerGame = this.last5.divideStats(5);
+    this.last5.winPercentage = games
+      ? parseFloat(((last5Wins / games) * 100).toFixed(2))
+      : 0;
+    this.last5PerGame = games ? this.last5.divideStats(games) : new Stats();
   }
 
   updateForm(stat, currentForm) {

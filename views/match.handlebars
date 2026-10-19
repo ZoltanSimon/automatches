@@ -297,117 +297,100 @@
           onclick="window.location.href='team?ID={{this.id}}'" />
         <div style="width: 92%;">
           <h3 class="cursor-pointer" onclick="window.location.href='team?ID={{this.id}}'">{{this.name}}</h3>
-          <div class="record">
-            <table style="color: white; background-color: #1D3557;">
+          <div class="record preview-record">
+            <table>
               <tr>
-                <td>{{percentage this.wins this.played}} % win</td>
-                <td>{{this.perGame.points}} pts/game</td>
-                <td>{{this.wins}} Wins</td>
-                <td>{{this.draws}} Draws</td>
-                <td>{{this.losses}} Losses</td>
+                <td>{{this.played}} played</td>
+                <td>{{percentage this.wins this.played}}% win</td>
+                <td>{{this.wins}}W {{this.draws}}D {{this.losses}}L</td>
+                <td class="preview-last-cell">
+                  {{#if this.matches.[0]}}
+                  <span class="preview-last-label">Last played</span>
+                  <span class="preview-last-when">{{daysAgo this.matches.[0].date}}</span>
+                  {{/if}}
+                </td>
+                <td class="preview-form-cell">
+                  <div class="preview-form" title="Last 5 matches">
+                    {{#each this.formArray as |form|}}
+                    <span class="form-indicator {{form}}"></span>
+                    {{/each}}
+                  </div>
+                </td>
               </tr>
             </table>
           </div>
         </div>
       </div>
 
-      <div class="stats">
-        <div class="stat">
-          <div class="label">Goals</div>
-          <div class="value">{{this.total.goals}}</div>
-          <div class="per-game">{{this.perGame.goals}}/game</div>
-        </div>
-
-        <div class="stat">
-          <div class="label">Goals Against</div>
-          <div class="value">{{this.total.goalsAgainst}}</div>
-          <div class="per-game">{{this.perGame.goalsAgainst}}/game</div>
-        </div>
-
-        <div class="stat">
-          <div class="label">xG</div>
-          <div class="value">{{this.total.xG}}</div>
-          <div class="per-game">{{this.perGame.xG}}/game</div>
-        </div>
-
-        <div class="stat">
-          <div class="label">xGA</div>
-          <div class="value">{{this.total.xGA}}</div>
-          <div class="per-game">{{this.perGame.xGA}}/game</div>
-        </div>
-
-        <div class="stat">
-          <div class="label">Corners</div>
-          <div class="value">{{this.total.corners}}</div>
-          <div class="per-game">{{this.perGame.corners}}/game</div>
-        </div>
-
-        <div class="stat">
-          <div class="label">Shots on Goal</div>
-          <div class="value">{{this.total.shotsOnGoal}}</div>
-          <div class="per-game">{{this.perGame.shotsOnGoal}}/game</div>
-        </div>
-      </div>
-
-      <div class="last5">
-        <div class="last5-header">
-          <center><h3 style="margin-top: 0px">Last 5 Matches</h3></center>
-          <div class="record">
-             <table style="color: white; background-color: #1D3557;">
-              <tr>
-                <td>{{this.last5.points}} pts</td>
-                <td>{{this.last5.xPoints}} xPts</td>
-                <td>{{this.last5PerGame.points}} pts/game</td>
-                  <td style="width: 20%;">
-                    <div style="display: flex; align-items: center; height: 100%;">
-                      {{#each this.formArray as |form|}}
-                      <span class="form-indicator {{form}}"></span>
-                      {{/each}}
-                    </div>
-                  </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-
-        <div class="stats">
-          <div class="stat">
-            <div class="label">Goals</div>
-            <div class="value">{{this.last5.goals}}</div>
-            <div class="per-game">{{this.last5PerGame.goals}}/game</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Goals Against</div>
-            <div class="value">{{this.last5.goalsAgainst}}</div>
-            <div class="per-game">{{this.last5PerGame.goalsAgainst}}/game</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">xG</div>
-            <div class="value">{{this.last5.xG}}</div>
-            <div class="per-game">{{this.last5PerGame.xG}}/game</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">xGA</div>
-            <div class="value">{{this.last5.xGA}}</div>
-            <div class="per-game">{{this.last5PerGame.xGA}}/game</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Corners</div>
-            <div class="value">{{this.last5.corners}}</div>
-            <div class="per-game">{{this.last5PerGame.corners}}/game</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Shots on Goal</div>
-            <div class="value">{{this.last5.shotsOnGoal}}</div>
-            <div class="per-game">{{this.last5PerGame.shotsOnGoal}}/game</div>
-          </div>
-        </div>
-      </div>
+      <table class="gf-table player-stats-table preview-stats-table">
+        <thead>
+          <tr class="main-table-header">
+            <th>Stat</th>
+            <th class="center-td">Total</th>
+            <th class="center-td">Per game</th>
+            <th class="center-td" title="Last 5 games">Last 5</th>
+            <th class="center-td" title="Last 5 games, per game">Last 5 / game</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="player-stat-name">Points</td>
+            <td class="center-td">{{this.total.points}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.points}}</td>
+            <td class="center-td">{{this.last5.points}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.points this.perGame.points}}">{{this.last5PerGame.points}}</span></td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">xPoints</td>
+            <td class="center-td">{{this.total.xPoints}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.xPoints}}</td>
+            <td class="center-td">{{this.last5.xPoints}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.xPoints this.perGame.xPoints}}">{{this.last5PerGame.xPoints}}</span></td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">Goals</td>
+            <td class="center-td">{{this.total.goals}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.goals}}</td>
+            <td class="center-td">{{this.last5.goals}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.goals this.perGame.goals}}">{{this.last5PerGame.goals}}</span></td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">Goals Against</td>
+            <td class="center-td">{{this.total.goalsAgainst}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.goalsAgainst}}</td>
+            <td class="center-td">{{this.last5.goalsAgainst}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.goalsAgainst this.perGame.goalsAgainst "lower"}}">{{this.last5PerGame.goalsAgainst}}</span></td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">xG</td>
+            <td class="center-td">{{this.total.xG}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.xG}}</td>
+            <td class="center-td">{{this.last5.xG}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.xG this.perGame.xG}}">{{this.last5PerGame.xG}}</span></td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">xGA</td>
+            <td class="center-td">{{this.total.xGA}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.xGA}}</td>
+            <td class="center-td">{{this.last5.xGA}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.xGA this.perGame.xGA "lower"}}">{{this.last5PerGame.xGA}}</span></td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">Corners</td>
+            <td class="center-td">{{this.total.corners}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.corners}}</td>
+            <td class="center-td">{{this.last5.corners}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.corners this.perGame.corners}}">{{this.last5PerGame.corners}}</span></td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">Shots on Goal</td>
+            <td class="center-td">{{this.total.shotsOnGoal}}</td>
+            <td class="center-td player-stat-rate">{{this.perGame.shotsOnGoal}}</td>
+            <td class="center-td">{{this.last5.shotsOnGoal}}</td>
+            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.shotsOnGoal this.perGame.shotsOnGoal}}">{{this.last5PerGame.shotsOnGoal}}</span></td>
+          </tr>
+        </tbody>
+      </table>
       <div class="match-detail-list">
         {{#each this.matches}}
         <div class="match-detail cursor-pointer" data-match-id="{{this.id}}" role="link" tabindex="0"

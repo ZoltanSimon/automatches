@@ -2045,6 +2045,68 @@ a.event-player-link {
   color: $red;
 }
 
+.preview-record {
+  width: 100%;
+  gap: 0;
+}
+
+.preview-record table {
+  width: 100%;
+  table-layout: fixed;
+  color: $lightest-blue;
+  background-color: $dark-blue;
+}
+
+.preview-record td {
+  text-align: center;
+  vertical-align: middle;
+  white-space: normal;
+  padding: 6px 4px;
+}
+
+.preview-record td:nth-child(-n + 3) {
+  width: 16%;
+}
+
+.preview-record td:nth-child(4) {
+  width: 32%;
+}
+
+.preview-record td:nth-child(5) {
+  width: 20%;
+}
+
+.preview-last-label,
+.preview-last-when {
+  line-height: 1.2;
+}
+
+.preview-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+}
+
+.preview-form .form-indicator {
+  width: 14px;
+  height: 18px;
+  margin: 0;
+  flex: 1 1 10px;
+  max-width: 18px;
+}
+
+.preview-stats-table {
+  margin-top: 12px;
+
+  th,
+  td {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+}
+
 .player-stats-table {
   grid-column: 1 / 4;
   width: 100%;

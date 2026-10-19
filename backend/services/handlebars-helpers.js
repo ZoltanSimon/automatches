@@ -46,6 +46,26 @@ export const formatDateOnly = (date) => {
   }).replace(/\//g, '.');
 }
 
+function calendarDay(date) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Berlin",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const value = (type) => Number(parts.find((part) => part.type === type)?.value);
+  return Date.UTC(value("year"), value("month") - 1, value("day"));
+}
+
+export const daysAgo = (date) => {
+  const then = new Date(date);
+  if (Number.isNaN(then.getTime())) return "";
+  const days = Math.round((calendarDay(new Date()) - calendarDay(then)) / 86400000);
+  if (days <= 0) return "today";
+  if (days === 1) return "1 day ago";
+  return `${days} days ago`;
+}
+
 export const transferFee = (type) => {
   if (!type || type === "N/A") return "-";
   return type;
