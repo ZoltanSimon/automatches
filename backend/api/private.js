@@ -3,7 +3,7 @@ import { getPlayers, getResultsDate, getSquad as getSquadFromApi, getStandingsFr
 import { getAllMatchesFromDbUntilDate, loadLeagues, loadPlayers, loadTeams, saveLeagueStandingsToDb, insertTeamsToDb, getLeagueFromDb, saveTransfersToDb, getTeamsDueForTransferUpdate, markTeamTransfersUpdated, saveSquadToDb, getTeamsDueForSquadUpdate, getMatchDetailsById, getMatchIdsMissingDetails, getFinishedMatchesMissingXg, getTeamEloForTeam, getEloRankings, setMatchFotmob } from "../data-access.js";
 import { dataDir, writeLeagueToServer, saveMatchToServer } from "../services/json-reader.js";
 import { forceRefreshRegistry, getRegistry, patchLoadedMatch, upsertRegistryMatchIfLoaded } from "../services/registry-service.js";
-import { fetchAndSavePlayerTransfers, insertAllPlayers, refetchPlayer, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
+import { fetchAndSavePlayerTransfers, insertAllPlayers, refetchPlayer, refetchTeamSquadAndTransfers, startPlayerFetchJob, updatePlayerProfilesFromFiles } from "../services/players-service.js";
 import { localhostOnly, wait } from "../lib/backend-helper.js";
 import { CURRENT_SEASON, parseLeagueIds, updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
 import { findMissingFinishedMatches, grabMatchesByIds, hydrateMissingMatches, matchesOnDay, matchesInRound, refetchLeagueRound, refetchMatchesOnDay, setManualMatchXg } from "../services/matches-service.js";
@@ -501,6 +501,15 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       emptyMessage: "playerID is required",
       failLog: "Error refetching player:",
       failMessage: "Failed to refetch player",
+    });
+  });
+
+  router.get("/refetch-team", async (request, response) => {
+    return handleRefetchRoute(response, {
+      run: () => refetchTeamSquadAndTransfers(request.query.teamID),
+      emptyMessage: "teamID is required",
+      failLog: "Error refetching team:",
+      failMessage: "Failed to refetch team",
     });
   });
 

@@ -256,11 +256,21 @@ export function formatEloDelta(after, before) {
     return null;
   }
 
-  const value = Math.round(end - start);
+  return formatSignedElo(end - start);
+}
+
+export function formatSignedElo(value, digits = 0) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+
+  const rounded = digits > 0 ? Number(number.toFixed(digits)) : Math.round(number);
+  const text = digits > 0 ? rounded.toFixed(digits) : String(rounded);
   return {
-    value,
-    display: value > 0 ? `+${value}` : String(value),
-    direction: value > 0 ? "up" : value < 0 ? "down" : "flat",
+    value: rounded,
+    display: rounded > 0 ? `+${text}` : text,
+    direction: rounded > 0 ? "up" : rounded < 0 ? "down" : "flat",
   };
 }
 

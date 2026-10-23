@@ -258,6 +258,29 @@ export async function writePlayerToServer(playerID, dataToWrite) {
   });
 }
 
+function appearanceTime(value) {
+  if (value == null || value === "") {
+    return null;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  const time = date.getTime();
+  return Number.isNaN(time) ? null : time;
+}
+
+// A later kickoff replaces the club. An undated appearance never overwrites a dated one.
+function shouldTakeClub(existingAsOf, incomingAsOf) {
+  const incomingTime = appearanceTime(incomingAsOf);
+  const existingTime = appearanceTime(existingAsOf);
+  if (incomingTime == null) {
+    return existingTime == null;
+  }
+  if (existingTime == null) {
+    return true;
+  }
+  return incomingTime >= existingTime;
+}
+
 export async function getAllPlayers(compList, nationList) {
   const playerMap = new Map();
 
@@ -265,6 +288,7 @@ export async function getAllPlayers(compList, nationList) {
     id,
     name,
     club = 0,
+    clubDate = null,
     nation = 0,
     position = [],
   }) => {
@@ -274,11 +298,15 @@ export async function getAllPlayers(compList, nationList) {
         name,
         club,
         nation,
+        clubAsOf: club ? clubDate : null,
         position: Array.isArray(position) ? position : [position],
       });
     } else {
       const existing = playerMap.get(id);
-      if (club) existing.club = club;
+      if (club && shouldTakeClub(existing.clubAsOf, clubDate)) {
+        existing.club = club;
+        existing.clubAsOf = clubDate;
+      }
       if (nation) existing.nation = nation;
       if (position && position.length) {
         existing.position = Array.from(
@@ -334,10 +362,12 @@ export async function getAllPlayers(compList, nationList) {
               }
             }
 
+            const minutes = Number(playerData.statistics?.[0]?.games?.minutes || 0);
             addOrUpdatePlayer({
               id: playerId,
               name: playerName,
-              club: clubId,
+              club: minutes > 0 ? clubId : 0,
+              clubDate: minutes > 0 ? matchDetail.fixture?.date : null,
               position: positions,
             });
           }

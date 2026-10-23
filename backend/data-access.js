@@ -311,7 +311,8 @@ export async function getTransferPlayersForInsert() {
            NULLIF(latest.team_in_id, 0),
            NULLIF(latest.team_out_id, 0),
            0
-         ) AS club
+         ) AS club,
+         latest.transfer_date AS transferDate
        FROM Player_Transfer latest
        INNER JOIN (
          SELECT player_id, id AS max_id
@@ -331,6 +332,7 @@ export async function getTransferPlayersForInsert() {
       id: Number(row.id),
       name: row.name,
       club: Number(row.club) || 0,
+      transferDate: row.transferDate ?? null,
       nation: 0,
       position: [""],
     }));

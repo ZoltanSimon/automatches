@@ -1,14 +1,15 @@
 import { buildMatchRegistry, getLoadedRegistry, upsertRegistryMatchIfLoaded } from "./registry-service.js";
 import { saveMatchesToServer, buildTeamList, getMatchFromServer } from "./json-reader.js";
-import { getAllCompetitionTeam } from "./teams-service.js";
+import { getAllCompetitionTeam, getTeamById } from "./teams-service.js";
 import { memoizeRegistryStat } from "./registry-stats.js";
 import { applyEloForFinishedMatches } from "./elo-service.js";
 import { allDBLeagues } from "../lib/catalog.js";
-import { getAllMatchesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, setMatchExpectedGoals } from "../data-access.js";
-import { formatEloDelta } from "../lib/elo.js";
+import { getAllMatchesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, getMatchEloRowsByIds, getTeamEloForTeam, setMatchExpectedGoals } from "../data-access.js";
+import { eloScopeFromTeam, formatEloDelta, formatSignedElo } from "../lib/elo.js";
 import { wait } from "../lib/backend-helper.js";
 import { getResults, getFixturesByDate, hasApiErrors } from "../api/webapi-handler.js";
 import { applyExpectedGoalsToMatch, parseExpectedGoalsValue, unwrapMatchPayload } from "../lib/match-details-mapper.js";
+import { calculateXPts } from "./poisson-model.js";
 
 const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
 const UPDATE_MATCHES_DELAY_MS = 3000;
@@ -332,6 +333,71 @@ export function getMatchById(registry, matchID) {
   return registry.matchByID.get(matchKey) ?? null;
 }
 
+function teamMatchEloDelta(row, teamId, match) {
+  if (!row) {
+    return null;
+  }
+
+  const isHome = Number(match?.homeTeam?.id) === Number(teamId);
+  const isAway = Number(match?.awayTeam?.id) === Number(teamId);
+  if (!isHome && !isAway) {
+    return null;
+  }
+
+  const before = Number(isHome ? row.home_elo_before : row.away_elo_before);
+  const after = Number(isHome ? row.home_elo_after : row.away_elo_after);
+  if (!Number.isFinite(before) || !Number.isFinite(after)) {
+    return null;
+  }
+
+  return after - before;
+}
+
+function opponentEloBefore(row, teamId, match) {
+  if (!row) {
+    return null;
+  }
+
+  const isHome = Number(match?.homeTeam?.id) === Number(teamId);
+  const isAway = Number(match?.awayTeam?.id) === Number(teamId);
+  if (!isHome && !isAway) {
+    return null;
+  }
+
+  const elo = Number(isHome ? row.away_elo_before : row.home_elo_before);
+  return Number.isFinite(elo) ? elo : null;
+}
+
+function summarizeOpponentElo(matches, teamId, eloByMatchId) {
+  const ratings = matches
+    .map((match) => opponentEloBefore(eloByMatchId.get(Number(match.id)), teamId, match))
+    .filter((elo) => Number.isFinite(elo));
+  if (!ratings.length) {
+    return { total: null, perGame: null };
+  }
+
+  const total = ratings.reduce((sum, elo) => sum + elo, 0);
+  return {
+    total: Math.round(total),
+    perGame: Number((total / ratings.length).toFixed(1)),
+  };
+}
+
+function summarizeEloChange(matches, teamId, eloByMatchId) {
+  const deltas = matches
+    .map((match) => teamMatchEloDelta(eloByMatchId.get(Number(match.id)), teamId, match))
+    .filter((delta) => Number.isFinite(delta));
+  if (!deltas.length) {
+    return { total: null, perGame: null };
+  }
+
+  const total = deltas.reduce((sum, delta) => sum + delta, 0);
+  return {
+    total: formatSignedElo(total),
+    perGame: formatSignedElo(total / deltas.length, 2),
+  };
+}
+
 export async function getMatchPageData(registry, currentMatch) {
   const { home, away } = currentMatch.teams;
   const registryTeams = [home.id, away.id]
@@ -340,14 +406,45 @@ export async function getMatchPageData(registry, currentMatch) {
   const teams = registryTeams.length > 0
     ? registryTeams
     : buildTeamList([currentMatch]).filter((team) => team.id === home.id || team.id === away.id);
+  const matchesByTeam = new Map(teams.map((team) => [
+    team.id,
+    [...team.matches].sort((a, b) => new Date(b.date) - new Date(a.date)),
+  ]));
+  const eloByMatchId = await getMatchEloRowsByIds(
+    [...matchesByTeam.values()].flatMap((matches) => matches.map((match) => match.id)),
+  );
   const teamList = teams
     .sort((a, b) => (a.id === home.id ? -1 : b.id === home.id ? 1 : 0))
-    .map((team) => ({
-      ...team,
-      matches: team.matches
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 5),
-    }));
+    .map((team) => {
+      const sortedMatches = matchesByTeam.get(team.id) || [];
+      const seasonElo = summarizeEloChange(sortedMatches, team.id, eloByMatchId);
+      const recentMatches = sortedMatches.slice(0, 5);
+      const recentElo = summarizeEloChange(recentMatches, team.id, eloByMatchId);
+      const seasonOpponentElo = summarizeOpponentElo(sortedMatches, team.id, eloByMatchId);
+      const recentOpponentElo = summarizeOpponentElo(recentMatches, team.id, eloByMatchId);
+      return {
+        ...team,
+        matches: sortedMatches.slice(0, 5).map((match) => {
+          const delta = teamMatchEloDelta(eloByMatchId.get(Number(match.id)), team.id, match);
+          return {
+            ...match,
+            eloChange: Number.isFinite(delta) ? formatSignedElo(delta) : null,
+          };
+        }),
+        eloChange: {
+          total: seasonElo.total,
+          perGame: seasonElo.perGame,
+          last5: recentElo.total,
+          last5PerGame: recentElo.perGame,
+        },
+        opponentElo: {
+          total: seasonOpponentElo.total,
+          perGame: seasonOpponentElo.perGame,
+          last5: recentOpponentElo.total,
+          last5PerGame: recentOpponentElo.perGame,
+        },
+      };
+    });
 
   const matchStatistics = buildMatchStatistics(currentMatch);
   const matchLeagueName = typeof currentMatch?.league?.name === "string"
@@ -358,12 +455,27 @@ export async function getMatchPageData(registry, currentMatch) {
     : "";
   const leagueName = matchLeagueName || dbLeagueName || "Unknown League";
   const matchEloRow = await getMatchEloByMatchId(currentMatch?.fixture?.id ?? currentMatch?.id);
-  const matchElo = matchEloRow
-    ? {
-        home: formatEloDelta(matchEloRow.home_elo_after, matchEloRow.home_elo_before),
-        away: formatEloDelta(matchEloRow.away_elo_after, matchEloRow.away_elo_before),
-      }
-    : null;
+  const eloScope = matchEloRow?.scope === "nt" || matchEloRow?.scope === "club"
+    ? matchEloRow.scope
+    : eloScopeFromTeam(getTeamById(currentMatch?.teams?.home?.id));
+  const [homeRatings, awayRatings] = await Promise.all([
+    getTeamEloForTeam(currentMatch?.teams?.home?.id),
+    getTeamEloForTeam(currentMatch?.teams?.away?.id),
+  ]);
+  const currentElo = (ratings) => {
+    const elo = Number(ratings?.[eloScope]?.elo);
+    return Number.isFinite(elo) ? Math.round(elo) : null;
+  };
+  const matchElo = {
+    home: currentElo(homeRatings),
+    away: currentElo(awayRatings),
+    change: matchEloRow
+      ? {
+          home: formatEloDelta(matchEloRow.home_elo_after, matchEloRow.home_elo_before),
+          away: formatEloDelta(matchEloRow.away_elo_after, matchEloRow.away_elo_before),
+        }
+      : null,
+  };
 
   return {
     teamList,
@@ -415,6 +527,18 @@ export function buildMatchStatistics(currentMatch) {
         expectedGoals.awayValue = formatXg(fotmob.awayXg);
       }
     }
+  }
+
+  const expectedGoals = rows.find((row) => row.type === "Expected Goals");
+  const homeXg = Number(expectedGoals?.homeValue);
+  const awayXg = Number(expectedGoals?.awayValue);
+  if (Number.isFinite(homeXg) && Number.isFinite(awayXg)) {
+    const xgIndex = rows.indexOf(expectedGoals);
+    rows.splice(xgIndex + 1, 0, {
+      type: "xPoints",
+      homeValue: calculateXPts(homeXg, awayXg).xPts.toFixed(2),
+      awayValue: calculateXPts(awayXg, homeXg).xPts.toFixed(2),
+    });
   }
 
   return rows;

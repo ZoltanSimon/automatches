@@ -33,10 +33,6 @@
             </div>
             <div class="player-meta">
                 <div class="player-meta-row">
-                    <span class="player-meta-label">Age:</span>
-                    <span class="player-meta-value">{{player.age}}</span>
-                </div>
-                <div class="player-meta-row">
                     <span class="player-meta-label">Nationality:</span>
                     <span class="player-meta-value player-meta-value-with-flag">
                         {{#if player.nation}}
@@ -47,7 +43,7 @@
                 </div>
                 <div class="player-meta-row">
                     <span class="player-meta-label">Birth Date:</span>
-                    <span class="player-meta-value">{{formatDateOnly player.birthdate}}</span>
+                    <span class="player-meta-value">{{formatDateOnly player.birthdate}}{{#if player.age}} ({{player.age}}){{/if}}</span>
                 </div>
                 <div class="player-meta-row">
                     <span class="player-meta-label">Birth Location:</span>

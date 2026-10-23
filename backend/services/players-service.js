@@ -8,12 +8,14 @@ import {
   getTransferPlayersForInsert,
   insertPlayersToDb,
   loadPlayerById,
+  markTeamTransfersUpdated,
+  saveSquadToDb,
   saveTransfersToDb,
   updatePlayerProfilesInDb,
 } from "../data-access.js";
 import { Player } from "./../../classes/player.js";
 import { allDBLeagues, allDBPlayers, upsertCatalogPlayer } from "../lib/catalog.js";
-import { getPlayersFromApi, getTransfersByPlayer } from "../api/webapi-handler.js";
+import { getPlayersFromApi, getSquad as getSquadFromApi, getTransfersByPlayer, getTransfersByTeam, hasApiErrors } from "../api/webapi-handler.js";
 import { LineupParser } from "../../classes/lineupparser.js";
 import { abbreviatePlayerPosition, comparePositionsByDisplayOrder, formatPlayerPosition, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
 import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
@@ -831,6 +833,35 @@ export function getTeamPlayerList(registry, teamID, squad = null, nr = 100, leag
   return mergedPlayers.slice(0, nr);
 }
 
+function calendarDay(value) {
+  if (value == null || value === "") {
+    return null;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+// A transfer replaces the club only when its date is after the last appearance.
+// Same-day matches stay with the team he actually played for.
+function isTransferNewerThanAppearance(transferDate, appearanceDate) {
+  const transferDay = calendarDay(transferDate);
+  if (transferDay == null) {
+    return false;
+  }
+
+  const appearanceDay = calendarDay(appearanceDate);
+  if (appearanceDay == null) {
+    return true;
+  }
+
+  return transferDay > appearanceDay;
+}
+
 export async function insertAllPlayers() {
   const allPlayers = await getAllPlayers(
     allDBLeagues.filter((el) => el.type == "league").concat(allDBLeagues.filter((el) => el.type == "cup")),
@@ -850,6 +881,8 @@ export async function insertAllPlayers() {
   }
 
   let addedFromTransfers = 0;
+  let clubsFromNewerTransfer = 0;
+  let clubsKeptFromAppearance = 0;
   for (const transferPlayer of transferPlayers) {
     const playerID = Number(transferPlayer?.id);
     if (!Number.isFinite(playerID)) {
@@ -859,9 +892,11 @@ export async function insertAllPlayers() {
     if (!playersById.has(playerID)) {
       playersById.set(playerID, transferPlayer);
       addedFromTransfers += 1;
-    } else if (transferPlayer.club) {
-      // Transfer data reflects the most recent club; override match-derived club
+    } else if (transferPlayer.club && isTransferNewerThanAppearance(transferPlayer.transferDate, playersById.get(playerID).clubAsOf)) {
       playersById.get(playerID).club = transferPlayer.club;
+      clubsFromNewerTransfer += 1;
+    } else if (transferPlayer.club && playersById.get(playerID).club) {
+      clubsKeptFromAppearance += 1;
     }
   }
 
@@ -871,7 +906,7 @@ export async function insertAllPlayers() {
   const playersMissingExtraData = await getPlayersMissingExtraData();
 
   console.log(
-    `[insertAllPlayers] Added ${addedFromTransfers} player(s) from transfers. Players with no extra data: ${playersMissingExtraData.length}.`,
+    `[insertAllPlayers] Added ${addedFromTransfers} player(s) from transfers. Club from a newer transfer: ${clubsFromNewerTransfer}. Kept a newer appearance: ${clubsKeptFromAppearance}. Players with no extra data: ${playersMissingExtraData.length}.`,
   );
 
   return {
@@ -1052,6 +1087,87 @@ export async function fetchAndSavePlayerProfile(playerID) {
     player: persisted.player,
     playerInsert: persisted.playerInsert,
     profileUpdate: persisted.profileUpdate,
+  };
+}
+
+const TEAM_REFETCH_GAP_MS = 5000;
+
+function countSquadPlayers(squads) {
+  if (!Array.isArray(squads)) {
+    return 0;
+  }
+
+  return squads.reduce(
+    (total, entry) => total + (Array.isArray(entry?.players) ? entry.players.length : 0),
+    0,
+  );
+}
+
+export async function refetchTeamSquadAndTransfers(teamID) {
+  const id = Number(teamID);
+  if (!Number.isFinite(id) || id <= 0) {
+    return emptyPlayerFetchResult();
+  }
+
+  const calls = [];
+  let squadSaved = false;
+  let squadError = null;
+
+  const squadFetch = await getSquadFromApi(id);
+  if (squadFetch.call) {
+    calls.push(squadFetch.call);
+  }
+
+  if (hasApiErrors(squadFetch.data)) {
+    squadError = "API returned errors; existing squad left unchanged";
+  } else {
+    const squads = Array.isArray(squadFetch.data?.response) ? squadFetch.data.response : [];
+    if (countSquadPlayers(squads) === 0) {
+      squadError = "Empty squad response; existing squad left unchanged";
+    } else {
+      await saveSquadToDb(id, squads);
+      squadSaved = true;
+    }
+  }
+
+  await wait(TEAM_REFETCH_GAP_MS);
+
+  let transfersSaved = 0;
+  let transferError = null;
+  const transferFetch = await getTransfersByTeam(id);
+  if (transferFetch.call) {
+    calls.push(transferFetch.call);
+  }
+
+  if (hasApiErrors(transferFetch.data)) {
+    transferError = "API returned errors; existing transfers left unchanged";
+  } else {
+    const saved = await saveTransfersToDb(transferFetch.data?.response ?? []);
+    transfersSaved = saved.saved;
+    await markTeamTransfersUpdated(id);
+  }
+
+  const failed = [];
+  if (squadError) {
+    console.warn(`[refetch-team] team ${id}: ${squadError}`);
+    failed.push({ id, error: squadError });
+  }
+  if (transferError) {
+    console.warn(`[refetch-team] team ${id}: ${transferError}`);
+    failed.push({ id, error: transferError });
+  }
+
+  const transfersOk = !transferError;
+  return {
+    success: squadSaved || transfersOk,
+    requested: 1,
+    saved: squadSaved ? [id] : [],
+    savedCount: (squadSaved ? 1 : 0) + (transfersOk ? 1 : 0),
+    failed,
+    calls,
+    squadSaved,
+    transfersSaved,
+    message: squadSaved || transfersOk ? undefined : (transferError || squadError),
   };
 }
 

@@ -8,8 +8,8 @@
         title="{{matchInfo.teams.home.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'" />
       <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'">
         {{matchInfo.teams.home.name}}</div>
-      <div class="elo-change-line {{#if matchElo.home}}{{matchElo.home.direction}}{{/if}}" title="Elo change for this match">
-        Elo {{#if matchElo.home}}{{matchElo.home.display}}{{else}}—{{/if}}
+      <div class="elo-change-line" title="Current Elo">
+        Elo {{#if matchElo.home}}{{matchElo.home}}{{else}}—{{/if}}
       </div>
     </div>
 
@@ -19,6 +19,12 @@
           href="/league?id={{matchInfo.league.id}}">{{headerLeagueName}}</a> - {{matchInfo.league.round}} -
         {{formatDate matchInfo.fixture.date}}</div>
       <span class="status">{{matchInfo.fixture.status.short}}</span>
+      {{#if matchElo.change}}
+      <span class="match-elo-delta" title="Elo change for this match">
+        {{#if matchElo.change.home}}<span class="elo-change {{matchElo.change.home.direction}}">{{matchElo.change.home.display}}</span>{{/if}}
+        {{#if matchElo.change.away}}<span class="elo-change {{matchElo.change.away.direction}}">{{matchElo.change.away.display}}</span>{{/if}}
+      </span>
+      {{/if}}
       {{#if isLocal}}
       <button type="button" id="refetch-match-btn" class="match-refetch-btn" data-match-id="{{matchID}}">
         Refetch
@@ -31,8 +37,8 @@
         title="{{matchInfo.teams.away.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'" />
       <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'">
         {{matchInfo.teams.away.name}}</div>
-      <div class="elo-change-line {{#if matchElo.away}}{{matchElo.away.direction}}{{/if}}" title="Elo change for this match">
-        Elo {{#if matchElo.away}}{{matchElo.away.display}}{{else}}—{{/if}}
+      <div class="elo-change-line" title="Current Elo">
+        Elo {{#if matchElo.away}}{{matchElo.away}}{{else}}—{{/if}}
       </div>
     </div>
   </div>
@@ -389,6 +395,20 @@
             <td class="center-td">{{this.last5.shotsOnGoal}}</td>
             <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.shotsOnGoal this.perGame.shotsOnGoal}}">{{this.last5PerGame.shotsOnGoal}}</span></td>
           </tr>
+          <tr>
+            <td class="player-stat-name">Elo</td>
+            <td class="center-td">{{#if this.eloChange.total}}<span class="elo-change {{this.eloChange.total.direction}}">{{this.eloChange.total.display}}</span>{{else}}—{{/if}}</td>
+            <td class="center-td">{{#if this.eloChange.perGame}}<span class="elo-change {{this.eloChange.perGame.direction}}">{{this.eloChange.perGame.display}}</span>{{else}}—{{/if}}</td>
+            <td class="center-td">{{#if this.eloChange.last5}}<span class="elo-change {{this.eloChange.last5.direction}}">{{this.eloChange.last5.display}}</span>{{else}}—{{/if}}</td>
+            <td class="center-td">{{#if this.eloChange.last5PerGame}}<span class="elo-change {{this.eloChange.last5PerGame.direction}}">{{this.eloChange.last5PerGame.display}}</span>{{else}}—{{/if}}</td>
+          </tr>
+          <tr>
+            <td class="player-stat-name">Elo of teams played</td>
+            <td class="center-td">{{#if this.opponentElo.total}}{{this.opponentElo.total}}{{else}}—{{/if}}</td>
+            <td class="center-td player-stat-rate">{{#if this.opponentElo.perGame}}{{this.opponentElo.perGame}}{{else}}—{{/if}}</td>
+            <td class="center-td">{{#if this.opponentElo.last5}}{{this.opponentElo.last5}}{{else}}—{{/if}}</td>
+            <td class="center-td">{{#if this.opponentElo.last5PerGame}}<span class="player-stat-trend {{rateTrend this.opponentElo.last5PerGame this.opponentElo.perGame}}">{{this.opponentElo.last5PerGame}}</span>{{else}}—{{/if}}</td>
+          </tr>
         </tbody>
       </table>
       <div class="match-detail-list">
@@ -417,6 +437,9 @@
           <div class="match-stats-detail">
             <span>Corners: {{this.stats.cornersHome}} - {{this.stats.cornersAway}}</span>
             <span>Shots: {{this.stats.shotsOnGoalHome}} - {{this.stats.shotsOnGoalAway}}</span>
+            {{#if this.eloChange}}
+            <span>Elo change: <span class="elo-change {{this.eloChange.direction}}">{{this.eloChange.display}}</span></span>
+            {{/if}}
             {{#if this.xG}}
             <span>xG: {{this.stats.xGHome}} - {{this.stats.xGAway}}</span>
             {{/if}}

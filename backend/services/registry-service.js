@@ -1,6 +1,6 @@
 import { getLeagueFromDb, getMatchDetailsById, getMatchDetailsByIds } from '../data-access.js';
 import { allDBLeagues, getCatalogLeague } from '../lib/catalog.js';
-import { defaultLeagues } from '../../shared/defaults.js';
+import { CURRENT_SEASON, defaultLeagues } from '../../shared/defaults.js';
 import { clearRegistryStats, createRegistryStats, memoizeRegistryStat } from './registry-stats.js';
 
 let _registryPromise = null;
@@ -36,7 +36,7 @@ async function warmRegistryStats(registry) {
     getAllCompetitionTeamsByID(registry);
     for (const league of allDBLeagues || []) {
       const leagueID = Number(league.id);
-      if (!Number.isFinite(leagueID)) {
+      if (!Number.isFinite(leagueID) || !isRecentEnoughForRegistry(league.season)) {
         continue;
       }
       getLeagueStandings(registry, leagueID);
@@ -48,16 +48,35 @@ async function warmRegistryStats(registry) {
   }
 }
 
+// Latest season on the competition, but only when it is the current season or one year behind.
+function isRecentEnoughForRegistry(season) {
+  const year = Number(season);
+  return Number.isFinite(year) && CURRENT_SEASON - year <= 1;
+}
+
 async function getRegistryLeagueSeasonConfigs() {
   const leagues = Array.isArray(allDBLeagues) ? allDBLeagues : [];
 
   // allDBLeagues.season is resolved from LeagueSeason (latest season first in loadLeagues).
-  return leagues
+  const configs = leagues
     .map((league) => ({
       leagueID: Number(league.id),
       season: Number(league.season),
     }))
-    .filter(({ leagueID, season }) => Number.isFinite(leagueID) && Number.isFinite(season));
+    .filter(({ leagueID, season }) => Number.isFinite(leagueID) && isRecentEnoughForRegistry(season));
+
+  const skipped = leagues.filter((league) => {
+    const leagueID = Number(league.id);
+    return Number.isFinite(leagueID) && !isRecentEnoughForRegistry(league.season);
+  });
+  if (skipped.length > 0) {
+    console.log(
+      `Registry omitted ${skipped.length} competition(s) whose latest season is before ${CURRENT_SEASON - 1}:`,
+      skipped.map((league) => `${league.id} (${league.season})`).join(", "),
+    );
+  }
+
+  return configs;
 }
 
 export function getLoadedRegistry() {
@@ -329,7 +348,11 @@ function createRegistry(matches) {
  */
 export async function getLeagueSeasonRegistry(leagueID, season) {
   const registrySeason = Number(getCatalogLeague(leagueID)?.season);
-  if (!Number.isFinite(registrySeason) || registrySeason !== Number(season)) {
+  const requestedSeason = Number(season);
+  const servedFromLoadedRegistry = registrySeason === requestedSeason
+    && isRecentEnoughForRegistry(registrySeason);
+
+  if (!servedFromLoadedRegistry) {
     return buildMatchRegistry([{ leagueID, season }]);
   }
 
