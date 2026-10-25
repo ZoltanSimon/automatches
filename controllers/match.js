@@ -1,24 +1,38 @@
+import { playerGoalList } from "../components/player-list.js";
+
+if (document.getElementById("player-list-table")) {
+	playerGoalList({ big: false, enableStatFilters: false, pageSize: 10 });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-	const summaryTab = document.getElementById("match-summary-tab");
-	const previewTab = document.getElementById("match-preview-tab");
-	const summaryPanel = document.getElementById("match-summary-panel");
-	const previewPanel = document.getElementById("match-preview-panel");
+	const tabButtons = [...document.querySelectorAll(".match-tab-btn[data-tab]")];
+	const tabPanels = [...document.querySelectorAll(".match-content-panel[data-panel]")];
 
-	if (summaryTab && previewTab && summaryPanel && previewPanel) {
-		const setActiveTab = (tab) => {
-			const summaryActive = tab === "summary";
+	if (tabButtons.length > 0) {
+		const tabNames = tabButtons.map((button) => button.dataset.tab);
 
-			summaryTab.classList.toggle("is-active", summaryActive);
-			previewTab.classList.toggle("is-active", !summaryActive);
-			summaryTab.setAttribute("aria-selected", String(summaryActive));
-			previewTab.setAttribute("aria-selected", String(!summaryActive));
+		const setActiveTab = (tab, { updateHash = true } = {}) => {
+			tabButtons.forEach((button) => {
+				const active = button.dataset.tab === tab;
+				button.classList.toggle("is-active", active);
+				button.setAttribute("aria-selected", String(active));
+			});
+			tabPanels.forEach((panel) => {
+				panel.classList.toggle("is-active", panel.dataset.panel === tab);
+			});
 
-			summaryPanel.classList.toggle("is-active", summaryActive);
-			previewPanel.classList.toggle("is-active", !summaryActive);
+			if (updateHash) {
+				history.replaceState(null, "", `${location.pathname}${location.search}#${tab}`);
+			}
 		};
 
-		summaryTab.addEventListener("click", () => setActiveTab("summary"));
-		previewTab.addEventListener("click", () => setActiveTab("preview"));
+		tabButtons.forEach((button) => {
+			button.addEventListener("click", () => setActiveTab(button.dataset.tab));
+		});
+
+		const hashTab = location.hash.slice(1);
+		const defaultTab = tabButtons.find((button) => button.classList.contains("is-active"))?.dataset.tab ?? tabNames[0];
+		setActiveTab(tabNames.includes(hashTab) ? hashTab : defaultTab, { updateHash: false });
 	}
 
 	const eventsPanel = document.querySelector(".match-events-panel");

@@ -1,0 +1,7 @@
+<tr>
+  <td class="center-td">{{#if noTotal}}—{{else}}{{lookup home.total key}}{{/if}}</td>
+  <td class="center-td"><span class="player-stat-trend {{rateTrend (lookup home.perGame key) (lookup away.perGame key) dir}}">{{lookup home.perGame key}}{{suffix}}</span></td>
+  <td class="center-td player-stat-name">{{label}}</td>
+  <td class="center-td"><span class="player-stat-trend {{rateTrend (lookup away.perGame key) (lookup home.perGame key) dir}}">{{lookup away.perGame key}}{{suffix}}</span></td>
+  <td class="center-td">{{#if noTotal}}—{{else}}{{lookup away.total key}}{{/if}}</td>
+</tr>

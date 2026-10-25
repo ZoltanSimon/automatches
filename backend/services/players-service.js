@@ -14,7 +14,7 @@ import {
   updatePlayerProfilesInDb,
 } from "../data-access.js";
 import { Player } from "./../../classes/player.js";
-import { allDBLeagues, allDBPlayers, upsertCatalogPlayer } from "../lib/catalog.js";
+import { allDBLeagues, allDBPlayers, getCatalogVersion, upsertCatalogPlayer } from "../lib/catalog.js";
 import { getPlayersFromApi, getSquad as getSquadFromApi, getTransfersByPlayer, getTransfersByTeam, hasApiErrors } from "../api/webapi-handler.js";
 import { LineupParser } from "../../classes/lineupparser.js";
 import { abbreviatePlayerPosition, comparePositionsByDisplayOrder, formatPlayerPosition, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
@@ -924,6 +924,63 @@ export async function updatePlayerProfilesFromFiles() {
   const result = await updatePlayerProfilesInDb(playersFromFiles);
   console.log("[updatePlayerProfilesFromFiles] Update finished:", result);
   return result;
+}
+
+let catalogPlayersById = { version: -1, players: new Map() };
+
+function getCatalogPlayer(playerID) {
+  const version = getCatalogVersion();
+  if (catalogPlayersById.version !== version) {
+    catalogPlayersById = {
+      version,
+      players: new Map(allDBPlayers.map((player) => [Number(player.id), player])),
+    };
+  }
+  return catalogPlayersById.players.get(Number(playerID));
+}
+
+/**
+ * Best-rated players over a set of matches (oldest first), e.g. head to head meetings.
+ * The club shown is the team the player appeared for in the most recent of those matches.
+ */
+export function getMatchesTopRatedPlayers(matches, limit = 10) {
+  const players = new Map();
+
+  for (const match of matches) {
+    const starterRoles = starterRolesForMatch(match);
+    for (const team of Array.isArray(match.players) ? match.players : []) {
+      const teamID = Number(team?.team?.id);
+      for (const playerEntry of team.players || []) {
+        const playerID = Number(playerEntry?.player?.id);
+        if (!Number.isFinite(playerID) || Number(playerEntry.statistics?.[0]?.games?.minutes || 0) <= 0) {
+          continue;
+        }
+
+        if (!players.has(playerID)) {
+          const inputPlayer = getCatalogPlayer(playerID) ?? { id: playerID, name: playerEntry.player.name };
+          players.set(playerID, createPlayerWithResolvedTeamNames(inputPlayer));
+        }
+
+        const player = players.get(playerID);
+        player.getPlayerStats(playerEntry, match.league);
+        recordLineupRole(player, starterRoles.get(playerID));
+        if (Number.isFinite(teamID)) {
+          player.club = teamID;
+          player.clubName = getTeamName(teamID);
+        }
+      }
+    }
+  }
+
+  // A single standout game shouldn't outrank players rated across several meetings.
+  const minRatedApps = Math.min(3, matches.length);
+  const topPlayers = [...players.values()]
+    .filter((player) => player.ratedApps >= minRatedApps)
+    .sort((a, b) => Number(b.avRating) - Number(a.avRating) || b.apps - a.apps || b.ga - a.ga)
+    .slice(0, limit);
+
+  topPlayers.forEach(finalizePlayerPositions);
+  return topPlayers;
 }
 
 export function getPlayerByID(playerID) {

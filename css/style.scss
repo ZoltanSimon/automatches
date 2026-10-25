@@ -1683,6 +1683,10 @@ td .form-indicator {
   cursor: pointer;
 }
 
+.match-tab-btn:hover:not(.is-active) {
+  background: $lightest-blue;
+}
+
 .match-tab-btn.is-active {
   background: $dark-blue;
   color: $lightest-blue;
@@ -1696,11 +1700,12 @@ td .form-indicator {
   display: block;
 }
 
-#match-preview-panel {
+// Match tabs that lay out two cards side by side (Preview, Head to Head).
+.match-split-panel {
   column-span: all;
 }
 
-#match-preview-panel.is-active {
+.match-split-panel.is-active {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
@@ -1709,6 +1714,153 @@ td .form-indicator {
 
 #match-preview-panel .team-card {
   margin-bottom: 0;
+}
+
+// .rectangle children like .rect-header span 1/4, which would add implicit columns here.
+#match-h2h-panel .rectangle {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+
+  > * {
+    grid-column: 1 / -1;
+  }
+}
+
+.h2h-summary {
+  padding: 16px;
+  border: 1px solid $dark-blue;
+  background-color: $blue;
+  color: $lightest-blue;
+}
+
+.h2h-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.h2h-summary-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: $lightest-blue;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+
+  img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+  }
+
+  &:hover span {
+    text-decoration: underline;
+  }
+}
+
+.h2h-home {
+  background: $dark-blue;
+}
+
+.h2h-draw {
+  background: $gray-neutral;
+}
+
+.h2h-away {
+  background: $red;
+}
+
+.h2h-count-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.h2h-count {
+  min-width: 2.2em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.h2h-count-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.h2h-bar {
+  display: flex;
+  height: 22px;
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid $dark-blue;
+  border-radius: 4px;
+  background: $light-blue;
+  font-size: 12px;
+  font-weight: 700;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+
+.h2h-summary-meta {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.h2h-stats-table {
+  margin-top: 0;
+
+  .player-stat-name {
+    font-weight: 700;
+  }
+}
+
+.h2h-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.h2h-meetings .match-detail {
+  margin-top: 0;
+}
+
+.match-score .form-indicator {
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: 1px;
+}
+
+.h2h-empty {
+  grid-column: 1 / -1;
+  padding: 24px;
+  text-align: center;
+  background: $light-blue;
+  border: 1px solid $dark-blue;
+  color: $dark-blue;
 }
 
 .match-events-panel,
@@ -2637,7 +2789,7 @@ tr td.match-list-center-td + td.match-list-center-td {
     padding-block: 6px;
   }
 
-  #match-preview-panel.is-active,
+  .match-split-panel.is-active,
   .world-cup-content {
     grid-template-columns: 1fr;
   }
@@ -2768,6 +2920,33 @@ tr td.match-list-center-td + td.match-list-center-td {
   td {
     padding: 2px;
     font-size: 14px;
+  }
+
+  .match-tabs {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .match-tab-btn {
+    flex: 1 1 auto;
+    padding: 8px 6px;
+  }
+
+  .h2h-summary {
+    padding: 10px;
+  }
+
+  .h2h-summary-team img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .h2h-count {
+    font-size: 1.3rem;
+  }
+
+  .h2h-summary-meta {
+    grid-template-columns: 1fr;
   }
 
   table {

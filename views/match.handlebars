@@ -44,20 +44,24 @@
   </div>
   {{/if}}
 
-  {{#if (isFinishedStatus matchInfo.fixture.status.short)}}
-  {{#if teamList.length}}
+  {{#if matchInfo}}
   <div class="match-tabs" role="tablist" aria-label="Match view tabs">
+    {{#unless (eq matchInfo.fixture.status.short "NS")}}
     <button id="match-summary-tab" class="match-tab-btn is-active" type="button" role="tab" aria-selected="true"
-      aria-controls="match-summary-panel">Match Summary</button>
-    <button id="match-preview-tab" class="match-tab-btn" type="button" role="tab" aria-selected="false"
-      aria-controls="match-preview-panel">Match Preview</button>
+      data-tab="summary" aria-controls="match-summary-panel">Match Summary</button>
+    {{/unless}}
+    {{#if teamList.length}}
+    <button id="match-preview-tab" class="match-tab-btn {{#if (eq matchInfo.fixture.status.short "NS")}}is-active{{/if}}"
+      type="button" role="tab" aria-selected="{{#if (eq matchInfo.fixture.status.short "NS")}}true{{else}}false{{/if}}"
+      data-tab="preview" aria-controls="match-preview-panel">Match Preview</button>
+    {{/if}}
+    <button id="match-h2h-tab" class="match-tab-btn" type="button" role="tab" aria-selected="false"
+      data-tab="h2h" aria-controls="match-h2h-panel">Head to Head</button>
   </div>
   {{/if}}
-  {{/if}}
 
-  {{#if (eq matchInfo.fixture.status.short "NS")}}
-  {{else}}
-  <div id="match-summary-panel" class="match-content-panel is-active">
+  {{#unless (eq matchInfo.fixture.status.short "NS")}}
+  <div id="match-summary-panel" class="match-content-panel is-active" data-panel="summary" role="tabpanel">
     <div class="match-center-layout">
       <div class="lineup-panel lineup-home">
         {{#if matchInfo.lineups}}
@@ -291,11 +295,11 @@
     </div>
   </div>
 
-  {{/if}}
+  {{/unless}}
 
   {{#if teamList.length}}
-  <div id="match-preview-panel"
-    class="match-content-panel {{#if (isFinishedStatus matchInfo.fixture.status.short)}}{{else}}is-active{{/if}}">
+  <div id="match-preview-panel" data-panel="preview" role="tabpanel"
+    class="match-content-panel match-split-panel {{#if (eq matchInfo.fixture.status.short "NS")}}is-active{{/if}}">
     {{#each teamList}}
     <div class="team-card gf-table {{#if (eq this.id ../matchInfo.teams.away.id)}}team-card-away{{/if}}">
       <div class="team-header">
@@ -413,38 +417,7 @@
       </table>
       <div class="match-detail-list">
         {{#each this.matches}}
-        <div class="match-detail cursor-pointer" data-match-id="{{this.id}}" role="link" tabindex="0"
-          aria-label="Open match {{this.homeTeam.name}} vs {{this.awayTeam.name}}">
-          <div class="match-opponent">
-            <div class="home-side">
-              <a href="/team?ID={{this.homeTeam.id}}" aria-label="{{this.homeTeam.name}} team page">
-                <img width="40px" src="images/logos/{{this.homeTeam.id}}.png" alt="{{this.homeTeam.name}}">
-              </a>
-              <a class="team-name" href="/team?ID={{this.homeTeam.id}}">{{this.homeTeam.name}}</a>
-            </div>
-            <div class="center-info">
-              <span class="match-score">{{this.homeScore}} - {{this.awayScore}}</span>
-              <span class="match-date"><a class="match-competition-link"
-                  href="/league?id={{this.leagueId}}">{{this.league}}</a> - {{formatDate this.date}}</span>
-            </div>
-            <div class="away-side">
-              <a class="team-name" href="/team?ID={{this.awayTeam.id}}">{{this.awayTeam.name}}</a>
-              <a href="/team?ID={{this.awayTeam.id}}" aria-label="{{this.awayTeam.name}} team page">
-                <img width="40px" src="images/logos/{{this.awayTeam.id}}.png" alt="{{this.awayTeam.name}}">
-              </a>
-            </div>
-          </div>
-          <div class="match-stats-detail">
-            <span>Corners: {{this.stats.cornersHome}} - {{this.stats.cornersAway}}</span>
-            <span>Shots: {{this.stats.shotsOnGoalHome}} - {{this.stats.shotsOnGoalAway}}</span>
-            {{#if this.eloChange}}
-            <span>Elo change: <span class="elo-change {{this.eloChange.direction}}">{{this.eloChange.display}}</span></span>
-            {{/if}}
-            {{#if this.xG}}
-            <span>xG: {{this.stats.xGHome}} - {{this.stats.xGAway}}</span>
-            {{/if}}
-          </div>
-        </div>
+        {{> match-detail-card}}
         {{/each}}
       </div>
 
@@ -490,6 +463,109 @@
       </div>
     </div>
 
+  </div>
+  {{/if}}
+
+  {{#if matchInfo}}
+  <div id="match-h2h-panel" class="match-content-panel match-split-panel" data-panel="h2h" role="tabpanel">
+    {{#with headToHead}}
+    <div class="h2h-column">
+    <div class="rectangle">
+    <div class="h2h-summary">
+      <div class="h2h-summary-grid">
+        <a class="h2h-summary-team" href="/team?ID={{home.id}}">
+          <img src="images/logos/{{home.id}}.png" alt="{{home.name}}" />
+          <span>{{home.name}}</span>
+        </a>
+        <div>
+          <div class="h2h-count-row">
+            <span class="h2h-count h2h-home" title="{{home.name}} wins">{{home.wins}}</span>
+            <span class="h2h-count h2h-draw" title="Draws">{{home.draws}}</span>
+            <span class="h2h-count h2h-away" title="{{away.name}} wins">{{away.wins}}</span>
+          </div>
+          <div class="h2h-count-labels"><span>Wins</span><span>Draws</span><span>Wins</span></div>
+        </div>
+        <a class="h2h-summary-team" href="/team?ID={{away.id}}">
+          <img src="images/logos/{{away.id}}.png" alt="{{away.name}}" />
+          <span>{{away.name}}</span>
+        </a>
+      </div>
+      <div class="h2h-bar" role="img"
+        aria-label="{{home.name}} {{home.total.winPercentage}}%, draws {{drawPercentage}}%, {{away.name}} {{away.total.winPercentage}}%">
+        {{#if home.wins}}<span class="h2h-home" style="width: {{home.total.winPercentage}}%">{{home.total.winPercentage}}%</span>{{/if}}
+        {{#if home.draws}}<span class="h2h-draw" style="width: {{drawPercentage}}%">{{drawPercentage}}%</span>{{/if}}
+        {{#if away.wins}}<span class="h2h-away" style="width: {{away.total.winPercentage}}%">{{away.total.winPercentage}}%</span>{{/if}}
+      </div>
+      <div class="h2h-summary-grid h2h-summary-meta">
+        <div class="preview-form" title="Last 5 meetings ({{home.name}})">
+          {{#each home.formArray as |form|}}<span class="form-indicator {{form}}"></span>{{/each}}
+        </div>
+        <span>{{home.played}} meetings &middot; Goals {{home.total.goals}} - {{away.total.goals}}</span>
+        <div class="preview-form" title="Last 5 meetings ({{away.name}})">
+          {{#each away.formArray as |form|}}<span class="form-indicator {{form}}"></span>{{/each}}
+        </div>
+      </div>
+    </div>
+
+    <table class="gf-table player-stats-table preview-stats-table h2h-stats-table">
+      <thead>
+        <tr class="main-table-header">
+          <th class="center-td">Total</th>
+          <th class="center-td">Per game</th>
+          <th class="center-td">Stat</th>
+          <th class="center-td">Per game</th>
+          <th class="center-td">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{> h2h-stat-row label="Points" key="points"}}
+        {{> h2h-stat-row label="xPoints" key="xPoints"}}
+        {{> h2h-stat-row label="Goals" key="goals"}}
+        {{> h2h-stat-row label="xG" key="xG"}}
+        {{> h2h-stat-row label="Shots on Goal" key="shotsOnGoal"}}
+        {{> h2h-stat-row label="Corners" key="corners"}}
+        {{> h2h-stat-row label="Possession" key="possession" suffix="%" noTotal=true}}
+        {{> h2h-stat-row label="Yellow Cards" key="yellowCards" dir="lower"}}
+        <tr>
+          <td class="center-td">{{#if home.eloChange.total}}<span class="elo-change {{home.eloChange.total.direction}}">{{home.eloChange.total.display}}</span>{{else}}—{{/if}}</td>
+          <td class="center-td">{{#if home.eloChange.perGame}}<span class="elo-change {{home.eloChange.perGame.direction}}">{{home.eloChange.perGame.display}}</span>{{else}}—{{/if}}</td>
+          <td class="center-td player-stat-name">Elo</td>
+          <td class="center-td">{{#if away.eloChange.perGame}}<span class="elo-change {{away.eloChange.perGame.direction}}">{{away.eloChange.perGame.display}}</span>{{else}}—{{/if}}</td>
+          <td class="center-td">{{#if away.eloChange.total}}<span class="elo-change {{away.eloChange.total.direction}}">{{away.eloChange.total.display}}</span>{{else}}—{{/if}}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    {{#if topPlayers.length}}
+    <div class="rectangle">
+      <div class="rect-header">
+        <div class="rect-title">
+          <h2>Top H2H Players</h2>
+        </div>
+      </div>
+      <div id="player-list" class="table-container">
+        {{> player-list-table big=false players=topPlayers}}
+      </div>
+    </div>
+    {{/if}}
+    </div>
+
+    <div class="rectangle h2h-meetings">
+      <div class="rect-header">
+        <div class="rect-title">
+          <h2>Last {{meetings.length}} H2H games</h2>
+        </div>
+      </div>
+      <div class="match-detail-list">
+        {{#each meetings}}
+        {{> match-detail-card eloLabel=../home.name}}
+        {{/each}}
+      </div>
+    </div>
+    {{else}}
+    <div class="lineup-empty h2h-empty">No previous meetings found between these teams.</div>
+    {{/with}}
   </div>
   {{/if}}
 

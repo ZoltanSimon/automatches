@@ -298,7 +298,12 @@ export async function ensureMatchInRegistry(registry, matchID) {
 
 export async function buildMatchRegistry(leagueIDs) {
   const allLeagueMatches = await getLeagueFromDb(leagueIDs);
-  const baseMatches = allLeagueMatches
+  return createRegistry(await hydrateFixtures(allLeagueMatches));
+}
+
+// Merges stored match details (statistics, lineups, fotmob) into base fixtures from the matches table.
+export async function hydrateFixtures(fixtures) {
+  const baseMatches = (Array.isArray(fixtures) ? fixtures : [])
     .map(normalizeFixtureAsMatch)
     .filter((match) => match?.fixture?.id !== undefined && match?.fixture?.id !== null);
   const matchIDs = [...new Set(baseMatches.map(({ fixture }) => fixture.id))];
@@ -310,13 +315,11 @@ export async function buildMatchRegistry(leagueIDs) {
       .map((match) => [String(match.fixture.id), match]),
   );
 
-  const mergedMatches = baseMatches.map((baseMatch) => {
+  return baseMatches.map((baseMatch) => {
     const detailMatch = detailedMatchByID.get(String(baseMatch.fixture.id));
     const merged = detailMatch ? deepMergeMatch(baseMatch, detailMatch) : baseMatch;
     return normalizeFixtureAsMatch(merged);
   });
-
-  return createRegistry(mergedMatches);
 }
 
 function createRegistry(matches) {

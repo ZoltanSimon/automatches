@@ -1,0 +1,32 @@
+<div class="match-detail cursor-pointer" data-match-id="{{this.id}}" role="link" tabindex="0"
+  aria-label="Open match {{this.homeTeam.name}} vs {{this.awayTeam.name}}">
+  <div class="match-opponent">
+    <div class="home-side">
+      <a href="/team?ID={{this.homeTeam.id}}" aria-label="{{this.homeTeam.name}} team page">
+        <img width="40px" src="images/logos/{{this.homeTeam.id}}.png" alt="{{this.homeTeam.name}}">
+      </a>
+      <a class="team-name" href="/team?ID={{this.homeTeam.id}}">{{this.homeTeam.name}}</a>
+    </div>
+    <div class="center-info">
+      <span class="match-score">{{#if this.result}}<span class="form-indicator {{this.result}}" title="{{this.result}}"></span>{{/if}}{{this.homeScore}} - {{this.awayScore}}</span>
+      <span class="match-date"><a class="match-competition-link"
+          href="/league?id={{this.leagueId}}">{{this.league}}</a> - {{formatDate this.date}}</span>
+    </div>
+    <div class="away-side">
+      <a class="team-name" href="/team?ID={{this.awayTeam.id}}">{{this.awayTeam.name}}</a>
+      <a href="/team?ID={{this.awayTeam.id}}" aria-label="{{this.awayTeam.name}} team page">
+        <img width="40px" src="images/logos/{{this.awayTeam.id}}.png" alt="{{this.awayTeam.name}}">
+      </a>
+    </div>
+  </div>
+  <div class="match-stats-detail">
+    <span>Corners: {{this.stats.cornersHome}} - {{this.stats.cornersAway}}</span>
+    <span>Shots: {{this.stats.shotsOnGoalHome}} - {{this.stats.shotsOnGoalAway}}</span>
+    {{#if this.eloChange}}
+    <span>Elo change{{#if eloLabel}} ({{eloLabel}}){{/if}}: <span class="elo-change {{this.eloChange.direction}}">{{this.eloChange.display}}</span></span>
+    {{/if}}
+    {{#if this.xG}}
+    <span>xG: {{this.stats.xGHome}} - {{this.stats.xGAway}}</span>
+    {{/if}}
+  </div>
+</div>

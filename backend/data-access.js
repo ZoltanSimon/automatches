@@ -621,7 +621,7 @@ export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished
         match.league?.round,
         match.teams?.home?.id,
         match.teams?.away?.id,
-        String(match.fixture?.date ?? "").replace("T", " ").slice(0, 19),
+        toDbDateTime(match.fixture?.date),
         match.fixture?.status?.short,
         match.goals?.home,
         match.goals?.away,
@@ -661,39 +661,89 @@ export async function getLeagueFromDb(leagueIDs) {
       params,
     );
 
-    return rows.map((r) => ({
-      fixture: {
-        id: r.fixtureId,
-        date: serializeFixtureDate(r.match_date),
-        status: { short: r.status },
-      },
-      league: {
-        id: r.league_id,
-        season: r.season,
-        round: r.round,
-        name: getCatalogLeague(r.league_id)?.name ?? null,
-        country: getCatalogLeague(r.league_id)?.country ?? null,
-      },
-      teams: {
-        home: {
-          id: r.home_team_id,
-          name: getTeamById(r.home_team_id)?.name || "Unknown",
-        },
-        away: {
-          id: r.away_team_id,
-          name: getTeamById(r.away_team_id)?.name || "Unknown",
-        },
-      },
-      goals: {
-        home: r.home_score,
-        away: r.away_score,
-      },
-    }));
+    return rows.map(fixtureFromMatchRow);
   } catch (e) {
     console.error(
       `❌ Failed to load leagues ${leagueIDs.join(", ")} from DB:`,
       e,
     );
+    return [];
+  }
+}
+
+// ISO fixture date ("2026-10-11T08:00:00+00:00") to a DATETIME literal.
+function toDbDateTime(date) {
+  return String(date ?? "").replace("T", " ").slice(0, 19);
+}
+
+function fixtureFromMatchRow(r) {
+  return {
+    fixture: {
+      id: r.fixtureId,
+      date: serializeFixtureDate(r.match_date),
+      status: { short: r.status },
+    },
+    league: {
+      id: r.league_id,
+      season: r.season,
+      round: r.round,
+      name: getCatalogLeague(r.league_id)?.name ?? null,
+      country: getCatalogLeague(r.league_id)?.country ?? null,
+    },
+    teams: {
+      home: {
+        id: r.home_team_id,
+        name: getTeamById(r.home_team_id)?.name || "Unknown",
+      },
+      away: {
+        id: r.away_team_id,
+        name: getTeamById(r.away_team_id)?.name || "Unknown",
+      },
+    },
+    goals: {
+      home: r.home_score,
+      away: r.away_score,
+    },
+  };
+}
+
+// Finished meetings between two teams across all seasons, newest first.
+export async function getHeadToHeadFixturesFromDb(teamA, teamB, { beforeDate = null, excludeId = null, limit = 10 } = {}) {
+  const a = Number(teamA);
+  const b = Number(teamB);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    return [];
+  }
+
+  const conditions = [
+    "((home_team_id = ? AND away_team_id = ?) OR (home_team_id = ? AND away_team_id = ?))",
+    "status IN (?)",
+  ];
+  const params = [a, b, b, a, [...FINISHED_MATCH_STATUSES]];
+
+  if (beforeDate) {
+    conditions.push("match_date < ?");
+    params.push(toDbDateTime(beforeDate));
+  }
+  if (excludeId != null) {
+    conditions.push("id <> ?");
+    params.push(Number(excludeId));
+  }
+  params.push(Number(limit) || 10);
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT id AS fixtureId, league_id, season, round, home_team_id, away_team_id, match_date, status, home_score, away_score
+       FROM matches
+       WHERE ${conditions.join(" AND ")}
+       ORDER BY match_date DESC
+       LIMIT ?`,
+      params,
+    );
+
+    return rows.map(fixtureFromMatchRow);
+  } catch (e) {
+    console.error(`❌ Failed to load head to head for ${a} vs ${b}:`, e);
     return [];
   }
 }

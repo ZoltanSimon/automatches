@@ -341,7 +341,7 @@ app.get("/match", async (request, response) => {
     });
   }
 
-  const { teamList, matchStatistics, leagueName, matchElo } = await getMatchPageData(registry, currentMatch);
+  const { teamList, matchStatistics, leagueName, matchElo, headToHead } = await getMatchPageData(registry, currentMatch);
   const headerLeagueName = typeof currentMatch?.league?.name === "string" && currentMatch.league.name.trim()
     ? currentMatch.league.name.trim()
     : leagueName;
@@ -355,6 +355,7 @@ app.get("/match", async (request, response) => {
     headerLeagueName,
     matchStatistics,
     matchElo,
+    headToHead,
   });
 });
 

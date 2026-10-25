@@ -1,15 +1,16 @@
-import { buildMatchRegistry, getLoadedRegistry, upsertRegistryMatchIfLoaded } from "./registry-service.js";
+import { buildMatchRegistry, getLoadedRegistry, hydrateFixtures, upsertRegistryMatchIfLoaded } from "./registry-service.js";
 import { saveMatchesToServer, buildTeamList, getMatchFromServer } from "./json-reader.js";
 import { getAllCompetitionTeam, getTeamById } from "./teams-service.js";
 import { memoizeRegistryStat } from "./registry-stats.js";
 import { applyEloForFinishedMatches } from "./elo-service.js";
 import { allDBLeagues } from "../lib/catalog.js";
-import { getAllMatchesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, getMatchEloRowsByIds, getTeamEloForTeam, setMatchExpectedGoals } from "../data-access.js";
+import { getAllMatchesFromDb, getHeadToHeadFixturesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, getMatchEloRowsByIds, getTeamEloForTeam, setMatchExpectedGoals } from "../data-access.js";
 import { eloScopeFromTeam, formatEloDelta, formatSignedElo } from "../lib/elo.js";
 import { wait } from "../lib/backend-helper.js";
 import { getResults, getFixturesByDate, hasApiErrors } from "../api/webapi-handler.js";
 import { applyExpectedGoalsToMatch, parseExpectedGoalsValue, unwrapMatchPayload } from "../lib/match-details-mapper.js";
 import { calculateXPts } from "./poisson-model.js";
+import { getMatchesTopRatedPlayers } from "./players-service.js";
 
 const FINISHED_MATCH_STATUSES = new Set(["FT", "AET", "PEN"]);
 const UPDATE_MATCHES_DELAY_MS = 3000;
@@ -398,7 +399,95 @@ function summarizeEloChange(matches, teamId, eloByMatchId) {
   };
 }
 
+// Elo change over all of the given matches and the 5 most recent (newest first).
+function summarizeTeamEloChange(newestFirst, teamId, eloByMatchId) {
+  const all = summarizeEloChange(newestFirst, teamId, eloByMatchId);
+  const recent = summarizeEloChange(newestFirst.slice(0, 5), teamId, eloByMatchId);
+  return {
+    total: all.total,
+    perGame: all.perGame,
+    last5: recent.total,
+    last5PerGame: recent.perGame,
+  };
+}
+
+function withMatchEloChange(match, teamId, eloByMatchId) {
+  const delta = teamMatchEloDelta(eloByMatchId.get(Number(match.id)), teamId, match);
+  return {
+    ...match,
+    eloChange: Number.isFinite(delta) ? formatSignedElo(delta) : null,
+  };
+}
+
+const HEAD_TO_HEAD_LIMIT = 12;
+
+function headToHeadResult(match, teamId) {
+  const isHome = Number(match.homeTeam?.id) === Number(teamId);
+  const goalsFor = isHome ? match.homeScore : match.awayScore;
+  const goalsAgainst = isHome ? match.awayScore : match.homeScore;
+  if (goalsFor > goalsAgainst) return "W";
+  if (goalsFor < goalsAgainst) return "L";
+  return "D";
+}
+
+export async function getHeadToHeadData(registry, currentMatch) {
+  const homeId = Number(currentMatch?.teams?.home?.id);
+  const awayId = Number(currentMatch?.teams?.away?.id);
+  if (!Number.isFinite(homeId) || !Number.isFinite(awayId)) {
+    return null;
+  }
+
+  const fixtures = await getHeadToHeadFixturesFromDb(homeId, awayId, {
+    beforeDate: currentMatch?.fixture?.date,
+    excludeId: currentMatch?.fixture?.id,
+    limit: HEAD_TO_HEAD_LIMIT,
+  });
+  if (fixtures.length === 0) {
+    return null;
+  }
+
+  // Recent meetings are already hydrated in the registry; only older ones need their details loaded.
+  const loaded = fixtures.map((fixture) => getMatchById(registry, fixture.fixture.id));
+  const [hydrated, eloByMatchId] = await Promise.all([
+    hydrateFixtures(fixtures.filter((_, index) => !loaded[index])),
+    getMatchEloRowsByIds(fixtures.map((fixture) => fixture.fixture.id)),
+  ]);
+  const hydratedById = new Map(hydrated.map((match) => [Number(match.fixture.id), match]));
+  // The DB returns newest first; team stats (form, last 5) expect oldest first.
+  const matches = fixtures
+    .map((fixture, index) => loaded[index] ?? hydratedById.get(Number(fixture.fixture.id)))
+    .filter(Boolean)
+    .reverse();
+
+  const teams = buildTeamList(matches);
+  const homeTeam = teams.find((team) => Number(team.id) === homeId);
+  const awayTeam = teams.find((team) => Number(team.id) === awayId);
+  if (!homeTeam || !awayTeam) {
+    return null;
+  }
+
+  const withEloChange = (team) => ({
+    ...team,
+    eloChange: summarizeTeamEloChange([...team.matches].reverse(), team.id, eloByMatchId),
+  });
+
+  return {
+    home: withEloChange(homeTeam),
+    away: withEloChange(awayTeam),
+    drawPercentage: Number((100 - homeTeam.total.winPercentage - awayTeam.total.winPercentage).toFixed(1)),
+    meetings: [...homeTeam.matches].reverse().map((match) => ({
+      ...withMatchEloChange(match, homeId, eloByMatchId),
+      result: headToHeadResult(match, homeId),
+    })),
+    topPlayers: getMatchesTopRatedPlayers(matches),
+  };
+}
+
 export async function getMatchPageData(registry, currentMatch) {
+  const headToHeadPromise = getHeadToHeadData(registry, currentMatch).catch((error) => {
+    console.error("Failed to build head to head:", error);
+    return null;
+  });
   const { home, away } = currentMatch.teams;
   const registryTeams = [home.id, away.id]
     .map((teamID) => getAllCompetitionTeam(registry, teamID))
@@ -417,26 +506,13 @@ export async function getMatchPageData(registry, currentMatch) {
     .sort((a, b) => (a.id === home.id ? -1 : b.id === home.id ? 1 : 0))
     .map((team) => {
       const sortedMatches = matchesByTeam.get(team.id) || [];
-      const seasonElo = summarizeEloChange(sortedMatches, team.id, eloByMatchId);
       const recentMatches = sortedMatches.slice(0, 5);
-      const recentElo = summarizeEloChange(recentMatches, team.id, eloByMatchId);
       const seasonOpponentElo = summarizeOpponentElo(sortedMatches, team.id, eloByMatchId);
       const recentOpponentElo = summarizeOpponentElo(recentMatches, team.id, eloByMatchId);
       return {
         ...team,
-        matches: sortedMatches.slice(0, 5).map((match) => {
-          const delta = teamMatchEloDelta(eloByMatchId.get(Number(match.id)), team.id, match);
-          return {
-            ...match,
-            eloChange: Number.isFinite(delta) ? formatSignedElo(delta) : null,
-          };
-        }),
-        eloChange: {
-          total: seasonElo.total,
-          perGame: seasonElo.perGame,
-          last5: recentElo.total,
-          last5PerGame: recentElo.perGame,
-        },
+        matches: recentMatches.map((match) => withMatchEloChange(match, team.id, eloByMatchId)),
+        eloChange: summarizeTeamEloChange(sortedMatches, team.id, eloByMatchId),
         opponentElo: {
           total: seasonOpponentElo.total,
           perGame: seasonOpponentElo.perGame,
@@ -458,9 +534,10 @@ export async function getMatchPageData(registry, currentMatch) {
   const eloScope = matchEloRow?.scope === "nt" || matchEloRow?.scope === "club"
     ? matchEloRow.scope
     : eloScopeFromTeam(getTeamById(currentMatch?.teams?.home?.id));
-  const [homeRatings, awayRatings] = await Promise.all([
+  const [homeRatings, awayRatings, headToHead] = await Promise.all([
     getTeamEloForTeam(currentMatch?.teams?.home?.id),
     getTeamEloForTeam(currentMatch?.teams?.away?.id),
+    headToHeadPromise,
   ]);
   const currentElo = (ratings) => {
     const elo = Number(ratings?.[eloScope]?.elo);
@@ -482,6 +559,7 @@ export async function getMatchPageData(registry, currentMatch) {
     matchStatistics,
     leagueName,
     matchElo,
+    headToHead,
   };
 }
 

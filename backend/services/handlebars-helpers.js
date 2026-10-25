@@ -323,10 +323,6 @@ export const matchTeamAverageRating = (lineup, matchPlayers, fotmob, homeTeamId)
   return (sum / ratings.length).toFixed(1);
 }
 
-export const isFinishedStatus = (statusShort) => {
-  return ["FT", "AET", "PEN", "CANC", "PST"].includes(statusShort);
-}
-
 export const isGoalEvent = (eventType, eventDetail = "") => {
   const type = String(eventType ?? "").trim().toLowerCase();
   const detail = String(eventDetail ?? "").trim().toLowerCase();
