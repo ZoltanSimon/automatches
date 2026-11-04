@@ -1,11 +1,11 @@
 import { buildMatchRegistry, getLoadedRegistry, hydrateFixtures, upsertRegistryMatchIfLoaded } from "./registry-service.js";
 import { saveMatchesToServer, buildTeamList, getMatchFromServer } from "./json-reader.js";
-import { getAllCompetitionTeam, getTeamById } from "./teams-service.js";
+import { getAllCompetitionTeam, getTeamById, getTeamHomeStadium, nameTeamCompetitions } from "./teams-service.js";
 import { memoizeRegistryStat } from "./registry-stats.js";
 import { applyEloForFinishedMatches } from "./elo-service.js";
 import { allDBLeagues } from "../lib/catalog.js";
-import { getAllMatchesFromDb, getHeadToHeadFixturesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, getMatchEloRowsByIds, getTeamEloForTeam, setMatchExpectedGoals } from "../data-access.js";
-import { eloScopeFromTeam, formatEloDelta, formatSignedElo } from "../lib/elo.js";
+import { getAllMatchesFromDb, getHeadToHeadFixturesFromDb, getMatchDetailsById, getMatchIdsMissingDetails, getMatchEloByMatchId, getMatchEloRowsByIds, getTeamEloForTeam, getTeamEloMonthChange, setMatchExpectedGoals } from "../data-access.js";
+import { eloScopeFromTeam, formatEloDelta, formatSignedElo, isNeutralVenue } from "../lib/elo.js";
 import { wait } from "../lib/backend-helper.js";
 import { getResults, getFixturesByDate, hasApiErrors } from "../api/webapi-handler.js";
 import { applyExpectedGoalsToMatch, parseExpectedGoalsValue, unwrapMatchPayload } from "../lib/match-details-mapper.js";
@@ -282,9 +282,13 @@ export async function matchesOnDay(registry, dateToCheck) {
 }
 
 export async function matchesInRound(roundNr, leagueID) {
-  const roundName = (leagueID == 2) ? `League Stage - ${roundNr}` : `Group Stage - ${roundNr}`;
+  // A bare number matches any of the usual round prefixes; anything else must be the exact round name
+  const round = String(roundNr ?? "").trim();
+  const roundNames = /^\d+$/.test(round)
+    ? [`Regular Season - ${round}`, `League Stage - ${round}`, `Group Stage - ${round}`]
+    : [round];
   const registry = await buildMatchRegistry([Number(leagueID)]);
-  return registry.matches.filter((match) => match.league.id == leagueID && match.league.round == roundName);
+  return registry.matches.filter((match) => match.league.id == leagueID && roundNames.includes(match.league.round));
 }
 
 export async function lastMatchesFromLeague(registry, leagueID) {
@@ -411,6 +415,32 @@ function summarizeTeamEloChange(newestFirst, teamId, eloByMatchId) {
   };
 }
 
+// Elo rows of the team stats table; expects the team's matches newest first.
+export function summarizeTeamElo(newestFirst, teamId, eloByMatchId) {
+  const seasonOpponentElo = summarizeOpponentElo(newestFirst, teamId, eloByMatchId);
+  const recentOpponentElo = summarizeOpponentElo(newestFirst.slice(0, 5), teamId, eloByMatchId);
+  return {
+    eloChange: summarizeTeamEloChange(newestFirst, teamId, eloByMatchId),
+    opponentElo: {
+      total: seasonOpponentElo.total,
+      perGame: seasonOpponentElo.perGame,
+      last5: recentOpponentElo.total,
+      last5PerGame: recentOpponentElo.perGame,
+    },
+  };
+}
+
+export async function getTeamEloMonthSummary(teamId, scope) {
+  const monthElo = await getTeamEloMonthChange(teamId, scope);
+  return monthElo
+    ? {
+        ...formatEloDelta(monthElo.current, monthElo.previous),
+        current: Math.round(monthElo.current),
+        scope,
+      }
+    : null;
+}
+
 function withMatchEloChange(match, teamId, eloByMatchId) {
   const delta = teamMatchEloDelta(eloByMatchId.get(Number(match.id)), teamId, match);
   return {
@@ -492,9 +522,10 @@ export async function getMatchPageData(registry, currentMatch) {
   const registryTeams = [home.id, away.id]
     .map((teamID) => getAllCompetitionTeam(registry, teamID))
     .filter(Boolean);
-  const teams = registryTeams.length > 0
+  const teams = (registryTeams.length > 0
     ? registryTeams
-    : buildTeamList([currentMatch]).filter((team) => team.id === home.id || team.id === away.id);
+    : buildTeamList([currentMatch]).filter((team) => team.id === home.id || team.id === away.id))
+    .map(nameTeamCompetitions);
   const matchesByTeam = new Map(teams.map((team) => [
     team.id,
     [...team.matches].sort((a, b) => new Date(b.date) - new Date(a.date)),
@@ -507,18 +538,11 @@ export async function getMatchPageData(registry, currentMatch) {
     .map((team) => {
       const sortedMatches = matchesByTeam.get(team.id) || [];
       const recentMatches = sortedMatches.slice(0, 5);
-      const seasonOpponentElo = summarizeOpponentElo(sortedMatches, team.id, eloByMatchId);
-      const recentOpponentElo = summarizeOpponentElo(recentMatches, team.id, eloByMatchId);
       return {
         ...team,
+        lastPlayedDate: sortedMatches[0]?.date ?? null,
         matches: recentMatches.map((match) => withMatchEloChange(match, team.id, eloByMatchId)),
-        eloChange: summarizeTeamEloChange(sortedMatches, team.id, eloByMatchId),
-        opponentElo: {
-          total: seasonOpponentElo.total,
-          perGame: seasonOpponentElo.perGame,
-          last5: recentOpponentElo.total,
-          last5PerGame: recentOpponentElo.perGame,
-        },
+        ...summarizeTeamElo(sortedMatches, team.id, eloByMatchId),
       };
     });
 
@@ -534,6 +558,9 @@ export async function getMatchPageData(registry, currentMatch) {
   const eloScope = matchEloRow?.scope === "nt" || matchEloRow?.scope === "club"
     ? matchEloRow.scope
     : eloScopeFromTeam(getTeamById(currentMatch?.teams?.home?.id));
+  await Promise.all(teamList.map(async (team) => {
+    team.eloMonthChange = await getTeamEloMonthSummary(team.id, eloScope);
+  }));
   const [homeRatings, awayRatings, headToHead] = await Promise.all([
     getTeamEloForTeam(currentMatch?.teams?.home?.id),
     getTeamEloForTeam(currentMatch?.teams?.away?.id),
@@ -553,6 +580,11 @@ export async function getMatchPageData(registry, currentMatch) {
         }
       : null,
   };
+  // Upcoming fixtures have no stored venue, so fall back to the home team's usual ground.
+  let matchVenue = currentMatch.fixture?.venue?.name || null;
+  if (!matchVenue && !isNeutralVenue(currentMatch, currentMatch.league, currentMatch.league?.round)) {
+    matchVenue = getTeamHomeStadium(await allTeamMatches(registry, home.id, null, false), home.id);
+  }
 
   return {
     teamList,
@@ -560,6 +592,7 @@ export async function getMatchPageData(registry, currentMatch) {
     leagueName,
     matchElo,
     headToHead,
+    matchVenue,
   };
 }
 

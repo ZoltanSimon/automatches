@@ -2,7 +2,7 @@
 <script type="module" src="./../controllers/team.js"></script>
 
 <div class="container">
-    <div class="team-page-header">
+    <div class="team-page-header team-page-header--team">
         <div class="team">
             <img src="images/logos/{{thisTeam.ID}}.png" alt="{{thisTeam.Name}}">
             <div>{{thisTeam.name}}</div>
@@ -12,53 +12,65 @@
             </button>
             {{/if}}
         </div>
-        <div class="team-info">
-            {{#each teamStats.[0].leagues}}
-            <div onclick="window.location.href='/league?id={{this.id}}'" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                <img src="images/competitions/{{this.id}}.png" class="logo-picture" />
-                <span>{{this.name}}</span>
-            </div>
-            {{/each}}
-
-        </div>
-        <div class="stat team-stats">
-            <span>{{teamStats.[0].wins}}W {{teamStats.[0].draws}}D {{teamStats.[0].losses}}L<br/></span>
-            <span class="pts value">{{percentage teamStats.[0].wins teamStats.[0].played}}% win<br/></span>
-            <span class="per-game pts-per">{{teamStats.[0].perGame.points}} pts/game</span>
-        </div>
-        <div class="stat">
-            <div class="label">Elo last month</div>
-            {{#if eloMonthChange}}
-            <div class="value elo-change {{eloMonthChange.direction}}">{{eloMonthChange.display}}</div>
-            <div class="per-game">{{eloMonthChange.current}} now</div>
-            {{else}}
-            <div class="value">—</div>
-            <div class="per-game">last 30 days</div>
+        <div class="team-details">
+            {{#if teamNation}}
+            <div class="team-meta">Nation: <img class="nation-flag" src="images/logos/{{teamNation.ID}}.png" alt="">
+                {{teamNation.name}}</div>
             {{/if}}
+            {{#if teamStadium}}<div class="team-meta">Stadium: {{teamStadium}}</div>{{/if}}
+            {{#if teamManager}}<div class="team-meta">Manager: {{teamManager}}</div>{{/if}}
         </div>
-        <div class="stat">
-            <div class="label">Goals</div>
-            <div class="value">{{teamStats.[0].total.goals}} - {{teamStats.[0].total.goalsAgainst}}</div>
-            <div class="per-game">{{teamStats.[0].perGame.goals}} - {{teamStats.[0].perGame.goalsAgainst}}/game</div>
+        <div class="team-info stat">
+            <div class="team-competitions">
+                {{#each teamStats.[0].leagues}}
+                <div onclick="window.location.href='/league?id={{this.id}}'"
+                    style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <img src="images/competitions/{{this.id}}.png" class="logo-picture" />
+                    <span>{{this.name}}</span>
+                </div>
+                {{/each}}
+            </div>
         </div>
-
-        <div class="stat">
-            <div class="label">xG</div>
-            <div class="value">{{teamStats.[0].total.xG}} - {{teamStats.[0].total.xGA}}</div>
-            <div class="per-game">{{teamStats.[0].perGame.xG}} - {{teamStats.[0].perGame.xGA}}/game</div>
+        {{> team-form teamStats.[0] stat=true}}
+    </div>
+    <div class="rectangle" id="team-statistics">
+        {{> rect-header title="Statistics" hideExpand=true wikiInfo="How the average team rating is calculated:"
+        wikiAnchor="team-rating"}}
+        <div class="table-container" style="grid-column: 1 / 4; width: 100%;">
+            {{> team-summary teamStats.[0] eloMonthChange=eloMonthChange}}
+            {{> team-stats-table teamStats.[0]}}
+            {{> team-competition-table teamStats.[0]}}
         </div>
-
-        <div class="stat">
-            <div class="label">Corners</div>
-            <div class="value">{{teamStats.[0].total.corners}} - {{teamStats.[0].total.cornersAgainst}}</div>
-            <div class="per-game">{{teamStats.[0].perGame.corners}} - {{teamStats.[0].perGame.cornersAgainst}}/game</div>
+    </div>
+        <div class="rectangle" id="team-transfers">
+        {{> rect-header title="Latest Transfers" link="/transfers"}}
+        <div class="table-container" style="grid-column: 1 / 4; width: 100%;">
+            {{> player-transfer latestTransfers=teamTransfers}}
         </div>
-
-        <div class="stat">
-            <div class="label">Shots on Goal</div>
-            <div class="value">{{teamStats.[0].total.shotsOnGoal}} - {{teamStats.[0].total.shotsOnGoalAgainst}}</div>
-            <div class="per-game">{{teamStats.[0].perGame.shotsOnGoal}} - {{teamStats.[0].perGame.shotsOnGoalAgainst}}/game</div>
-        </div>
+        <p class="updated-at-label">Transfers updated at {{#if transferUpdatedAt}}{{formatDateOnly
+            transferUpdatedAt}}{{else}}unknown{{/if}}</p>
+    </div>
+    <div class="rectangle" style="padding: 8px;">
+        <span>{{thisTeam.name}} is a {{#if isNationalTeam}}national team{{else}}football club{{#if teamNation}} from
+            {{teamNation.name}}{{/if}}{{/if}}{{#if teamManager}}, managed by {{teamManager}}{{/if}}{{#if teamStadium}},
+            playing their home matches at {{teamStadium}}{{/if}}.
+            This season they featured in the following competitions: {{#each teamStats.[0].leagues}}{{#unless
+            @first}}{{#if @last}} and {{else}}, {{/if}}{{/unless}}{{this.name}}{{/each}},
+            having {{plural teamStats.[0].wins "win"}}, {{plural teamStats.[0].draws "draw"}}, and {{plural
+            teamStats.[0].losses "loss" "losses"}}. They've scored a total of {{plural teamStats.[0].total.goals
+            "goal"}} from {{teamStats.[0].total.xG}} expected goals, conceding {{plural teamStats.[0].total.goalsAgainst
+            "goal"}} from {{teamStats.[0].total.xGA}} expected goals.
+            {{#if teamTopScorers.length}}Their current top {{#if (eq teamTopScorers.length 1)}}scorer is{{else}}scorers
+            are{{/if}}
+            {{#each teamTopScorers}}{{#unless @first}}{{#if @last}} and {{else}}, {{/if}}{{/unless}}<a
+                href="/player?id={{this.id}}">{{this.name}}</a>{{/each}}
+            with {{plural topGoals "goal"}}{{#unless (eq teamTopScorers.length 1)}} each{{/unless}}.{{/if}}
+            {{#if eloMonthChange}}Their current <a href="/gf-wiki#elo">Elo rating</a> is {{eloMonthChange.current}},
+            {{#if (eq eloMonthChange.direction "flat")}}unchanged over the last 30 days{{else}}which has changed by
+            {{eloMonthChange.display}} over the last 30 days{{/if}}.{{/if}}<br /><br />
+            If you are interested in the featured competitions, click on the competition icons next to the team's logo
+            and name. You can also click on the matches to see more details about them, or on the players to see their
+            respective pages. </span>
     </div>
     <div class="rectangle">
         <span hidden id="league-name"></span>
@@ -68,32 +80,23 @@
             {{> match-list-table}}
         </div>
     </div>
-    <div class="rectangle" id="team-transfers">
-        {{> rect-header title="Latest Transfers" link="/transfers"}}
-        <div class="table-container" style="grid-column: 1 / 4; width: 100%;">
-            {{> player-transfer latestTransfers=teamTransfers}}
-        </div>
-        <p class="updated-at-label">Transfers updated at {{#if transferUpdatedAt}}{{formatDateOnly transferUpdatedAt}}{{else}}unknown{{/if}}</p>
-    </div>
+
     <div class="rectangle team-players-rect">
-        <h2>Players</h2>
-        <div style="display:flex; align-items:center; gap:10px; margin: 0 0 10px 0;">
+        <div class="team-players-header">
+            <h2>Players</h2>
             {{#if showAllPlayerStats}}
-            <span>Showing all competitions</span>
-            <a href="/team?ID={{thisTeam.ID}}">Show latest tournament stats</a>
+            <span class="team-players-scope">Showing all competitions</span>
+            <a class="more-link more-button" href="/team?ID={{thisTeam.ID}}">Show latest tournament</a>
             {{else}}
-            <span>Showing latest tournament: {{selectedPlayerStatsLeagueName}}</span>
-            <a href="/team?ID={{thisTeam.ID}}&allStats=1">Show all stats</a>
+            <span class="team-players-scope">Showing latest tournament: <strong>{{selectedPlayerStatsLeagueName}}</strong></span>
+            <a class="more-link more-button" href="/team?ID={{thisTeam.ID}}&allStats=1">Show all stats</a>
             {{/if}}
         </div>
         <div id="player-list" class="table-container">
             {{> player-list-table big=false}}
         </div>
-        <p class="updated-at-label">Squad updated at {{#if squadUpdatedAt}}{{formatDateOnly squadUpdatedAt}}{{else}}unknown{{/if}}</p>
+        <p class="updated-at-label">Squad updated at {{#if squadUpdatedAt}}{{formatDateOnly
+            squadUpdatedAt}}{{else}}unknown{{/if}}</p>
     </div>
-    <div class="rectangle" style="padding: 8px;">
-        <span>{{thisTeam.name}} is a football club which featured in the following competitions this season: {{#each teamStats.[0].leagues}} {{this.name}},
-            {{/each}} having {{teamStats.[0].wins}} wins, {{teamStats.[0].draws}} draws, and {{teamStats.[0].losses}} losses. They've scored a total of {{teamStats.[0].total.goals}}, from {{teamStats.[0].total.xG}} expected goals, conceding {{teamStats.[0].total.goalsAgainst}} goals from {{teamStats.[0].total.xGA}} expected goals.<br/><br/>
-        If you are interested in the featured competitions, click on the competition icons next to the team's logo and name. You can also click on the matches to see more details about them, or on the players to see their respective pages.   </span>
-    </div>
+
 </div>

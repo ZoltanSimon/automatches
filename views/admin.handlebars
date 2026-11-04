@@ -3,15 +3,191 @@
   window.allLeagues = {{{json leagues}}};
 </script>
 <link rel="stylesheet" href="css/automatches.css" />
-<div class="main-admin-container">
-  <div class="work-area child-div">
-    <div id="league-stuff">
-      <span id="league-name"></span>- ID:
-      <span id="league-id"></span>- Round:
-      <span id="round-no"></span>
-      <button id="clear-results">Clear</button>
-      <button id="copy-for-blog">Copy</button>
-      <div id="missing-xg-panel" hidden>
+
+<div class="admin-page" id="admin-page">
+  <details class="admin-box admin-league-picker" id="admin-league-picker" data-persist open>
+    <summary>Leagues <span id="admin-selected-summary" class="admin-muted">None selected</span></summary>
+    <div class="admin-league-toolbar">
+      <div id="league-list">
+        <div class="admin-league-group-label">Leagues</div>
+        <div id="league-list-league">
+          {{#each leagues}}
+          {{#if (eq this.type "league")}}
+          <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
+            class="admin-league-to-select" />
+          {{/if}}
+          {{/each}}
+        </div>
+        <div class="admin-league-group-label">Cups</div>
+        <div id="league-list-cup">
+          {{#each leagues}}
+          {{#if (eq this.type "cup")}}
+          <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
+            class="admin-league-to-select" />
+          {{/if}}
+          {{/each}}
+        </div>
+        <div class="admin-league-group-label">National teams</div>
+        <div id="league-list-nt">
+          {{#each leagues}}
+          {{#if (eq this.type "nt")}}
+          <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
+            class="admin-league-to-select" />
+          {{/if}}
+          {{/each}}
+        </div>
+      </div>
+
+      <div class="admin-league-side">
+        <div class="admin-btn-row">
+          <button id="select-all-leagues" type="button">Select first 10</button>
+          <button id="clear-leagues" type="button">Clear</button>
+        </div>
+        <div class="admin-season-panel">
+          <label class="admin-season-label" for="league-season-select">Season</label>
+          <select id="league-season-select" disabled>
+            <option value="">Select a league</option>
+          </select>
+          <div id="league-season-target" class="admin-season-target">No league selected</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <div class="admin-grid" id="admin-grid">
+    <aside class="admin-actions">
+      <details class="admin-box" id="group-data-sync" data-persist open>
+        <summary>Data sync</summary>
+        <div class="admin-btn-row">
+          <button id="update-leagues" type="button">Update leagues</button>
+          <button id="import-and-update-matches" type="button" title="Updates leagues, then fetches every missing finished match">Import + update matches <span class="admin-slow">slow</span></button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="update-league-all-seasons" type="button" title="Uses the first selected league">Update selected league (all seasons)</button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="missing-matches" type="button" title="Finished matches with no details file, for the selected leagues">Missing match details (selected)</button>
+          <button id="reload-runtime-cache" type="button" title="Reloads players, teams, leagues and the match registry">Reload runtime cache</button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="get-transfers" type="button">Transfers (clubs due) <span class="admin-slow">slow</span></button>
+          <button id="update-squads" type="button">Squads (teams due) <span class="admin-slow">slow</span></button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="get-all-clubs" type="button">Insert all clubs</button>
+          <button id="insert-all-players" type="button">Insert all players</button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="update-player-profiles-from-files" type="button">Update player profiles from files</button>
+        </div>
+      </details>
+
+      <details class="admin-box" id="group-matches" data-persist open>
+        <summary>Matches &amp; rounds</summary>
+        <div class="admin-field">
+          <label for="matches-date">Date</label>
+          <input type="date" id="matches-date" />
+          <button id="show-matches-on-date" type="button">Show</button>
+          <button id="refetch-day" type="button" title="Refetches every tracked fixture on this date from the API">Refetch day</button>
+        </div>
+        <div class="admin-field">
+          <label for="roundnr">Round</label>
+          <input type="number" min="1" placeholder="12" id="roundnr" />
+          <button id="get-matches-by-round" type="button" title="Selected league, from the DB">Show</button>
+          <button id="refetch-round" type="button" title="Selected league + season, from the API">Refetch round</button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="submit-league-info" type="button">League standings</button>
+          <button id="test-standings" type="button" title="Fetches and saves standings for the selected league + season">Fetch + save standings</button>
+        </div>
+      </details>
+
+      <details class="admin-box" id="group-xg" data-persist open>
+        <summary>xG &amp; FotMob</summary>
+        <div class="admin-field">
+          <label for="matchIDs">Match IDs</label>
+          <input type="text" placeholder="123,456" id="matchIDs" />
+          <button id="grab-match-info" type="button">Grab info</button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="matches-missing-xg" type="button">Missing xG (current season)</button>
+        </div>
+        <div class="admin-field">
+          <label for="fotmob-link-match-id">FotMob</label>
+          <input type="number" placeholder="Match ID" id="fotmob-link-match-id" />
+          <input type="text" placeholder="FotMob URL or ID" id="fotmob-link-input" />
+          <button id="fotmob-link-fetch" type="button">Fetch</button>
+        </div>
+        <div class="admin-field">
+          <label for="fotmob-backfill-season">Backfill</label>
+          <select id="fotmob-backfill-season"></select>
+          <button id="fotmob-backfill-count" type="button">Count</button>
+          <button id="fotmob-backfill-start" type="button">Start</button>
+          <button id="fotmob-backfill-stop" type="button" disabled>Stop</button>
+        </div>
+        <div id="fotmob-backfill-status" class="admin-muted"></div>
+      </details>
+
+      <details class="admin-box" id="group-players" data-persist open>
+        <summary>Players &amp; teams</summary>
+        <div class="admin-field">
+          <label for="playerID">Player ID</label>
+          <input type="number" placeholder="276" id="playerID" />
+        </div>
+        <div class="admin-btn-row">
+          <button id="get-player-profile" type="button">Info</button>
+          <button id="get-teams-by-player" type="button">Teams</button>
+          <button id="get-transfers-by-player" type="button">Transfers</button>
+          <button id="refetch-player" type="button" title="Profile + transfers">Refetch all</button>
+        </div>
+        <div class="admin-field">
+          <label for="teamID">Team ID</label>
+          <input type="number" placeholder="541" id="teamID" />
+        </div>
+        <div class="admin-btn-row">
+          <button id="getSquads" type="button">Squad</button>
+          <button id="get-transfers-by-team" type="button">Transfers</button>
+          <button id="refetch-team" type="button" title="Squad + transfers">Refetch all</button>
+          <button id="team-elo" type="button">Elo</button>
+        </div>
+        <div class="admin-btn-row">
+          <button id="get-player-goal-list" type="button">Player list (top players)</button>
+        </div>
+      </details>
+
+      <details class="admin-box" id="group-elo" data-persist>
+        <summary>Elo</summary>
+        <div class="admin-field">
+          <label for="elo-backfill-scope">Backfill</label>
+          <select id="elo-backfill-scope">
+            <option value="">All</option>
+            <option value="club">Club</option>
+            <option value="nt">National teams</option>
+          </select>
+          <label class="admin-inline-check"><input type="checkbox" id="elo-backfill-dry-run" checked /> Dry run</label>
+          <button id="backfill-elo" type="button">Run</button>
+        </div>
+        <div class="admin-field">
+          <label for="elo-rankings-scope">Rankings</label>
+          <select id="elo-rankings-scope">
+            <option value="club">Club</option>
+            <option value="nt">National teams</option>
+          </select>
+          <input type="number" min="1" max="500" value="50" id="elo-rankings-limit" title="Rows" />
+          <button id="show-elo-rankings" type="button">Show</button>
+        </div>
+      </details>
+    </aside>
+
+    <section class="admin-workspace">
+      <details class="admin-box" id="admin-log-box" data-persist open>
+        <summary>Activity log <button type="button" id="admin-log-clear" class="admin-small-btn">Clear</button></summary>
+        <div id="admin-log" class="admin-log">
+          <div class="admin-muted admin-log-empty">Nothing yet.</div>
+        </div>
+      </details>
+
+      <div id="missing-xg-panel" class="admin-box" hidden>
         <h3>Missing xG <span id="missing-xg-count"></span></h3>
         <div class="missing-xg-toolbar">
           <button type="button" id="missing-xg-select-20">Select 20</button>
@@ -41,167 +217,76 @@
           </table>
         </div>
       </div>
-      <h3>Results</h3>
-      <div id="fixtures-info"></div>
-      <div id="results-text"></div>
-      <h3>Standings</h3>
-      <div id="standings"></div>
-      <div id="standings-text"></div>
-      <div id="player-list"></div>
-    </div>
-    <div id="top-team-list" class="table-container">
-      {{> player-list-table big=false}}
-    </div>
-    <div id="one-fixture"></div>
-    <table class="gf-table" id="selected-matches"></table>
-  </div>
-  <div class="control-panel child-div">
-    <div class="floating-buttons">
-      <div class="row admin-league-toolbar">
-        <div id="league-list">
-          <div id="league-list-league">
-            {{#each leagues}}
-            {{#if (eq this.type "league")}}
-            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
-              class="admin-league-to-select" />
-            {{/if}}
-            {{/each}}
-          </div>
-          <div id="league-list-cup">
-            {{#each leagues}}
-            {{#if (eq this.type "cup")}}
-            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
-              class="admin-league-to-select" />
-            {{/if}}
-            {{/each}}
-          </div>
-          <div id="league-list-nt">
-            {{#each leagues}}
-            {{#if (eq this.type "nt")}}
-            <img width="26" src="/images/competitions/{{this.id}}.png" id="img-{{this.id}}" alt="{{this.name}}" title="{{this.name}}"
-              class="admin-league-to-select" />
-            {{/if}}
-            {{/each}}
-          </div>
-          <div type="text" id="calendar"></div>
-        </div>
 
-        <button id="select-all-leagues" type="button">
-          Select all
-        </button>
-        <div class="admin-season-panel">
-          <label class="admin-season-label" for="league-season-select">Season</label>
-          <select id="league-season-select" disabled>
-            <option value="">Select a league</option>
-          </select>
-          <div id="league-season-target" class="admin-season-target">No league selected</div>
-        </div>
-        <!--input id="datepicker-input" type="date" /-->
-      </div>
-
-      <div class="row">
-        <button id="submit-league-info" class="btn btn-primary btn-block">
-          League standings
-        </button>
-        <div class="roundandmatch">
-          <div class="automatches-row">
-            <!--input type="number" placeholder="Round Number" id="roundnr" />
-            <button id="get-matches-by-round">Matches in round</button-->
-            <button id="update-leagues">Update Leagues</button>
-            <button id="import-and-update-matches">Import + Update Matches</button>
-            <button id="update-league-all-seasons">Update League (All Seasons)</button>
-          </div>
-          <!--div class="automatches-row">
-            <input type="string" placeholder="2023-08-23" id="dateStart" />
-            <input type="string" placeholder="2023-08-26" id="dateEnd" />
-            <button id="submit-match-list">Get Match list</button>
-          </div-->
-          <div class="automatches-row">
-            <input type="text" placeholder="Match IDs" id="matchIDs" />
-            <button id="grab-match-info">Grab match info</button>
-            <button id="matches-missing-xg">Missing xG (current season)</button>
-          </div>
-          <div class="automatches-row">
-            <input type="number" placeholder="Match ID" id="fotmob-link-match-id" />
-            <input type="text" placeholder="FotMob match URL or ID" id="fotmob-link-input" />
-            <button id="fotmob-link-fetch">Fetch FotMob by ID</button>
-          </div>
-          <div class="automatches-row">
-            <input type="number" placeholder="276" id="playerID" />
-            <!--input type="number" placeholder="276" id="playerID2" /-->
-            <!--button id="getPlayerStats">Player Stats</button-->
-            <button id="get-player-profile">Player Info</button>
-            <button id="get-teams-by-player">Player Teams</button>
-            <button id="get-transfers-by-player">Player Transfers</button>
-          </div>
-          <div class="automatches-row">
-            <input type="number" placeholder="541" id="teamID" />
-            <button id="getSquads">Get Squads</button>
-            <button id="get-player-goal-list">Get Player List</button>
-            <button id="get-transfers-by-team">Get Transfers</button>
-          </div>
-          <div class="automatches-row">
-            <button id="get-transfers">Get Transfers (clubs due for update)</button>
-            <button id="update-squads">Get Squads (teams due for update)</button>
-          
-          <button id="get-all-clubs">Get all clubs</button>
-
-          <button id="insert-all-players">Insert all players</button>
-          <button id="test-standings">Test Standings (L1)</button>
-          </div>
+      <div id="elo-rankings-panel" class="admin-box" hidden>
+        <h3>Elo rankings <span id="elo-rankings-caption" class="admin-muted"></span></h3>
+        <div class="admin-table-wrap">
+          <table class="gf-table" id="elo-rankings-table">
+            <thead><tr><th>#</th><th>Team</th><th>ID</th><th>Elo</th><th>Matches</th></tr></thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
-      <div class="row" style="margin-top: 5px">
-        <textarea rows="5" cols="44" placeholder="This is the default text" id="textOnPic"></textarea>
-        <textarea id="pasteArea" rows="5" cols="10" placeholder="Paste Image Here"></textarea>
-      </div>
-      <div class="row">
-        <input type="string" placeholder="OFFICIAL" id="breaking-official" />
-        <button id="add-breaking">🚨BREAKING🚨</button>
-        <button id="happy-bday">Bday</button>
+
+      <div id="league-stuff" class="admin-box">
+        <div class="admin-results-header">
+          <div>
+            <strong id="league-name"></strong>
+            <span class="admin-muted">ID <span id="league-id"></span> · Round <span id="round-no"></span></span>
+          </div>
+          <div class="admin-btn-row">
+            <button id="clear-results" type="button">Clear</button>
+            <button id="copy-for-blog" type="button">Copy for blog</button>
+          </div>
+        </div>
+        <h3>Results</h3>
+        <div id="fixtures-info"></div>
+        <div id="results-text"></div>
+        <h3>Standings</h3>
+        <div id="standings"></div>
+        <div id="standings-text"></div>
+        <div id="player-list"></div>
       </div>
 
-      <div class="row" style="margin-top: 5px">
-        <button type="button" id="download-image" class="btn btn-primary btn-block">
-          Download
-        </button>
+      <div id="top-team-list" class="table-container">
+        {{> player-list-table big=false}}
       </div>
-      <div class="row" style="margin-top: 5px">
-        <button type="button" style="width: 33%" class="btn btn-secondary" id="copy-match-stats">
-          Match stats
-        </button>
-        <button type="button" style="width: 32%" class="btn btn-secondary" id="copy-standings">
-          Standings
-        </button>
-        <button type="button" style="width: 33%" class="btn btn-secondary" id="copy-player-stats">
-          Player Stats
-        </button>
+      <div id="one-fixture"></div>
+      <table class="gf-table" id="selected-matches"></table>
+    </section>
+
+    <aside class="admin-graphics" id="admin-graphics">
+      <div class="admin-box">
+        <div class="admin-graphics-header">
+          <strong>Graphics</strong>
+          <button type="button" id="toggle-graphics" class="admin-small-btn">Hide</button>
+        </div>
+        <div class="admin-graphics-body">
+          <canvas id="my-canvas" width="1080" height="1080"></canvas>
+          <div class="admin-field">
+            <label for="breaking-official">Banner</label>
+            <input type="text" placeholder="OFFICIAL" id="breaking-official" />
+            <button id="add-breaking" type="button">🚨BREAKING🚨</button>
+            <button id="happy-bday" type="button">Bday</button>
+          </div>
+          <div class="admin-graphics-inputs">
+            <textarea rows="5" placeholder="Text on picture" id="textOnPic"></textarea>
+            <textarea id="pasteArea" rows="5" placeholder="Paste image here"></textarea>
+          </div>
+          <div class="admin-label">Draw on canvas from</div>
+          <div class="admin-btn-grid">
+            <button type="button" id="copy-matches">Matches</button>
+            <button type="button" id="copy-selected">Selected matches</button>
+            <button type="button" id="copy-standings">Standings</button>
+            <button type="button" id="copy-match-stats">Match stats</button>
+            <button type="button" id="copy-player-list">Player list</button>
+          </div>
+          <button type="button" id="download-image" class="admin-primary">Download PNG</button>
+          <div class="admin-label">Generated text</div>
+          <textarea id="generated-text" rows="10" placeholder="Generated text appears here"></textarea>
+          <button type="button" id="copy-text">Copy text</button>
+        </div>
       </div>
-      <div class="row" style="margin-top: 5px">
-        <button type="button" style="width: 33%" class="btn btn-secondary" id="copy-matches">
-          Matches
-        </button>
-        <button type="button" style="width: 32%" class="btn btn-secondary" id="copy-selected">
-          Selected Matches
-        </button>
-        <button type="button" style="width: 33%" class="btn btn-secondary" id="copy-player-list">
-          Player List
-        </button>
-      </div>
-      <div class="row" id="missing-matches"></div>
-    </div>
-    <div class="floating-text">
-      <textarea id="generated-text" rows="22" cols="33" placeholder="This is text"></textarea>
-      <button type="button" id="generate-text" class="btn btn-primary btn-block">
-        Generate
-      </button>
-      <button type="button" id="copy-text" class="btn btn-primary btn-block">
-        Copy
-      </button>
-    </div>
-  </div>
-  <div class="canvas-div child-div">
-    <canvas id="my-canvas" width="1080" height="1080" style="border: 1px solid #d3d3d3"></canvas>
+    </aside>
   </div>
 </div>
-<div id="top-team-list"></div>

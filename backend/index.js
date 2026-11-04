@@ -227,6 +227,12 @@ app.get("/team", async (req, res) => {
     squadUpdatedAt,
     transferUpdatedAt,
     eloMonthChange,
+    teamStadium,
+    teamManager,
+    teamNation,
+    teamTopScorers,
+    topGoals,
+    isNationalTeam,
   } = await getTeamRouteData(registry, thisTeam.ID, req.query.allStats);
   const teamTransfers = await getTransfersByTeam(thisTeam.ID, 25);
 
@@ -248,6 +254,12 @@ app.get("/team", async (req, res) => {
     squadUpdatedAt,
     transferUpdatedAt,
     eloMonthChange,
+    teamStadium,
+    teamManager,
+    teamNation,
+    teamTopScorers,
+    topGoals,
+    isNationalTeam,
   });
 });
 
@@ -341,7 +353,7 @@ app.get("/match", async (request, response) => {
     });
   }
 
-  const { teamList, matchStatistics, leagueName, matchElo, headToHead } = await getMatchPageData(registry, currentMatch);
+  const { teamList, matchStatistics, leagueName, matchElo, headToHead, matchVenue } = await getMatchPageData(registry, currentMatch);
   const headerLeagueName = typeof currentMatch?.league?.name === "string" && currentMatch.league.name.trim()
     ? currentMatch.league.name.trim()
     : leagueName;
@@ -356,6 +368,7 @@ app.get("/match", async (request, response) => {
     matchStatistics,
     matchElo,
     headToHead,
+    matchVenue,
   });
 });
 
@@ -411,7 +424,7 @@ app.get("/about", (req, res) => {
 app.get("/gf-wiki", (req, res) => {
   res.render("gf-wiki", {
     title: "GF Wiki - Generation Football",
-    description: "Learn how Generation Football calculates Expected Points (xPts) and Elo ratings.",
+    description: "Learn how Generation Football calculates Expected Points (xPts), Elo ratings and average team ratings.",
   });
 });
 

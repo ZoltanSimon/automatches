@@ -16,8 +16,8 @@
     <div class="score-section">
       <div class="score">{{matchInfo.goals.home}} - {{matchInfo.goals.away}}</div>
       <div><a class="cursor-pointer" style="color: white;"
-          href="/league?id={{matchInfo.league.id}}">{{headerLeagueName}}</a> - {{matchInfo.league.round}} -
-        {{formatDate matchInfo.fixture.date}}</div>
+          href="/league?id={{matchInfo.league.id}}">{{headerLeagueName}}</a> - {{matchInfo.league.round}}</div>
+      {{#if matchVenue}}<div class="match-venue">{{formatDate matchInfo.fixture.date}} - {{matchVenue}}</div>{{/if}}
       <span class="status">{{matchInfo.fixture.status.short}}</span>
       {{#if matchElo.change}}
       <span class="match-elo-delta" title="Elo change for this match">
@@ -302,119 +302,19 @@
     class="match-content-panel match-split-panel {{#if (eq matchInfo.fixture.status.short "NS")}}is-active{{/if}}">
     {{#each teamList}}
     <div class="team-card gf-table {{#if (eq this.id ../matchInfo.teams.away.id)}}team-card-away{{/if}}">
-      <div class="team-header">
-        <img class="cursor-pointer" src="images/logos/{{this.id}}.png" alt="{{this.name}}" title="{{this.name}}"
-          onclick="window.location.href='team?ID={{this.id}}'" />
-        <div style="width: 92%;">
-          <h3 class="cursor-pointer" onclick="window.location.href='team?ID={{this.id}}'">{{this.name}}</h3>
-          <div class="record preview-record">
-            <table>
-              <tr>
-                <td>{{this.played}} played</td>
-                <td>{{percentage this.wins this.played}}% win</td>
-                <td>{{this.wins}}W {{this.draws}}D {{this.losses}}L</td>
-                <td class="preview-last-cell">
-                  {{#if this.matches.[0]}}
-                  <span class="preview-last-label">Last played</span>
-                  <span class="preview-last-when">{{daysAgo this.matches.[0].date}}</span>
-                  {{/if}}
-                </td>
-                <td class="preview-form-cell">
-                  <div class="preview-form" title="Last 5 matches">
-                    {{#each this.formArray as |form|}}
-                    <span class="form-indicator {{form}}"></span>
-                    {{/each}}
-                  </div>
-                </td>
-              </tr>
-            </table>
+      <div class="team-preview-summary">
+        <div class="team-header">
+          <div class="team-header-name">
+            <img class="cursor-pointer" src="images/logos/{{this.id}}.png" alt="{{this.name}}" title="{{this.name}}"
+              onclick="window.location.href='team?ID={{this.id}}'" />
+            <h3 class="cursor-pointer" onclick="window.location.href='team?ID={{this.id}}'">{{this.name}}</h3>
           </div>
+          {{> team-form}}
         </div>
+        {{> team-summary}}
       </div>
 
-      <table class="gf-table player-stats-table preview-stats-table">
-        <thead>
-          <tr class="main-table-header">
-            <th>Stat</th>
-            <th class="center-td">Total</th>
-            <th class="center-td">Per game</th>
-            <th class="center-td" title="Last 5 games">Last 5</th>
-            <th class="center-td" title="Last 5 games, per game">Last 5 / game</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="player-stat-name">Points</td>
-            <td class="center-td">{{this.total.points}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.points}}</td>
-            <td class="center-td">{{this.last5.points}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.points this.perGame.points}}">{{this.last5PerGame.points}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">xPoints</td>
-            <td class="center-td">{{this.total.xPoints}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.xPoints}}</td>
-            <td class="center-td">{{this.last5.xPoints}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.xPoints this.perGame.xPoints}}">{{this.last5PerGame.xPoints}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">Goals</td>
-            <td class="center-td">{{this.total.goals}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.goals}}</td>
-            <td class="center-td">{{this.last5.goals}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.goals this.perGame.goals}}">{{this.last5PerGame.goals}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">Goals Against</td>
-            <td class="center-td">{{this.total.goalsAgainst}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.goalsAgainst}}</td>
-            <td class="center-td">{{this.last5.goalsAgainst}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.goalsAgainst this.perGame.goalsAgainst "lower"}}">{{this.last5PerGame.goalsAgainst}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">xG</td>
-            <td class="center-td">{{this.total.xG}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.xG}}</td>
-            <td class="center-td">{{this.last5.xG}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.xG this.perGame.xG}}">{{this.last5PerGame.xG}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">xGA</td>
-            <td class="center-td">{{this.total.xGA}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.xGA}}</td>
-            <td class="center-td">{{this.last5.xGA}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.xGA this.perGame.xGA "lower"}}">{{this.last5PerGame.xGA}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">Corners</td>
-            <td class="center-td">{{this.total.corners}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.corners}}</td>
-            <td class="center-td">{{this.last5.corners}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.corners this.perGame.corners}}">{{this.last5PerGame.corners}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">Shots on Goal</td>
-            <td class="center-td">{{this.total.shotsOnGoal}}</td>
-            <td class="center-td player-stat-rate">{{this.perGame.shotsOnGoal}}</td>
-            <td class="center-td">{{this.last5.shotsOnGoal}}</td>
-            <td class="center-td"><span class="player-stat-trend {{rateTrend this.last5PerGame.shotsOnGoal this.perGame.shotsOnGoal}}">{{this.last5PerGame.shotsOnGoal}}</span></td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">Elo</td>
-            <td class="center-td">{{#if this.eloChange.total}}<span class="elo-change {{this.eloChange.total.direction}}">{{this.eloChange.total.display}}</span>{{else}}—{{/if}}</td>
-            <td class="center-td">{{#if this.eloChange.perGame}}<span class="elo-change {{this.eloChange.perGame.direction}}">{{this.eloChange.perGame.display}}</span>{{else}}—{{/if}}</td>
-            <td class="center-td">{{#if this.eloChange.last5}}<span class="elo-change {{this.eloChange.last5.direction}}">{{this.eloChange.last5.display}}</span>{{else}}—{{/if}}</td>
-            <td class="center-td">{{#if this.eloChange.last5PerGame}}<span class="elo-change {{this.eloChange.last5PerGame.direction}}">{{this.eloChange.last5PerGame.display}}</span>{{else}}—{{/if}}</td>
-          </tr>
-          <tr>
-            <td class="player-stat-name">Elo of teams played</td>
-            <td class="center-td">{{#if this.opponentElo.total}}{{this.opponentElo.total}}{{else}}—{{/if}}</td>
-            <td class="center-td player-stat-rate">{{#if this.opponentElo.perGame}}{{this.opponentElo.perGame}}{{else}}—{{/if}}</td>
-            <td class="center-td">{{#if this.opponentElo.last5}}{{this.opponentElo.last5}}{{else}}—{{/if}}</td>
-            <td class="center-td">{{#if this.opponentElo.last5PerGame}}<span class="player-stat-trend {{rateTrend this.opponentElo.last5PerGame this.opponentElo.perGame}}">{{this.opponentElo.last5PerGame}}</span>{{else}}—{{/if}}</td>
-          </tr>
-        </tbody>
-      </table>
+      {{> team-stats-table}}
       <div class="match-detail-list">
         {{#each this.matches}}
         {{> match-detail-card}}

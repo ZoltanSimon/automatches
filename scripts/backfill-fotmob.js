@@ -1,13 +1,14 @@
 import pool from "../backend/config.js";
-import { getFinishedMatchIdsMissingFotmob, loadLeagues, loadTeams, setMatchFotmob } from "../backend/data-access.js";
+import { loadLeagues, loadTeams } from "../backend/data-access.js";
 import { setCatalog } from "../backend/lib/catalog.js";
-import { fetchExternalMatchXg } from "../backend/services/xg-lookup-service.js";
+import { findMatchIdsMissingFotmob, normalizeBackfillSeason, runFotmobBackfill } from "../backend/services/fotmob-backfill-service.js";
 import { CURRENT_SEASON } from "../shared/defaults.js";
 
-const DOMESTIC_LEAGUE_IDS = [39, 140, 135, 78, 61, 88, 94, 203];
-const EUROPEAN_CUP_IDS = [2, 3, 848];
-
 const dryRun = process.argv.includes("--dry-run");
+// --all-seasons, or --season=2024; defaults to CURRENT_SEASON
+const seasonArg = process.argv.find((arg) => arg.startsWith("--season="))?.split("=")[1];
+const season = normalizeBackfillSeason(process.argv.includes("--all-seasons") ? "all" : (seasonArg || CURRENT_SEASON));
+const seasonLabel = season === "all" ? "all-season" : String(season);
 
 async function main() {
   setCatalog({
@@ -15,34 +16,23 @@ async function main() {
     leagues: await loadLeagues(),
   });
 
-  const matchIds = await getFinishedMatchIdsMissingFotmob({
-    season: CURRENT_SEASON,
-    domesticLeagueIds: DOMESTIC_LEAGUE_IDS,
-    europeanLeagueIds: EUROPEAN_CUP_IDS,
-  });
+  const matchIds = await findMatchIdsMissingFotmob(season);
 
-  console.log(`Found ${matchIds.length} finished ${CURRENT_SEASON} matches missing FotMob data.`);
+  console.log(`Found ${matchIds.length} finished ${seasonLabel} matches missing FotMob data.`);
   if (dryRun || matchIds.length === 0) {
     return;
   }
 
-  let saved = 0;
-  let missed = 0;
-
-  for (let index = 0; index < matchIds.length; index += 1) {
-    const matchId = matchIds[index];
-    const [result] = await fetchExternalMatchXg([matchId]);
-    const label = `${index + 1}/${matchIds.length} ${matchId}`;
-
-    if (result?.fotmob) {
-      await setMatchFotmob(matchId, result.fotmob);
-      saved += 1;
-      console.log(`[saved] ${label} ${result.sourceMatch || ""}`.trim());
-    } else {
-      missed += 1;
-      console.warn(`[miss] ${label} ${result?.error || "No FotMob data"}`);
-    }
-  }
+  const { saved, missed } = await runFotmobBackfill(matchIds, {
+    onResult: ({ index, matchId, result }) => {
+      const label = `${index + 1}/${matchIds.length} ${matchId}`;
+      if (result?.fotmob) {
+        console.log(`[saved] ${label} ${result.sourceMatch || ""}`.trim());
+      } else {
+        console.warn(`[miss] ${label} ${result?.error || "No FotMob data"}`);
+      }
+    },
+  });
 
   console.log(`FotMob backfill complete. Saved ${saved}, missed ${missed}.`);
 }

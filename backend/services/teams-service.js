@@ -1,13 +1,15 @@
 import { buildTeamList } from "./json-reader.js";
 import { allDBLeagues, allDBTeams } from "../lib/catalog.js";
-import { allTeamMatches } from "./matches-service.js";
+import { allTeamMatches, getTeamEloMonthSummary, summarizeTeamElo } from "./matches-service.js";
 import { Team } from "../../classes/team.js";
 import { memoizeRegistryStat } from "./registry-stats.js";
+import { isNeutralVenue } from "../lib/elo.js";
 
 const defaultTeamSortDirection = "desc";
 const validTeamSortStats = new Set([
   "played",
   "elo",
+  "avgRating",
   "winPercentage",
   "possession",
   "goals",
@@ -23,6 +25,7 @@ const validTeamStatFilterOperators = new Set(["gte", "lte", "between", "eq", "ne
 const simpleTeamStatReaders = {
   played: (team) => team.played,
   elo: (team) => team.elo,
+  avgRating: (team) => team.total?.avgRating,
   winPercentage: (team) => team.total?.winPercentage,
   possession: (team) => team.perGame?.possession,
 };
@@ -37,22 +40,22 @@ const pairedTeamStatReaders = {
   offsides: { for: (team) => team.total?.offsides, against: (team) => team.total?.offsidesAgainst },
 };
 const teamColumnStatMap = new Map([
-  [7, { stat: "goals", isAgainst: false }],
-  [8, { stat: "goals", isAgainst: true }],
-  [9, { stat: "xG", isAgainst: false }],
-  [10, { stat: "xG", isAgainst: true }],
-  [11, { stat: "corners", isAgainst: false }],
-  [12, { stat: "corners", isAgainst: true }],
-  [13, { stat: "shotsOnGoal", isAgainst: false }],
-  [14, { stat: "shotsOnGoal", isAgainst: true }],
-  [15, { stat: "fouls", isAgainst: false }],
-  [16, { stat: "fouls", isAgainst: true }],
-  [17, { stat: "yellowCards", isAgainst: false }],
-  [18, { stat: "yellowCards", isAgainst: true }],
-  [19, { stat: "redCards", isAgainst: false }],
-  [20, { stat: "redCards", isAgainst: true }],
-  [21, { stat: "offsides", isAgainst: false }],
-  [22, { stat: "offsides", isAgainst: true }],
+  [8, { stat: "goals", isAgainst: false }],
+  [9, { stat: "goals", isAgainst: true }],
+  [10, { stat: "xG", isAgainst: false }],
+  [11, { stat: "xG", isAgainst: true }],
+  [12, { stat: "corners", isAgainst: false }],
+  [13, { stat: "corners", isAgainst: true }],
+  [14, { stat: "shotsOnGoal", isAgainst: false }],
+  [15, { stat: "shotsOnGoal", isAgainst: true }],
+  [16, { stat: "fouls", isAgainst: false }],
+  [17, { stat: "fouls", isAgainst: true }],
+  [18, { stat: "yellowCards", isAgainst: false }],
+  [19, { stat: "yellowCards", isAgainst: true }],
+  [20, { stat: "redCards", isAgainst: false }],
+  [21, { stat: "redCards", isAgainst: true }],
+  [22, { stat: "offsides", isAgainst: false }],
+  [23, { stat: "offsides", isAgainst: true }],
 ]);
 
 function normalizeTextValue(value) {
@@ -317,6 +320,7 @@ export function copyTeam(team) {
     last5: copyStats(team.last5),
     last5PerGame: copyStats(team.last5PerGame),
     leagues: new Map(team.leagues),
+    leagueBreakdown: [...(team.leagueBreakdown || [])],
     matches: [...team.matches],
     formArray: [...(team.formArray || [])],
   });
@@ -529,6 +533,62 @@ export function getTeamById(teamID) {
   return allDBTeams.find((team) => Number(team.ID) === Number(teamID)) || null;
 }
 
+const HOME_STADIUM_SAMPLE_SIZE = 10;
+
+function newestMatchesFirst(matches) {
+  return [...matches].sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+}
+
+// Most used venue of the latest home matches, so one-off grounds don't win and a stadium move is picked up.
+export function getTeamHomeStadium(matches, teamID) {
+  const venueCounts = new Map();
+  const recentHomeMatches = newestMatchesFirst(matches)
+    .filter((match) => (
+      Number(match.teams?.home?.id) === Number(teamID)
+      && match.fixture?.venue?.name
+      && !isNeutralVenue(match, match.league, match.league?.round)
+    ))
+    .slice(0, HOME_STADIUM_SAMPLE_SIZE);
+
+  for (const match of recentHomeMatches) {
+    const venue = match.fixture.venue.name;
+    venueCounts.set(venue, (venueCounts.get(venue) || 0) + 1);
+  }
+
+  let stadium = null;
+  let stadiumCount = 0;
+  for (const [venue, count] of venueCounts) {
+    if (count > stadiumCount) {
+      stadium = venue;
+      stadiumCount = count;
+    }
+  }
+
+  return stadium;
+}
+
+export function getTeamManager(matches, teamID) {
+  for (const match of newestMatchesFirst(matches)) {
+    const lineups = Array.isArray(match.lineups) ? match.lineups : [];
+    const lineup = lineups.find((entry) => Number(entry?.team?.id) === Number(teamID));
+    if (lineup?.coach?.name) {
+      return lineup.coach.name;
+    }
+  }
+
+  return null;
+}
+
+// Teams have no country of their own, so use their domestic competitions, leagues before cups.
+export function getTeamNation(matches) {
+  const domesticCompetitions = newestMatchesFirst(matches)
+    .map((match) => allDBLeagues.find((league) => Number(league.id) === Number(match.league?.id)))
+    .filter((league) => Number(league?.nation));
+  const competition = domesticCompetitions.find((league) => league.type === "league") ?? domesticCompetitions[0];
+
+  return competition ? getTeamById(competition.nation) : null;
+}
+
 export async function getTeamPageData(registry, teamID) {
   const selectedTeamID = Number(teamID);
   const allCompetitionTeam = getAllCompetitionTeam(registry, selectedTeamID);
@@ -546,16 +606,27 @@ export async function getTeamPageData(registry, teamID) {
     return { matches, teamStats: [] };
   }
 
-  teamStats[0].leagues = [...teamStats[0].leagues.values()].map((league) => {
-    const leagueFromDb = allDBLeagues.find((dbLeague) => Number(dbLeague.id) === Number(league.id));
-
-    return {
-      ...league,
-      name: league.name || leagueFromDb?.name || `Competition ${league.id}`,
-    };
-  });
+  nameTeamCompetitions(teamStats[0]);
 
   return { matches, teamStats };
+}
+
+function withLeagueName(league) {
+  const leagueFromDb = allDBLeagues.find((dbLeague) => Number(dbLeague.id) === Number(league.id));
+
+  return {
+    ...league,
+    name: league.name || leagueFromDb?.name || `Competition ${league.id}`,
+  };
+}
+
+// Turns a team's leagues into a named list and sorts its per-competition breakdown, most played first.
+export function nameTeamCompetitions(team) {
+  team.leagues = [...team.leagues.values()].map(withLeagueName);
+  team.leagueBreakdown = (team.leagueBreakdown || [])
+    .map(withLeagueName)
+    .sort((a, b) => b.played - a.played);
+  return team;
 }
 
 function parseShowAllPlayerStats(allStatsQuery) {
@@ -564,11 +635,26 @@ function parseShowAllPlayerStats(allStatsQuery) {
 }
 
 export async function getTeamRouteData(registry, teamID, allStatsQuery) {
-  const { getSquadFromDb, getTeamEloMonthChange } = await import("../data-access.js");
+  const { getMatchEloRowsByIds, getSquadFromDb } = await import("../data-access.js");
   const { getTeamPlayerList } = await import("./players-service.js");
-  const { eloScopeFromTeam, formatEloDelta } = await import("../lib/elo.js");
+  const { eloScopeFromTeam } = await import("../lib/elo.js");
 
   const { matches, teamStats } = await getTeamPageData(registry, teamID);
+  if (teamStats.length) {
+    const newestFirst = [...teamStats[0].matches].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const eloByMatchId = await getMatchEloRowsByIds(newestFirst.map((match) => match.id));
+    const now = new Date();
+    const nextMatch = matches.find(({ fixture }) =>
+      ["NS", "TBD"].includes(fixture.status?.short) && new Date(fixture.date) >= now);
+    Object.assign(
+      teamStats[0],
+      summarizeTeamElo(newestFirst, teamStats[0].id, eloByMatchId),
+      {
+        lastPlayedDate: newestFirst[0]?.date ?? null,
+        nextMatchDate: nextMatch?.fixture.date ?? null,
+      },
+    );
+  }
   const { squad: savedSquad, squadUpdatedAt, transferUpdatedAt } = await getSquadFromDb(teamID);
   const showAllPlayerStats = parseShowAllPlayerStats(allStatsQuery);
 
@@ -593,16 +679,16 @@ export async function getTeamRouteData(registry, teamID, allStatsQuery) {
     playerLeagueFilter,
   );
 
+  // Everyone level on most goals for this team across all competitions, from the current squad when it is saved.
+  const squadPlayers = getTeamPlayerList(registry, teamID, savedSquad, 1000, []);
+  const topGoals = Math.max(0, ...squadPlayers.map((player) => Number(player.goals) || 0));
+  const teamTopScorers = topGoals > 0
+    ? squadPlayers.filter((player) => Number(player.goals) === topGoals)
+    : [];
+
   const team = getTeamById(teamID);
   const eloScope = eloScopeFromTeam(team);
-  const monthElo = await getTeamEloMonthChange(teamID, eloScope);
-  const eloMonthChange = monthElo
-    ? {
-        ...formatEloDelta(monthElo.current, monthElo.previous),
-        current: Math.round(monthElo.current),
-        scope: eloScope,
-      }
-    : null;
+  const eloMonthChange = await getTeamEloMonthSummary(teamID, eloScope);
 
   return {
     matches,
@@ -614,5 +700,11 @@ export async function getTeamRouteData(registry, teamID, allStatsQuery) {
     squadUpdatedAt,
     transferUpdatedAt,
     eloMonthChange,
+    teamStadium: getTeamHomeStadium(matches, teamID),
+    teamManager: getTeamManager(matches, teamID),
+    teamNation: eloScope === "nt" ? null : getTeamNation(matches),
+    teamTopScorers,
+    topGoals,
+    isNationalTeam: eloScope === "nt",
   };
 }

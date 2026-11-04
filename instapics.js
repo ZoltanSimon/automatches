@@ -90,6 +90,22 @@ export function drawResizedImage(image, imgHeight, startX, startY) {
   ctx.drawImage(image, (startX - newWidth) / 2, startY, newWidth, newHeight);
 }
 
+export function drawPastedImage(blob, hasBreakingText = false) {
+  let imgHeight = fontY - 34 - lineheight;
+  if (hasBreakingText) imgHeight -= 66;
+
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const pasted = new Image();
+    pasted.onload = function () {
+      drawResizedImage(pasted, imgHeight, 1080, 30);
+      ctx.drawImage(border_image, 0, 0);
+    };
+    pasted.src = event.target.result;
+  };
+  reader.readAsDataURL(blob);
+}
+
 function drawCentre(img, x, y, height) {
   ctx.drawImage(img, x - height / 2, y, height, height);
 }

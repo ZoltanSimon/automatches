@@ -4,12 +4,14 @@
       <h2>GF Wiki</h2>
       <p>
         This page explains the metrics Generation Football uses alongside
-        traditional results: Expected Points (xPts), Elo ratings, the
-        icons in player tables, and the abbreviations used in those tables.
+        traditional results: Expected Points (xPts), Elo ratings, average
+        team ratings, the icons in player tables, and the abbreviations used
+        in those tables.
       </p>
       <ul>
         <li><a href="#xpoints">Expected Points (xPts)</a></li>
         <li><a href="#elo">Elo ratings</a></li>
+        <li><a href="#team-rating">Average team rating</a></li>
         <li><a href="#player-icons">Player table icons</a></li>
         <li><a href="#abbreviations">Abbreviations</a></li>
       </ul>
@@ -75,6 +77,40 @@
         <a href="/top-teams">Top Teams</a> list after recent form. Team pages
         show the last month of Elo movement, and match pages show how much
         each side gained or lost from that fixture.
+      </p>
+      <hr>
+
+      <h2 id="team-rating">Average team rating</h2>
+      <p>
+        The average team rating sums up how well a team’s players were rated,
+        using the same player match ratings shown on lineups and player pages.
+      </p>
+      <p>
+        For each match we take the ratings of the team’s players who played
+        <strong>at least 22 minutes</strong> and average them. Short cameos
+        are left out, so a late substitute’s rating from a few minutes on the
+        pitch cannot pull the team’s number up or down. When our main data
+        source has no player ratings for a match, FotMob player ratings are
+        used instead, with the same 22-minute rule. Matches with no ratings
+        at all are skipped.
+      </p>
+      <p>
+        A team’s rating for a competition is the average of its match
+        ratings in that competition, with every rated match counting equally.
+        The overall rating does the same across all of the team’s matches.
+      </p>
+      <p>
+        Team pages show the overall rating and a breakdown by competition,
+        league tables show it in the <strong>Rtg</strong> column for the
+        matches counted in the standings, and the
+        <a href="/top-teams">Top Teams</a> list shows it for the selected
+        leagues. Ratings are coloured the same way as player ratings: dark
+        green from 8, green from 7, yellow from 6, orange from 5, and red
+        below that.
+      </p>
+      <p>
+        The team average on a match page is calculated differently: it
+        includes every player who has a rating, regardless of minutes.
       </p>
       <hr>
       <h2 id="player-icons">Player table icons</h2>
@@ -188,7 +224,7 @@
         <li><strong>GD</strong> — goal difference.</li>
         <li><strong>Pts</strong> — points.</li>
         <li><strong>Ag</strong> — against. Team tables pair this with For, for goals, expected goals, and the other split stats.</li>
-        <li><strong>Rtg</strong> — rating, on match lineups.</li>
+        <li><strong>Rtg</strong> — rating. On match lineups it is the player’s rating; in league and team tables it is the <a href="#team-rating">average team rating</a>.</li>
       </ul>
 
       <h3>Expected stats</h3>

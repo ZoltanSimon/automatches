@@ -20,11 +20,12 @@
   </div>
   {{/unless}}
   {{#if wikiInfo}}
-    {{> wiki-info lead=wikiInfo}}
+    {{> wiki-info lead=wikiInfo anchor=wikiAnchor}}
   {{/if}}
   {{#if showLeagueChip}}
   <div id="active-view-bar" class="active-view-bar active-view-bar--inline" hidden></div>
   {{/if}}
+  {{#if leagues}}
   <div class="rect-league-list" id="league-list-league">
     {{#each leagues}}
     <button type="button" id="img-{{this.id}}" title="{{this.name}}" class="league-option {{../leaguepar}}-league-to-select{{#if (includesID ../selectedLeagues this.id)}} selected-league{{/if}}">
@@ -34,4 +35,5 @@
     {{/each}}
   </div>
   <div class="rect-expand-league-list"><a href="#" class="more-link more-button">Leagues</a></div>
+  {{/if}}
 </div>

@@ -8,6 +8,7 @@ import { localhostOnly, wait } from "../lib/backend-helper.js";
 import { CURRENT_SEASON, parseLeagueIds, updateCurrentSeasonLeagues, updateLeagueSeasonData } from "../services/leagues-service.js";
 import { findMissingFinishedMatches, grabMatchesByIds, hydrateMissingMatches, matchesOnDay, matchesInRound, refetchLeagueRound, refetchMatchesOnDay, setManualMatchXg } from "../services/matches-service.js";
 import { fetchExternalMatchXg, fetchFotmobMatchById } from "../services/xg-lookup-service.js";
+import { findMatchIdsMissingFotmob, getFotmobBackfillStatus, startFotmobBackfill, stopFotmobBackfill } from "../services/fotmob-backfill-service.js";
 import { extractExpectedGoals, teamNameFromMatchDetails } from "../lib/match-details-mapper.js";
 import { replayElo } from "../services/elo-service.js";
 
@@ -291,10 +292,15 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
 
   router.get("/insert-all-clubs-to-db", async (request, response) => {
     try {
-      const [allDBTeams, allMatches] = await Promise.all([
+      const [allDBTeams, allMatches, leagues] = await Promise.all([
         loadTeams(),
         getAllMatchesFromDbUntilDate("2999-12-31"),
+        loadLeagues(),
       ]);
+
+      const ntLeagueIDs = new Set(
+        leagues.filter((league) => league.type === "nt").map((league) => Number(league.id))
+      );
 
       const existingTeamIDs = new Set(allDBTeams.map((team) => Number(team.ID)));
       const knownTeamNames = new Map(
@@ -302,16 +308,24 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       );
 
       const teamIDsFromMatches = new Set();
+      const ntTeamIDs = new Set();
       for (const match of allMatches) {
         const homeTeamID = Number(match.homeTeamId);
         const awayTeamID = Number(match.awayTeamId);
+        const isNtMatch = ntLeagueIDs.has(Number(match.leagueId));
 
         if (Number.isFinite(homeTeamID)) {
           teamIDsFromMatches.add(homeTeamID);
+          if (isNtMatch) {
+            ntTeamIDs.add(homeTeamID);
+          }
         }
 
         if (Number.isFinite(awayTeamID)) {
           teamIDsFromMatches.add(awayTeamID);
+          if (isNtMatch) {
+            ntTeamIDs.add(awayTeamID);
+          }
         }
       }
 
@@ -362,6 +376,7 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
         teamsNew.push({
           ID: teamID,
           name: teamName,
+          is_club: ntTeamIDs.has(teamID) ? 0 : 1,
         });
       }
 
@@ -907,6 +922,50 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
         message: error.message || "Failed to fetch xG",
       });
     }
+  });
+
+  router.get("/fotmob-backfill/count", async (request, response) => {
+    try {
+      const matchIds = await findMatchIdsMissingFotmob(request.query.season);
+      response.json({ success: true, count: matchIds.length });
+    } catch (error) {
+      console.error("Error counting matches missing FotMob:", error);
+      response.status(500).json({
+        success: false,
+        message: error.message || "Failed to count matches missing FotMob",
+      });
+    }
+  });
+
+  router.get("/fotmob-backfill/status", (request, response) => {
+    response.json({ success: true, ...getFotmobBackfillStatus() });
+  });
+
+  router.post("/fotmob-backfill/start", async (request, response) => {
+    if (getFotmobBackfillStatus().running) {
+      return response.status(409).json({
+        success: false,
+        message: "FotMob backfill is already running",
+      });
+    }
+
+    try {
+      const status = await startFotmobBackfill({
+        season: request.body?.season ?? request.query.season,
+        onSaved: (matchId, fotmob) => patchLoadedMatch(matchId, { fotmob }),
+      });
+      response.json({ success: true, ...status });
+    } catch (error) {
+      console.error("Error starting FotMob backfill:", error);
+      response.status(500).json({
+        success: false,
+        message: error.message || "Failed to start FotMob backfill",
+      });
+    }
+  });
+
+  router.post("/fotmob-backfill/stop", (request, response) => {
+    response.json({ success: true, ...stopFotmobBackfill() });
   });
 
   router.post("/set-match-xg", async (request, response) => {

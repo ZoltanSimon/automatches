@@ -7,6 +7,8 @@ const popoverSelectors = {
   title: ".stat-filter-popover__title",
   operator: '[data-role="operator"]',
   operatorField: '[data-role="operator-field"]',
+  side: '[data-role="side"]',
+  sideField: '[data-role="side-field"]',
   min: '[data-role="min"]',
   max: '[data-role="max"]',
   maxField: '[data-role="max-field"]',
@@ -26,7 +28,7 @@ const POSITION_GROUP_LABELS = {
   3: "Attacker",
 };
 const POPOVER_SIZES = {
-  number: { width: 280, height: 260 },
+  number: { width: 280, height: 320 },
   select: { width: 360, height: 420 },
   nation: { width: 320, height: 460 },
 };
@@ -155,11 +157,43 @@ function removeFilter(filters, filter = null) {
   return nextFilters;
 }
 
+// A paired header (e.g. Goals over For/Ag) covers its own column (For) and the next one (Against).
+function pairedColumnIndexes(columnIndex) {
+  const base = Number.parseInt(columnIndex, 10);
+  return [base, base + 1];
+}
+
+function isPairedPopover() {
+  return popoverElement?.dataset.paired === "1";
+}
+
+function popoverColumnIndex() {
+  const base = Number.parseInt(popoverElement.dataset.columnIndex, 10);
+  const againstSide = isPairedPopover() && getPopoverField(popoverElement, "side").value === "against";
+  return againstSide ? base + 1 : base;
+}
+
+function popoverLabel() {
+  if (!isPairedPopover()) {
+    return popoverElement.dataset.label;
+  }
+
+  const side = getPopoverField(popoverElement, "side").value === "against" ? "Against" : "For";
+  return `${popoverElement.dataset.label} - ${side}`;
+}
+
+function withoutPopoverColumnFilters(filters) {
+  const columnIndexes = isPairedPopover()
+    ? pairedColumnIndexes(popoverElement.dataset.columnIndex)
+    : [Number.parseInt(popoverElement.dataset.columnIndex, 10)];
+  return filters.filter((filter) => !columnIndexes.includes(Number.parseInt(filter?.columnIndex, 10)));
+}
+
 function popoverFilter(operator, min, max = "", value = min) {
   return {
     stat: popoverElement.dataset.stat,
-    label: popoverElement.dataset.label,
-    columnIndex: Number.parseInt(popoverElement.dataset.columnIndex, 10),
+    label: popoverLabel(),
+    columnIndex: popoverColumnIndex(),
     operator,
     min,
     max,
@@ -173,7 +207,11 @@ function commitPopoverFilter(filter) {
     return;
   }
 
-  applyConfigFilterState(config, upsertFilter(getConfigFilters(config), filter));
+  // A paired header holds one filter, so switching For/Against replaces the other side's.
+  const filters = isPairedPopover()
+    ? withoutPopoverColumnFilters(getConfigFilters(config))
+    : getConfigFilters(config);
+  applyConfigFilterState(config, upsertFilter(filters, filter));
   hidePopover();
 }
 
@@ -182,21 +220,32 @@ function clearCurrentPopoverFilter() {
     return;
   }
 
-  clearTableStatFilter(popoverElement.dataset.tableId, {
-    stat: popoverElement.dataset.stat,
-    columnIndex: popoverElement.dataset.columnIndex,
-  });
+  const config = getConfig(popoverElement.dataset.tableId);
+  if (config && isPairedPopover()) {
+    applyConfigFilterState(config, withoutPopoverColumnFilters(getConfigFilters(config)));
+  } else {
+    clearTableStatFilter(popoverElement.dataset.tableId, {
+      stat: popoverElement.dataset.stat,
+      columnIndex: popoverElement.dataset.columnIndex,
+    });
+  }
   hidePopover();
 }
 
 function sameColumnFilter(config, trigger, header) {
+  const columnIndexes = trigger.dataset.pairedColumnIndex
+    ? [trigger.dataset.columnIndex, trigger.dataset.pairedColumnIndex]
+    : [trigger.dataset.columnIndex];
   const currentFilter = getConfigFilters(config).find(
-    (filter) => String(filter?.columnIndex ?? "") === trigger.dataset.columnIndex,
+    (filter) => columnIndexes.includes(String(filter?.columnIndex ?? "")),
   );
   const isSameColumn = currentFilter?.stat === header.dataset.stat
-    && String(currentFilter?.columnIndex ?? "") === trigger.dataset.columnIndex;
+    && columnIndexes.includes(String(currentFilter?.columnIndex ?? ""));
+  const side = isSameColumn && String(currentFilter.columnIndex) === trigger.dataset.pairedColumnIndex
+    ? "against"
+    : "for";
 
-  return { currentFilter, isSameColumn };
+  return { currentFilter, isSameColumn, side };
 }
 
 function hydrateFilterMetadata(config, filter) {
@@ -634,7 +683,7 @@ function setActiveHeaderState(tableId, filters) {
   const filterList = Array.isArray(filters) ? filters : filters ? [filters] : [];
   filterList.forEach((filter) => {
     const trigger = config.table.querySelector(
-      `.stat-filter-trigger[data-column-index="${filter.columnIndex}"]`,
+      `.stat-filter-trigger[data-column-index="${filter.columnIndex}"], .stat-filter-trigger[data-paired-column-index="${filter.columnIndex}"]`,
     );
     if (!trigger) {
       return;
@@ -741,6 +790,13 @@ function createPopover() {
       <strong class="stat-filter-popover__title"></strong>
       <button type="button" class="stat-filter-popover__close" data-action="close" aria-label="Close filter">&times;</button>
     </div>
+    <label class="stat-filter-popover__field" data-role="side-field" hidden>
+      <span>Side</span>
+      <select class="stat-filter-popover__operator" data-role="side">
+        <option value="for">For</option>
+        <option value="against">Against</option>
+      </select>
+    </label>
     <label class="stat-filter-popover__field" data-role="operator-field">
       <span>Rule</span>
       <select class="stat-filter-popover__operator" data-role="operator">
@@ -892,13 +948,17 @@ function applyPopoverFilter() {
 function openPopover(trigger, header, config) {
   const popover = createPopover();
   const mode = filterModeName(header.dataset.filterType);
-  const { currentFilter, isSameColumn } = sameColumnFilter(config, trigger, header);
+  const { currentFilter, isSameColumn, side } = sameColumnFilter(config, trigger, header);
+  const paired = Boolean(trigger.dataset.pairedColumnIndex);
 
   popover.hidden = false;
   popover.dataset.tableId = config.tableId;
   popover.dataset.stat = header.dataset.stat || "";
   popover.dataset.label = getHeaderLabel(header, config);
   popover.dataset.columnIndex = String(trigger.dataset.columnIndex);
+  popover.dataset.paired = paired ? "1" : "";
+  getPopoverField(popover, "sideField").hidden = !paired;
+  getPopoverField(popover, "side").value = side;
   getPopoverField(popover, "title").textContent = `Filter: ${popover.dataset.label}`;
   setPopoverMode(popover, mode);
   filterModes[mode].prepare(popover, { isSameColumn, currentFilter });
@@ -918,6 +978,9 @@ function registerHeaderTrigger(header, config) {
   trigger.title = "Filter this statistic";
   trigger.setAttribute("aria-label", "Filter this statistic");
   trigger.dataset.columnIndex = String(columnIndex);
+  if (header.hasAttribute("data-paired-filter")) {
+    trigger.dataset.pairedColumnIndex = String(pairedColumnIndexes(columnIndex)[1]);
+  }
   trigger.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();

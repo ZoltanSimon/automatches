@@ -7,6 +7,11 @@ import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
 export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;
 export const eq = (a, b) => a === b;
+// "1 goal", "2 goals"; pass the plural form when it isn't the word plus "s".
+export const plural = (count, singular, pluralForm) => {
+  const many = typeof pluralForm === "string" ? pluralForm : `${singular}s`;
+  return `${count} ${Number(count) === 1 ? singular : many}`;
+};
 export const json = (context) => JSON.stringify(context);
 export const concat = (...parts) => {
   // Handlebars passes an options object as the last argument to helpers.
@@ -64,6 +69,15 @@ export const daysAgo = (date) => {
   if (days <= 0) return "today";
   if (days === 1) return "1 day ago";
   return `${days} days ago`;
+}
+
+export const daysUntil = (date) => {
+  const then = new Date(date);
+  if (Number.isNaN(then.getTime())) return "";
+  const days = Math.round((calendarDay(then) - calendarDay(new Date())) / 86400000);
+  if (days <= 0) return "today";
+  if (days === 1) return "in 1 day";
+  return `in ${days} days`;
 }
 
 export const transferFee = (type) => {
@@ -165,6 +179,9 @@ export const displayRating = (value) => {
   const parsed = positiveRating(value);
   return parsed == null ? "" : parsed.toFixed(1);
 }
+
+export const anyTeamHasRating = (teams) =>
+  Array.isArray(teams) && teams.some((team) => positiveRating(team?.total?.avgRating) != null);
 
 function fotmobNameTokens(value) {
   return String(value ?? "")

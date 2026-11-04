@@ -4,6 +4,7 @@ import { allDBTeams, getCatalogLeague } from "./lib/catalog.js";
 import { getTeamById, isAgeGroupNationalSide } from "./services/teams-service.js";
 import {
   extractPlayerProfile,
+  isValidPlayerId,
   mergeProfileValue,
 } from "./lib/backend-helper.js";
 import {
@@ -243,9 +244,7 @@ export async function getLeagueStandingsFromDb(leagueID, season = null) {
 
 export async function insertPlayersToDb(allPlayers, { overwritePosition = true } = {}) {
   // Filter out players without valid IDs
-  const validPlayers = allPlayers.filter(
-    (player) => player.id != null && player.id !== "",
-  );
+  const validPlayers = allPlayers.filter((player) => isValidPlayerId(player.id));
 
   if (validPlayers.length === 0) {
     console.log({ message: "No valid players to insert." });
@@ -498,12 +497,14 @@ export async function insertTeamsToDb(teams) {
   try {
     for (const team of teams) {
       const { ID, name } = team;
+      // The column defaults to 0 (national team), so new rows must set it explicitly.
+      const isClub = team.is_club === 0 || team.is_club === false ? 0 : 1;
       await pool.execute(
-        `INSERT INTO Team (ID, name)
-          VALUES (?, ?)
+        `INSERT INTO Team (ID, name, is_club)
+          VALUES (?, ?, ?)
           ON DUPLICATE KEY UPDATE
           name = VALUES(name);`,
-        [ID, name],
+        [ID, name, isClub],
       );
     }
     console.log({ message: "Teams loaded successfully!" });
@@ -1145,13 +1146,15 @@ export async function getFinishedMatchIdsMissingFotmob({
   europeanLeagueIds,
 } = {}) {
   await ensureMatchDetailsFotmobColumn();
+  // season "all" skips the season filter entirely
+  const allSeasons = season === "all";
   const normalizedSeason = normalizeSeasonValue(season) ?? CURRENT_SEASON;
   const finishedStatuses = [...FINISHED_MATCH_STATUSES];
   const [rows] = await pool.query(
     `SELECT m.id AS fixtureId
      FROM matches m
      LEFT JOIN match_details d ON d.match_id = m.id
-     WHERE m.season = ?
+     WHERE (? OR m.season = ?)
        AND m.status IN (?)
        AND d.fotmob IS NULL
        AND (
@@ -1165,7 +1168,7 @@ export async function getFinishedMatchIdsMissingFotmob({
          )
        )
      ORDER BY m.match_date ASC`,
-    [normalizedSeason, finishedStatuses, domesticLeagueIds, europeanLeagueIds],
+    [allSeasons, normalizedSeason, finishedStatuses, domesticLeagueIds, europeanLeagueIds],
   );
 
   return rows.map((row) => Number(row.fixtureId));
@@ -1442,7 +1445,7 @@ export async function saveTransfersToDb(transfersData, { replacePlayerHistory = 
   const playersByID = new Map();
   for (const playerEntry of players) {
     const playerID = Number(playerEntry?.player?.id);
-    if (!Number.isFinite(playerID)) {
+    if (!isValidPlayerId(playerID)) {
       continue;
     }
 

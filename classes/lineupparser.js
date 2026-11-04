@@ -106,7 +106,7 @@ export class LineupParser {
       orderedPlayers.forEach((player, index) => {
         const role = positions?.[index] || "Unknown";
         const playerId = Number(player.id);
-        if (role === "Unknown" || !Number.isFinite(playerId)) {
+        if (role === "Unknown" || !Number.isFinite(playerId) || playerId <= 0) {
           return;
         }
 

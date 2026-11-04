@@ -101,12 +101,18 @@ export function mergeProfileValue(existingValue, nextValue) {
   return nextValue !== null && nextValue !== undefined ? nextValue : existingValue;
 }
 
+// The API sends id 0 (players) or null (lineups) for players it can't identify, and Number(null) is 0.
+export function isValidPlayerId(playerID) {
+  const id = Number(playerID);
+  return Number.isFinite(id) && id > 0;
+}
+
 export function extractPlayerProfile(playerPayload, options = {}) {
   const { resolveNationId } = options;
   const player = playerPayload?.player || playerPayload;
   const id = Number(player?.id);
 
-  if (!Number.isFinite(id)) {
+  if (!isValidPlayerId(id)) {
     return null;
   }
 

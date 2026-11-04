@@ -19,7 +19,8 @@ import {
 
 const tableName = "team-list-table";
 const teamStatFilterButtons = document.querySelectorAll(".team-stat-filter-btn");
-const teamStatFiltersStorageKey = "teams.activeStatFilters";
+// Bumped when a default-visible column is added, so saved selections pick it up.
+const teamStatFiltersStorageKey = "teams.activeStatFilters.v2";
 const teamQueryKeys = {
   sortStat: "tsort",
   sortDirection: "tdir",
@@ -38,6 +39,7 @@ const defaultVisibleTeamStats = [
   "form",
   "played",
   "elo",
+  "avgRating",
   "winPercentage",
   "goals",
   "xG",
@@ -326,12 +328,18 @@ export function createTeamsTable(response, onlyTotal, big) {
   if (enableTeamStatFilters) {
     registerStatFilterPopover({
       tableId: tableName,
-      headerSelector: "thead th.sortable[data-stat]",
+      // Single-column headers (Elo, Rtg) and For/Ag group headers; group headers carry
+      // data-paired-filter, so their popover picks For (own column) or Against (next one).
+      headerSelector: "thead tr:first-child th.sortable[data-stat], thead tr:first-child th.top-row[data-stat]",
       rowSelector: "tbody tr",
       storageKey: "teams.stat-filter",
       serverSide: serverSideTeamsTable,
       initialFilters: serverState?.statFilters || [],
       getLabel: (header, tableElement) => {
+        if (header.classList.contains("top-row")) {
+          return header.innerText.trim();
+        }
+
         const parentHeader = tableElement.querySelector(
           `thead tr:first-child th[data-stat="${header.dataset.stat}"]`,
         );

@@ -173,7 +173,7 @@ function shouldSkipTablePagination(container) {
   return Boolean(
     container.id === "standings"
     || container.classList.contains("world-cup-panel")
-    || container.querySelector("#league-standings, .knockout-round, .world-cup-group-table"),
+    || container.querySelector("#league-standings, .knockout-round, .world-cup-group-table, .preview-stats-table"),
   );
 }
 

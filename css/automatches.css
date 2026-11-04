@@ -49,15 +49,186 @@ table tr:nth-of-type(2n) td {
   padding-top: 25px;
 }
 
-.floating-buttons {
-  width: 780px;
-  background-color: #a8dadc;
+/* ---------- Admin layout ---------- */
+.admin-page {
+  --admin-border: #c9d6df;
+  --admin-bg: #f6f9fb;
+  --admin-accent: #1d3557;
+  --admin-muted: #5c6b7a;
+  font-size: 14px;
 }
 
+.admin-page button {
+  padding: 4px 10px;
+  border: 1px solid #9fb3c8;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--admin-accent);
+  cursor: pointer;
+  font: inherit;
+  white-space: nowrap;
+}
+
+.admin-page button:hover:not(:disabled) {
+  background: #e8f1f8;
+}
+
+.admin-page button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.admin-page button.is-busy::after {
+  content: " …";
+}
+
+.admin-page input[type="text"],
+.admin-page input[type="number"],
+.admin-page input[type="date"],
+.admin-page select,
+.admin-page textarea {
+  padding: 3px 6px;
+  border: 1px solid #9fb3c8;
+  border-radius: 4px;
+  font: inherit;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.admin-box {
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+}
+
+.admin-box > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--admin-accent);
+  user-select: none;
+}
+
+.admin-box[open] > summary {
+  margin-bottom: 8px;
+}
+
+.admin-box h3 {
+  margin: 4px 0 8px;
+  font-size: 16px;
+}
+
+.admin-muted {
+  color: var(--admin-muted);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.admin-slow {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #b35c00;
+  margin-left: 4px;
+}
+
+.admin-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--admin-muted);
+  margin: 8px 0 4px;
+}
+
+.admin-small-btn {
+  margin-left: 8px;
+  padding: 0 6px !important;
+  font-size: 12px !important;
+}
+
+.admin-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.admin-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.admin-field > label:first-child {
+  flex: 0 0 64px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--admin-muted);
+}
+
+.admin-field input[type="text"],
+.admin-field input[type="number"],
+.admin-field input[type="date"],
+.admin-field select {
+  flex: 1 1 60px;
+}
+
+.admin-inline-check {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 400px minmax(0, 1fr) 680px;
+  gap: 12px;
+  align-items: start;
+}
+
+.admin-grid.graphics-collapsed {
+  grid-template-columns: 400px minmax(0, 1fr) auto;
+}
+
+.admin-actions {
+  position: sticky;
+  top: 8px;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}
+
+.admin-workspace {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* League picker */
 .admin-league-toolbar {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+#league-list {
+  cursor: pointer;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.admin-league-to-select {
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.6)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+.admin-league-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+  margin: 4px 0 2px;
 }
 
 .admin-league-row {
@@ -71,15 +242,16 @@ table tr:nth-of-type(2n) td {
 .select-league-row {
   height: 26px;
   margin-left: 4px;
-  padding: 0 6px;
+  padding: 0 6px !important;
   flex: 0 0 auto;
-  font-size: 12px;
+  font-size: 12px !important;
   line-height: 1;
 }
 
-#select-all-leagues {
-  height: 30px;
-  flex: 0 0 auto;
+.admin-league-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .admin-season-panel {
@@ -87,7 +259,6 @@ table tr:nth-of-type(2n) td {
   flex-direction: column;
   gap: 4px;
   min-width: 160px;
-  margin: 0;
 }
 
 .admin-season-label {
@@ -97,94 +268,195 @@ table tr:nth-of-type(2n) td {
   text-transform: uppercase;
 }
 
-#league-season-select {
-  height: 32px;
-}
-
 .admin-season-target {
   font-size: 12px;
-  color: #1d3557;
+  color: var(--admin-accent);
   min-height: 16px;
-}
-
-#dateStart,
-#dateEnd,
-#fixtureID,
-#playerID,
-#playerID2,
-#roundNr,
-#teamID {
-  width: 150px;
-}
-
-.work-area {
-  width: 900px;
-  float: left;
-}
-
-.control-panel {
-  padding-left: 10px;
-  width: 800px;
-  float: left;
-  margin-right: 3px;
-}
-
-.canvas-div {
-  width: 1080px;
-  float: left;
-}
-
-#league-list {
-  cursor: pointer;
-  width: auto;
-  flex: 0 0 auto;
 }
 
 .selected-league {
   border: 2px solid red;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
 }
 
-.automatches-row {
-  margin-bottom: 3px;
+/* Results */
+.admin-results-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.automatches-row * {
-  flex: 1 1 0px;
+.admin-results-header #league-name {
+  margin-right: 8px;
 }
 
-.thirtythree {
-  width: 33%;
+.admin-table-wrap {
+  max-height: 480px;
+  overflow: auto;
+  background: #fff;
 }
 
-#submit-league-info {
-  margin-bottom: 3px;
+/* Activity log */
+.admin-log {
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  font-size: 13px;
 }
 
-#league-name,
-#league-id,
-#round-no {
+.admin-log-empty {
+  padding: 6px 8px;
+}
+
+.admin-log-entry {
+  padding: 4px 8px;
+  border-bottom: 1px solid #eef2f5;
+}
+
+.admin-log-entry > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-log-entry > summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-log-time {
+  color: var(--admin-muted);
+  font-family: monospace;
+  margin-right: 6px;
+}
+
+.admin-log-badge {
   display: inline-block;
-  margin-right: 10px; /* Adds space between spans */
+  min-width: 28px;
+  margin-right: 6px;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+  background: #1d7a3a;
 }
 
-.main-admin-container {
+.admin-log-entry.is-error .admin-log-badge {
+  background: #c1121f;
+}
+
+.admin-log-entry.is-api .admin-log-badge {
+  background: #457b9d;
+}
+
+.admin-log-entry.is-click {
+  color: var(--admin-muted);
+}
+
+.admin-log-entry.is-click .admin-log-badge {
+  background: #9aa7b4;
+}
+
+.admin-log-entry.is-click .admin-log-label {
+  font-weight: 400;
+}
+
+.admin-log-label {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.admin-log-entry pre {
+  max-height: 300px;
+  overflow: auto;
+  margin: 4px 0;
+  padding: 6px;
+  background: #f6f9fb;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Graphics */
+.admin-graphics-header {
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  height: 1100px
+  justify-content: space-between;
+  align-items: center;
 }
 
-.child-div {
-  flex-shrink: 0;
+.admin-graphics-body {
+  margin-top: 8px;
 }
 
-.my-canvas {
-  position: relative;
+.admin-grid.graphics-collapsed .admin-graphics-body {
+  display: none;
+}
+
+#my-canvas {
+  display: block;
+  width: 640px;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #d3d3d3;
+  margin-bottom: 8px;
+}
+
+.admin-graphics-inputs {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 6px;
+}
+
+.admin-graphics textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.admin-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.admin-page button.admin-primary {
+  width: 100%;
+  margin-bottom: 4px;
+  background: var(--admin-accent);
+  border-color: var(--admin-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.admin-page button.admin-primary:hover {
+  background: #457b9d;
+}
+
+@media (max-width: 1600px) {
+  .admin-grid,
+  .admin-grid.graphics-collapsed {
+    grid-template-columns: 400px minmax(0, 1fr);
+  }
+
+  .admin-graphics {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1000px) {
+  .admin-grid,
+  .admin-grid.graphics-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-actions {
+    position: static;
+    max-height: none;
+  }
 }
 
 #missing-xg-panel {

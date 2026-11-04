@@ -9,6 +9,9 @@
       <th style="width:52px;" class="list-header"><b>L</b></th>
       <th style="width:90px;" class="list-header"><b>Goals</b></th>
       <th style="width:90px;" class="list-header"><b>xG</b></th>
+      {{#if (anyTeamHasRating standings)}}
+      <th style="width:58px;" class="list-header" title="Average team rating (players with at least 22 minutes)"><b>Rtg</b></th>
+      {{/if}}
       <th style="padding:4px;" class="form-column list-header"><b>Form</b></th>
       <th style="width:58px;" class="list-header"><b>Pts</b></th>
       <th style="width:58px;" class="list-header"><b>xPts</b></th>
@@ -28,6 +31,9 @@
       <td style="padding:4px; text-align: center;">{{thisTeam.losses}}</td>
       <td style="padding:4px; text-align: center;">{{thisTeam.total.goals}} : {{thisTeam.total.goalsAgainst}}</td>
       <td style="padding:2px; text-align: center;"><i>{{thisTeam.total.xG}} : {{thisTeam.total.xGA}}</i></td>
+      {{#if (anyTeamHasRating ../standings)}}
+      <td style="padding:4px; text-align: center;" class="{{ratingClass thisTeam.total.avgRating}}">{{#if thisTeam.total.avgRating}}{{thisTeam.total.avgRating}}{{else}}—{{/if}}</td>
+      {{/if}}
       <td style="padding: 0px;" data-stat="form">
         <div style="display: flex; align-items: center; height: 100%;">
           {{#each thisTeam.formArray as |form|}}

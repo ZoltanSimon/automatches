@@ -1,0 +1,33 @@
+<div class="h2h-summary team-summary">
+    <div class="h2h-summary-grid">
+        <div class="team-summary-stat">
+            <div class="h2h-count">{{#if eloMonthChange}}{{eloMonthChange.current}}{{else}}—{{/if}}</div>
+            <div class="team-summary-label">Elo</div>
+        </div>
+        <div>
+            <div class="h2h-count-row">
+                <span class="h2h-count h2h-home" title="Wins">{{wins}}</span>
+                <span class="h2h-count h2h-draw" title="Draws">{{draws}}</span>
+                <span class="h2h-count h2h-away" title="Losses">{{losses}}</span>
+            </div>
+            <div class="h2h-count-labels"><span>Wins</span><span>Draws</span><span>Losses</span></div>
+        </div>
+        <div class="team-summary-stat">
+            {{#if eloMonthChange}}
+            <div class="h2h-count elo-change {{eloMonthChange.direction}}">{{eloMonthChange.display}}</div>
+            {{else}}
+            <div class="h2h-count">—</div>
+            {{/if}}
+            <div class="team-summary-label">Elo last 30 days</div>
+        </div>
+    </div>
+    {{#if played}}
+    <div class="h2h-bar" role="img"
+        aria-label="Wins {{percentage wins played}}%, draws {{percentage draws played}}%, losses {{percentage losses played}}%">
+        {{#if wins}}<span class="h2h-home" style="width: {{percentage wins played}}%">{{percentage wins played}}%</span>{{/if}}
+        {{#if draws}}<span class="h2h-draw" style="width: {{percentage draws played}}%">{{percentage draws played}}%</span>{{/if}}
+        {{#if losses}}<span class="h2h-away" style="width: {{percentage losses played}}%">{{percentage losses played}}%</span>{{/if}}
+    </div>
+    <div class="h2h-summary-meta">{{played}} matches &middot; {{percentage wins played}}% win</div>
+    {{/if}}
+</div>

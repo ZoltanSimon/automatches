@@ -1,0 +1,25 @@
+<table class="gf-table preview-stats-table team-competition-table">
+    <thead>
+        <tr class="main-table-header">
+            <th colspan="2">Competition</th>
+            <th class="center-td" title="Matches played">Played</th>
+            <th class="center-td">Goals</th>
+            <th class="center-td">Assists</th>
+            <th class="center-td" title="Average team rating (players with at least 22 minutes)">Avg Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each leagueBreakdown}}
+        <tr style="cursor: pointer;" onclick="window.location.href='/league?id={{this.id}}'">
+            <td style="width:36px; padding: 2px; text-align: center; border-right: 0;">
+                <img src="images/competitions/{{this.id}}.png" class="logo-picture" alt="{{this.name}}" />
+            </td>
+            <td style="border-left-style: hidden;">{{this.name}}</td>
+            <td style="text-align: center;">{{this.played}}</td>
+            <td style="text-align: center;">{{this.goals}}</td>
+            <td style="text-align: center;">{{#if this.assists includeZero=true}}{{this.assists}}{{else}}—{{/if}}</td>
+            <td style="text-align: center;" class="{{ratingClass this.avgRating}}">{{#if this.avgRating}}{{this.avgRating}}{{else}}—{{/if}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>

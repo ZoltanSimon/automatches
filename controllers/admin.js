@@ -5,9 +5,11 @@ import {
   showToast,
   addLeagues,
   selectedLeagues,
+  copyText,
+  copyToClipboard,
 } from "../common-functions.js";
 import { matchesToCanvas, matchList } from "../components/match-list.js";
-import { make_base, fontY } from "../instapics.js";
+import { make_base, drawPastedImage } from "../instapics.js";
 import {
   standingsToCanvas,
   leagueStandings
@@ -85,10 +87,27 @@ function renderSeasonOptions(leagueID) {
   }
 }
 
+function renderSelectedSummary() {
+  const summary = document.getElementById("admin-selected-summary");
+  if (!summary) {
+    return;
+  }
+
+  const names = selectedLeagues.map((leagueID) => leagueById.get(Number(leagueID))?.name || String(leagueID));
+  if (names.length === 0) {
+    summary.textContent = "None selected";
+    return;
+  }
+
+  const shown = names.slice(0, 3).join(", ");
+  summary.textContent = names.length > 3 ? `${shown} (+${names.length - 3})` : shown;
+}
+
 function setActiveLeague(leagueID) {
   const normalizedLeagueID = Number(leagueID);
-  activeLeagueID = Number.isNaN(normalizedLeagueID) ? null : normalizedLeagueID;
+  activeLeagueID = leagueID === null || Number.isNaN(normalizedLeagueID) ? null : normalizedLeagueID;
   renderSeasonOptions(activeLeagueID);
+  renderSelectedSummary();
 }
 
 seasonSelect.addEventListener("change", () => {
@@ -99,14 +118,300 @@ seasonSelect.addEventListener("change", () => {
   selectedLeagueSeasons.set(activeLeagueID, Number(seasonSelect.value));
 });
 
-const datepickerInput = document.getElementById("datepicker-input");
-if (datepickerInput) {
-  datepickerInput.addEventListener("change", function () {
-    document.getElementById("fixtures-info").innerHTML = "";
-    const selectedDate = this.value;
-    showMatchesOnDate(selectedDate, true);
+// ---------- Activity log + action helper ----------
+
+const ADMIN_LOG_MAX_ENTRIES = 200;
+const ADMIN_LOG_MAX_JSON_CHARS = 20000;
+const adminLog = document.getElementById("admin-log");
+
+const LOG_KINDS = {
+  click: { className: " is-click", badge: "BTN" },
+  api: { className: " is-api", badge: "API" },
+};
+
+function logActivity({ label, ok = true, summary = "", data, elapsedMs, kind }) {
+  if (!adminLog) {
+    return;
+  }
+
+  adminLog.querySelector(".admin-log-empty")?.remove();
+
+  const kindStyle = LOG_KINDS[kind];
+  const entry = document.createElement("details");
+  entry.className = `admin-log-entry${ok ? kindStyle?.className ?? "" : " is-error"}`;
+
+  const head = document.createElement("summary");
+  const time = document.createElement("span");
+  time.className = "admin-log-time";
+  time.textContent = new Date().toLocaleTimeString();
+  const badge = document.createElement("span");
+  badge.className = "admin-log-badge";
+  badge.textContent = ok ? kindStyle?.badge ?? "OK" : "ERR";
+  const labelEl = document.createElement("span");
+  labelEl.className = "admin-log-label";
+  labelEl.textContent = label;
+  const summaryEl = document.createElement("span");
+  summaryEl.textContent = `${summary}${elapsedMs !== undefined ? ` (${(elapsedMs / 1000).toFixed(1)}s)` : ""}`;
+  head.append(time, badge, labelEl, summaryEl);
+  entry.append(head);
+
+  if (data !== undefined) {
+    let json;
+    try {
+      json = JSON.stringify(data, null, 2);
+    } catch {
+      json = String(data);
+    }
+    const pre = document.createElement("pre");
+    pre.textContent = json.length > ADMIN_LOG_MAX_JSON_CHARS
+      ? `${json.slice(0, ADMIN_LOG_MAX_JSON_CHARS)}\n… truncated (${json.length} chars)`
+      : json;
+    entry.append(pre);
+  }
+
+  adminLog.prepend(entry);
+  while (adminLog.children.length > ADMIN_LOG_MAX_ENTRIES) {
+    adminLog.lastElementChild.remove();
+  }
+}
+
+document.getElementById("admin-log-clear")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  adminLog.innerHTML = `<div class="admin-muted admin-log-empty">Nothing yet.</div>`;
+});
+
+// Every /api/ call on this page is logged, including ones made inside shared components.
+// Callers that write their own, more specific log entry pass { [SKIP_ACTIVITY_LOG]: true }.
+const SKIP_ACTIVITY_LOG = Symbol("skipActivityLog");
+const nativeFetch = window.fetch.bind(window);
+
+function summarizeApiResponse(status, data) {
+  if (Array.isArray(data)) {
+    return `HTTP ${status} · ${data.length} item(s)`;
+  }
+  if (data && typeof data === "object") {
+    if (data.message) {
+      return `HTTP ${status} · ${data.message}`;
+    }
+    if ("savedCount" in data && "requested" in data) {
+      return `HTTP ${status} · saved ${data.savedCount}/${data.requested}`;
+    }
+    if ("count" in data) {
+      return `HTTP ${status} · count ${data.count}`;
+    }
+  }
+  return `HTTP ${status}`;
+}
+
+window.fetch = async function (input, init = {}) {
+  const url = typeof input === "string" ? input : input?.url ?? String(input);
+  const path = url.replace(window.location.origin, "");
+  if (!path.startsWith("/api/") || init?.[SKIP_ACTIVITY_LOG]) {
+    return nativeFetch(input, init);
+  }
+
+  const method = (init?.method || "GET").toUpperCase();
+  const label = `${method} ${decodeURIComponent(path).slice(0, 140)}`;
+  const startedAt = performance.now();
+
+  let response;
+  try {
+    response = await nativeFetch(input, init);
+  } catch (error) {
+    logActivity({ label, ok: false, summary: error.message, elapsedMs: performance.now() - startedAt, kind: "api" });
+    throw error;
+  }
+
+  const elapsedMs = performance.now() - startedAt;
+  response.clone().json()
+    .then((data) => {
+      logActivity({
+        label,
+        ok: response.ok && data?.success !== false,
+        summary: summarizeApiResponse(response.status, data),
+        data,
+        elapsedMs,
+        kind: "api",
+      });
+    })
+    .catch(() => {
+      logActivity({ label, ok: response.ok, summary: `HTTP ${response.status}`, elapsedMs, kind: "api" });
+    });
+
+  return response;
+};
+
+// Button presses are logged in the capture phase, so they appear before whatever the handler does
+document.getElementById("admin-page")?.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button || button.disabled || button.id === "admin-log-clear") {
+    return;
+  }
+
+  const text = (button.firstChild?.textContent || button.textContent).trim() || button.title || button.id;
+  const matchSuffix = button.dataset.matchId ? ` (match ${button.dataset.matchId})` : "";
+  logActivity({ label: `${text}${matchSuffix}`, summary: "", kind: "click" });
+}, true);
+
+window.addEventListener("error", (event) => {
+  logActivity({ label: "Script error", ok: false, summary: event.message || String(event.error) });
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  logActivity({ label: "Unhandled promise rejection", ok: false, summary: event.reason?.message || String(event.reason) });
+});
+
+/**
+ * Runs a JSON API call for a button: optional confirm, busy state, activity log entry and toast.
+ * Returns the parsed response on success, or null on failure/cancel.
+ */
+async function runAction(button, { label, url, method = "GET", body, confirmText, summarize, toastSuccess = true }) {
+  if (confirmText && !window.confirm(confirmText)) {
+    return null;
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.classList.add("is-busy");
+  }
+  const startedAt = performance.now();
+
+  try {
+    const response = await fetch(url, body === undefined
+      ? { method, [SKIP_ACTIVITY_LOG]: true }
+      : { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), [SKIP_ACTIVITY_LOG]: true });
+    const data = await response.json().catch(() => null);
+    const elapsedMs = performance.now() - startedAt;
+
+    if (!response.ok || data?.success === false) {
+      const message = data?.message || `${label} failed (HTTP ${response.status}).`;
+      logActivity({ label, ok: false, summary: message, data, elapsedMs });
+      showToast(message, "error");
+      return null;
+    }
+
+    let summary = "Done.";
+    try {
+      summary = summarize ? summarize(data) : summary;
+    } catch (error) {
+      console.warn(`${label}: could not summarize response`, error);
+    }
+    logActivity({ label, ok: true, summary, data, elapsedMs });
+    if (toastSuccess) {
+      showToast(`${label}: ${summary}`, "success");
+    }
+    return data;
+  } catch (error) {
+    console.error(`${label} failed:`, error);
+    logActivity({ label, ok: false, summary: error.message, elapsedMs: performance.now() - startedAt });
+    showToast(error.message || `${label} failed.`, "error");
+    return null;
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.classList.remove("is-busy");
+    }
+  }
+}
+
+function requireInput(id, message) {
+  const value = document.getElementById(id)?.value.trim() ?? "";
+  if (!value) {
+    showToast(message, "error");
+  }
+  return value;
+}
+
+function onClick(id, handler) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.onclick = (event) => handler(event.currentTarget, event);
+  }
+}
+
+// ---------- Remembered UI state (open groups, graphics column) ----------
+
+const ADMIN_UI_STATE_KEY = "gf-admin-ui";
+
+function readUiState() {
+  try {
+    return JSON.parse(localStorage.getItem(ADMIN_UI_STATE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function writeUiState(patch) {
+  try {
+    localStorage.setItem(ADMIN_UI_STATE_KEY, JSON.stringify({ ...readUiState(), ...patch }));
+  } catch {
+    // storage unavailable, state just isn't remembered
+  }
+}
+
+const adminGrid = document.getElementById("admin-grid");
+const toggleGraphicsButton = document.getElementById("toggle-graphics");
+
+function setGraphicsCollapsed(collapsed) {
+  adminGrid?.classList.toggle("graphics-collapsed", collapsed);
+  if (toggleGraphicsButton) {
+    toggleGraphicsButton.textContent = collapsed ? "Show" : "Hide";
+  }
+}
+
+{
+  const uiState = readUiState();
+  const openGroups = uiState.openGroups || {};
+  document.querySelectorAll("details[data-persist][id]").forEach((details) => {
+    if (details.id in openGroups) {
+      details.open = Boolean(openGroups[details.id]);
+    }
+    details.addEventListener("toggle", () => {
+      writeUiState({ openGroups: { ...(readUiState().openGroups || {}), [details.id]: details.open } });
+    });
+  });
+
+  setGraphicsCollapsed(Boolean(uiState.graphicsCollapsed));
+  toggleGraphicsButton?.addEventListener("click", () => {
+    const collapsed = !adminGrid.classList.contains("graphics-collapsed");
+    setGraphicsCollapsed(collapsed);
+    writeUiState({ graphicsCollapsed: collapsed });
   });
 }
+
+// ---------- Matches on a date ----------
+
+function toIsoDay(date) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+}
+
+const matchesDateInput = document.getElementById("matches-date");
+if (matchesDateInput) {
+  matchesDateInput.value = toIsoDay(new Date());
+}
+
+onClick("show-matches-on-date", async () => {
+  const day = requireInput("matches-date", "Pick a date first.");
+  if (!day) {
+    return;
+  }
+  document.getElementById("fixtures-info").innerHTML = "";
+  await showMatchesOnDate(day, true);
+});
+
+onClick("refetch-day", async (button) => {
+  const day = requireInput("matches-date", "Pick a date first.");
+  if (!day) {
+    return;
+  }
+  await runAction(button, {
+    label: `Refetch day ${day}`,
+    url: `/api/refetch-day?date=${encodeURIComponent(day)}`,
+    confirmText: `Refetch every tracked fixture on ${day} from the API?`,
+    summarize: (data) => `Saved ${data.savedCount}/${data.requested} matches.`,
+  });
+});
 
 await showMatchesOnDate(new Date(), true);
 addLeagues("admin", true);
@@ -131,15 +436,6 @@ document.querySelectorAll(".admin-league-to-select").forEach((element) => {
 const matchListDiv = document.getElementById("match-list");
 if (matchListDiv) {
   matchListDiv.style.visibility = "visible";
-}
-async function submitRequest_matchList() {
-  let leagueID = selectedLeagues[0];
-  let startDate = document.getElementById("dateStart").value;
-  let endDate = document.getElementById("dateEnd").value;
-  getResultsDate(leagueID, 2024, startDate, endDate).then((response) => {
-    matchList(response.response, true);
-    addText(response.response);
-  });
 }
 
 function selectLeagueElements(leagueElements) {
@@ -183,7 +479,11 @@ function addLeagueRowSelectButtons() {
   const containers = ["league-list-league", "league-list-cup", "league-list-nt"]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
-  const iconRowWidth = 450;
+  // Fill the picker width left over by the season panel, minus room for each row's Select button
+  const toolbar = document.querySelector(".admin-league-toolbar");
+  const sidePanel = document.querySelector(".admin-league-side");
+  const availableWidth = (toolbar?.clientWidth ?? 0) - (sidePanel?.offsetWidth ?? 0) - 16 - 70;
+  const iconRowWidth = Math.max(450, availableWidth);
 
   for (const container of containers) {
     container.style.width = `${iconRowWidth}px`;
@@ -231,7 +531,18 @@ await Promise.all(
     });
   }),
 );
-addLeagueRowSelectButtons();
+{
+  // Rows are built from measured icon positions, so the picker must be open while measuring
+  const leaguePicker = document.getElementById("admin-league-picker");
+  const wasOpen = leaguePicker?.open ?? true;
+  if (leaguePicker && !wasOpen) {
+    leaguePicker.open = true;
+  }
+  addLeagueRowSelectButtons();
+  if (leaguePicker && !wasOpen) {
+    leaguePicker.open = false;
+  }
+}
 
 document.getElementById("select-all-leagues").onclick = function () {
   const allTheLeagues = document
@@ -240,31 +551,70 @@ document.getElementById("select-all-leagues").onclick = function () {
   selectLeagueElements([...allTheLeagues].slice(0, 10));
 };
 
-document.getElementById("submit-league-info").onclick = async function () {
-  await leagueStandings(selectedLeagues[0]);
-};
+onClick("clear-leagues", () => {
+  selectLeagueElements([]);
+});
 
-const getMatchesByRoundButton = document.getElementById("get-matches-by-round");
-if (getMatchesByRoundButton) {
-  getMatchesByRoundButton.onclick = async function () {
-    let leagueID = selectedLeagues[0];
-    let roundNumber = document.getElementById("roundnr").value;
-    let roundLabel = leagueID != 2 ? `Regular Season - ${roundNumber}` : `League Stage - ${roundNumber}`;
-    console.log(roundLabel);
-    const response = await fetch(`/api/get-matches-by-round?leagueID=${leagueID}&roundNo=${roundLabel}`);
-    const matches = await response.json();
-    matchList(matches, true);
-    addText(matches);
-    buildResults(matches);
-  };
+function requireSelectedLeague(action) {
+  const leagueID = selectedLeagues[0];
+  if (!leagueID) {
+    showToast(`Select a league before ${action}.`, "error");
+  }
+  return leagueID;
 }
 
-const submitMatchListButton = document.getElementById("submit-match-list");
-if (submitMatchListButton) {
-  submitMatchListButton.onclick = async function () {
-    await submitRequest_matchList();
-  };
+onClick("submit-league-info", async () => {
+  const leagueID = requireSelectedLeague("loading standings");
+  if (leagueID) {
+    await leagueStandings(leagueID);
+  }
+});
+
+function roundLabelFor(leagueID, roundNumber) {
+  return Number(leagueID) !== 2 ? `Regular Season - ${roundNumber}` : `League Stage - ${roundNumber}`;
 }
+
+onClick("get-matches-by-round", async (button) => {
+  const leagueID = requireSelectedLeague("loading a round");
+  const roundNumber = leagueID && requireInput("roundnr", "Enter a round number first.");
+  if (!leagueID || !roundNumber) {
+    return;
+  }
+
+  const matches = await runAction(button, {
+    label: `Round ${roundNumber} (league ${leagueID})`,
+    url: `/api/get-matches-by-round?leagueID=${leagueID}&roundNo=${encodeURIComponent(roundNumber)}`,
+    summarize: (data) => `${data.length} match(es).`,
+    toastSuccess: false,
+  });
+  if (!Array.isArray(matches) || matches.length === 0) {
+    if (matches) {
+      showToast(`No matches found for round ${roundNumber}.`, "error");
+    }
+    return;
+  }
+
+  matchList(matches, true);
+  addText(matches);
+  buildResults(matches);
+});
+
+onClick("refetch-round", async (button) => {
+  const leagueID = requireSelectedLeague("refetching a round");
+  const roundNumber = leagueID && requireInput("roundnr", "Enter a round number first.");
+  if (!leagueID || !roundNumber) {
+    return;
+  }
+
+  const season = getStoredSeason(leagueID) || CURRENT_SEASON;
+  const roundLabel = roundLabelFor(leagueID, roundNumber);
+  await runAction(button, {
+    label: `Refetch round ${roundNumber} (league ${leagueID}, ${season})`,
+    url: `/api/refetch-round?leagueID=${leagueID}&season=${season}&round=${encodeURIComponent(roundLabel)}`,
+    confirmText: `Refetch "${roundLabel}" for league ${leagueID}, season ${season} from the API?`,
+    summarize: (data) => `Saved ${data.savedCount}/${data.requested} matches.`,
+  });
+});
 
 function formatMissingXgDate(value) {
   if (!value) {
@@ -528,7 +878,7 @@ function applyExternalXgResult(row, result) {
   return { found: true };
 }
 
-async function fetchExternalXgMatches(matchIds, fotmobID = "") {
+async function fetchExternalXgMatches(matchIds, fotmobID = "", { skipActivityLog = false } = {}) {
   const ids = [...new Set((matchIds || []).map(String).filter(Boolean))].slice(0, MISSING_XG_MAX_SELECTION);
   if (ids.length === 0) {
     throw new Error("Select at least one match.");
@@ -538,6 +888,7 @@ async function fetchExternalXgMatches(matchIds, fotmobID = "") {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(fotmobID ? { matchIDs: ids, fotmobID } : { matchIDs: ids }),
+    [SKIP_ACTIVITY_LOG]: skipActivityLog,
   });
   const result = await response.json();
 
@@ -734,18 +1085,21 @@ if (matchesMissingXgButton) {
   matchesMissingXgButton.onclick = async function () {
     matchesMissingXgButton.disabled = true;
     try {
-      const response = await fetch(`/api/matches-missing-xg?season=${CURRENT_SEASON}`);
+      const response = await fetch(`/api/matches-missing-xg?season=${CURRENT_SEASON}`, { [SKIP_ACTIVITY_LOG]: true });
       const data = await response.json();
       if (!response.ok || data.success === false) {
-        showToast(data.message || "Failed to load matches missing xG.");
+        logActivity({ label: "Missing xG", ok: false, summary: data.message || "Failed to load.", data });
+        showToast(data.message || "Failed to load matches missing xG.", "error");
         return;
       }
 
       renderMissingXgMatches(data.matches);
+      logActivity({ label: "Missing xG", summary: `${data.count} match(es) without xG in season ${data.season}.` });
       showToast(`Found ${data.count} match(es) without xG in season ${data.season}.`, "success");
     } catch (error) {
       console.error("Failed to load matches missing xG:", error);
-      showToast(error.message || "Failed to load matches missing xG.");
+      logActivity({ label: "Missing xG", ok: false, summary: error.message });
+      showToast(error.message || "Failed to load matches missing xG.", "error");
     } finally {
       matchesMissingXgButton.disabled = false;
     }
@@ -764,9 +1118,17 @@ if (fotmobLinkButton) {
 
     fotmobLinkButton.disabled = true;
     try {
-      const result = await fetchExternalXgMatches([matchId], fotmobID);
+      const result = await fetchExternalXgMatches([matchId], fotmobID, { skipActivityLog: true });
       const lookup = (result.results || [])[0];
       const label = lookup?.sourceMatch ? ` (${lookup.sourceMatch})` : "";
+      logActivity({
+        label: `FotMob ${matchId}`,
+        ok: Boolean(lookup?.fotmobSaved),
+        summary: lookup?.fotmobSaved
+          ? `Saved${label}${lookup.ok ? `, xG ${formatXgValue(lookup.home)}–${formatXgValue(lookup.away)}` : ""}`
+          : lookup?.error || "Nothing saved.",
+        data: result,
+      });
       if (!lookup?.fotmobSaved) {
         showToast(lookup?.error || `Nothing saved for match ${matchId}.`);
       } else if (lookup.warning) {
@@ -778,11 +1140,143 @@ if (fotmobLinkButton) {
       }
     } catch (error) {
       console.error("Failed to fetch FotMob by ID:", error);
-      showToast(error.message || "Failed to fetch FotMob data.");
+      logActivity({ label: `FotMob ${matchId}`, ok: false, summary: error.message });
+      showToast(error.message || "Failed to fetch FotMob data.", "error");
     } finally {
       fotmobLinkButton.disabled = false;
     }
   };
+}
+
+const fotmobBackfillSeasonSelect = document.getElementById("fotmob-backfill-season");
+const fotmobBackfillCountButton = document.getElementById("fotmob-backfill-count");
+const fotmobBackfillStartButton = document.getElementById("fotmob-backfill-start");
+const fotmobBackfillStopButton = document.getElementById("fotmob-backfill-stop");
+const fotmobBackfillStatus = document.getElementById("fotmob-backfill-status");
+let fotmobBackfillPollTimer = null;
+
+function fotmobBackfillSeasonLabel(season) {
+  return season === "all" ? "all seasons" : `season ${season}`;
+}
+
+// Logged by the callers instead of the fetch wrapper, so the 3s status poll doesn't flood the log
+async function fotmobBackfillRequest(path, options = {}) {
+  const response = await fetch(`/api/fotmob-backfill/${path}`, { ...options, [SKIP_ACTIVITY_LOG]: true });
+  const result = await response.json();
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message || "FotMob backfill request failed.");
+  }
+  return result;
+}
+
+function renderFotmobBackfillStatus(status) {
+  const running = Boolean(status?.running);
+  fotmobBackfillStartButton.disabled = running;
+  fotmobBackfillCountButton.disabled = running;
+  fotmobBackfillSeasonSelect.disabled = running;
+  fotmobBackfillStopButton.disabled = !running || Boolean(status?.stopping);
+
+  if (!status?.startedAt) {
+    fotmobBackfillStatus.textContent = "";
+    return;
+  }
+
+  const progress = `${status.processed}/${status.total} · saved ${status.saved} · missed ${status.missed}`;
+  if (running) {
+    const remainingMin = Math.ceil(((status.total - status.processed) * 4) / 60);
+    fotmobBackfillStatus.textContent = `${status.stopping ? "Stopping" : "Running"} (${fotmobBackfillSeasonLabel(status.season)}): ${progress} · ~${remainingMin} min left${status.current ? ` · ${status.current}` : ""}`;
+  } else {
+    fotmobBackfillStatus.textContent = `${status.error ? `Failed: ${status.error} · ` : "Last run: "}${progress} (${fotmobBackfillSeasonLabel(status.season)})`;
+  }
+}
+
+async function pollFotmobBackfill() {
+  clearTimeout(fotmobBackfillPollTimer);
+  try {
+    const status = await fotmobBackfillRequest("status");
+    renderFotmobBackfillStatus(status);
+    if (status.running) {
+      fotmobBackfillPollTimer = setTimeout(pollFotmobBackfill, 3000);
+    } else if (status.finishedAt && fotmobBackfillPollTimer !== null) {
+      logActivity({
+        label: "FotMob backfill",
+        ok: !status.error,
+        summary: `${status.error ? `Failed: ${status.error} · ` : "Finished: "}saved ${status.saved}, missed ${status.missed} (${fotmobBackfillSeasonLabel(status.season)}).`,
+        data: status,
+      });
+      showToast(`FotMob backfill finished: saved ${status.saved}, missed ${status.missed}.`, status.saved > 0 ? "success" : undefined);
+      fotmobBackfillPollTimer = null;
+    }
+  } catch (error) {
+    console.error("Failed to read FotMob backfill status:", error);
+    logActivity({ label: "FotMob backfill status", ok: false, summary: error.message });
+    fotmobBackfillStatus.textContent = error.message;
+  }
+}
+
+if (fotmobBackfillSeasonSelect) {
+  const seasonOptions = [CURRENT_SEASON, CURRENT_SEASON - 1, CURRENT_SEASON - 2, CURRENT_SEASON - 3, "all"];
+  for (const season of seasonOptions) {
+    const option = document.createElement("option");
+    option.value = String(season);
+    option.textContent = season === "all" ? "All seasons" : String(season);
+    fotmobBackfillSeasonSelect.append(option);
+  }
+
+  fotmobBackfillCountButton.onclick = async function () {
+    const season = fotmobBackfillSeasonSelect.value;
+    fotmobBackfillCountButton.disabled = true;
+    try {
+      const result = await fotmobBackfillRequest(`count?season=${encodeURIComponent(season)}`);
+      const minutes = Math.ceil((result.count * 4) / 60);
+      logActivity({ label: "FotMob backfill count", summary: `${result.count} missing (${fotmobBackfillSeasonLabel(season)}), ~${minutes} min.` });
+      showToast(`${result.count} finished matches missing FotMob (${fotmobBackfillSeasonLabel(season)}), ~${minutes} min to backfill.`, "success");
+    } catch (error) {
+      console.error("Failed to count missing FotMob:", error);
+      showToast(error.message);
+    } finally {
+      fotmobBackfillCountButton.disabled = false;
+    }
+  };
+
+  fotmobBackfillStartButton.onclick = async function () {
+    const season = fotmobBackfillSeasonSelect.value;
+    if (!window.confirm(`Start FotMob backfill for ${fotmobBackfillSeasonLabel(season)}? It runs in the background (~4s per match).`)) {
+      return;
+    }
+    fotmobBackfillStartButton.disabled = true;
+    try {
+      const status = await fotmobBackfillRequest("start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ season }),
+      });
+      logActivity({ label: "FotMob backfill", summary: `Started: ${status.total} matches (${fotmobBackfillSeasonLabel(status.season)}).` });
+      showToast(`FotMob backfill started: ${status.total} matches (${fotmobBackfillSeasonLabel(status.season)}).`, "success");
+      fotmobBackfillPollTimer = 0;
+      pollFotmobBackfill();
+    } catch (error) {
+      console.error("Failed to start FotMob backfill:", error);
+      showToast(error.message);
+      fotmobBackfillStartButton.disabled = false;
+    }
+  };
+
+  fotmobBackfillStopButton.onclick = async function () {
+    fotmobBackfillStopButton.disabled = true;
+    try {
+      const status = await fotmobBackfillRequest("stop", { method: "POST" });
+      logActivity({ label: "FotMob backfill", summary: `Stop requested at ${status.processed}/${status.total}.`, data: status });
+      renderFotmobBackfillStatus(status);
+    } catch (error) {
+      console.error("Failed to stop FotMob backfill:", error);
+      logActivity({ label: "FotMob backfill stop", ok: false, summary: error.message });
+      showToast(error.message);
+    }
+  };
+
+  // Picks up a job that is already running, e.g. after a page reload
+  pollFotmobBackfill();
 }
 
 const missingXgTable = document.getElementById("missing-xg-table");
@@ -1017,417 +1511,327 @@ document.getElementById("missing-xg-fetch-xg-selected")?.addEventListener("click
   }
 });
 
-document.getElementById("update-leagues").onclick = async function () {
-  const response = await fetch(
-    "/api/update-leagues",
-    {
-      method: "GET",
-    }
-  );
-  const data = await response.json();
-  showToast(`Updated ${data.updatedSeasons} seasons across ${data.updatedLeagues} leagues (season ${data.season} or newer).`, 'success');
-  console.log(data);
-};
+// ---------- Data sync ----------
 
-document.getElementById("import-and-update-matches").onclick = async function () {
-  const response = await fetch("/api/import-and-update-matches", {
-    method: "GET",
-  });
-  const data = await response.json();
+onClick("update-leagues", (button) => runAction(button, {
+  label: "Update leagues",
+  url: "/api/update-leagues",
+  summarize: (data) => `Updated ${data.updatedSeasons} seasons across ${data.updatedLeagues} leagues (season ${data.season} or newer).`,
+}));
 
-  if (!response.ok || !data.success) {
-    showToast(data.message || "Failed to import and update matches.");
-    console.log(data);
-    return;
-  }
+onClick("import-and-update-matches", (button) => runAction(button, {
+  label: "Import + update matches",
+  url: "/api/import-and-update-matches",
+  confirmText: "Update all leagues and fetch every missing finished match? This can take a while.",
+  summarize: (data) => `Imported ${data.leagueUpdate.updatedLeagues} leagues and saved ${data.hydration.savedCount}/${data.missingMatches} match files.`,
+}));
 
-  showToast(
-    `Imported ${data.leagueUpdate.updatedLeagues} leagues and saved ${data.hydration.savedCount}/${data.missingMatches} match files.`,
-    "success",
-  );
-  console.log(data);
-};
-
-document.getElementById("update-league-all-seasons").onclick = async function () {
-  const leagueID = selectedLeagues[0];
+onClick("update-league-all-seasons", (button) => {
+  const leagueID = requireSelectedLeague("updating all seasons");
   if (!leagueID) {
-    showToast("Select one league before updating all seasons.");
-    return;
+    return null;
   }
-
-  const response = await fetch(
-    `/api/update-league-all-seasons?leagueID=${leagueID}`,
-    {
-      method: "GET",
-    }
-  );
-
-  const data = await response.json();
-  if (!response.ok || !data.success) {
-    showToast(data.message || "Failed to update all seasons.");
-    return;
-  }
-
-  showToast(
-    `Updated ${data.updatedSeasons}/${data.totalSeasons} seasons for league ${leagueID}.`,
-    "success",
-  );
-  console.log(data);
-};
-
-const grabMatchInfoButton = document.getElementById("grab-match-info");
-if (grabMatchInfoButton) {
-  grabMatchInfoButton.onclick = async function () {
-    const matchIDs = document.getElementById("matchIDs").value.trim();
-    if (!matchIDs) {
-      showToast("Enter one or more match IDs first.");
-      return;
-    }
-
-    const response = await fetch(`/api/grab-match-info?matchIDs=${encodeURIComponent(matchIDs)}&includeMatches=1`, {
-      method: "GET",
-    });
-    const result = await response.json();
-
-    if (!response.ok || result.success === false) {
-      showToast(result.message || "Failed to grab match info.");
-      return;
-    }
-
-    const remaining = result.limits
-      ? `${result.limits.dailyRemaining} requests left today, ${result.limits.perMinuteRemaining} left this minute`
-      : "";
-    showToast(`Grabbed ${result.savedCount}/${result.requested} matches ${remaining}`.trim());
-
-    const matches = Array.isArray(result?.match) ? result.match : result?.matches;
-    try {
-      if (Array.isArray(matches) && matches.length > 0) {
-        oneFixture(matches);
-        addMatchStats(matches[0]);
-      }
-    } catch (error) {
-      console.error("Could not render grabbed match:", error);
-    }
-  };
-}
-
-const missingMatchesButton = document.getElementById("missing-matches");
-if (missingMatchesButton) {
-  missingMatchesButton.onclick = async function () {
-    let leagueID = selectedLeagues.join(",");
-    const response = await fetch(`/api/missing-matches?leagueID=${leagueID}`, {
-      method: "GET",
-    });
-    const data = await response.json();
-    if (data.length > 0) matchList(data, true);
-    console.log(data);
-  };
-}
-
-document.getElementById("get-player-goal-list").onclick = async function () {
-  playerGoalList({ big: false, enableStatFilters: false });
-};
-
-document.getElementById("get-all-clubs").onclick = async function () {
-  let response = await fetch("/api/insert-all-clubs-to-db", {
-    method: "GET",
+  return runAction(button, {
+    label: `Update league ${leagueID} (all seasons)`,
+    url: `/api/update-league-all-seasons?leagueID=${leagueID}`,
+    summarize: (data) => `Updated ${data.updatedSeasons}/${data.totalSeasons} seasons for ${data.leagueName || `league ${leagueID}`}.`,
   });
-  let result = await response.json();
-  console.log("Inserted teams:", result);
-};
+});
 
-document.getElementById("insert-all-players").onclick = async function () {
-  try {
-    const response = await fetch(`/api/insert-all-players`);
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.error("Failed to fetch and build player list:", error);
-    return [];
+onClick("reload-runtime-cache", (button) => runAction(button, {
+  label: "Reload runtime cache",
+  url: "/api/reload-runtime-cache",
+  summarize: (data) => `${data.players} players, ${data.teams} teams, ${data.leagues} leagues, ${data.matches} matches.`,
+}));
+
+onClick("missing-matches", async (button) => {
+  if (selectedLeagues.length === 0) {
+    showToast("Select one or more leagues first.", "error");
+    return;
   }
-};
+  const matches = await runAction(button, {
+    label: "Missing match details",
+    url: `/api/missing-matches?leagueID=${selectedLeagues.join(",")}`,
+    summarize: (data) => `${data.length} finished match(es) without details.`,
+  });
+  if (Array.isArray(matches) && matches.length > 0) {
+    matchList(matches, true);
+  }
+});
 
-const getPlayerStatsButton = document.getElementById("getPlayerStats");
-if (getPlayerStatsButton) {
-  getPlayerStatsButton.onclick = async function () {
-    const playerID = document.getElementById("playerID").value;
+onClick("test-standings", (button) => {
+  const leagueID = requireSelectedLeague("fetching standings");
+  if (!leagueID) {
+    return null;
+  }
+  const season = getStoredSeason(leagueID) || CURRENT_SEASON;
+  return runAction(button, {
+    label: `Fetch + save standings (league ${leagueID}, ${season})`,
+    url: `/api/test-standings?leagueID=${leagueID}&season=${season}`,
+    summarize: (data) => `Saved ${data.standings?.length ?? 0} standings group(s).`,
+  });
+});
+
+// ---------- Match info ----------
+
+onClick("grab-match-info", async (button) => {
+  const matchIDs = requireInput("matchIDs", "Enter one or more match IDs first.");
+  if (!matchIDs) {
+    return;
+  }
+
+  const result = await runAction(button, {
+    label: `Grab match info ${matchIDs}`,
+    url: `/api/grab-match-info?matchIDs=${encodeURIComponent(matchIDs)}&includeMatches=1`,
+    summarize: (data) => {
+      const remaining = data.limits
+        ? ` · ${data.limits.dailyRemaining} requests left today, ${data.limits.perMinuteRemaining} this minute`
+        : "";
+      return `Grabbed ${data.savedCount}/${data.requested} matches${remaining}.`;
+    },
+  });
+
+  const matches = Array.isArray(result?.match) ? result.match : result?.matches;
+  try {
+    if (Array.isArray(matches) && matches.length > 0) {
+      oneFixture(matches);
+      addMatchStats(matches[0]);
+    }
+  } catch (error) {
+    console.error("Could not render grabbed match:", error);
+  }
+});
+
+// ---------- Players & teams ----------
+
+function playerAction(id, { label, path, summarize }) {
+  onClick(id, (button) => {
+    const playerID = requireInput("playerID", "Enter a player ID first.");
     if (!playerID) {
-      showToast("Enter a player ID first.");
-      return;
+      return null;
     }
-
-    try {
-      const response = await fetch(`/api/get-player-stats?playerID=${playerID}`);
-      const data = await response.json();
-      console.log(data);
-      if (!response.ok || !data.success) {
-        showToast(data.message || "Failed to fetch player stats.");
-        return;
-      }
-      showToast(`Got stats for player ${playerID}. See console.`, "success");
-    } catch (error) {
-      console.error("Failed to fetch player stats:", error);
-      showToast(error.message || "Failed to fetch player stats.");
-    }
-  };
+    return runAction(button, {
+      label: `${label} ${playerID}`,
+      url: `/api/${path}?playerID=${encodeURIComponent(playerID)}`,
+      summarize,
+    });
+  });
 }
 
-document.getElementById("get-player-profile").onclick = async function () {
-  const button = document.getElementById("get-player-profile");
-  const playerID = document.getElementById("playerID").value.trim();
-
-  if (!playerID) {
-    showToast("Enter a player ID first.");
-    return;
-  }
-
-  button.disabled = true;
-
-  try {
-    const response = await fetch(`/api/get-player-profile?playerID=${playerID}`);
-    const data = await response.json();
-    console.log(data);
-    if (!response.ok || !data.success) {
-      showToast(data.message || "Failed to fetch player info.");
+function teamAction(id, { label, path, summarize, onResult }) {
+  onClick(id, async (button) => {
+    const teamID = requireInput("teamID", "Enter a team ID first.");
+    if (!teamID) {
       return;
     }
+    const data = await runAction(button, {
+      label: `${label} ${teamID}`,
+      url: `/api/${path}?teamID=${encodeURIComponent(teamID)}`,
+      summarize,
+    });
+    if (data && onResult) {
+      onResult(data);
+    }
+  });
+}
 
-    showToast(`Updated Player table for ${data.player?.name || playerID}.`, "success");
-  } catch (error) {
-    console.error("Failed to fetch player info:", error);
-    showToast(error.message || "Failed to fetch player info.");
-  } finally {
-    button.disabled = false;
-  }
-};
+playerAction("get-player-profile", {
+  label: "Player info",
+  path: "get-player-profile",
+  summarize: (data) => `Updated Player table for ${data.player?.name || "player"}.`,
+});
 
-document.getElementById("get-teams-by-player").onclick = async function () {
-  const playerID = document.getElementById("playerID").value;
-  if (!playerID) {
-    showToast("Enter a player ID first.");
+playerAction("get-teams-by-player", {
+  label: "Player teams",
+  path: "get-teams-by-player",
+  summarize: () => "Fetched (details in log).",
+});
+
+playerAction("get-transfers-by-player", {
+  label: "Player transfers",
+  path: "get-transfers-by-player",
+  summarize: (data) => `Saved ${data.saved ?? 0} transfer row(s).`,
+});
+
+playerAction("refetch-player", {
+  label: "Refetch player",
+  path: "refetch-player",
+  summarize: (data) => `Profile saved, ${data.transfersSaved ?? 0} transfer row(s).`,
+});
+
+teamAction("getSquads", {
+  label: "Squad",
+  path: "get-squads",
+  summarize: () => "Fetched squad.",
+  onResult: (data) => addSquad(data.squads),
+});
+
+teamAction("get-transfers-by-team", {
+  label: "Team transfers",
+  path: "get-transfers-by-team",
+  summarize: () => "Fetched (details in log).",
+});
+
+teamAction("refetch-team", {
+  label: "Refetch team",
+  path: "refetch-team",
+  summarize: (data) => `Saved ${data.savedCount ?? 0}/${data.requested ?? 0}${data.failed?.length ? `, ${data.failed.length} failed` : ""}.`,
+});
+
+teamAction("team-elo", {
+  label: "Team Elo",
+  path: "team-elo",
+  summarize: ({ elo }) => {
+    const parts = ["club", "nt"]
+      .filter((scope) => elo?.[scope])
+      .map((scope) => `${scope}: ${Math.round(elo[scope].elo)} (${elo[scope].matchesPlayed} matches)`);
+    return parts.length > 0 ? parts.join(" · ") : "No Elo rating.";
+  },
+});
+
+onClick("get-player-goal-list", () => {
+  playerGoalList({ big: false, enableStatFilters: false });
+});
+
+// ---------- Elo ----------
+
+onClick("backfill-elo", (button) => {
+  const scope = document.getElementById("elo-backfill-scope").value;
+  const dryRun = document.getElementById("elo-backfill-dry-run").checked;
+  const scopeLabel = scope || "all";
+  return runAction(button, {
+    label: `Elo backfill (${scopeLabel}${dryRun ? ", dry run" : ""})`,
+    url: "/api/backfill-elo",
+    method: "POST",
+    body: { scope, dryRun },
+    confirmText: dryRun ? undefined : `Replay Elo from scratch for scope "${scopeLabel}"? This rewrites the Elo tables.`,
+    summarize: () => (dryRun ? "Dry run finished (details in log)." : "Elo replayed (details in log)."),
+  });
+});
+
+onClick("show-elo-rankings", async (button) => {
+  const scope = document.getElementById("elo-rankings-scope").value;
+  const limit = Number(document.getElementById("elo-rankings-limit").value) || 50;
+  const data = await runAction(button, {
+    label: `Elo rankings (${scope})`,
+    url: `/api/elo-rankings?scope=${scope}&limit=${limit}`,
+    summarize: (result) => `${result.rankings.length} team(s).`,
+    toastSuccess: false,
+  });
+  if (!data) {
     return;
   }
 
-  try {
-    const response = await fetch(`/api/get-teams-by-player?playerID=${playerID}`);
-    const data = await response.json();
-    console.log(data);
-    if (!response.ok || !data.success) {
-      showToast(data.message || "Failed to fetch player teams.");
-      return;
+  const tbody = document.querySelector("#elo-rankings-table tbody");
+  tbody.replaceChildren(...data.rankings.map((row, index) => {
+    const tr = document.createElement("tr");
+    for (const value of [index + 1, row.name || "?", row.team_id, Math.round(Number(row.elo)), row.matches_played]) {
+      const td = document.createElement("td");
+      td.textContent = String(value ?? "");
+      tr.append(td);
     }
-    showToast(`Got teams for player ${playerID}. See console.`, "success");
-  } catch (error) {
-    console.error("Failed to fetch player teams:", error);
-    showToast(error.message || "Failed to fetch player teams.");
-  }
-};
+    return tr;
+  }));
+  document.getElementById("elo-rankings-caption").textContent = `${scope === "nt" ? "National teams" : "Clubs"} · top ${data.rankings.length}`;
+  const panel = document.getElementById("elo-rankings-panel");
+  panel.hidden = false;
+  panel.scrollIntoView({ block: "nearest", behavior: "smooth" });
+});
 
-document.getElementById("getSquads").onclick = async function () {
-  const teamID = document.getElementById("teamID").value;
-  if (!teamID) {
-    showToast("Enter a team ID first.");
-    return;
-  }
+// ---------- Data sync: bulk jobs ----------
 
-  try {
-    const response = await fetch(`/api/get-squads?teamID=${teamID}`);
-    const data = await response.json();
-    console.log(data);
+onClick("update-squads", (button) => runAction(button, {
+  label: "Squads (teams due)",
+  url: "/api/update-squads",
+  confirmText: "Fetch squads for every team due an update? 10s between calls, this can take a while.",
+  summarize: (data) => `Processed ${data.teamsProcessed} team(s), saved ${data.totalSaved} squad(s).`,
+}));
 
-    if (!response.ok || !data.success) {
-      throw new Error(data?.message || "Failed to fetch squad.");
+onClick("get-transfers", (button) => runAction(button, {
+  label: "Transfers (clubs due)",
+  url: "/api/get-transfers",
+  confirmText: "Fetch transfers for every club due an update? 10s between calls, this can take a while.",
+  summarize: (data) => `Processed ${data.teamsProcessed} club(s), saved ${data.totalSaved} transfer row(s).`,
+}));
+
+onClick("get-all-clubs", (button) => runAction(button, {
+  label: "Insert all clubs",
+  url: "/api/insert-all-clubs-to-db",
+  confirmText: "Insert every club found in matches into the Team table?",
+  summarize: () => "Done (details in log).",
+}));
+
+onClick("insert-all-players", (button) => runAction(button, {
+  label: "Insert all players",
+  url: "/api/insert-all-players",
+  confirmText: "Insert all players from files into the DB?",
+  summarize: () => "Done (details in log).",
+}));
+
+onClick("update-player-profiles-from-files", (button) => runAction(button, {
+  label: "Update player profiles from files",
+  url: "/api/update-player-profiles-from-files",
+  confirmText: "Update player profile fields from the player files?",
+  summarize: (data) => data.message || "Done.",
+}));
+
+// ---------- Results area ----------
+
+onClick("clear-results", () => {
+  for (const id of ["fixtures-info", "results-text", "standings", "standings-text", "one-fixture", "selected-matches"]) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.innerHTML = "";
     }
-
-    addSquad(data.squads);
-    showToast(`Fetched squad for team ${teamID}.`, "success");
-  } catch (error) {
-    console.error("Failed to fetch squad:", error);
-    showToast(error.message || "Failed to fetch squad.");
   }
-};
+  document.getElementById("elo-rankings-panel").hidden = true;
+});
 
-document.getElementById("get-transfers-by-team").onclick = async function () {
-  const teamID = document.getElementById("teamID").value;
-  if (!teamID) {
-    showToast("Enter a team ID first.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/get-transfers-by-team?teamID=${teamID}`);
-    const data = await response.json();
-    console.log(data);
-    if (!response.ok || !data.success) {
-      showToast(data.message || "Failed to fetch transfers.");
-      return;
-    }
-    showToast(`Got transfers for team ${teamID}. See console.`, "success");
-  } catch (error) {
-    console.error("Failed to fetch transfers by team:", error);
-    showToast(error.message || "Failed to fetch transfers.");
-  }
-};
-
-document.getElementById("get-transfers-by-player").onclick = async function () {
-  const playerID = document.getElementById("playerID").value;
-  if (!playerID) {
-    showToast("Enter a player ID first.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/get-transfers-by-player?playerID=${playerID}`);
-    const data = await response.json();
-    console.log(data);
-    if (!response.ok || !data.success) {
-      showToast(data.message || "Failed to fetch player transfers.");
-      return;
-    }
-    showToast(`Saved ${data.saved ?? 0} transfer row(s) for player ${playerID}.`, "success");
-  } catch (error) {
-    console.error("Failed to fetch transfers by player:", error);
-    showToast(error.message || "Failed to fetch player transfers.");
-  }
-};
-
-document.getElementById("update-squads").onclick = async function () {
-  const button = this;
-  button.disabled = true;
-  showToast("Fetching squads for teams due an update (10s between calls, this can take a while)...", "success");
-
-  try {
-    const response = await fetch("/api/update-squads");
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data?.message || "Failed to fetch squads.");
-    }
-
-    console.log(data.results);
-    showToast(`Processed ${data.teamsProcessed} team(s), saved ${data.totalSaved} squad(s).`, "success");
-  } catch (error) {
-    console.error("Failed to fetch squads:", error);
-    showToast(error.message || "Failed to fetch squads.");
-  } finally {
-    button.disabled = false;
-  }
-};
-
-document.getElementById("get-transfers").onclick = async function () {
-  const button = this;
-  button.disabled = true;
-  showToast("Fetching transfers for clubs due an update (10s between calls, this can take a while)...", "success");
-
-  try {
-    const response = await fetch("/api/get-transfers");
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data?.message || "Failed to fetch transfers.");
-    }
-
-    console.log(data.results);
-    showToast(`Processed ${data.teamsProcessed} club(s), saved ${data.totalSaved} transfer row(s).`, "success");
-  } catch (error) {
-    console.error("Failed to fetch transfers:", error);
-    showToast(error.message || "Failed to fetch transfers.");
-  } finally {
-    button.disabled = false;
-  }
-};
-
-document.getElementById("clear-results").onclick = async function () {
-  document.getElementById("fixtures-info").innerHTML = "";
-};
-
-document.getElementById("copy-for-blog").onclick = function () {
+onClick("copy-for-blog", () => {
   copyToClipboard("league-stuff");
-};
+});
 
-document.getElementById("generate-text").onclick = async function () {};
+// ---------- Graphics ----------
 
-document.getElementById("copy-text").onclick = async function () {
+onClick("copy-text", () => {
   copyText("generated-text");
-};
+});
 
-document.getElementById("textOnPic").onkeyup = function () {
-  let inputTextValue = document.getElementById("textOnPic").value;
-  let breakingText = document.getElementById("breaking-official").value;
-  make_base(inputTextValue, breakingText);
-};
+function redrawBaseImage() {
+  make_base(
+    document.getElementById("textOnPic").value,
+    document.getElementById("breaking-official").value,
+  );
+}
 
-document.getElementById("add-breaking").onclick = function () {
-  document.getElementById("breaking-official").value =
-    document.getElementById("add-breaking").innerHTML;
-};
+document.getElementById("textOnPic").onkeyup = redrawBaseImage;
+document.getElementById("breaking-official").onkeyup = redrawBaseImage;
 
-document.getElementById("happy-bday").onclick = function () {
+onClick("add-breaking", (button) => {
+  document.getElementById("breaking-official").value = button.textContent;
+  redrawBaseImage();
+});
+
+onClick("happy-bday", () => {
   document.getElementById("breaking-official").value = "🎉HAPPY BIRTHDAY🎂";
-};
+  redrawBaseImage();
+});
 
 document.getElementById("pasteArea").onpaste = function (event) {
-  let breakingText = document.getElementById("breaking-official").value;
-  // use event.originalEvent.clipboard for newer chrome versions
-  var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-  // find pasted image among pasted items
-  var blob = null;
-  for (var i = 0; i < items.length; i++) {
-    if (items[i].type.indexOf("image") === 0) {
-      blob = items[i].getAsFile();
-    }
+  const items = [...(event.clipboardData?.items || [])];
+  const imageItem = items.find((item) => item.type.startsWith("image"));
+  if (!imageItem) {
+    showToast("No image found on the clipboard.", "error");
+    return;
   }
-  // load image if there is a pasted image
-  if (blob !== null) {
-    var reader = new FileReader();
-    reader.onload = function (event) {
-      imgHeight = fontY - 34 - lineheight;
-      if (breakingText) imgHeight -= 66;
 
-      base_image = new Image();
-      base_image.src = event.target.result;
-      base_image.onload = function () {
-        drawResizedImage(base_image, imgHeight, 1080, 30);
-        ctx.drawImage(border_image, 0, 0);
-      };
-    };
-    reader.readAsDataURL(blob);
-  }
+  event.preventDefault();
+  drawPastedImage(imageItem.getAsFile(), Boolean(document.getElementById("breaking-official").value));
 };
 
-document.getElementById("copy-match-stats").onclick = function () {
-  matchStatsToCanvas();
-};
-
-document.getElementById("copy-standings").onclick = function (event) {
-  standingsToCanvas();
-};
-
-document.getElementById("copy-player-stats").onclick = function () {
-  playerStatsToCanvas();
-};
-
-document.getElementById("copy-matches").onclick = function () {
-  matchesToCanvas("match-list");
-};
-
-document.getElementById("copy-selected").onclick = function () {
-  matchesToCanvas("selected-matches");
-};
-
-document.getElementById("copy-player-list").onclick = function () {
-  playerListToCanvas();
-};
-
-document.getElementById("download-image").onclick = function () {
-  download();
-};
-
-document.getElementById("test-standings").onclick = async function () {
-  const leagueID = selectedLeagues[0] || 1;
-  const season = getStoredSeason(leagueID) || CURRENT_SEASON;
-  console.log(`Testing standings for league ID: ${leagueID}, season: ${season}`);
-  const response = await fetch(`/api/test-standings?leagueID=${leagueID}&season=${season}`);
-  const result = await response.json();
-  console.log(result);
-};
+onClick("copy-match-stats", () => matchStatsToCanvas());
+onClick("copy-standings", () => standingsToCanvas());
+onClick("copy-matches", () => matchesToCanvas("match-list"));
+onClick("copy-selected", () => matchesToCanvas("selected-matches"));
+onClick("copy-player-list", () => playerListToCanvas());
+onClick("download-image", () => download());

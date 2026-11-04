@@ -1,0 +1,9 @@
+<div class="team-form{{#if stat}} stat{{/if}}">
+    <div class="preview-form" title="Last 5 matches">
+        {{#each formArray as |form|}}
+        <span class="form-indicator {{form}}"></span>
+        {{/each}}
+    </div>
+    {{#if lastPlayedDate}}<span>Last played {{daysAgo lastPlayedDate}}</span>{{/if}}
+    {{#if nextMatchDate}}<span>Next match {{daysUntil nextMatchDate}}</span>{{/if}}
+</div>

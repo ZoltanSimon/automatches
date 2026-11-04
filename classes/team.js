@@ -1,6 +1,8 @@
 import { Match } from "./match.js";
 import { calculateXPts } from "../backend/services/poisson-model.js";
 import { getHomeAwayXg } from "../backend/lib/match-xg.js";
+import { getTeamMatchRating } from "../backend/lib/match-rating.js";
+import { getTeamMatchAssists } from "../backend/lib/match-assists.js";
 export class Team {
   #stats;
   constructor(team) {
@@ -20,6 +22,7 @@ export class Team {
     this.points = 0;
     this.matches = [];
     this.leagues = new Map();
+    this.leagueBreakdown = [];
   }
 
   calculateTotals() {
@@ -37,6 +40,7 @@ export class Team {
     this.total.winPercentage = parseFloat(((this.wins / this.played) * 100).toFixed(1));
     this.total.xG = parseFloat(this.total.xG.toFixed(1));
     this.total.xGA = parseFloat(this.total.xGA.toFixed(1));
+    this.total.finalizeRating();
   }
 
   calculatePerGame() {
@@ -58,6 +62,7 @@ export class Team {
     this.last5.winPercentage = games
       ? parseFloat(((last5Wins / games) * 100).toFixed(2))
       : 0;
+    this.last5.finalizeRating();
     this.last5PerGame = games ? this.last5.divideStats(games) : new Stats();
   }
 
@@ -71,11 +76,43 @@ export class Team {
     }
   }
 
+  calculateLeagueBreakdown() {
+    const byLeague = new Map();
+    for (const stat of this.#stats) {
+      if (!byLeague.has(stat.leagueId)) {
+        byLeague.set(stat.leagueId, { played: 0, goals: 0, assists: null, ratingSum: 0, ratedMatches: 0 });
+      }
+      const entry = byLeague.get(stat.leagueId);
+      entry.played++;
+      entry.goals += stat.goalsFor;
+      if (stat.assists != null) {
+        entry.assists = (entry.assists ?? 0) + stat.assists;
+      }
+      if (stat.rating != null) {
+        entry.ratingSum += stat.rating;
+        entry.ratedMatches++;
+      }
+    }
+
+    this.leagueBreakdown = [...byLeague].map(([leagueId, entry]) => ({
+      ...this.leagues.get(leagueId),
+      id: leagueId,
+      played: entry.played,
+      goals: entry.goals,
+      assists: entry.assists,
+      ratedMatches: entry.ratedMatches,
+      avgRating: entry.ratedMatches
+        ? parseFloat((entry.ratingSum / entry.ratedMatches).toFixed(2))
+        : null,
+    }));
+  }
+
   calculateStats() {
     this.played = this.#stats.length;
     this.calculateTotals();
     this.calculatePerGame();
     this.calculateLast5();
+    this.calculateLeagueBreakdown();
     this.formArray = this.form.split('');
   }
 
@@ -103,6 +140,9 @@ export class Team {
       redCardsAgainst: oStats[11]?.value ?? 0,
       offsides: tStats[6]?.value ?? 0,
       offsidesAgainst: oStats[6]?.value ?? 0,
+      rating: getTeamMatchRating(match, this.id),
+      assists: getTeamMatchAssists(match, this.id),
+      leagueId: match.league.id,
     });
     if (!this.matches.find((m) => m.id === match.fixture.id)) {
       let thisMatch = new Match(match);
@@ -150,6 +190,15 @@ export class Stats {
     this.redCardsAgainst = 0;
     this.offsides = 0;
     this.offsidesAgainst = 0;
+    this.ratingSum = 0;
+    this.ratedMatches = 0;
+    this.avgRating = null;
+  }
+
+  finalizeRating() {
+    this.avgRating = this.ratedMatches
+      ? parseFloat((this.ratingSum / this.ratedMatches).toFixed(2))
+      : null;
   }
 
   addStats(stat) {
@@ -183,6 +232,10 @@ export class Stats {
     this.redCardsAgainst += stat.redCardsAgainst || 0;
     this.offsides += stat.offsides || 0;
     this.offsidesAgainst += stat.offsidesAgainst || 0;
+    if (stat.rating != null) {
+      this.ratingSum += stat.rating;
+      this.ratedMatches++;
+    }
   }
 
   divideStats(divisor) {
@@ -228,6 +281,9 @@ export class Stats {
     dividedStats.offsidesAgainst = parseFloat(
       (this.offsidesAgainst / divisor).toFixed(2)
     );
+    // Already an average, so it carries over undivided.
+    dividedStats.ratedMatches = this.ratedMatches;
+    dividedStats.avgRating = this.avgRating;
     return dividedStats;
   }
 }

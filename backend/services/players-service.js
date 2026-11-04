@@ -17,7 +17,7 @@ import { Player } from "./../../classes/player.js";
 import { allDBLeagues, allDBPlayers, getCatalogVersion, upsertCatalogPlayer } from "../lib/catalog.js";
 import { getPlayersFromApi, getSquad as getSquadFromApi, getTransfersByPlayer, getTransfersByTeam, hasApiErrors } from "../api/webapi-handler.js";
 import { LineupParser } from "../../classes/lineupparser.js";
-import { abbreviatePlayerPosition, comparePositionsByDisplayOrder, formatPlayerPosition, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
+import { abbreviatePlayerPosition, comparePositionsByDisplayOrder, formatPlayerPosition, isValidPlayerId, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
 import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
 import { parseLeagueIds } from "./leagues-service.js";
 import { memoizeRegistryStat } from "./registry-stats.js";
@@ -405,6 +405,9 @@ function buildPlayerIndex(registry) {
 
       for (const playerEntry of team.players || []) {
         const playerID = playerEntry.player.id;
+        if (!isValidPlayerId(playerID)) {
+          continue;
+        }
 
         if (Number(playerEntry.statistics?.[0]?.games?.minutes || 0) > 0) {
           const appearanceKey = Number(playerID);
@@ -761,7 +764,7 @@ export function getTopPlayersPageData(registry, query = {}) {
 
 function createFallbackPlayerFromSquadEntry(squadEntry, teamID) {
   const squadPlayerID = Number(squadEntry?.id ?? squadEntry?.player?.id);
-  if (!Number.isFinite(squadPlayerID)) {
+  if (!isValidPlayerId(squadPlayerID)) {
     return null;
   }
 
@@ -806,7 +809,7 @@ export function getTeamPlayerList(registry, teamID, squad = null, nr = 100, leag
 
   for (const squadEntry of squadPlayers) {
     const squadPlayerID = Number(squadEntry?.id ?? squadEntry?.player?.id);
-    if (!Number.isFinite(squadPlayerID) || seenPlayerIDs.has(squadPlayerID)) {
+    if (!isValidPlayerId(squadPlayerID) || seenPlayerIDs.has(squadPlayerID)) {
       continue;
     }
 
@@ -952,7 +955,7 @@ export function getMatchesTopRatedPlayers(matches, limit = 10) {
       const teamID = Number(team?.team?.id);
       for (const playerEntry of team.players || []) {
         const playerID = Number(playerEntry?.player?.id);
-        if (!Number.isFinite(playerID) || Number(playerEntry.statistics?.[0]?.games?.minutes || 0) <= 0) {
+        if (!isValidPlayerId(playerID) || Number(playerEntry.statistics?.[0]?.games?.minutes || 0) <= 0) {
           continue;
         }
 
