@@ -58,6 +58,7 @@ app.use(cors(corsOptions));
 app.use((req, res, next) => {
   res.locals.headerLeagues = allDBLeagues || [];
   res.locals.isLocal = isLocalRequest(req);
+  res.locals.currentPath = req.path;
   next();
 });
 app.use(
@@ -411,6 +412,10 @@ app.get("/player", async (request, response) => {
 
 app.get("/starting11", (req, res) => {
   res.render("palya", { title: "Starting 11 Builder - Football", description: "Build and explore the best starting 11 lineups for your favorite football teams on Generation Football's Starting 11 page." });
+});
+
+app.get("/starting11-new", (req, res) => {
+  res.render("starting11-new", { title: "Starting 11 Builder - Football", description: "Build and explore the best starting 11 lineups for your favorite football teams on Generation Football's Starting 11 page." });
 });
 
 app.get("/privacy-policy", (req, res) => {

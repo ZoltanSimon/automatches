@@ -49,7 +49,15 @@ export function poissonProbability(k, lambda) {
 }
 
 /** Most probable scoreline under independent Poisson scoring. */
-export function mostLikelyScore(lambdaHome, lambdaAway, maxGoals = 6) {
+const OUTCOME_MATCHES = {
+  home: (home, away) => home > away,
+  draw: (home, away) => home === away,
+  away: (home, away) => home < away,
+};
+
+// Optional outcome ("home" | "draw" | "away") restricts the search to scorelines with that result.
+export function mostLikelyScore(lambdaHome, lambdaAway, maxGoals = 6, outcome = null) {
+  const allowed = OUTCOME_MATCHES[outcome] ?? (() => true);
   let bestHome = 0;
   let bestAway = 0;
   let bestP = -1;
@@ -57,6 +65,7 @@ export function mostLikelyScore(lambdaHome, lambdaAway, maxGoals = 6) {
   for (let home = 0; home <= maxGoals; home++) {
     const pHome = poissonProbability(home, lambdaHome);
     for (let away = 0; away <= maxGoals; away++) {
+      if (!allowed(home, away)) continue;
       const p = pHome * poissonProbability(away, lambdaAway);
       if (p > bestP) {
         bestP = p;

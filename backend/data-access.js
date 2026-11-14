@@ -749,6 +749,36 @@ export async function getHeadToHeadFixturesFromDb(teamA, teamB, { beforeDate = n
   }
 }
 
+// Date of each team's most recent finished match before the given date, any competition.
+export async function getLastMatchDatesBeforeFromDb(teamIds, beforeDate, excludeId = null) {
+  const ids = [...new Set((Array.isArray(teamIds) ? teamIds : [teamIds]).map(Number).filter(Number.isFinite))];
+  const lastDates = new Map();
+  if (ids.length === 0 || !beforeDate) {
+    return lastDates;
+  }
+
+  const sideQuery = (column) => `
+    SELECT ${column} AS team_id, match_date
+    FROM matches
+    WHERE ${column} IN (?) AND status IN (?) AND match_date < ? AND id <> ?`;
+  const sideParams = [ids, [...FINISHED_MATCH_STATUSES], toDbDateTime(beforeDate), Number(excludeId) || 0];
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT team_id, MAX(match_date) AS last_date
+       FROM (${sideQuery("home_team_id")} UNION ALL ${sideQuery("away_team_id")}) AS team_matches
+       GROUP BY team_id`,
+      [...sideParams, ...sideParams],
+    );
+    for (const row of rows) {
+      lastDates.set(Number(row.team_id), serializeFixtureDate(row.last_date));
+    }
+  } catch (e) {
+    console.error(`❌ Failed to load last match dates for ${ids.join(", ")}:`, e);
+  }
+  return lastDates;
+}
+
 export async function getLeagueSeasonConfigsFromMatches(leagueIDs) {
   const ids = (Array.isArray(leagueIDs) ? leagueIDs : [leagueIDs])
     .map((id) => Number(id))

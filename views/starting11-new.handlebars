@@ -1,0 +1,198 @@
+<link rel="stylesheet" href="/../css/starting11-new.css" />
+
+<div class="s11-layout">
+  <section class="rectangle s11-board-panel">
+    <div class="s11-panel-header">
+      <h2>Starting 11 Builder</h2>
+      <div class="s11-actions">
+        <button type="button" class="s11-button s11-button--ghost" id="resetButton">Reset positions</button>
+        <button type="button" class="more-button s11-button" id="downloadButton">Download image</button>
+      </div>
+    </div>
+    <p class="s11-hint">Drag the players to move them around the pitch.</p>
+
+    <div class="s11-board" id="starting-eleven-board">
+      <div class="s11-goal"></div>
+      <div class="s11-pitch" id="s11-pitch">
+        <div class="s11-markings">
+          <div class="s11-halfway"></div>
+          <div class="s11-centre-circle"></div>
+          <div class="s11-spot s11-centre-spot"></div>
+          <div class="s11-corner s11-corner-tl"></div>
+          <div class="s11-corner s11-corner-tr"></div>
+          <div class="s11-corner s11-corner-bl"></div>
+          <div class="s11-corner s11-corner-br"></div>
+          <div class="s11-end s11-end-top">
+            <div class="s11-pen-area"></div>
+            <div class="s11-gk-area"></div>
+            <div class="s11-spot s11-pen-spot"></div>
+            <div class="s11-d"><div class="s11-d-circle"></div></div>
+          </div>
+          <div class="s11-end s11-end-bottom">
+            <div class="s11-pen-area"></div>
+            <div class="s11-gk-area"></div>
+            <div class="s11-spot s11-pen-spot"></div>
+            <div class="s11-d"><div class="s11-d-circle"></div></div>
+          </div>
+        </div>
+        <div class="s11-players" id="s11-players"></div>
+      </div>
+      <div class="s11-team-name" id="s11-team-name"></div>
+      <div class="s11-watermark" id="s11-watermark">https://generationfootball.net</div>
+    </div>
+  </section>
+
+  <section class="rectangle s11-info">
+    <h3 class="s11-section-title">How it works</h3>
+    <p>
+      Build a lineup, style the kits, then download it as an image to share on social media.
+    </p>
+    <ol>
+      <li>
+        <strong>Pick a formation.</strong> Each player is placed in their spot and gets a position
+        label. Changing the formation moves everyone to the new spots and resets the labels.
+      </li>
+      <li>
+        <strong>Fill in your players.</strong> In the Players list, enter each player's position,
+        shirt number and name. Use <em>Kit text</em> to choose whether shirts show the position,
+        the number or nothing.
+      </li>
+      <li>
+        <strong>Move players around.</strong> Drag a shirt or a name to place a player anywhere on the
+        pitch, with a mouse or a finger. <em>Reset positions</em> puts everyone back in formation.
+      </li>
+      <li>
+        <strong>Style the kit and pitch.</strong> Choose the shirt shape, a solid, hooped or striped
+        pattern, and the kit and text colors. In the Pitch panel you can switch between striped and
+        solid grass and hide the watermark.
+      </li>
+      <li>
+        <strong>Download.</strong> <em>Download image</em> saves the board as a PNG.
+      </li>
+    </ol>
+    <p class="s11-hint">
+      Nothing is saved: reloading or leaving the page clears your lineup, so download it once
+      you're happy with it.
+    </p>
+  </section>
+
+  <div class="s11-controls" id="s11-controls">
+    <section class="rectangle">
+      <h3 class="s11-section-title">Team</h3>
+      <div class="s11-field">
+        <label class="s11-label" for="formation-selector">Formation</label>
+        <select class="s11-input" id="formation-selector" name="formation-selector">
+          <option value="1-4-0-0-3-0-20-1">4-3-3</option>
+          <option value="1-4-0-1-2-0-20-1">4-3-3 CDM</option>
+          <option value="1-4-0-0-2-1-20-1">4-3-3 CAM</option>
+          <option value="1-4-0-0-4-0-0-2">4-4-2</option>
+          <option value="1-4-0-0-4-0-1-1">4-4-1-1</option>
+          <option value="1-4-0-1-2-1-0-2">4-1-2-1-2</option>
+          <option value="1-4-0-1-20-1-0-2">4-1-2-1-2 Wide</option>
+          <option value="1-4-0-1-0-30-0-2">4-1-3-2</option>
+          <option value="1-4-0-2-0-30-0-1">4-2-3-1</option>
+          <option value="1-4-0-2-0-20-0-2">4-2-2-2</option>
+          <option value="1-4-0-0-5-0-0-1">4-5-1</option>
+          <option value="1-4-0-1-3-20-0-0">4-6-0</option>
+          <option value="1-3-0-0-5-0-0-2">3-5-2</option>
+          <option value="1-3-0-200-2-0-20-1">3-4-3</option>
+          <option value="1-3-0-300-0-3-0-1">3-3-3-1</option>
+          <option value="1-3-200-0-3-0-0-2">5-3-2</option>
+          <option value="1-3-200-0-4-0-0-1">5-4-1</option>
+        </select>
+      </div>
+      <div class="s11-field">
+        <label class="s11-label" for="team-name">Team name</label>
+        <div class="s11-inline">
+          <input class="s11-input" type="text" id="team-name" name="team-name" value="Team Name" />
+          <label class="s11-check">
+            <input type="checkbox" id="show-team-name" name="show-team-name" checked />
+            Show
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="rectangle">
+      <h3 class="s11-section-title">Kit</h3>
+      <div class="s11-field">
+        <span class="s11-label" id="shape-label">Shape</span>
+        <div class="s11-segmented" role="radiogroup" aria-labelledby="shape-label">
+          <label><input type="radio" name="shape-selector" value="kit" checked /><span>Kit</span></label>
+          <label><input type="radio" name="shape-selector" value="circle" /><span>Circle</span></label>
+          <label><input type="radio" name="shape-selector" value="rectangle" /><span>Square</span></label>
+        </div>
+      </div>
+      <div class="s11-field">
+        <span class="s11-label" id="pattern-label">Pattern</span>
+        <div class="s11-segmented" role="radiogroup" aria-labelledby="pattern-label">
+          <label><input type="radio" name="pattern-selector" value="solid" checked /><span>Solid</span></label>
+          <label><input type="radio" name="pattern-selector" value="horizontal-stripes" /><span>Hoops</span></label>
+          <label><input type="radio" name="pattern-selector" value="vertical-stripes" /><span>Stripes</span></label>
+        </div>
+      </div>
+      <div class="s11-field">
+        <span class="s11-label">Colors</span>
+        <div class="s11-swatches">
+          <label class="s11-swatch">
+            <input type="color" id="kit-color-selector" name="kit-color-selector" value="#1D3557" />
+            <span>Kit</span>
+          </label>
+          <label class="s11-swatch" id="secondary-kit-color">
+            <input type="color" id="kit-color-selector2" name="kit-color-selector2" value="#E63946" />
+            <span>Stripes</span>
+          </label>
+          <label class="s11-swatch">
+            <input type="color" id="number-color-selector" name="number-color-selector" value="#ffffff" />
+            <span>Text</span>
+          </label>
+        </div>
+      </div>
+      <div class="s11-field">
+        <span class="s11-label" id="bottom-text-label">Kit text</span>
+        <div class="s11-segmented" role="radiogroup" aria-labelledby="bottom-text-label">
+          <label><input type="radio" name="bottom-text" value="show-position" checked /><span>Position</span></label>
+          <label><input type="radio" name="bottom-text" value="show-number" /><span>Number</span></label>
+          <label><input type="radio" name="bottom-text" value="show-off" /><span>Off</span></label>
+        </div>
+      </div>
+      <div class="s11-field">
+        <span class="s11-label" id="shadow-label">Text shadow</span>
+        <div class="s11-segmented" role="radiogroup" aria-labelledby="shadow-label">
+          <label><input type="radio" name="shadow-switch" value="show-shadow" /><span>On</span></label>
+          <label><input type="radio" name="shadow-switch" value="hide-shadow" checked /><span>Off</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="rectangle">
+      <h3 class="s11-section-title">Players</h3>
+      <div class="s11-player-row s11-player-row--head" aria-hidden="true">
+        <span>Pos</span>
+        <span>No.</span>
+        <span>Name</span>
+      </div>
+      <div class="s11-player-list" id="player-inputs"></div>
+    </section>
+
+    <section class="rectangle">
+      <h3 class="s11-section-title">Pitch</h3>
+      <div class="s11-field">
+        <span class="s11-label" id="pitch-label">Grass</span>
+        <div class="s11-segmented" role="radiogroup" aria-labelledby="pitch-label">
+          <label><input type="radio" name="pitch-selector" value="pattern" checked /><span>Striped</span></label>
+          <label><input type="radio" name="pitch-selector" value="solid" /><span>Solid</span></label>
+        </div>
+      </div>
+      <div class="s11-field">
+        <span class="s11-label" id="watermark-label">Watermark</span>
+        <div class="s11-segmented" role="radiogroup" aria-labelledby="watermark-label">
+          <label><input type="radio" name="watermark" value="show-watermark" checked /><span>Show</span></label>
+          <label><input type="radio" name="watermark" value="hide-watermark" /><span>Hide</span></label>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<script type="module" src="/../controllers/starting11-new.js"></script>
