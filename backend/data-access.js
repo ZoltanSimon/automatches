@@ -11,6 +11,7 @@ import {
   MATCH_DETAILS_COLUMNS,
   detailsRowToMatchObject,
   matchObjectToDetailsRow,
+  parseJsonColumn,
   serializeFixtureDate,
   unwrapMatchPayload,
 } from "./lib/match-details-mapper.js";
@@ -272,8 +273,9 @@ export async function insertPlayersToDb(allPlayers, { overwritePosition = true }
       const placeholders = batch.map(() => "(?, ?, ?, ?, ?)").join(", ");
       const flatValues = values.flat();
 
+      // An empty incoming position never clears a stored one.
       const positionUpdate = overwritePosition
-        ? "position = VALUES(position)"
+        ? "position = IF(TRIM(IFNULL(VALUES(position), '')) = '', position, VALUES(position))"
         : "position = IF(position IS NULL OR TRIM(IFNULL(position, '')) = '', VALUES(position), position)";
 
       await pool.execute(
@@ -574,17 +576,24 @@ export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished
     .map((match) => Number(match?.fixture?.id))
     .filter((fixtureID) => Number.isFinite(fixtureID));
   const finishedFixtureIDs = new Set();
+  // Status and season before this save, to see which seasons' position counts change.
+  const previousRows = new Map();
 
-  if (skipExistingFinished && fixtureIDs.length > 0) {
-    const [existingFinishedMatches] = await pool.query(
-      "SELECT id FROM matches WHERE id IN (?) AND status IN (?)",
-      [fixtureIDs, [...FINISHED_MATCH_STATUSES]],
+  if (fixtureIDs.length > 0) {
+    const [existingMatches] = await pool.query(
+      "SELECT id, status, season FROM matches WHERE id IN (?)",
+      [fixtureIDs],
     );
 
-    for (const row of existingFinishedMatches) {
-      finishedFixtureIDs.add(Number(row.id));
+    for (const row of existingMatches) {
+      previousRows.set(Number(row.id), row);
+      if (FINISHED_MATCH_STATUSES.has(row.status)) {
+        finishedFixtureIDs.add(Number(row.id));
+      }
     }
   }
+
+  const changedPositionSeasons = new Set();
 
   let importedMatches = 0;
   let skippedFinishedMatches = 0;
@@ -630,7 +639,20 @@ export async function upsertMatchSummaries(matchPayloads, { skipExistingFinished
       ],
     );
     importedMatches += 1;
+
+    // A match that turns finished (or moves season) changes that season's position counts,
+    // even when its lineups were saved before kickoff and the details save is skipped.
+    const previous = previousRows.get(fixtureID);
+    const wasFinished = Boolean(previous) && FINISHED_MATCH_STATUSES.has(previous.status);
+    const isFinished = FINISHED_MATCH_STATUSES.has(match.fixture?.status?.short);
+    const season = Number(match.league?.season);
+    if (wasFinished !== isFinished || (previous && Number(previous.season) !== season)) {
+      if (wasFinished) changedPositionSeasons.add(Number(previous.season));
+      if (isFinished) changedPositionSeasons.add(season);
+    }
   }
+
+  await markPlayerPositionSeasonsDirty([...changedPositionSeasons]);
 
   return { importedMatches, skippedFinishedMatches };
 }
@@ -1034,6 +1056,7 @@ export async function upsertMatchDetails(matchId, matchObject, { overwrite = fal
       values,
     );
 
+    await markPlayerPositionMatchesDirty([row.match_id]);
     return { matchId: row.match_id, saved: true, skipped: false };
   }
 
@@ -1044,6 +1067,9 @@ export async function upsertMatchDetails(matchId, matchObject, { overwrite = fal
   );
 
   const skipped = Number(result?.affectedRows || 0) === 0;
+  if (!skipped) {
+    await markPlayerPositionMatchesDirty([row.match_id]);
+  }
   return {
     matchId: row.match_id,
     saved: !skipped,
@@ -1070,6 +1096,11 @@ export async function insertMatchDetailsRows(rows, { overwrite = false } = {}) {
 
   const [result] = await pool.query(sql, values);
   const affectedRows = Number(result?.affectedRows || 0);
+
+  if (overwrite || affectedRows > 0) {
+    // INSERT IGNORE doesn't say which rows were new; marking a season twice is harmless.
+    await markPlayerPositionMatchesDirty(validRows.map((row) => Number(row.match_id)));
+  }
 
   if (overwrite) {
     return { inserted: validRows.length, skipped: 0 };
@@ -2193,5 +2224,245 @@ function chunkRows(items, size) {
     chunks.push(items.slice(i, i + size));
   }
   return chunks;
+}
+
+// ---- Player positions ----
+// player_position: starts per player, competition season (matches.season), played season
+// (the July-June football season of the match date, e.g. 2026 = 2026-2027), scope (club/nt)
+// and role code, rebuilt from match_details lineups (never incremented). Rebuilds replace
+// whole competition seasons; the site groups and weights by played season.
+// player_position_dirty: competition seasons whose lineups changed since the last rebuild;
+// any process saving match details marks them, and the server rebuilds them
+// (backend/services/player-position-service.js).
+
+let playerPositionTablesPromise = null;
+
+const PLAYER_POSITION_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS player_position (
+    player_id INT NOT NULL,
+    season SMALLINT NOT NULL,
+    played_season SMALLINT NOT NULL,
+    scope ENUM('club', 'nt') NOT NULL,
+    role VARCHAR(4) NOT NULL,
+    starts SMALLINT UNSIGNED NOT NULL,
+    first_start DATE NULL,
+    last_start DATE NULL,
+    PRIMARY KEY (player_id, season, played_season, scope, role),
+    INDEX idx_player_position_role_played (role, played_season)
+  )
+`;
+
+export async function ensurePlayerPositionTables() {
+  if (!playerPositionTablesPromise) {
+    playerPositionTablesPromise = (async () => {
+      try {
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS player_position_dirty (
+          season SMALLINT NOT NULL PRIMARY KEY,
+          marked_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+        )
+      `);
+        await pool.query(PLAYER_POSITION_TABLE_SQL);
+        await recreateOutdatedPlayerPositionTable();
+      } catch (error) {
+        playerPositionTablesPromise = null;
+        throw error;
+      }
+    })();
+  }
+
+  return playerPositionTablesPromise;
+}
+
+// player_position only holds counts derived from lineups, so a table from an earlier
+// layout (no played_season) is dropped, recreated, and every season rebuilt.
+async function recreateOutdatedPlayerPositionTable() {
+  const [columns] = await pool.query("SHOW COLUMNS FROM player_position LIKE 'played_season'");
+  if (columns.length > 0) {
+    return;
+  }
+
+  await pool.query("DROP TABLE player_position");
+  await pool.query(PLAYER_POSITION_TABLE_SQL);
+  try {
+    await pool.query(
+      `INSERT INTO player_position_dirty (season, marked_at)
+       SELECT DISTINCT season, NOW(3) FROM matches WHERE status IN (?)
+       ON DUPLICATE KEY UPDATE marked_at = NOW(3)`,
+      [[...FINISHED_MATCH_STATUSES]],
+    );
+  } catch (error) {
+    // No matches table yet: nothing to rebuild, and an empty table is filled at startup anyway.
+    if (error?.code !== "ER_NO_SUCH_TABLE") throw error;
+  }
+}
+
+// Marking never fails the save that triggered it; a missed mark is caught by the next one.
+async function markPlayerPositionsQuietly(task) {
+  try {
+    await ensurePlayerPositionTables();
+    await task();
+  } catch (error) {
+    console.error("Failed to mark player positions for rebuild:", error);
+  }
+}
+
+export async function markPlayerPositionSeasonsDirty(seasons) {
+  const seasonList = [...new Set((seasons || []).map(Number).filter(Number.isFinite))];
+  if (seasonList.length === 0) {
+    return;
+  }
+
+  await markPlayerPositionsQuietly(() => pool.query(
+    `INSERT INTO player_position_dirty (season, marked_at)
+     VALUES ${seasonList.map(() => "(?, NOW(3))").join(", ")}
+     ON DUPLICATE KEY UPDATE marked_at = NOW(3)`,
+    seasonList,
+  ));
+}
+
+// Seasons of the finished matches among matchIds.
+export async function markPlayerPositionMatchesDirty(matchIds) {
+  const ids = [...new Set((matchIds || []).map(Number).filter(Number.isFinite))];
+  if (ids.length === 0) {
+    return;
+  }
+
+  await markPlayerPositionsQuietly(() => pool.query(
+    `INSERT INTO player_position_dirty (season, marked_at)
+     SELECT DISTINCT season, NOW(3) FROM matches WHERE id IN (?) AND status IN (?)
+     ON DUPLICATE KEY UPDATE marked_at = NOW(3)`,
+    [ids, [...FINISHED_MATCH_STATUSES]],
+  ));
+}
+
+export async function markAllPlayerPositionSeasonsDirty() {
+  await ensurePlayerPositionTables();
+  await pool.query(
+    `INSERT INTO player_position_dirty (season, marked_at)
+     SELECT DISTINCT season, NOW(3) FROM matches WHERE status IN (?)
+     ON DUPLICATE KEY UPDATE marked_at = NOW(3)`,
+    [[...FINISHED_MATCH_STATUSES]],
+  );
+}
+
+// `markedBefore` is the DB clock as a string, passed back to clearDirtyPlayerPositionSeasons.
+export async function getDirtyPlayerPositionSeasons() {
+  await ensurePlayerPositionTables();
+  const [[{ now }]] = await pool.query("SELECT DATE_FORMAT(NOW(3), '%Y-%m-%d %H:%i:%s.%f') AS now");
+  const [rows] = await pool.query("SELECT season FROM player_position_dirty ORDER BY season");
+  return { markedBefore: now, seasons: rows.map((row) => Number(row.season)) };
+}
+
+// Seasons marked again after markedBefore stay dirty for the next run.
+export async function clearDirtyPlayerPositionSeasons(seasons, markedBefore) {
+  if (!seasons?.length) {
+    return;
+  }
+
+  await pool.query(
+    "DELETE FROM player_position_dirty WHERE season IN (?) AND marked_at <= ?",
+    [seasons, markedBefore],
+  );
+}
+
+export async function hasPlayerPositions() {
+  await ensurePlayerPositionTables();
+  const [rows] = await pool.query("SELECT 1 FROM player_position LIMIT 1");
+  return rows.length > 0;
+}
+
+/**
+ * One page of finished matches' lineups, in match id order.
+ * @param {{ seasons?: number[]|null, afterMatchId?: number, limit?: number }} options seasons null = all
+ */
+export async function getLineupsForPositionRebuild({ seasons = null, afterMatchId = 0, limit = 2000 } = {}) {
+  const where = ["m.status IN (?)", "d.match_id > ?"];
+  const params = [[...FINISHED_MATCH_STATUSES], Number(afterMatchId) || 0];
+
+  if (Array.isArray(seasons)) {
+    if (seasons.length === 0) {
+      return [];
+    }
+    where.push("m.season IN (?)");
+    params.push(seasons);
+  }
+
+  const [rows] = await pool.query(
+    `SELECT
+       d.match_id,
+       d.lineups,
+       m.season,
+       DATE_FORMAT(m.match_date, '%Y-%m-%d') AS match_day,
+       l.type AS league_type
+     FROM match_details d
+     INNER JOIN matches m ON m.id = d.match_id
+     LEFT JOIN League l ON l.id = m.league_id
+     WHERE ${where.join(" AND ")}
+     ORDER BY d.match_id
+     LIMIT ?`,
+    [...params, Number(limit) || 2000],
+  );
+
+  return rows.map((row) => ({ ...row, lineups: parseJsonColumn(row.lineups) ?? [] }));
+}
+
+/**
+ * Replaces player_position rows in one transaction: every row, or only the given seasons.
+ * @param {{ playerId: number, season: number, playedSeason: number, scope: string, role: string, starts: number, firstStart: string|null, lastStart: string|null }[]} rows
+ */
+export async function replacePlayerPositions(rows, { seasons = null } = {}) {
+  await ensurePlayerPositionTables();
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    if (Array.isArray(seasons)) {
+      if (seasons.length > 0) {
+        await conn.query("DELETE FROM player_position WHERE season IN (?)", [seasons]);
+      }
+    } else {
+      await conn.query("DELETE FROM player_position");
+    }
+
+    for (const chunk of chunkRows(rows, 1000)) {
+      await conn.query(
+        "INSERT INTO player_position (player_id, season, played_season, scope, role, starts, first_start, last_start) VALUES ?",
+        [chunk.map((row) => [row.playerId, row.season, row.playedSeason, row.scope, row.role, row.starts, row.firstStart, row.lastStart])],
+      );
+    }
+    await conn.commit();
+  } catch (error) {
+    try {
+      await conn.rollback();
+    } catch {
+      // The original error is more useful if rollback also fails.
+    }
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
+
+export async function loadPlayerPositions() {
+  await ensurePlayerPositionTables();
+  const [rows] = await pool.query(
+    `SELECT player_id, played_season, scope, role, starts,
+       DATE_FORMAT(first_start, '%Y-%m-%d') AS first_start,
+       DATE_FORMAT(last_start, '%Y-%m-%d') AS last_start
+     FROM player_position`,
+  );
+  return rows;
+}
+
+// Player.position caches the main position's name (transfer lists read it in SQL).
+export async function updatePlayerPositionCache(changes) {
+  for (const chunk of chunkRows(changes || [], 500)) {
+    await pool.query(
+      `UPDATE Player
+       SET position = CASE id ${chunk.map(() => "WHEN ? THEN ?").join(" ")} END
+       WHERE id IN (?)`,
+      [...chunk.flatMap(({ id, position }) => [id, position]), chunk.map(({ id }) => id)],
+    );
+  }
 }
 

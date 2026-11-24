@@ -2134,12 +2134,17 @@ td .form-indicator {
 .lineup-panel {
   border: 3px solid $dark-blue;
   border-radius: $table-radius;
+  // Same colour as the border, so the rounded corners leave no light gap next to the square table.
+  background: $dark-blue;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .lineup-table {
   width: 100%;
+  // The rounded .lineup-panel already draws the outer border and corners.
+  border: none;
+  border-radius: 0;
 
   th,
   td {
@@ -2243,6 +2248,13 @@ a.lineup-player-name {
 
 .lineup-empty {
   opacity: 0.9;
+}
+
+// The lineup panel is dark (see .lineup-panel); keep its empty message on a light background.
+.lineup-panel .lineup-empty {
+  padding: 8px;
+  background: $white;
+  opacity: 1;
 }
 
 .match-events-grid {

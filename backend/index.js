@@ -29,6 +29,7 @@ import { parseDate, handleError, isLocalRequest } from "./lib/backend-helper.js"
 import { getTeamById, getTopTeams, getTeamRouteData, getTopTeamsPageData } from "./services/teams-service.js";
 import { getLeagueSeasonRegistry, refreshRegistry, getRegistry, ensureMatchInRegistry } from "./services/registry-service.js";
 import { allDBLeagues, setCatalog } from "./lib/catalog.js";
+import { initPlayerPositions, processDirtyPlayerPositions } from "./services/player-position-service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -77,12 +78,22 @@ app.listen(PORT, async () => {
     leagues: await loadLeagues(),
   });
   await ensureEloTables();
-  
+  try {
+    await initPlayerPositions();
+  } catch (error) {
+    console.error("Loading player positions failed:", error);
+  }
+
   await refreshRegistry(); // build it immediately on startup
   setInterval(() => {
-    refreshRegistry().catch((error) => {
-      console.error("Scheduled registry refresh failed:", error);
-    });
+    refreshRegistry()
+      .catch((error) => {
+        console.error("Scheduled registry refresh failed:", error);
+      })
+      .then(() => processDirtyPlayerPositions())
+      .catch((error) => {
+        console.error("Scheduled player position rebuild failed:", error);
+      });
   }, 30 * 60 * 1000);
 });
 
@@ -429,7 +440,7 @@ app.get("/about", (req, res) => {
 app.get("/gf-wiki", (req, res) => {
   res.render("gf-wiki", {
     title: "GF Wiki - Generation Football",
-    description: "Learn how Generation Football calculates Expected Points (xPts), Elo ratings and average team ratings.",
+    description: "Learn how Generation Football calculates Expected Points (xPts), Elo ratings, average team ratings and player positions.",
   });
 });
 

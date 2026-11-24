@@ -1,0 +1,44 @@
+# Local development stack: Node app (+ optional MySQL). No Caddy/TLS.
+# By default the app uses the MySQL on the mini PC configured in .env.
+# Usage:  docker compose -f docker-compose.local.yml up --build
+# Site:   http://localhost:3000
+services:
+  app:
+    build: .
+    container_name: automatches-app-local
+    command: ["node", "--watch", "backend/index.js"]   # restarts on backend changes
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file: .env
+    environment:
+      DATA_PATH: /app/data     # DB_HOST etc. come from .env (mini PC by default)
+    volumes:
+      - .:/app                 # live source code
+      - /app/node_modules      # keep the container's own node_modules
+      - ${DATA_DIR:-./data}:/app/data
+
+  # Optional local MySQL. Only started with: --profile localdb (and DB_HOST=db in .env)
+  db:
+    profiles: ["localdb"]
+    image: mysql:8.0
+    container_name: automatches-db-local
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-automatches}
+      MYSQL_USER: ${DB_USER:-automatches}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-automatches}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    ports:
+      - "${DB_HOST_PORT:-3307}:3306"   # for MySQL Workbench etc. on the host
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro   # *.sql / *.sql.gz imported on first start
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+volumes:
+  db_data:

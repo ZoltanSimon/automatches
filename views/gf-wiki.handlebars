@@ -5,13 +5,14 @@
       <p>
         This page explains the metrics Generation Football uses alongside
         traditional results: Expected Points (xPts), Elo ratings, average
-        team ratings, the icons in player tables, and the abbreviations used
-        in those tables.
+        team ratings, player positions, the icons in player tables, and the
+        abbreviations used in those tables.
       </p>
       <ul>
         <li><a href="#xpoints">Expected Points (xPts)</a></li>
         <li><a href="#elo">Elo ratings</a></li>
         <li><a href="#team-rating">Average team rating</a></li>
+        <li><a href="#positions">Player positions</a></li>
         <li><a href="#player-icons">Player table icons</a></li>
         <li><a href="#abbreviations">Abbreviations</a></li>
       </ul>
@@ -113,6 +114,64 @@
         includes every player who has a rating, regardless of minutes.
       </p>
       <hr>
+
+      <h2 id="positions">Player positions</h2>
+      <p>
+        A player’s positions come from where they actually started matches,
+        not from a fixed label. For every match with a lineup, we take each
+        team’s formation and the order of the starting eleven on the pitch,
+        and from that assign every starter a specific role, such as right
+        back, defensive midfielder or left winger.
+      </p>
+      <p>
+        Only starts count: substitute appearances are left out. Lineups that
+        are incomplete, have no formation, or use a formation we do not
+        recognise are skipped rather than guessed, because one missing player
+        would shift everyone after them into the wrong role. Club and national
+        team starts count the same.
+      </p>
+      <p>
+        Recent seasons matter more. Seasons run from July to June. A start in
+        the current season counts in full, a start last season counts half as
+        much, the season before that a quarter, and so on.
+      </p>
+      <ul>
+        <li>
+          <strong>Main position</strong> — the role with the most of these
+          weighted starts. If two roles are level, the one with more actual
+          starts wins.
+        </li>
+        <li>
+          <strong>Secondary positions</strong> — any other role with
+          <strong>at least 10%</strong> of the player’s weighted starts and
+          <strong>at least 3</strong> actual starts. Occasional one-off
+          appearances in a role do not count.
+        </li>
+      </ul>
+      <p>
+        On a player’s page, the Positions table shows each of these roles.
+        <strong>Starts</strong> is the real number of starts in that role
+        across all seasons. <strong>Share</strong> is the role’s share of the
+        weighted starts, so it leans towards the current season and need not
+        match the raw start counts. On the pitch, the main position is the red
+        dot and the secondary ones are blue, fading the less often the role is
+        played.
+      </p>
+      <p>
+        Players with no usable lineups yet, such as new signings or players
+        whose matches have no detailed lineup, show the position listed by our
+        data source instead. That can be a general one like
+        <strong>MF</strong> (midfielder) rather than a specific role, and has
+        no starts or share. Positions are recalculated shortly after new
+        results come in.
+      </p>
+      <p>
+        The same main and secondary positions are used for the
+        <strong>Pos</strong> and <strong>SecPos</strong> columns in player
+        tables. The position filter in those tables matches any of a player’s
+        regular positions, main or secondary.
+      </p>
+      <hr>
       <h2 id="player-icons">Player table icons</h2>
       <p>
         The <a href="/top-players">Top Players</a> table uses icons in the
@@ -177,8 +236,8 @@
       <h3>Players</h3>
       <ul class="wiki-abbr-list">
         <li><strong>Nat</strong> — player nationality.</li>
-        <li><strong>Pos</strong> — primary position, shown as an abbreviation.</li>
-        <li><strong>SecPos</strong> — secondary position. Blank when the player has only one position in the matches.</li>
+        <li><strong>Pos</strong> — main position, shown as an abbreviation. See <a href="#positions">Player positions</a>.</li>
+        <li><strong>SecPos</strong> — secondary position. Blank when the player has no regular second position. See <a href="#positions">Player positions</a>.</li>
         <li><strong>NPG</strong> — non-penalty goals. Goals from open play, excluding penalties.</li>
         <li><strong>GA/90</strong> — goals plus assists per 90 minutes. Narrow screens show this as GA90.</li>
         <li><strong>No.</strong> — shirt number.</li>

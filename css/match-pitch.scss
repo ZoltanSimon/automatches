@@ -1,0 +1,385 @@
+@use 'tokens' as *;
+@use 'pitch' as *;
+
+// Lineup pitch on the match page. The builder's portrait board (_pitch.scss) is
+// rotated 90deg to make a horizontal pitch; the players sit unrotated on top.
+
+$pitch-rating-tones: (
+  "rating-dark-green": (darken($brand-green, 12%), #fff),
+  "rating-green": ($brand-green, #fff),
+  "rating-yellow": (#ffeb3b, #000),
+  "rating-orange": (#ff9800, #fff),
+  "rating-red": (#f44336, #fff)
+);
+
+.match-pitch-panel {
+  background: $light-blue;
+  padding: 8px;
+  border: 1px solid $dark-blue;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: $dark-blue;
+}
+
+.match-pitch-header {
+  padding: 8px;
+  background: $dark-blue;
+  border: 1px solid $dark-blue;
+  border-radius: 2px;
+  margin-bottom: 8px;
+
+  h3 {
+    margin: 0;
+    color: $lightest-blue;
+  }
+}
+
+.match-pitch-teams {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.match-pitch-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.match-pitch-team-away {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.match-pitch-team-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-pitch-formation {
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+// A tiny jersey in the team's kit colour (same outline as the pitch kits).
+.match-pitch-swatch-wrap {
+  flex: none;
+  display: inline-flex;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.7));
+}
+
+.match-pitch-swatch {
+  width: 16px;
+  height: 15px;
+  clip-path: polygon(25% 100%, 75% 100%, 72.22% 33.33%, 79.17% 53.62%, 100% 44.93%, 79.17% 7.25%, 63.89% 0%, 58.33% 0%, 50% 8%, 41.67% 0%, 36.11% 0%, 20.83% 7.25%, 0% 44.93%, 20.83% 53.62%, 27.78% 33.33%);
+}
+
+// 880x700: the builder's 700x880 board on its side.
+.match-pitch {
+  --kit-scale: 0.62;
+
+  position: relative;
+  // Keeps the jerseys' z-index local, so they never paint over the fixed header/footer.
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 880 / 700;
+  container-type: inline-size;
+  overflow: hidden;
+  background: $blue;
+  font-family: "Source Sans 3", Arial, sans-serif;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+// As wide as the box is tall (700/880), so it fills the box once rotated.
+.match-pitch-rotor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 79.5455%;
+  aspect-ratio: 700 / 880;
+  transform: translate(-50%, -50%) rotate(90deg);
+  pointer-events: none;
+}
+
+// The board's pitch rect (3.1429% / 2.2727% margins) after rotating.
+.match-pitch-players {
+  position: absolute;
+  left: 2.2727%;
+  top: 3.1429%;
+  width: 95.4545%;
+  height: 93.7143%;
+}
+
+.match-pitch-player {
+  z-index: 1;
+  color: inherit;
+  text-decoration: none;
+  cursor: default;
+  touch-action: auto;
+  transition: transform 0.15s ease;
+
+  .s11-shape-wrap {
+    // Thin trim in the kit's border colour, then the builder's drop shadow.
+    filter: drop-shadow(0.12cqw 0 0 var(--kit-border)) drop-shadow(-0.12cqw 0 0 var(--kit-border))
+      drop-shadow(0 0.12cqw 0 var(--kit-border)) drop-shadow(0 -0.12cqw 0 var(--kit-border))
+      drop-shadow(0.2cqw 0.2cqw 0.3cqw rgba(0, 0, 0, 0.6));
+  }
+
+  .s11-kit-text {
+    text-shadow: 0 0 0.3cqw rgba(0, 0, 0, 0.35);
+  }
+
+  .s11-name {
+    max-width: 9.4cqw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: max(1.9cqw, 10px);
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 0 0.3cqw rgba(0, 0, 0, 0.9), 0 0 0.6cqw rgba(0, 0, 0, 0.6);
+  }
+}
+
+a.match-pitch-player {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    z-index: 3;
+    transform: translate(-50%, -53.6%) scale(1.12);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $white;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+.match-pitch-rating {
+  position: absolute;
+  top: -0.6cqw;
+  right: -1.8cqw;
+  padding: 0.25cqw 0.45cqw;
+  border-radius: 0.6cqw;
+  font-size: max(1.45cqw, 9px);
+  font-weight: 700;
+  line-height: 1;
+  color: $white;
+  background: #555;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+@each $tone, $colours in $pitch-rating-tones {
+  .match-pitch-rating[data-tone="#{$tone}"] {
+    background: nth($colours, 1);
+    color: nth($colours, 2);
+  }
+}
+
+.match-pitch-events {
+  position: absolute;
+  top: -0.6cqw;
+  left: -1.9cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2cqw;
+}
+
+.match-pitch-goal {
+  display: block;
+  width: max(1.7cqw, 10px);
+  height: max(1.7cqw, 10px);
+  border-radius: 50%;
+  background: $white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+
+  &.is-own-goal {
+    box-shadow: 0 0 0 0.2cqw $red, 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.match-pitch-card {
+  display: block;
+  width: max(1.1cqw, 7px);
+  height: max(1.5cqw, 10px);
+  border-radius: 0.15cqw;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+
+  &.is-yellow {
+    background: #f5c518;
+  }
+
+  &.is-red {
+    background: #d62828;
+  }
+}
+
+.match-pitch-sub {
+  position: absolute;
+  right: -2.2cqw;
+  bottom: 0.2cqw;
+  padding: 0.2cqw 0.35cqw;
+  border-radius: 0.5cqw;
+  font-size: max(1.3cqw, 9px);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: $white;
+  background: rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+
+.match-pitch-sub-arrow {
+  margin-right: 0.2cqw;
+  font-size: 0.8em;
+  color: #ff6b6b;
+}
+
+// Narrow pitches (one-column mobile layout): drop the names and the sub minute
+// (the arrow stays), so the chips don't cover the numbers.
+@container (max-width: 420px) {
+  .match-pitch-player .s11-name,
+  .match-pitch-sub-minute {
+    display: none;
+  }
+
+  .match-pitch-sub-arrow {
+    margin-right: 0;
+  }
+}
+
+// ---------- Player page ----------
+// The same pitch, smaller, with one dot per position (main, then secondary).
+
+.player-pitch-wrap {
+  grid-column: 1 / 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 16px;
+  padding: 8px;
+}
+
+.player-pitch {
+  flex: 0 1 340px;
+  max-width: 340px;
+  border-radius: 2px;
+}
+
+// Main and secondary positions, as a table next to the pitch.
+.player-pitch-info {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.player-pitch-table {
+  font-size: 14px;
+
+  th {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 6px 8px;
+  }
+
+  tbody tr.is-main {
+    font-weight: 700;
+  }
+}
+
+.player-pitch-table__position {
+  overflow-wrap: anywhere;
+}
+
+.player-pitch-table__role {
+  white-space: nowrap;
+}
+
+// Same look as the dots on the pitch, at a fixed small size.
+.player-pitch-table__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  vertical-align: middle;
+  width: 30px;
+  height: 30px;
+  border: 2px solid $light-blue;
+  border-radius: 50%;
+  background: $dark-blue;
+  color: $white;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  &.is-main {
+    border-color: $white;
+    background: $red;
+    box-shadow: 0 0 0 1px $dark-blue;
+  }
+}
+
+.player-pitch-dot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max(11cqw, 30px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: max(0.6cqw, 2px) solid $light-blue;
+  border-radius: 50%;
+  background: $dark-blue;
+  color: $white;
+  font-size: max(3.6cqw, 11px);
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.9;
+  box-shadow: 0.2cqw 0.4cqw 0.8cqw rgba(0, 0, 0, 0.55);
+  cursor: default;
+  pointer-events: auto;
+
+  &.is-main {
+    z-index: 1;
+    border-color: $white;
+    background: $red;
+    opacity: 1;
+  }
+}
+
+// Starts per position per season, under the pitch.
+.player-position-history {
+  grid-column: 1 / 4;
+  margin: 0 8px 8px;
+  width: calc(100% - 16px);
+  font-size: 13px;
+
+  td {
+    padding: 4px 8px;
+    overflow-wrap: anywhere;
+  }
+}
+
+.player-position-history__season {
+  width: 1%;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.player-position-history__role {
+  white-space: nowrap;
+  cursor: default;
+}

@@ -38,6 +38,35 @@ const PLAYER_POSITION_ABBREVIATIONS = {
   attacker: "FW",
 };
 
+// Stored role codes (player_position.role) and their display names. Every formation
+// role in LineupParser.formations maps to exactly one code via the abbreviations above.
+const ROLE_NAMES_BY_CODE = {
+  GK: "Goalkeeper",
+  RB: "Right Back",
+  CB: "Center Back",
+  LB: "Left Back",
+  RWB: "Right Wing Back",
+  LWB: "Left Wing Back",
+  DM: "Defensive Midfielder",
+  CM: "Central Midfielder",
+  AM: "Attacking Midfielder",
+  RM: "Right Midfielder",
+  LM: "Left Midfielder",
+  RW: "Right Winger",
+  LW: "Left Winger",
+  ST: "Striker",
+};
+
+// "Centre Back" -> "CB"; "" for generic or unknown names (Defender, Unknown, ...).
+export function roleCodeFromName(name) {
+  const code = PLAYER_POSITION_ABBREVIATIONS[toTrimmedString(name).toLowerCase()];
+  return code && ROLE_NAMES_BY_CODE[code] ? code : "";
+}
+
+export function roleNameFromCode(code) {
+  return ROLE_NAMES_BY_CODE[toTrimmedString(code).toUpperCase()] || "";
+}
+
 function toTrimmedString(value) {
   if (value === null || value === undefined) {
     return "";

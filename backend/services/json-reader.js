@@ -3,7 +3,6 @@ import path from "path";
 import { networkPath } from "../config.js";
 import { CURRENT_SEASON } from "../../shared/defaults.js";
 import { findOrCreateTeam, getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
-import { LineupParser } from "../../classes/lineupparser.js";
 import { ensureMatchesTable, getMatchDetailsByIds, upsertMatchDetails, upsertMatchSummaries } from "../data-access.js";
 import { unwrapMatchPayload } from "../lib/match-details-mapper.js";
 import { getResultFromApi, getResultsFromApiByIds } from "../api/webapi-handler.js";
@@ -19,6 +18,18 @@ const MATCH_SHARD_BUCKET_COUNT = 1000;
 async function applyEloForMatchPayloads(matches) {
   const { applyEloForMatchPayloads: applyElo } = await import("./elo-service.js");
   return applyElo(matches);
+}
+
+const FINISHED_STATUSES = new Set(["FT", "AET", "PEN"]);
+
+// The save already marked the seasons dirty in the DB; this just rebuilds them sooner.
+async function schedulePlayerPositionRefresh() {
+  try {
+    const { schedulePlayerPositionRefresh: schedule } = await import("./player-position-service.js");
+    schedule();
+  } catch (error) {
+    console.error("Failed to schedule a player position rebuild:", error);
+  }
 }
 
 function normalizeFixtureID(fixtureID) {
@@ -240,6 +251,10 @@ export async function persistDownloadedMatches(
     }
   }
 
+  if (matches.some((match) => FINISHED_STATUSES.has(match?.fixture?.status?.short))) {
+    await schedulePlayerPositionRefresh();
+  }
+
   return { summary, details };
 }
 
@@ -329,46 +344,19 @@ export async function getAllPlayers(compList, nationList) {
       );
 
       for (const matchDetail of detailedMatches) {
-        const { lineups = [], players: matchPlayers = [] } = matchDetail;
-
-        // Pre-parse lineup positions only once
-        const parsedLineupsByTeam = new Map();
-        for (const lineup of lineups) {
-          parsedLineupsByTeam.set(
-            lineup.team.id,
-            LineupParser.parseLineups([lineup], lineup.team.id)
-          );
-        }
+        const { players: matchPlayers = [] } = matchDetail;
 
         for (const teamData of matchPlayers) {
           const clubId = teamData.team.id;
 
           for (const playerData of teamData.players || []) {
             const playerId = playerData.player.id;
-            const playerName = playerData.player.name;
-            let positions = [];
-
-            const lineup = lineups.find((l) => l.team.id === clubId);
-            if (lineup) {
-              const starter = lineup.startXI?.find(
-                (s) => s.player.id === playerId
-              );
-              if (starter) {
-                const parsed = parsedLineupsByTeam.get(clubId);
-                if (parsed && parsed[playerId]?.role) {
-                  // Changed from playerName to playerId
-                  positions.push(parsed[playerId].role); // Changed from playerName to playerId
-                }
-              }
-            }
-
             const minutes = Number(playerData.statistics?.[0]?.games?.minutes || 0);
             addOrUpdatePlayer({
               id: playerId,
-              name: playerName,
+              name: playerData.player.name,
               club: minutes > 0 ? clubId : 0,
               clubDate: minutes > 0 ? matchDetail.fixture?.date : null,
-              position: positions,
             });
           }
         }
@@ -416,7 +404,6 @@ export async function getAllPlayers(compList, nationList) {
                 id: entry.player.id,
                 name: entry.player.name,
                 nation: nationId,
-                position: entry.position ? [entry.position] : [],
               });
             }
           }
@@ -427,6 +414,7 @@ export async function getAllPlayers(compList, nationList) {
     }
   }
 
+  // Positions come from player_position (insertAllPlayers fills them in).
   return Array.from(playerMap.values());
 }
 

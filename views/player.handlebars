@@ -1,6 +1,7 @@
 <script src="./../controllers/refetch-ui.js"></script>
 <script type="module" src="./../controllers/player.js"></script>
 <link rel="stylesheet" href="css/league.css" />
+<link rel="stylesheet" href="/../css/match-pitch.css" />
 
 <div class="container">
     <div class="player-page-header">
@@ -56,6 +57,53 @@
             </div>
         </div>
     </div>
+
+    {{#unless error}}
+    {{#with (playerPitch player) as |pitch|}}
+    <div class="rectangle" id="player-positions">
+        {{> rect-header title="Positions" hideExpand=true wikiInfo="How main and secondary positions are worked out is explained on the" wikiAnchor="positions"}}
+        <div class="player-pitch-wrap">
+            <div class="match-pitch player-pitch" role="img" aria-label="{{pitch.ariaLabel}}">
+                {{> horizontal-pitch-board}}
+                <div class="match-pitch-players" aria-hidden="true">
+                    {{#each pitch.spots}}
+                    <span class="player-pitch-dot{{#if isMain}} is-main{{/if}}" style="left:{{x}}%;top:{{y}}%;opacity:{{opacity}}" title="{{title}}">{{label}}</span>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="player-pitch-info">
+                <table class="gf-table player-pitch-table">
+                    <thead>
+                        <tr class="main-table-header">
+                            <th>Position</th>
+                            <th class="center-td">Role</th>
+                            {{#if pitch.hasStarts}}
+                            <th class="center-td">Starts</th>
+                            <th class="center-td" title="Share of starts, with recent seasons counting more">Share</th>
+                            {{/if}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each pitch.rows}}
+                        <tr class="{{#if isMain}}is-main{{/if}}">
+                            <td class="player-pitch-table__position">
+                                <span class="player-pitch-table__badge{{#if isMain}} is-main{{/if}}">{{label}}</span>
+                                <span>{{name}}</span>
+                            </td>
+                            <td class="center-td player-pitch-table__role">{{#if isMain}}Main{{else}}Secondary{{/if}}</td>
+                            {{#if pitch.hasStarts}}
+                            <td class="center-td">{{#if starts}}{{starts}}{{else}}-{{/if}}</td>
+                            <td class="center-td">{{#if sharePct}}{{sharePct}}%{{else}}-{{/if}}</td>
+                            {{/if}}
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{/with}}
+    {{/unless}}
 
     <div class="rectangle">
 

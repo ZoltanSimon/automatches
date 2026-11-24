@@ -2057,12 +2057,15 @@ td .form-indicator:last-child {
 .lineup-panel {
   border: 3px solid #1d3557;
   border-radius: 4px;
+  background: #1d3557;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .lineup-table {
   width: 100%;
+  border: none;
+  border-radius: 0;
 }
 .lineup-table th,
 .lineup-table td {
@@ -2149,6 +2152,12 @@ a.lineup-player-name:hover {
 
 .lineup-empty {
   opacity: 0.9;
+}
+
+.lineup-panel .lineup-empty {
+  padding: 8px;
+  background: #fff;
+  opacity: 1;
 }
 
 .match-events-grid {

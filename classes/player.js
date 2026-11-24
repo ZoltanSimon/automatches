@@ -75,7 +75,6 @@ export class Player {
     this.height = height;
     this.age = Number(inputPlayer.age) || this.calculateAgeFromBirthDate(birthDate);
     this.exactPositions = [];
-    this.lineupRoleCounts = {};
     this.shirtNumber = inputPlayer.shirtNumber || inputPlayer.shirt_number || "";
     this.shirtNumbers = this.shirtNumber;
   }
@@ -198,9 +197,6 @@ export class Player {
   addCounters(otherPlayer) {
     for (const field of COUNTER_FIELDS) {
       this[field] += otherPlayer[field];
-    }
-    for (const [role, count] of Object.entries(otherPlayer.lineupRoleCounts || {})) {
-      this.lineupRoleCounts[role] = (this.lineupRoleCounts[role] || 0) + count;
     }
   }
 

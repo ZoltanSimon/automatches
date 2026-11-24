@@ -1,0 +1,24 @@
+{{!-- One jersey on the match pitch. Context: a player from buildMatchPitch (backend/lib/match-pitch.js). --}}
+{{#*inline "pitchPlayerBody"}}
+<div class="s11-shape-wrap"><div class="s11-shape"></div></div>
+<span class="s11-kit-text">{{number}}</span>
+<span class="s11-name">{{shortName}}</span>
+{{#if rating}}<span class="match-pitch-rating" data-tone="{{rating.className}}">{{rating.value}}</span>{{/if}}
+{{#if hasEvents}}
+<span class="match-pitch-events">
+  {{#each goals}}<img class="match-pitch-goal" src="/images/icon-goal.png" alt="Goal {{this}}" title="Goal {{this}}" />{{/each}}
+  {{#each ownGoals}}<img class="match-pitch-goal is-own-goal" src="/images/icon-goal.png" alt="Own goal {{this}}" title="Own goal {{this}}" />{{/each}}
+  {{#if yellow}}<span class="match-pitch-card is-yellow" title="Yellow card"></span>{{/if}}
+  {{#if red}}<span class="match-pitch-card is-red" title="Red card"></span>{{/if}}
+</span>
+{{/if}}
+{{#if subOffMinute}}<span class="match-pitch-sub" title="Substituted {{subOffMinute}}"><span class="match-pitch-sub-arrow" aria-hidden="true">&#9660;</span><span class="match-pitch-sub-minute">{{subOffMinute}}</span></span>{{/if}}
+{{/inline}}
+{{#if linkable}}
+<a class="s11-player match-pitch-player{{#if isGK}} is-gk{{/if}}" href="/player?id={{id}}"
+  style="left:{{x}}%;top:{{y}}%;{{kitStyle}}" title="{{number}} {{fullName}}"
+  aria-label="{{fullName}}, number {{number}}: open player profile">{{> pitchPlayerBody}}</a>
+{{else}}
+<div class="s11-player match-pitch-player{{#if isGK}} is-gk{{/if}}"
+  style="left:{{x}}%;top:{{y}}%;{{kitStyle}}" title="{{number}} {{fullName}}">{{> pitchPlayerBody}}</div>
+{{/if}}

@@ -14,7 +14,9 @@ import {
   updatePlayerProfilesInDb,
 } from "../data-access.js";
 import { Player } from "./../../classes/player.js";
-import { allDBLeagues, allDBPlayers, getCatalogVersion, upsertCatalogPlayer } from "../lib/catalog.js";
+import { allDBLeagues, allDBPlayers, getCatalogVersion, getPlayerPositionProfile, upsertCatalogPlayer } from "../lib/catalog.js";
+import { roleNameFromCode } from "../../classes/player-positions.js";
+import { processDirtyPlayerPositions } from "./player-position-service.js";
 import { getPlayersFromApi, getSquad as getSquadFromApi, getTransfersByPlayer, getTransfersByTeam, hasApiErrors } from "../api/webapi-handler.js";
 import { LineupParser } from "../../classes/lineupparser.js";
 import { abbreviatePlayerPosition, comparePositionsByDisplayOrder, formatPlayerPosition, isValidPlayerId, parseLowercaseStringList, wait } from "../lib/backend-helper.js";
@@ -261,54 +263,51 @@ function splitPositionNames(positionValue) {
     .filter(Boolean);
 }
 
+/**
+ * Every regular position for the player page pitch, main first, from the player's
+ * lineup history over all seasons (backend/lib/player-position-profile.js). Without
+ * one, the stored (possibly generic) position.
+ * @returns {{ role: string, starts: number|null, share: number|null, isMain: boolean }[]}
+ */
+export function playerPitchPositions(player) {
+  const profile = getPlayerPositionProfile(player?.id);
+  if (profile) {
+    return profile.roles.map(({ name, starts, share, isMain }) => ({ role: name, starts, share, isMain }));
+  }
+
+  const fallback = splitPositionNames(player?.position)[0] || formatPlayerPosition(player?.exactPositions?.[0]);
+  return fallback ? [{ role: fallback, starts: null, share: null, isMain: true }] : [];
+}
+
 function finalizePlayerPositions(player) {
-  const storedParts = splitPositionNames(player.position);
-  let primary = storedParts[0] || "";
-  let secondary = storedParts[1] || "";
-
-  if (!primary) {
-    const fallback = (player.exactPositions || [])
-      .map((position) => formatPlayerPosition(position))
-      .filter(Boolean);
-    primary = fallback[0] || "";
-    if (!secondary) {
-      secondary = fallback[1] || "";
-    }
-  }
-
-  if (!secondary) {
-    const primaryKey = primary.toLowerCase();
-    const rankedRoles = Object.entries(player.lineupRoleCounts || {})
-      .filter(([role, count]) => role && role !== "Unknown" && count > 0)
-      .sort((roleA, roleB) => roleB[1] - roleA[1] || comparePositionsByDisplayOrder(roleA[0], roleB[0]));
-    const nextRole = rankedRoles.find(([role]) => formatPlayerPosition(role).toLowerCase() !== primaryKey)?.[0] || "";
-    secondary = formatPlayerPosition(nextRole);
-  }
-
-  if (secondary.toLowerCase() === primary.toLowerCase()) {
-    secondary = "";
-  }
+  const profile = getPlayerPositionProfile(player.id);
+  const names = profile
+    ? profile.roles.map((role) => role.name)
+    : fallbackPositionNames(player);
+  const [primary = "", secondary = ""] = names;
 
   player.position = primary;
   player.secondaryPosition = secondary;
+  // Every regular position, lowercase, for the position filter.
+  player.positions = names.map((name) => name.toLowerCase());
   player.positionName = primary;
   player.secondaryPositionName = secondary;
   player.displayPosition = abbreviatePlayerPosition(primary);
   player.displaySecondaryPosition = abbreviatePlayerPosition(secondary);
 }
 
-function recordLineupRole(player, role) {
-  if (!player || !role || role === "Unknown") {
-    return;
-  }
-
-  player.lineupRoleCounts[role] = (player.lineupRoleCounts[role] || 0) + 1;
+// No lineup history yet: the stored position, else API-Football's per-match positions.
+function fallbackPositionNames(player) {
+  const storedParts = splitPositionNames(player.position);
+  const names = storedParts.length > 0
+    ? storedParts
+    : (player.exactPositions || []).map((position) => formatPlayerPosition(position)).filter(Boolean);
+  return names.filter((name, index) => names.findIndex((other) => other.toLowerCase() === name.toLowerCase()) === index).slice(0, 2);
 }
 
 function copyPlayer(player, overrides = {}) {
   return Object.assign(Object.create(Object.getPrototypeOf(player)), player, {
     exactPositions: [...player.exactPositions],
-    lineupRoleCounts: { ...player.lineupRoleCounts },
     competitionList: [...player.competitionList],
     ...overrides,
   });
@@ -330,7 +329,7 @@ function createPlayerCell(basePlayer, playerID, leagueID, teamID, matchIndex) {
   };
 }
 
-function addAppearanceToCell(cell, playerEntry, match, matchIndex, starterRoles) {
+function addAppearanceToCell(cell, playerEntry, match, matchIndex) {
   const { player } = cell;
   const positionCount = player.exactPositions.length;
   const competitionCount = player.competitionList.length;
@@ -350,8 +349,6 @@ function addAppearanceToCell(cell, playerEntry, match, matchIndex, starterRoles)
   if (playerEntry.statistics?.[0]?.games?.number) {
     cell.shirtNumberMatchIndex = matchIndex;
   }
-
-  recordLineupRole(player, starterRoles.get(Number(cell.playerID)));
 }
 
 /**
@@ -435,7 +432,7 @@ function buildPlayerIndex(registry) {
         }
 
         const cell = getCell(basePlayer, playerID, match.league.id, teamID, matchIndex);
-        addAppearanceToCell(cell, playerEntry, match, matchIndex, starterRoles);
+        addAppearanceToCell(cell, playerEntry, match, matchIndex);
       }
     }
   });
@@ -717,12 +714,8 @@ export function getPlayerList(
 
   if (positionFilter.length) {
     const selectedPositions = parseLowercaseStringList(positionFilter);
-    players = players.filter((player) => {
-      const playerPositions = [player.position, player.secondaryPosition]
-        .map((position) => String(position || "").trim().toLowerCase())
-        .filter(Boolean);
-      return playerPositions.some((position) => selectedPositions.includes(position));
-    });
+    // Any regular position counts, not just the first two.
+    players = players.filter((player) => (player.positions || []).some((position) => selectedPositions.includes(position)));
   }
 
   const filteredPlayers = selectedStatFilters.length
@@ -866,6 +859,8 @@ function isTransferNewerThanAppearance(transferDate, appearanceDate) {
 }
 
 export async function insertAllPlayers() {
+  await processDirtyPlayerPositions();
+
   const allPlayers = await getAllPlayers(
     allDBLeagues.filter((el) => el.type == "league").concat(allDBLeagues.filter((el) => el.type == "cup")),
     allDBLeagues.filter((el) => el.type == "nt")
@@ -903,7 +898,11 @@ export async function insertAllPlayers() {
     }
   }
 
-  const playersToInsert = [...playersById.values()];
+  // Main position from the lineup history; "" leaves a stored position alone.
+  const playersToInsert = [...playersById.values()].map((player) => {
+    const profile = getPlayerPositionProfile(player.id);
+    return { ...player, position: [profile ? roleNameFromCode(profile.main) : ""] };
+  });
 
   await insertPlayersToDb(playersToInsert);
   const playersMissingExtraData = await getPlayersMissingExtraData();
@@ -950,7 +949,6 @@ export function getMatchesTopRatedPlayers(matches, limit = 10) {
   const players = new Map();
 
   for (const match of matches) {
-    const starterRoles = starterRolesForMatch(match);
     for (const team of Array.isArray(match.players) ? match.players : []) {
       const teamID = Number(team?.team?.id);
       for (const playerEntry of team.players || []) {
@@ -966,7 +964,6 @@ export function getMatchesTopRatedPlayers(matches, limit = 10) {
 
         const player = players.get(playerID);
         player.getPlayerStats(playerEntry, match.league);
-        recordLineupRole(player, starterRoles.get(playerID));
         if (Number.isFinite(teamID)) {
           player.club = teamID;
           player.clubName = getTeamName(teamID);
@@ -1049,6 +1046,9 @@ export function getPlayerPageData(registry, playerID, leagueQuery) {
   const filteredLeagueIds = requestedLeagueIds.filter((leagueId) => availableLeagueIds.includes(leagueId));
   const selectedLeague = filteredLeagueIds.length > 0 ? filteredLeagueIds : availableLeagueIds;
   const details = getPlayerDetails(registry, playerID, selectedLeague);
+  // From the whole lineup history, so the league chips don't move the dots on the position pitch.
+  details.player.pitchPositions = playerPitchPositions(allDetails.player);
+  details.player.positionHistory = getPlayerPositionProfile(playerID)?.bySeason ?? [];
 
   return {
     details,

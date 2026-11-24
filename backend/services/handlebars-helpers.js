@@ -2,6 +2,8 @@ import { abbreviatePlayerPosition as abbreviatePlayerPositionLabel, formatPlayer
 import { buildPositionFilterOptions } from "../../classes/player-positions.js";
 import { allDBLeagues, allDBPlayers } from "../lib/catalog.js";
 import { formatTeamXg } from "../lib/match-xg.js";
+import { buildMatchPitch } from "../lib/match-pitch.js";
+import { buildPlayerPitch } from "../lib/player-pitch.js";
 import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
 
 export const gt = (a, b) => a > b;
@@ -263,6 +265,53 @@ export const matchLineupRating = (matchPlayers, teamID, playerID, playerName, sh
   const fotmobPlayer = findFotmobPlayer(fotmob, fotmobSide(teamID, homeTeamId), playerName, shirt);
   return displayRating(fotmobPlayer?.rating);
 }
+
+// Both starting XIs laid out on one horizontal pitch (see backend/lib/match-pitch.js).
+export const matchPitch = (matchInfo) => buildMatchPitch(matchInfo, {
+  ratingFor: (team, player) => {
+    const rating = matchLineupRating(matchInfo?.players, team?.id, player?.id, player?.name, player?.number, matchInfo?.fotmob, matchInfo?.teams?.home?.id);
+    return rating ? { value: rating, className: ratingClass(rating) } : null;
+  },
+});
+
+// The player's regular positions as dots on a small pitch (see backend/lib/player-pitch.js).
+export const playerPitch = (player) => buildPlayerPitch(player?.pitchPositions);
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// "2025-08-16" -> { month: "Aug", year: "2025" }
+function monthYear(day) {
+  const match = /^(\d{4})-(\d{2})/.exec(String(day || ""));
+  return match ? { month: MONTHS[Number(match[2]) - 1], year: match[1] } : null;
+}
+
+// When the starts were actually played: "Aug 2025 – May 2026", "Aug – Nov 2025", "Aug 2025".
+export function startDateRange(firstStart, lastStart) {
+  const first = monthYear(firstStart);
+  const last = monthYear(lastStart) || first;
+  if (!first || !last) return "";
+  if (first.year !== last.year) return `${first.month} ${first.year} – ${last.month} ${last.year}`;
+  if (first.month !== last.month) return `${first.month} – ${last.month} ${last.year}`;
+  return `${last.month} ${last.year}`;
+}
+
+const startsText = (starts) => `${starts} ${starts === 1 ? "start" : "starts"}`;
+
+// History rows for the player page: "2025-2026  RB 28 · CB 3". The season comes from the
+// match dates (July-June); hovering shows the date span and national-team starts.
+export const playerPositionHistory = (history) => (Array.isArray(history) ? history : []).map(({ label, firstStart, lastStart, total, ntStarts, roles }) => ({
+  label,
+  title: [startDateRange(firstStart, lastStart), ntStarts > 0 ? `${ntStarts} for the national team` : ""].filter(Boolean).join(" · "),
+  total,
+  roles: roles.map(({ code, name, starts, ntStarts: roleNtStarts }) => ({
+    code,
+    name,
+    starts,
+    title: roleNtStarts > 0
+      ? `${name}: ${startsText(starts)} (${roleNtStarts} for the national team)`
+      : `${name}: ${startsText(starts)}`,
+  })),
+}));
 
 export const matchLineupStat = (fotmob, homeTeamId, teamID, playerName, shirt, field) => {
   const fotmobPlayer = findFotmobPlayer(fotmob, fotmobSide(teamID, homeTeamId), playerName, shirt);

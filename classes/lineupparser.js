@@ -1,6 +1,4 @@
 export class LineupParser {
-  static playerPositionCounts = {}; // { playerName: { role: count } }
-
   // Top to bottom, right to left within each row. Shared with starter role counts.
   static orderedGridPlayers(players) {
     const gridPlayers = players
@@ -21,70 +19,6 @@ export class LineupParser {
     return Object.keys(rowMap)
       .sort((a, b) => a - b)
       .flatMap((row) => rowMap[row].sort((a, b) => b.col - a.col));
-  }
-
-  static parseLineups(lineups, clubId = null) {
-    const result = {};
-
-    lineups.forEach((team) => {
-      const formation = team.formation;
-      const orderedPlayers = LineupParser.orderedGridPlayers(team.startXI.map((p) => p.player));
-
-      const formationEntry = LineupParser.formations.find(
-        (f) => f.formation === formation,
-      );
-      const positions = formationEntry?.positions;
-
-      if (!positions || positions.length !== orderedPlayers.length) {
-        console.warn(
-          `Formation mismatch or undefined: ${formation} with ${orderedPlayers.length} players.`,
-        );
-      }
-
-      const teamResult = {};
-
-      orderedPlayers.forEach((player, i) => {
-        const role = positions?.[i] || "Unknown";
-
-        if (!LineupParser.playerPositionCounts[player.id]) {
-          LineupParser.playerPositionCounts[player.id] = {};
-        }
-        const roleCounts = LineupParser.playerPositionCounts[player.id];
-        roleCounts[role] = (roleCounts[role] || 0) + 1;
-
-        teamResult[player.id] = {
-          role,
-          name: player.name, // Keep name as data, not key
-          number: player.number,
-          pos: player.pos,
-          grid: player.grid,
-        };
-      });
-
-      result[team.team.name] = teamResult;
-    });
-
-    // Finalize roles to use the most frequent one - using player IDs
-    for (const teamName in result) {
-      for (const playerId in result[teamName]) {
-        const roleCounts = LineupParser.playerPositionCounts[playerId];
-        const finalRole = Object.entries(roleCounts).sort(
-          (a, b) => b[1] - a[1],
-        )[0][0]; // highest count
-        result[teamName][playerId].role = finalRole;
-      }
-    }
-
-    if (clubId) {
-      for (const lineup of lineups) {
-        if (lineup.team.id === clubId) {
-          return result[lineup.team.name] || {};
-        }
-      }
-      return {};
-    }
-
-    return result;
   }
 
   static starterRolesByPlayerId(lineups = []) {

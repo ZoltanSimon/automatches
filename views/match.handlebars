@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/../css/match-pitch.css" />
 <script src="./../controllers/refetch-ui.js"></script>
 <script type="module" src="./../controllers/match.js"></script>
 <div class="container match-page">
@@ -183,6 +184,33 @@
           <div class="lineup-empty">No events available.</div>
           {{/if}}
         </div>
+
+        {{#with (matchPitch matchInfo) as |pitch|}}
+        <div class="match-pitch-panel">
+          <div class="match-pitch-header">
+            <h3>Lineups</h3>
+          </div>
+          <div class="match-pitch-teams">
+            <span class="match-pitch-team">
+              {{#if pitch.home}}<span class="match-pitch-swatch-wrap"><span class="match-pitch-swatch" style="background:{{pitch.home.kitPrimary}}"></span></span>{{/if}}
+              <span class="match-pitch-team-name">{{../matchInfo.teams.home.name}}</span>
+              {{#if pitch.home.formation}}<span class="match-pitch-formation">{{pitch.home.formation}}</span>{{/if}}
+            </span>
+            <span class="match-pitch-team match-pitch-team-away">
+              {{#if pitch.away.formation}}<span class="match-pitch-formation">{{pitch.away.formation}}</span>{{/if}}
+              <span class="match-pitch-team-name">{{../matchInfo.teams.away.name}}</span>
+              {{#if pitch.away}}<span class="match-pitch-swatch-wrap"><span class="match-pitch-swatch" style="background:{{pitch.away.kitPrimary}}"></span></span>{{/if}}
+            </span>
+          </div>
+          <div class="match-pitch" data-shape="kit" data-bottom-text="show-number">
+            {{> horizontal-pitch-board}}
+            <div class="match-pitch-players">
+              {{#each pitch.home.players}}{{> match-pitch-player}}{{/each}}
+              {{#each pitch.away.players}}{{> match-pitch-player}}{{/each}}
+            </div>
+          </div>
+        </div>
+        {{/with}}
 
         <div class="match-stats-panel">
           {{#if matchStatistics.length}}

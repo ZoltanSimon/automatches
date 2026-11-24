@@ -1,6 +1,8 @@
 export let allDBPlayers = [];
 export let allDBTeams = [];
 export let allDBLeagues = [];
+// player id -> position profile (backend/lib/player-position-profile.js).
+let playerPositionProfiles = new Map();
 
 let catalogVersion = 0;
 
@@ -8,7 +10,7 @@ export function getCatalogVersion() {
   return catalogVersion;
 }
 
-export function setCatalog({ players, teams, leagues } = {}) {
+export function setCatalog({ players, teams, leagues, positionProfiles } = {}) {
   if (players !== undefined) {
     allDBPlayers = players;
   }
@@ -18,7 +20,14 @@ export function setCatalog({ players, teams, leagues } = {}) {
   if (leagues !== undefined) {
     allDBLeagues = leagues;
   }
+  if (positionProfiles !== undefined) {
+    playerPositionProfiles = positionProfiles;
+  }
   catalogVersion += 1;
+}
+
+export function getPlayerPositionProfile(playerId) {
+  return playerPositionProfiles.get(Number(playerId)) ?? null;
 }
 
 export function getCatalogLeague(leagueId) {

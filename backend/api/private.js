@@ -11,6 +11,7 @@ import { fetchExternalMatchXg, fetchFotmobMatchById } from "../services/xg-looku
 import { findMatchIdsMissingFotmob, getFotmobBackfillStatus, startFotmobBackfill, stopFotmobBackfill } from "../services/fotmob-backfill-service.js";
 import { extractExpectedGoals, teamNameFromMatchDetails } from "../lib/match-details-mapper.js";
 import { replayElo } from "../services/elo-service.js";
+import { processDirtyPlayerPositions, reloadPlayerPositionProfiles } from "../services/player-position-service.js";
 
 const MAX_GET_PLAYERS_RUNS = 50;
 let playersFetchJob = {
@@ -184,6 +185,8 @@ export function createApiRouter({ setAllDbState, allDBLeagues = [] }) {
       const leagues = await loadLeagues();
       leaguesCache = leagues;
       setAllDbState({ players, teams, leagues });
+      await processDirtyPlayerPositions();
+      await reloadPlayerPositionProfiles();
 
       await forceRefreshRegistry();
 
