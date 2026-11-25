@@ -1441,6 +1441,7 @@ td .form-indicator:last-child {
 
 .player-picture {
   width: 60px;
+  vertical-align: bottom;
 }
 
 .player-position {

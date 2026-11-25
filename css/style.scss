@@ -1490,6 +1490,8 @@ td .form-indicator {
 
 .player-picture {
   width: 60px;
+  // Sit on the cell bottom, not the text baseline (no gap below the photo).
+  vertical-align: bottom;
 }
 
 .player-position {
