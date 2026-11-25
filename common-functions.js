@@ -46,7 +46,7 @@ export let download = function (canvasName = "my-canvas") {
 };
 
 export function imagePath(teamID) {
-  return `images/logos/${teamID}.png`;
+  return `/images/logos/${teamID}.png`;
 }
 
 export function removeNewlines(str) {

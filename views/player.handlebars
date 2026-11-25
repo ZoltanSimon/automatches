@@ -1,15 +1,15 @@
-<script src="./../controllers/refetch-ui.js"></script>
-<script type="module" src="./../controllers/player.js"></script>
-<link rel="stylesheet" href="css/league.css" />
-<link rel="stylesheet" href="/../css/match-pitch.css" />
+<script src="/controllers/refetch-ui.js"></script>
+<script type="module" src="/controllers/player.js"></script>
+<link rel="stylesheet" href="/css/league.css" />
+<link rel="stylesheet" href="/css/match-pitch.css" />
 
 <div class="container">
     <div class="player-page-header">
         <div class="league player-header-grid">
-            <img class="player-face" src="images/player-pictures/{{player.id}}.png" alt="{{player.name}}">
+            <img class="player-face" src="/images/player-pictures/{{player.id}}.png" alt="{{player.name}}">
             <div class="league-info player-header-main">
                 <div class="league-title-row">
-                    <h2>{{player.name}}</h2>
+                    <h1>{{player.name}}</h1>
                     {{#if isLocal}}
                     <button type="button" id="refetch-player-btn" class="match-refetch-btn" data-player-id="{{player.id}}">
                         Refetch
@@ -18,9 +18,9 @@
                 </div>
                 <div class="league-nation player-subinfo">
                     <div class="row player-club-row">
-                        <img class="club-logo" src="images/logos/{{player.club}}.png" alt="{{player.clubName}}"
-                            onclick="window.location.href='team?ID={{player.club}}'">
-                        <span onclick="window.location.href='team?ID={{player.club}}'">{{player.clubName}}</span>
+                        <img class="club-logo" src="/images/logos/{{player.club}}.png" alt="{{player.clubName}}"
+                            onclick="window.location.href='{{teamUrl player.club player.clubName}}'">
+                        <span onclick="window.location.href='{{teamUrl player.club player.clubName}}'">{{player.clubName}}</span>
                     </div>
                     <div class="row player-position-row">
                         <span style="color: white;">{{player.displayPosition}}</span>
@@ -37,7 +37,7 @@
                     <span class="player-meta-label">Nationality:</span>
                     <span class="player-meta-value player-meta-value-with-flag">
                         {{#if player.nation}}
-                        <img class="nation-flag" src="images/logos/{{player.nation}}.png" alt="{{player.nationName}}">
+                        <img class="nation-flag" src="/images/logos/{{player.nation}}.png" alt="{{player.nationName}}">
                         {{/if}}
                         <span>{{player.nationName}}</span>
                     </span>
@@ -61,7 +61,7 @@
     {{#unless error}}
     {{#with (playerPitch player) as |pitch|}}
     <div class="rectangle" id="player-positions">
-        {{> rect-header title="Positions" hideExpand=true wikiInfo="How main and secondary positions are worked out is explained on the" wikiAnchor="positions"}}
+        {{> rect-header title="Positions" hideExpand=true wikiInfo="How main and secondary positions are worked out is explained on the" wikiArticle="player-positions"}}
         <div class="player-pitch-wrap">
             <div class="match-pitch player-pitch" role="img" aria-label="{{pitch.ariaLabel}}">
                 {{> horizontal-pitch-board}}
@@ -359,7 +359,7 @@
     {{> player-transfers playerTransfers=playerTransfers}}
     <div class="rectangle" style="padding: 8px;">
         <span>{{player.fullName}} is a football player, aged {{player.age}}{{#if player.nationName}}, representing the country of {{player.nationName}}{{/if}}. He was born on {{formatDateOnly player.birthdate}}, in {{player.birthLocation}}. {{player.name}} plays for <a
-            href="team?ID={{player.club}}">{{player.clubName}}</a>, mainly as a {{player.displayPosition}}. He has made
+            href="{{teamUrl player.club player.clubName}}">{{player.clubName}}</a>, mainly as a {{player.displayPosition}}. He has made
             {{player.apps}} appearances and has scored {{player.goals}} goals, providing {{player.assists}} assists in
             all competitions this season, for club and country.<br /><br />
             If you are interested in his statistics in specific leagues, click on the league icons above to filter the

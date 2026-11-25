@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -21,11 +22,29 @@
 
   <title>{{title}}</title>
   <meta name="description" content="{{description}}">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="{{#if robots}}{{robots}}{{else}}index, follow, max-image-preview:large{{/if}}">
+  {{#unless robots}}
+  <link rel="canonical" href="{{#if canonicalPath}}{{absUrl canonicalPath}}{{else}}{{canonicalUrl}}{{/if}}">
+  {{/unless}}
 
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="css/header.css" />
-  <link rel="stylesheet" href="css/style.css" />
+  <meta property="og:site_name" content="{{siteName}}">
+  <meta property="og:type" content="{{#if ogType}}{{ogType}}{{else}}website{{/if}}">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{description}}">
+  <meta property="og:url" content="{{#if canonicalPath}}{{absUrl canonicalPath}}{{else}}{{canonicalUrl}}{{/if}}">
+  <meta property="og:image" content="{{#if ogImage}}{{absUrl ogImage}}{{else}}{{ogImageUrl}}{{/if}}">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{title}}">
+  <meta name="twitter:description" content="{{description}}">
+  <meta name="twitter:image" content="{{#if ogImage}}{{absUrl ogImage}}{{else}}{{ogImageUrl}}{{/if}}">
+  {{#if jsonLd}}
+  <script type="application/ld+json">{{{jsonLd}}}</script>
+  {{/if}}
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 
   <script async
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5722075030849203"
@@ -34,18 +53,18 @@
 </head>
 
 <body>
-  <header>
+  <header class="site-header">
     <div class="logo-title">
       <div class="logo-brand">
-        <a href="/"><img src="/images/logo.png" alt="Generation Football Logo" /></a>
-        <a href="/"><h1>generationFOOTBALL</h1></a>
+        <a href="/"><img src="/images/logo.png" alt="Generation Football logo" /></a>
+        <a href="/" aria-label="Generation Football home"><span class="site-title">generationFOOTBALL</span></a>
       </div>
       <div class="header-actions">
-        <a href="/starting11-new" class="header-link" title="Starting 11 Builder" {{#if (eq currentPath "/starting11-new")}}aria-current="page"{{/if}}>
+        <a href="/starting-11" class="header-link" title="Starting 11 Builder" {{#if (eq currentPath "/starting-11")}}aria-current="page"{{/if}}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
           <span class="header-link-text">Starting 11</span>
         </a>
-        <a href="/gf-wiki" class="header-link" title="GF Wiki" {{#if (eq currentPath "/gf-wiki")}}aria-current="page"{{/if}}>
+        <a href="/wiki" class="header-link" title="GF Wiki" {{#if (startsWith currentPath "/wiki")}}aria-current="page"{{/if}}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>
           <span class="header-link-text">GF Wiki</span>
         </a>
@@ -162,7 +181,7 @@
     {{{body}}}
   </main>
   <footer>
-    <p>&copy; 2026 generationFOOTBALL - <a style="color: white" href="./privacy-policy">Privacy Policy</a> {{> donate-button compact=true}}</p>
+    <p>&copy; 2026 generationFOOTBALL - <a style="color: white" href="/privacy-policy">Privacy Policy</a> {{> donate-button compact=true}}</p>
   </footer>
 </body>
 

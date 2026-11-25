@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" width="800" height="440" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">Which player ratings count towards the team rating</title>
+  <desc id="d">Only players with at least 22 minutes count. In this example four players qualify and their ratings average 6.95. Two late substitutes with 9 and 2 minutes are left out, including one rated 8.6.</desc>
+  <rect width="800" height="440" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">Only players with 22+ minutes count</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">Minutes played and match rating for six of a team's players</text>
+  <line x1="355.3333333333333" y1="98" x2="355.3333333333333" y2="352" stroke="#E63946" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="355.3333333333333" y="92" font-size="14" font-weight="700" fill="#E63946" text-anchor="middle">22 minutes</text>
+  <text x="32" y="128" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Goalkeeper</text>
+  <rect x="260" y="112" width="390.0" height="24" rx="4" fill="#457B9D"/>
+  <text x="658.0" y="130" font-size="14" font-weight="600" fill="#4A5A70" text-anchor="start">90'</text>
+  <rect x="720" y="110" width="48" height="28" rx="5" fill="#1D3557" stroke="#1D3557"/>
+  <text x="744" y="130" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">7.0</text>
+  <text x="32" y="168" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Centre-back</text>
+  <rect x="260" y="152" width="390.0" height="24" rx="4" fill="#457B9D"/>
+  <text x="658.0" y="170" font-size="14" font-weight="600" fill="#4A5A70" text-anchor="start">90'</text>
+  <rect x="720" y="150" width="48" height="28" rx="5" fill="#1D3557" stroke="#1D3557"/>
+  <text x="744" y="170" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">7.4</text>
+  <text x="32" y="208" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Midfielder (subbed off)</text>
+  <rect x="260" y="192" width="277.3" height="24" rx="4" fill="#457B9D"/>
+  <text x="545.3" y="210" font-size="14" font-weight="600" fill="#4A5A70" text-anchor="start">64'</text>
+  <rect x="720" y="190" width="48" height="28" rx="5" fill="#1D3557" stroke="#1D3557"/>
+  <text x="744" y="210" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">6.6</text>
+  <text x="32" y="248" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Substitute on 64'</text>
+  <rect x="260" y="232" width="112.7" height="24" rx="4" fill="#457B9D"/>
+  <text x="380.7" y="250" font-size="14" font-weight="600" fill="#4A5A70" text-anchor="start">26'</text>
+  <rect x="720" y="230" width="48" height="28" rx="5" fill="#1D3557" stroke="#1D3557"/>
+  <text x="744" y="250" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">6.8</text>
+  <text x="32" y="288" font-size="16" font-weight="600" fill="#4A5A70" text-anchor="start">Substitute on 81'</text>
+  <rect x="260" y="272" width="39.0" height="24" rx="4" fill="#D5E3EA"/>
+  <text x="307.0" y="290" font-size="14" font-weight="600" fill="#4A5A70" text-anchor="start">9'</text>
+  <rect x="720" y="270" width="48" height="28" rx="5" fill="#FFFFFF" stroke="#D5E3EA"/>
+  <text x="744" y="290" font-size="16" font-weight="700" fill="#4A5A70" text-anchor="middle" text-decoration="line-through">8.6</text>
+  <text x="32" y="328" font-size="16" font-weight="600" fill="#4A5A70" text-anchor="start">Substitute on 88'</text>
+  <rect x="260" y="312" width="8.7" height="24" rx="4" fill="#D5E3EA"/>
+  <text x="276.7" y="330" font-size="14" font-weight="600" fill="#4A5A70" text-anchor="start">2'</text>
+  <rect x="720" y="310" width="48" height="28" rx="5" fill="#FFFFFF" stroke="#D5E3EA"/>
+  <text x="744" y="330" font-size="16" font-weight="700" fill="#4A5A70" text-anchor="middle" text-decoration="line-through">6.0</text>
+  <rect x="32" y="370" width="736" height="52" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <text x="48" y="402" font-size="18" font-weight="700" fill="#1D3557" text-anchor="start">Team rating for this match: (7.0 + 7.4 + 6.6 + 6.8) ÷ 4 = 6.95</text>
+</svg>

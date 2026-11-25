@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" width="800" height="440" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">Elo expected score by rating difference</title>
+  <desc id="d">An S-shaped curve. With equal ratings at a neutral venue a team's expected score is 0.50. The 100-point home advantage lifts it to 0.64, and a 200-point edge gives about 0.76.</desc>
+  <rect width="800" height="440" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">Expected score before kick-off</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">1 = win, 0.5 = draw, 0 = loss. The gap includes home advantage.</text>
+  <line x1="90" y1="96" x2="90" y2="380" stroke="#D5E3EA"/>
+  <text x="90" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">-400</text>
+  <line x1="173.75" y1="96" x2="173.75" y2="380" stroke="#D5E3EA"/>
+  <text x="173.75" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">-300</text>
+  <line x1="257.5" y1="96" x2="257.5" y2="380" stroke="#D5E3EA"/>
+  <text x="257.5" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">-200</text>
+  <line x1="341.25" y1="96" x2="341.25" y2="380" stroke="#D5E3EA"/>
+  <text x="341.25" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">-100</text>
+  <line x1="425" y1="96" x2="425" y2="380" stroke="#D5E3EA"/>
+  <text x="425" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">0</text>
+  <line x1="508.75" y1="96" x2="508.75" y2="380" stroke="#D5E3EA"/>
+  <text x="508.75" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">+100</text>
+  <line x1="592.5" y1="96" x2="592.5" y2="380" stroke="#D5E3EA"/>
+  <text x="592.5" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">+200</text>
+  <line x1="676.25" y1="96" x2="676.25" y2="380" stroke="#D5E3EA"/>
+  <text x="676.25" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">+300</text>
+  <line x1="760" y1="96" x2="760" y2="380" stroke="#D5E3EA"/>
+  <text x="760" y="402" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="middle">+400</text>
+  <line x1="90" y1="380" x2="760" y2="380" stroke="#D5E3EA"/>
+  <text x="80" y="385" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="end">0.00</text>
+  <line x1="90" y1="309" x2="760" y2="309" stroke="#D5E3EA"/>
+  <text x="80" y="314" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="end">0.25</text>
+  <line x1="90" y1="238" x2="760" y2="238" stroke="#D5E3EA"/>
+  <text x="80" y="243" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="end">0.50</text>
+  <line x1="90" y1="167" x2="760" y2="167" stroke="#D5E3EA"/>
+  <text x="80" y="172" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="end">0.75</text>
+  <line x1="90" y1="96" x2="760" y2="96" stroke="#D5E3EA"/>
+  <text x="80" y="101" font-size="14" font-weight="400" fill="#4A5A70" text-anchor="end">1.00</text>
+  <polyline points="90.0,354.2 98.4,352.8 106.8,351.3 115.1,349.8 123.5,348.2 131.9,346.6 140.3,344.8 148.6,343.0 157.0,341.1 165.4,339.2 173.8,337.1 182.1,335.0 190.5,332.8 198.9,330.4 207.3,328.1 215.6,325.6 224.0,323.0 232.4,320.3 240.8,317.6 249.1,314.7 257.5,311.8 265.9,308.7 274.3,305.6 282.6,302.4 291.0,299.1 299.4,295.8 307.8,292.3 316.1,288.8 324.5,285.2 332.9,281.5 341.3,277.8 349.6,274.0 358.0,270.1 366.4,266.2 374.8,262.3 383.1,258.3 391.5,254.3 399.9,250.2 408.3,246.2 416.6,242.1 425.0,238.0 433.4,233.9 441.8,229.8 450.1,225.8 458.5,221.7 466.9,217.7 475.2,213.7 483.6,209.8 492.0,205.9 500.4,202.0 508.8,198.2 517.1,194.5 525.5,190.8 533.9,187.2 542.3,183.7 550.6,180.2 559.0,176.9 567.4,173.6 575.8,170.4 584.1,167.3 592.5,164.2 600.9,161.3 609.3,158.4 617.6,155.7 626.0,153.0 634.4,150.4 642.8,147.9 651.1,145.6 659.5,143.2 667.9,141.0 676.3,138.9 684.6,136.8 693.0,134.9 701.4,133.0 709.8,131.2 718.1,129.4 726.5,127.8 734.9,126.2 743.3,124.7 751.6,123.2 760.0,121.8" fill="none" stroke="#1D3557" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="425.0" cy="238.0" r="7" fill="#457B9D" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="437.0" y="274.0" font-size="15" font-weight="700" fill="#457B9D" text-anchor="start">Equal ratings, neutral venue: 0.50</text>
+  <circle cx="508.8" cy="198.2" r="7" fill="#279B65" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="522.8" y="232.2" font-size="15" font-weight="700" fill="#279B65" text-anchor="start">Equal ratings, at home (+100): 0.64</text>
+  <circle cx="592.5" cy="164.2" r="7" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="606.5" y="194.2" font-size="15" font-weight="700" fill="#1D3557" text-anchor="start">200 points stronger: 0.76</text>
+  <text x="425" y="430" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">Rating difference (team − opponent, after home advantage)</text>
+</svg>

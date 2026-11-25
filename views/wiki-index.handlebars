@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="/css/wiki.css" />
+
+<script>
+  // Old single-page wiki links (/gf-wiki#elo) arrive here as /wiki#elo.
+  (function () {
+    var anchors = {{{legacyAnchors}}};
+    var hash = window.location.hash.slice(1);
+    if (hash && anchors[hash]) window.location.replace(anchors[hash]);
+  })();
+</script>
+
+<div class="wiki-page">
+  <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><span aria-current="page">GF Wiki</span></li>
+    </ol>
+  </nav>
+
+  <header class="wiki-hub__header">
+    <p class="wiki-kicker">GF Wiki</p>
+    <h1>How the numbers on Generation Football work</h1>
+    <p class="wiki-lead">
+      Alongside goals and results, Generation Football shows a few numbers you won't find in a
+      plain league table. These guides explain where each one comes from, how to read it, and
+      where to find it on the site.
+    </p>
+  </header>
+
+  <ul class="wiki-hub__grid">
+    {{#each articles}}
+    <li>
+      <article class="wiki-card">
+        <a class="wiki-card__link" href="{{this.path}}">
+          {{#if this.image}}
+          <img class="wiki-card__image" src="{{this.image}}" alt="" width="640" height="360" loading="lazy" />
+          {{/if}}
+          <div class="wiki-card__body">
+            <h2 class="wiki-card__title">{{this.navTitle}}</h2>
+            <p class="wiki-card__desc">{{this.description}}</p>
+            <span class="wiki-card__more" aria-hidden="true">Read the guide →</span>
+          </div>
+        </a>
+      </article>
+    </li>
+    {{/each}}
+  </ul>
+</div>

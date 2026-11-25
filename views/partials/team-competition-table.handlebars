@@ -10,9 +10,9 @@
     </thead>
     <tbody>
         {{#each leagueBreakdown}}
-        <tr style="cursor: pointer;" onclick="window.location.href='/league?id={{this.id}}'">
+        <tr style="cursor: pointer;" onclick="window.location.href='{{leagueUrl this.id}}'">
             <td style="width:36px; padding: 2px; text-align: center; border-right: 0;">
-                <img src="images/competitions/{{this.id}}.png" class="logo-picture" alt="{{this.name}}" />
+                <img src="/images/competitions/{{this.id}}.png" class="logo-picture" alt="{{this.name}}" />
             </td>
             <td style="border-left-style: hidden;">{{this.name}}</td>
             <td style="text-align: center;">{{this.played}}</td>

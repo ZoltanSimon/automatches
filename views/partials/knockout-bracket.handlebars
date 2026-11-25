@@ -11,7 +11,7 @@
         <a class="knockout-team {{#if this.home.winner}}is-winner{{/if}} {{#unless this.home.url}}is-placeholder{{/unless}}" href="{{#if this.home.url}}{{this.home.url}}{{else}}#{{/if}}">
           <span class="knockout-team-main">
             {{#if this.home.id}}
-            <img class="knockout-team-logo" src="images/logos/{{this.home.id}}.png" alt="{{this.home.name}}" loading="lazy">
+            <img class="knockout-team-logo" src="/images/logos/{{this.home.id}}.png" alt="{{this.home.name}}" loading="lazy">
             {{/if}}
             <span class="knockout-team-name">{{this.home.name}}</span>
           </span>
@@ -21,7 +21,7 @@
         <a class="knockout-team {{#if this.away.winner}}is-winner{{/if}} {{#unless this.away.url}}is-placeholder{{/unless}}" href="{{#if this.away.url}}{{this.away.url}}{{else}}#{{/if}}">
           <span class="knockout-team-main">
             {{#if this.away.id}}
-            <img class="knockout-team-logo" src="images/logos/{{this.away.id}}.png" alt="{{this.away.name}}" loading="lazy">
+            <img class="knockout-team-logo" src="/images/logos/{{this.away.id}}.png" alt="{{this.away.name}}" loading="lazy">
             {{/if}}
             <span class="knockout-team-name">{{this.away.name}}</span>
           </span>

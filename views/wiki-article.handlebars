@@ -1,0 +1,73 @@
+<link rel="stylesheet" href="/css/wiki.css" />
+
+<div class="wiki-page">
+  <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/wiki">GF Wiki</a></li>
+      <li><span aria-current="page">{{article.navTitle}}</span></li>
+    </ol>
+  </nav>
+
+  <div class="wiki-layout">
+    <article class="wiki-article" aria-labelledby="wiki-title">
+      <header class="wiki-article__header">
+        <p class="wiki-kicker">GF Wiki</p>
+        <h1 id="wiki-title">{{article.title}}</h1>
+        <p class="wiki-lead">{{article.lead}}</p>
+        {{#if article.updated}}
+        <p class="wiki-meta">Last updated <time datetime="{{article.updated}}">{{article.updatedText}}</time></p>
+        {{/if}}
+      </header>
+
+      <div class="wiki-body">
+        {{{article.html}}}
+      </div>
+
+      <nav class="wiki-pager" aria-label="More wiki articles">
+        {{#if article.prev}}
+        <a class="wiki-pager__link wiki-pager__link--prev" href="{{article.prev.path}}" rel="prev">
+          <span class="wiki-pager__label">← Previous</span>
+          <span class="wiki-pager__title">{{article.prev.title}}</span>
+        </a>
+        {{/if}}
+        {{#if article.next}}
+        <a class="wiki-pager__link wiki-pager__link--next" href="{{article.next.path}}" rel="next">
+          <span class="wiki-pager__label">Next →</span>
+          <span class="wiki-pager__title">{{article.next.title}}</span>
+        </a>
+        {{/if}}
+      </nav>
+    </article>
+
+    {{#if article.toc.length}}
+    <nav class="wiki-toc" aria-label="On this page">
+      <h2 class="wiki-side-title">On this page</h2>
+      <ol>
+        {{#each article.toc}}
+        <li><a href="#{{this.id}}">{{this.text}}</a></li>
+        {{/each}}
+      </ol>
+    </nav>
+    {{/if}}
+
+    <aside class="wiki-related" aria-labelledby="wiki-related-title">
+      {{#if article.related.length}}
+      <h2 class="wiki-side-title" id="wiki-related-title">Related articles</h2>
+      <ul>
+        {{#each article.related}}
+        <li>
+          <a href="{{this.path}}">
+            <span class="wiki-related__name">{{this.title}}</span>
+            <span class="wiki-related__desc">{{this.description}}</span>
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <h2 class="wiki-side-title" id="wiki-related-title">More from the wiki</h2>
+      {{/if}}
+      <p class="wiki-related__all"><a href="/wiki">Browse all wiki articles</a></p>
+    </aside>
+  </div>
+</div>

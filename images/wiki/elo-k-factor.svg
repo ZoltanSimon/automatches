@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 370" width="800" height="370" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">Elo K-factor by match importance</title>
+  <desc id="d">How far one result can move a rating: K 20 for friendlies, 30 for domestic matches, 40 for qualifiers and major club competitions, 50 for major national-team tournaments and 60 for the World Cup final.</desc>
+  <rect width="800" height="370" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">Bigger matches move ratings further</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">K-factor: the most a single result can shift a rating, before the margin bonus</text>
+  <text x="32" y="123" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Friendlies</text>
+  <rect x="420" y="104" width="300" height="28" rx="5" fill="#F1FAEE"/>
+  <rect x="420" y="104" width="100.0" height="28" rx="5" fill="#457B9D"/>
+  <text x="510" y="124" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="end">K = 20</text>
+  <text x="32" y="173" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">League and domestic cup matches</text>
+  <rect x="420" y="154" width="300" height="28" rx="5" fill="#F1FAEE"/>
+  <rect x="420" y="154" width="150.0" height="28" rx="5" fill="#457B9D"/>
+  <text x="560" y="174" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="end">K = 30</text>
+  <text x="32" y="223" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Qualifiers, Champions League, Europa League…</text>
+  <rect x="420" y="204" width="300" height="28" rx="5" fill="#F1FAEE"/>
+  <rect x="420" y="204" width="200.0" height="28" rx="5" fill="#457B9D"/>
+  <text x="610" y="224" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="end">K = 40</text>
+  <text x="32" y="273" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">World Cup, Euros, Copa América, AFCON, Asian Cup</text>
+  <rect x="420" y="254" width="300" height="28" rx="5" fill="#F1FAEE"/>
+  <rect x="420" y="254" width="250.0" height="28" rx="5" fill="#457B9D"/>
+  <text x="660" y="274" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="end">K = 50</text>
+  <text x="32" y="323" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">World Cup final</text>
+  <rect x="420" y="304" width="300" height="28" rx="5" fill="#F1FAEE"/>
+  <rect x="420" y="304" width="300.0" height="28" rx="5" fill="#279B65"/>
+  <text x="710" y="324" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="end">K = 60</text>
+</svg>

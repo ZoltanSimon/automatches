@@ -1,10 +1,10 @@
-<script type="module" src="./../controllers/ucl-last-round.js"></script>
-<link rel="stylesheet" href="css/ucl-last-round.css" />
+<script type="module" src="/controllers/ucl-last-round.js"></script>
+<link rel="stylesheet" href="/css/ucl-last-round.css" />
 <div id="ucl-container">
     <!-- Left Div -->
     <div id="left">
         <div id="matches-container">
-            <h2>UEFA Champions League - Last round scores</h2>
+            <h1>UEFA Champions League - Last round scores</h1>
             <div id="matches">
                 <table class="gf-table" cellspacing="0" cellpadding="5">
                     <thead>
@@ -20,7 +20,7 @@
 
                             <td style="border-right: none; text-align: right; width: 28%;">{{this.teams.home.name}}</td>
                             <td style="border-left: none;">
-                                <img src="images/logos/{{this.teams.home.id}}.png" alt="{{this.teams.home.name}} Logo"
+                                <img src="/images/logos/{{this.teams.home.id}}.png" alt="{{this.teams.home.name}} Logo"
                                     width="26px">
                             </td>
                             <td style="text-align:center">
@@ -32,7 +32,7 @@
                             </td>
 
                             <td style="border-right: none;">
-                                <img src="images/logos/{{this.teams.away.id}}.png" alt="{{this.teams.away.name}} Logo"
+                                <img src="/images/logos/{{this.teams.away.id}}.png" alt="{{this.teams.away.name}} Logo"
                                     width="26px">
                             </td>
                             <td style="border-left: none; width: 28%;">{{this.teams.away.name}}</td>

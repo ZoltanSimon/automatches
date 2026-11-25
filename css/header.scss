@@ -1,6 +1,6 @@
 @use 'tokens' as *;
 
-header {
+.site-header {
   background-color: $blue;
   color: $white;
   text-align: center;
@@ -24,7 +24,9 @@ header {
     margin-right: 10px;
   }
 
-  h1 {
+  .site-title {
+    display: block;
+    line-height: 1.2;
     font-size: 56px;
     font-weight: 900;
     margin: 0;
@@ -234,7 +236,7 @@ header {
   }
 }
 
-nav {
+#mainNav {
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.35s ease;
@@ -305,14 +307,14 @@ nav {
       height: 46px;
     }
 
-    h1 {
+    .site-title {
       font-size: 38px;
     }
   }
 }
 
 @media (max-width: 600px) {
-  header {
+  .site-header {
     padding: 4px 4px 2px 4px;
   }
 
@@ -371,13 +373,13 @@ nav {
       margin-right: 6px;
     }
 
-    h1 {
+    .site-title {
       font-size: 24px;
       white-space: nowrap;
     }
   }
 
-  nav ul li {
+  #mainNav ul li {
     flex: 1 1 30%;
     margin-bottom: 10px;
 
@@ -388,7 +390,7 @@ nav {
 }
 
 @media (max-width: 400px) {
-  header {
+  .site-header {
     padding: 2px;
     width: 100%;
     box-sizing: border-box;
@@ -400,7 +402,7 @@ nav {
       margin-right: 4px;
     }
 
-    h1 {
+    .site-title {
       font-size: 19px;
       white-space: nowrap;
     }
@@ -419,7 +421,7 @@ nav {
     font-size: 13px;
   }
 
-  nav ul li {
+  #mainNav ul li {
     flex: 1 1 30%;
     margin-bottom: 4px;
 
@@ -430,7 +432,7 @@ nav {
 }
 
 @media (max-width: 340px) {
-  .logo-title h1 {
+  .logo-title .site-title {
     font-size: 16px;
   }
 }

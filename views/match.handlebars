@@ -1,13 +1,14 @@
-<link rel="stylesheet" href="/../css/match-pitch.css" />
-<script src="./../controllers/refetch-ui.js"></script>
-<script type="module" src="./../controllers/match.js"></script>
+<link rel="stylesheet" href="/css/match-pitch.css" />
+<script src="/controllers/refetch-ui.js"></script>
+<script type="module" src="/controllers/match.js"></script>
 <div class="container match-page">
   {{#if matchInfo}}
+  <h1 class="visually-hidden">{{matchInfo.teams.home.name}} vs {{matchInfo.teams.away.name}}{{#if headerLeagueName}}, {{headerLeagueName}}{{/if}}</h1>
   <div class="match-header">
     <div class="team">
-      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}"
-        title="{{matchInfo.teams.home.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'" />
-      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.home.id}}'">
+      <img class="cursor-pointer" src="/images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}"
+        title="{{matchInfo.teams.home.name}}" onclick="window.location.href='{{teamUrl matchInfo.teams.home.id matchInfo.teams.home.name}}'" />
+      <div class="cursor-pointer" onclick="window.location.href='{{teamUrl matchInfo.teams.home.id matchInfo.teams.home.name}}'">
         {{matchInfo.teams.home.name}}</div>
       <div class="elo-change-line" title="Current Elo">
         Elo {{#if matchElo.home}}{{matchElo.home}}{{else}}—{{/if}}
@@ -17,7 +18,7 @@
     <div class="score-section">
       <div class="score">{{matchInfo.goals.home}} - {{matchInfo.goals.away}}</div>
       <div><a class="cursor-pointer" style="color: white;"
-          href="/league?id={{matchInfo.league.id}}">{{headerLeagueName}}</a> - {{matchInfo.league.round}}</div>
+          href="{{leagueUrl matchInfo.league.id matchInfo.league.season}}">{{headerLeagueName}}</a> - {{matchInfo.league.round}}</div>
       {{#if matchVenue}}<div class="match-venue">{{formatDate matchInfo.fixture.date}} - {{matchVenue}}</div>{{/if}}
       <span class="status">{{matchInfo.fixture.status.short}}</span>
       {{#if matchElo.change}}
@@ -34,9 +35,9 @@
     </div>
 
     <div class="team">
-      <img class="cursor-pointer" src="images/logos/{{matchInfo.teams.away.id}}.png" alt="{{matchInfo.teams.away.name}}"
-        title="{{matchInfo.teams.away.name}}" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'" />
-      <div class="cursor-pointer" onclick="window.location.href='team?ID={{matchInfo.teams.away.id}}'">
+      <img class="cursor-pointer" src="/images/logos/{{matchInfo.teams.away.id}}.png" alt="{{matchInfo.teams.away.name}}"
+        title="{{matchInfo.teams.away.name}}" onclick="window.location.href='{{teamUrl matchInfo.teams.away.id matchInfo.teams.away.name}}'" />
+      <div class="cursor-pointer" onclick="window.location.href='{{teamUrl matchInfo.teams.away.id matchInfo.teams.away.name}}'">
         {{matchInfo.teams.away.name}}</div>
       <div class="elo-change-line" title="Current Elo">
         Elo {{#if matchElo.away}}{{matchElo.away}}{{else}}—{{/if}}
@@ -89,7 +90,7 @@
             <tr class="lineup-player-row">
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
-                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+                  href="{{playerUrl this.player.id this.player.name}}">{{this.player.name}}</a></td>
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
@@ -107,7 +108,7 @@
             <tr class="lineup-player-row lineup-sub-row">
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
-                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+                  href="{{playerUrl this.player.id this.player.name}}">{{this.player.name}}</a></td>
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
@@ -163,7 +164,7 @@
               <div class="event-side event-side-home">
                 {{#if (eq this.team.id ../matchInfo.teams.home.id)}}
                 <span class="event-text"><a class="event-player-link cursor-pointer"
-                    href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}}
+                    href="{{playerUrl this.player.id this.player.name}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}}
                   ({{this.detail}}){{/if}}</span>
                 {{/if}}
               </div>
@@ -173,7 +174,7 @@
               <div class="event-side event-side-away">
                 {{#if (eq this.team.id ../matchInfo.teams.away.id)}}
                 <span class="event-text"><a class="event-player-link cursor-pointer"
-                    href="/player?id={{this.player.id}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}}
+                    href="{{playerUrl this.player.id this.player.name}}">{{this.player.name}}</a> - {{this.type}}{{#if this.detail}}
                   ({{this.detail}}){{/if}}</span>
                 {{/if}}
               </div>
@@ -263,7 +264,7 @@
             <tr class="lineup-player-row">
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
-                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+                  href="{{playerUrl this.player.id this.player.name}}">{{this.player.name}}</a></td>
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
@@ -281,7 +282,7 @@
             <tr class="lineup-player-row lineup-sub-row">
               <td class="lineup-number-td">{{this.player.number}}</td>
               <td><a class="lineup-player-name cursor-pointer"
-                  href="/player?id={{this.player.id}}">{{this.player.name}}</a></td>
+                  href="{{playerUrl this.player.id this.player.name}}">{{this.player.name}}</a></td>
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xg")}}<td class="lineup-xg-td" title="xG">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xg") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xgot")}}<td class="lineup-xg-td" title="xGOT">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xgot") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
               {{#if (fotmobHasLineupStat ../../matchInfo.fotmob "xa")}}<td class="lineup-xg-td" title="xA">{{#with (matchLineupStat ../../matchInfo.fotmob ../../matchInfo.teams.home.id ../team.id this.player.name this.player.number "xa") as |xg|}}{{#if xg}}{{xg}}{{else}}-{{/if}}{{/with}}</td>{{/if}}
@@ -333,9 +334,9 @@
       <div class="team-preview-summary">
         <div class="team-header">
           <div class="team-header-name">
-            <img class="cursor-pointer" src="images/logos/{{this.id}}.png" alt="{{this.name}}" title="{{this.name}}"
-              onclick="window.location.href='team?ID={{this.id}}'" />
-            <h3 class="cursor-pointer" onclick="window.location.href='team?ID={{this.id}}'">{{this.name}}</h3>
+            <img class="cursor-pointer" src="/images/logos/{{this.id}}.png" alt="{{this.name}}" title="{{this.name}}"
+              onclick="window.location.href='{{teamUrl this.id this.name}}'" />
+            <h3 class="cursor-pointer" onclick="window.location.href='{{teamUrl this.id this.name}}'">{{this.name}}</h3>
           </div>
           {{> team-form}}
         </div>
@@ -401,8 +402,8 @@
     <div class="rectangle">
     <div class="h2h-summary">
       <div class="h2h-summary-grid">
-        <a class="h2h-summary-team" href="/team?ID={{home.id}}">
-          <img src="images/logos/{{home.id}}.png" alt="{{home.name}}" />
+        <a class="h2h-summary-team" href="{{teamUrl home.id home.name}}">
+          <img src="/images/logos/{{home.id}}.png" alt="{{home.name}}" />
           <span>{{home.name}}</span>
         </a>
         <div>
@@ -413,8 +414,8 @@
           </div>
           <div class="h2h-count-labels"><span>Wins</span><span>Draws</span><span>Wins</span></div>
         </div>
-        <a class="h2h-summary-team" href="/team?ID={{away.id}}">
-          <img src="images/logos/{{away.id}}.png" alt="{{away.name}}" />
+        <a class="h2h-summary-team" href="{{teamUrl away.id away.name}}">
+          <img src="/images/logos/{{away.id}}.png" alt="{{away.name}}" />
           <span>{{away.name}}</span>
         </a>
       </div>

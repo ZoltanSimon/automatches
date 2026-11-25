@@ -1,21 +1,21 @@
-<div class="match-detail cursor-pointer" data-match-id="{{this.id}}" role="link" tabindex="0"
+<div class="match-detail cursor-pointer" data-match-id="{{this.id}}" data-match-url="{{matchUrl this}}" role="link" tabindex="0"
   aria-label="Open match {{this.homeTeam.name}} vs {{this.awayTeam.name}}">
   <div class="match-opponent">
     <div class="home-side">
-      <a href="/team?ID={{this.homeTeam.id}}" aria-label="{{this.homeTeam.name}} team page">
-        <img width="40px" src="images/logos/{{this.homeTeam.id}}.png" alt="{{this.homeTeam.name}}">
+      <a href="{{teamUrl this.homeTeam.id this.homeTeam.name}}" aria-label="{{this.homeTeam.name}} team page">
+        <img width="40px" src="/images/logos/{{this.homeTeam.id}}.png" alt="{{this.homeTeam.name}}">
       </a>
-      <a class="team-name" href="/team?ID={{this.homeTeam.id}}">{{this.homeTeam.name}}</a>
+      <a class="team-name" href="{{teamUrl this.homeTeam.id this.homeTeam.name}}">{{this.homeTeam.name}}</a>
     </div>
     <div class="center-info">
       <span class="match-score">{{#if this.result}}<span class="form-indicator {{this.result}}" title="{{this.result}}"></span>{{/if}}{{this.homeScore}} - {{this.awayScore}}</span>
       <span class="match-date"><a class="match-competition-link"
-          href="/league?id={{this.leagueId}}">{{this.league}}</a> - {{formatDate this.date}}</span>
+          href="{{leagueUrl this.leagueId}}">{{this.league}}</a> - {{formatDate this.date}}</span>
     </div>
     <div class="away-side">
-      <a class="team-name" href="/team?ID={{this.awayTeam.id}}">{{this.awayTeam.name}}</a>
-      <a href="/team?ID={{this.awayTeam.id}}" aria-label="{{this.awayTeam.name}} team page">
-        <img width="40px" src="images/logos/{{this.awayTeam.id}}.png" alt="{{this.awayTeam.name}}">
+      <a class="team-name" href="{{teamUrl this.awayTeam.id this.awayTeam.name}}">{{this.awayTeam.name}}</a>
+      <a href="{{teamUrl this.awayTeam.id this.awayTeam.name}}" aria-label="{{this.awayTeam.name}} team page">
+        <img width="40px" src="/images/logos/{{this.awayTeam.id}}.png" alt="{{this.awayTeam.name}}">
       </a>
     </div>
   </div>

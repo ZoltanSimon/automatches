@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">The fourteen player roles on the pitch</title>
+  <desc id="d">A pitch with the team attacking to the right. From the goal outwards: GK, then CB with LB and RB either side, LWB and RWB wider and further up, DM, CM with LM and RM, AM, LW and RW on the wings, and ST up front.</desc>
+  <rect width="800" height="450" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">Fourteen roles, from goalkeeper to striker</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">Team attacking left to right, so the right-sided roles sit at the bottom</text>
+  <rect x="32" y="84" width="736" height="340" rx="6" fill="#2E8B57"/>
+  <rect x="32" y="84" width="73.6" height="340" fill="#33975F"/>
+  <rect x="179.2" y="84" width="73.6" height="340" fill="#33975F"/>
+  <rect x="326.4" y="84" width="73.6" height="340" fill="#33975F"/>
+  <rect x="473.6" y="84" width="73.6" height="340" fill="#33975F"/>
+  <rect x="620.8" y="84" width="73.6" height="340" fill="#33975F"/>
+  <rect x="32" y="84" width="736" height="340" rx="6" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2" fill="none"/>
+  <line x1="400" y1="84" x2="400" y2="424" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2" fill="none"/>
+  <circle cx="400" cy="254" r="45.900000000000006" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2" fill="none"/>
+  <rect x="32" y="153.19" width="115.552" height="201.62" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2" fill="none"/>
+  <rect x="652.448" y="153.19" width="115.552" height="201.62" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2" fill="none"/>
+  <rect x="32" y="208.1" width="38.272" height="91.80000000000001" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2" fill="none"/>
+  <rect x="729.728" y="208.1" width="38.272" height="91.80000000000001" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2" fill="none"/>
+  <path d="M 698 70 l 50 0 m -10 -6 l 10 6 l -10 6" stroke="#279B65" stroke-width="3" fill="none"/>
+  <text x="688" y="75" font-size="14" font-weight="700" fill="#279B65" text-anchor="end">Attack</text>
+  <circle cx="68.8" cy="254.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="68.8" y="259.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">GK</text>
+  <text x="68.8" y="292.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Goalkeeper</text>
+  <circle cx="179.2" cy="254.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="179.2" y="259.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">CB</text>
+  <text x="179.2" y="292.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Centre back</text>
+  <circle cx="201.3" cy="141.8" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="201.3" y="146.8" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">LB</text>
+  <text x="201.3" y="179.8" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Left back</text>
+  <circle cx="201.3" cy="362.8" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="201.3" y="367.8" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">RB</text>
+  <text x="201.3" y="400.8" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Right back</text>
+  <circle cx="297.0" cy="124.8" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="297.0" y="129.8" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">LWB</text>
+  <text x="297.0" y="162.8" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Left wing back</text>
+  <circle cx="297.0" cy="369.6" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="297.0" y="374.6" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">RWB</text>
+  <text x="297.0" y="407.6" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Right wing back</text>
+  <circle cx="297.0" cy="254.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="297.0" y="259.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">DM</text>
+  <text x="297.0" y="292.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Defensive mid</text>
+  <circle cx="400.0" cy="254.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="400.0" y="259.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">CM</text>
+  <text x="400.0" y="292.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Central mid</text>
+  <circle cx="422.1" cy="152.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="422.1" y="157.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">LM</text>
+  <text x="422.1" y="190.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Left mid</text>
+  <circle cx="422.1" cy="356.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="422.1" y="361.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">RM</text>
+  <text x="422.1" y="394.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Right mid</text>
+  <circle cx="510.4" cy="254.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="510.4" y="259.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">AM</text>
+  <text x="510.4" y="292.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Attacking mid</text>
+  <circle cx="584.0" cy="141.8" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="584.0" y="146.8" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">LW</text>
+  <text x="584.0" y="179.8" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Left winger</text>
+  <circle cx="584.0" cy="366.2" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="584.0" y="371.2" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">RW</text>
+  <text x="584.0" y="404.2" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Right winger</text>
+  <circle cx="665.0" cy="254.0" r="21" fill="#1D3557" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="665.0" y="259.0" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">ST</text>
+  <text x="665.0" y="292.0" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" stroke="#1D3557" stroke-width="3" stroke-opacity="0.55" paint-order="stroke">Striker</text>
+</svg>

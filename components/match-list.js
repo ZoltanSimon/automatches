@@ -46,7 +46,7 @@ let yPos = 220;
       thisTime = `<td style="text-align: center;">${date.getUTCHours()} : ${(date.getMinutes() < 10 ? "0" : "") + date.getMinutes()}</td>`;
       thisDate = `<td style="text-align: center;">${dateToAdd}</td>`;
     } else {
-      thisID = `<td width=40 rowspan=2><img width=40 src="images/competitions/${element.league.id}.png"/></td>`;
+      thisID = `<td width=40 rowspan=2><img width=40 src="/images/competitions/${element.league.id}.png"/></td>`;
       thisTime = ``;
       thisDate = `<td rowspan=2 style="text-align: center;">${date.getUTCHours()} : ${(date.getMinutes() < 10 ? "0" : "") + date.getMinutes()}</td>`;
     }

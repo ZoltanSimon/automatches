@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">Common table abbreviations</title>
+  <desc id="d">Eight abbreviations from Generation Football tables: xG, xGA, xPts, GD, Rtg, NPG, GA/90 and SecPos, each with its full name.</desc>
+  <rect width="800" height="450" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">Short labels, full meanings</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">Every abbreviation used in our tables, explained</text>
+  <rect x="32" y="96" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="44" y="110" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="92" y="137" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">xG</text>
+  <text x="156" y="137" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Expected goals</text>
+  <rect x="404" y="96" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="416" y="110" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="464" y="137" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">xGA</text>
+  <text x="528" y="137" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Expected goals against</text>
+  <rect x="32" y="180" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="44" y="194" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="92" y="221" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">xPts</text>
+  <text x="156" y="221" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Expected points</text>
+  <rect x="404" y="180" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="416" y="194" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="464" y="221" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">GD</text>
+  <text x="528" y="221" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Goal difference</text>
+  <rect x="32" y="264" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="44" y="278" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="92" y="305" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">Rtg</text>
+  <text x="156" y="305" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Rating</text>
+  <rect x="404" y="264" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="416" y="278" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="464" y="305" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">NPG</text>
+  <text x="528" y="305" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Non-penalty goals</text>
+  <rect x="32" y="348" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="44" y="362" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="92" y="389" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">GA/90</text>
+  <text x="156" y="389" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Goals + assists per 90</text>
+  <rect x="404" y="348" width="356" height="68" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <rect x="416" y="362" width="96" height="40" rx="6" fill="#1D3557"/>
+  <text x="464" y="389" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">SecPos</text>
+  <text x="528" y="389" font-size="18" font-weight="600" fill="#1D3557" text-anchor="start">Secondary position</text>
+</svg>

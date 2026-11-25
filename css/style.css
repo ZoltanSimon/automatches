@@ -21,9 +21,29 @@ main {
   margin-bottom: 30px;
 }
 
+h1,
 h2 {
   margin-top: 0px;
   display: inline-block;
+}
+.heading-plain {
+  display: block;
+  font: inherit;
+  margin: 0;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 table {
@@ -134,35 +154,6 @@ footer .donate-button {
 
 .content {
   padding: 20px;
-}
-
-.wiki-icon-list {
-  list-style: none;
-  padding: 0;
-  margin: 12px 0 16px;
-  display: grid;
-  gap: 12px;
-  color: #1d3557;
-  --stat-icon-primary: #1d3557;
-  --stat-icon-secondary: #f1faee;
-}
-.wiki-icon-list li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.wiki-icon-list svg,
-.wiki-icon-list .yellow-card,
-.wiki-icon-list .red-card {
-  flex: 0 0 auto;
-}
-
-.wiki-abbr-list {
-  margin: 8px 0 16px;
-  padding-left: 1.2em;
-}
-.wiki-abbr-list li {
-  margin: 6px 0;
 }
 
 .wiki-info {
@@ -816,6 +807,9 @@ footer .donate-button {
 #right .rect-expand-league-list.active a::before {
   content: "▲ ";
 }
+.rectangle h1,
+#left h1,
+#right h1,
 .rectangle h2,
 #left h2,
 #right h2 {
@@ -823,6 +817,9 @@ footer .donate-button {
   color: #1d3557;
   margin: 0;
 }
+.rectangle .rect-title h1,
+#left .rect-title h1,
+#right .rect-title h1,
 .rectangle .rect-title h2,
 #left .rect-title h2,
 #right .rect-title h2 {
@@ -866,6 +863,7 @@ footer .donate-button {
   display: none;
 }
 
+.league-info h1,
 .league-info h2 {
   font-size: 42px;
   font-weight: 400;
@@ -2981,6 +2979,9 @@ tr td.match-list-center-td + td.match-list-center-td {
     max-height: 100px;
     opacity: 1;
   }
+  .rectangle h1,
+  #left h1,
+  #right h1,
   .rectangle h2,
   #left h2,
   #right h2 {
@@ -3128,6 +3129,9 @@ tr td.match-list-center-td + td.match-list-center-td {
   #right {
     padding-inline: 0;
   }
+  .rectangle h1,
+  #left h1,
+  #right h1,
   .rectangle h2,
   #left h2,
   #right h2 {

@@ -1,11 +1,11 @@
 <div class="rect-header{{#if headerClass}} {{headerClass}}{{/if}}">
   <div class="rect-title">
-    <h2>
+    {{#if (eq level 1)}}<h1>{{else}}<h2>{{/if}}
       {{#if titleLogoId}}
         <img class="rect-title-logo" src="/images/competitions/{{titleLogoId}}.png" alt="{{#if titleLogoAlt}}{{titleLogoAlt}}{{else}}{{title}}{{/if}}" />
       {{/if}}
       {{title}}
-    </h2>
+    {{#if (eq level 1)}}</h1>{{else}}</h2>{{/if}}
   </div>
   {{#unless hideExpand}}
   <div class="rect-expand">
@@ -20,7 +20,7 @@
   </div>
   {{/unless}}
   {{#if wikiInfo}}
-    {{> wiki-info lead=wikiInfo anchor=wikiAnchor}}
+    {{> wiki-info lead=wikiInfo article=wikiArticle}}
   {{/if}}
   {{#if showLeagueChip}}
   <div id="active-view-bar" class="active-view-bar active-view-bar--inline" hidden></div>

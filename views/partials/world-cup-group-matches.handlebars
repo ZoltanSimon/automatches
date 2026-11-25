@@ -15,16 +15,16 @@
       {{#each groupRound.matches as |match|}}
       <tr>
         <td style="text-align: center; white-space: nowrap;">{{formatDateOnly match.fixture.date}}</td>
-        <td style="cursor:pointer;" onclick="window.location.href='/team?ID={{match.teams.home.id}}'">
+        <td style="cursor:pointer;" onclick="window.location.href='{{teamUrl match.teams.home.id match.teams.home.name}}'">
           <span style="display: inline-flex; align-items: center; gap: 6px;">
-            <img src="images/logos/{{match.teams.home.id}}.png" alt="{{match.teams.home.name}}" title="{{match.teams.home.name}}" width="20" height="20" />
+            <img src="/images/logos/{{match.teams.home.id}}.png" alt="{{match.teams.home.name}}" title="{{match.teams.home.name}}" width="20" height="20" />
             <span>{{match.teams.home.name}}</span>
           </span>
         </td>
         <td style="text-align: center; font-weight: bold;">{{match.scoreDisplay}}</td>
-        <td style="cursor:pointer;" onclick="window.location.href='/team?ID={{match.teams.away.id}}'">
+        <td style="cursor:pointer;" onclick="window.location.href='{{teamUrl match.teams.away.id match.teams.away.name}}'">
           <span style="display: inline-flex; align-items: center; gap: 6px;">
-            <img src="images/logos/{{match.teams.away.id}}.png" alt="{{match.teams.away.name}}" title="{{match.teams.away.name}}" width="20" height="20" />
+            <img src="/images/logos/{{match.teams.away.id}}.png" alt="{{match.teams.away.name}}" title="{{match.teams.away.name}}" width="20" height="20" />
             <span>{{match.teams.away.name}}</span>
           </span>
         </td>

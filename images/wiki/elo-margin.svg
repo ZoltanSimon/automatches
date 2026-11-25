@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="800" height="360" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">Elo margin-of-victory multiplier</title>
+  <desc id="d">A draw or one-goal win multiplies the rating change by 1, a two-goal win by 1.5, and wider margins by (11 + goal difference) / 8: 1.75 for three goals, 1.875 for four, 2 for five.</desc>
+  <rect width="800" height="360" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">Wider wins count a little more</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">Multiplier applied to the rating change, by goal difference</text>
+  <line x1="90" y1="300" x2="734" y2="300" stroke="#1D3557" stroke-width="2"/>
+  <rect x="110" y="200" width="70" height="100" rx="5" fill="#A8DADC"/>
+  <text x="145" y="190" font-size="17" font-weight="700" fill="#1D3557" text-anchor="middle">×1</text>
+  <text x="145" y="324" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">Draw or 1</text>
+  <rect x="214" y="150" width="70" height="150" rx="5" fill="#457B9D"/>
+  <text x="249" y="140" font-size="17" font-weight="700" fill="#1D3557" text-anchor="middle">×1.5</text>
+  <text x="249" y="324" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">2</text>
+  <rect x="318" y="125" width="70" height="175" rx="5" fill="#457B9D"/>
+  <text x="353" y="115" font-size="17" font-weight="700" fill="#1D3557" text-anchor="middle">×1.75</text>
+  <text x="353" y="324" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">3</text>
+  <rect x="422" y="112.5" width="70" height="187.5" rx="5" fill="#457B9D"/>
+  <text x="457" y="102.5" font-size="17" font-weight="700" fill="#1D3557" text-anchor="middle">×1.875</text>
+  <text x="457" y="324" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">4</text>
+  <rect x="526" y="100" width="70" height="200" rx="5" fill="#457B9D"/>
+  <text x="561" y="90" font-size="17" font-weight="700" fill="#1D3557" text-anchor="middle">×2</text>
+  <text x="561" y="324" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">5</text>
+  <rect x="630" y="87.5" width="70" height="212.5" rx="5" fill="#457B9D"/>
+  <text x="665" y="77.5" font-size="17" font-weight="700" fill="#1D3557" text-anchor="middle">×2.125</text>
+  <text x="665" y="324" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">6</text>
+  <text x="400" y="350" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">Goal difference</text>
+</svg>

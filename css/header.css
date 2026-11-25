@@ -1,5 +1,5 @@
 @charset "UTF-8";
-header {
+.site-header {
   background-color: #457B9D;
   color: #fff;
   text-align: center;
@@ -22,7 +22,9 @@ header {
   height: 60px;
   margin-right: 10px;
 }
-.logo-title h1 {
+.logo-title .site-title {
+  display: block;
+  line-height: 1.2;
   font-size: 56px;
   font-weight: 900;
   margin: 0;
@@ -217,7 +219,7 @@ header {
   background-color: rgba(230, 57, 70, 0.8);
 }
 
-nav {
+#mainNav {
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.35s ease;
@@ -225,10 +227,10 @@ nav {
   margin-bottom: 4px;
   text-align: center;
 }
-nav.nav-open {
+#mainNav.nav-open {
   max-height: 400px;
 }
-nav ul {
+#mainNav ul {
   display: flex;
   flex-wrap: wrap;
   padding: 0;
@@ -237,12 +239,12 @@ nav ul {
   max-width: 740px;
   justify-content: center;
 }
-nav ul li {
+#mainNav ul li {
   flex: 1 1 15%;
   margin: 5px;
   box-sizing: border-box;
 }
-nav ul li a {
+#mainNav ul li a {
   font-weight: 700;
   font-size: 15px;
   padding: 6px 20px;
@@ -254,7 +256,7 @@ nav ul li a {
   display: block;
   text-align: center;
 }
-nav ul li a:hover {
+#mainNav ul li a:hover {
   background-color: rgba(230, 57, 70, 0.9);
   transform: scale(1.05);
 }
@@ -278,12 +280,12 @@ nav ul li a:hover {
   .logo-title img {
     height: 46px;
   }
-  .logo-title h1 {
+  .logo-title .site-title {
     font-size: 38px;
   }
 }
 @media (max-width: 600px) {
-  header {
+  .site-header {
     padding: 4px 4px 2px 4px;
   }
   .logo-title {
@@ -330,20 +332,20 @@ nav ul li a:hover {
     height: 32px;
     margin-right: 6px;
   }
-  .logo-title h1 {
+  .logo-title .site-title {
     font-size: 24px;
     white-space: nowrap;
   }
-  nav ul li {
+  #mainNav ul li {
     flex: 1 1 30%;
     margin-bottom: 10px;
   }
-  nav ul li:nth-last-child(-n+3) {
+  #mainNav ul li:nth-last-child(-n+3) {
     margin-bottom: 0;
   }
 }
 @media (max-width: 400px) {
-  header {
+  .site-header {
     padding: 2px;
     width: 100%;
     box-sizing: border-box;
@@ -352,7 +354,7 @@ nav ul li a:hover {
     height: 26px;
     margin-right: 4px;
   }
-  .logo-title h1 {
+  .logo-title .site-title {
     font-size: 19px;
     white-space: nowrap;
   }
@@ -366,16 +368,16 @@ nav ul li a:hover {
   .league-search-link {
     font-size: 13px;
   }
-  nav ul li {
+  #mainNav ul li {
     flex: 1 1 30%;
     margin-bottom: 4px;
   }
-  nav ul li:nth-last-child(-n+3) {
+  #mainNav ul li:nth-last-child(-n+3) {
     margin-bottom: 0;
   }
 }
 @media (max-width: 340px) {
-  .logo-title h1 {
+  .logo-title .site-title {
     font-size: 16px;
   }
 }/*# sourceMappingURL=header.css.map */

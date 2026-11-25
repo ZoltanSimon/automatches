@@ -1,9 +1,9 @@
-<script type="module" src="./../controllers/top-teams.js"></script>
+<script type="module" src="/controllers/top-teams.js"></script>
 
 <div class="small-container">
   <div class="teams-page-layout">
     <div class="rectangle">
-      {{> rect-header title="Top Teams" link="" leagues=leagues selectedLeagues=selectedTLeagues leaguepar="tleague" }}
+      {{> rect-header level=1 title="Top Teams" link="" leagues=leagues selectedLeagues=selectedTLeagues leaguepar="tleague" }}
 
       <div id="top-team-list">
         {{> team-list-table big=true}}

@@ -15,7 +15,7 @@
 {{#if subOffMinute}}<span class="match-pitch-sub" title="Substituted {{subOffMinute}}"><span class="match-pitch-sub-arrow" aria-hidden="true">&#9660;</span><span class="match-pitch-sub-minute">{{subOffMinute}}</span></span>{{/if}}
 {{/inline}}
 {{#if linkable}}
-<a class="s11-player match-pitch-player{{#if isGK}} is-gk{{/if}}" href="/player?id={{id}}"
+<a class="s11-player match-pitch-player{{#if isGK}} is-gk{{/if}}" href="{{playerUrl id fullName}}"
   style="left:{{x}}%;top:{{y}}%;{{kitStyle}}" title="{{number}} {{fullName}}"
   aria-label="{{fullName}}, number {{number}}: open player profile">{{> pitchPlayerBody}}</a>
 {{else}}

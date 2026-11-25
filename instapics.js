@@ -5,8 +5,8 @@ let c = document.getElementById("my-canvas");
 export let ctx = c?.getContext("2d");
 const font = "sans-serif";
 const fontSize = 46;
-const backgroundImageName = "images/insta_new_no_pic.png";
-const borderImage = "images/border.png";
+const backgroundImageName = "/images/insta_new_no_pic.png";
+const borderImage = "/images/border.png";
 const lineheight = 50;
 let newWidth, newHeight, base_image;
 export let fontY;
@@ -126,7 +126,7 @@ export function loadClubLogo(clubToLoad) {
 export function loadPlayerFace(playerToLoad) {
   var img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = `images/player-pictures/${playerToLoad}.png`;
+  img.src = `/images/player-pictures/${playerToLoad}.png`;
   if (!imgs.players) imgs.players = [];
   imgs.players[playerToLoad] = img;
 }
@@ -134,7 +134,7 @@ export function loadPlayerFace(playerToLoad) {
 export function loadCompLogo(compToLoad) {
   var img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = `images/competitions/${compToLoad}.png`;
+  img.src = `/images/competitions/${compToLoad}.png`;
   if (!imgs.leagues) imgs.leagues = [];
   imgs.leagues[compToLoad] = img;
 }

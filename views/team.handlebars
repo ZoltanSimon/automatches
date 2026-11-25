@@ -1,11 +1,11 @@
-<script src="./../controllers/refetch-ui.js"></script>
-<script type="module" src="./../controllers/team.js"></script>
+<script src="/controllers/refetch-ui.js"></script>
+<script type="module" src="/controllers/team.js"></script>
 
 <div class="container">
     <div class="team-page-header team-page-header--team">
         <div class="team">
-            <img src="images/logos/{{thisTeam.ID}}.png" alt="{{thisTeam.Name}}">
-            <div>{{thisTeam.name}}</div>
+            <img src="/images/logos/{{thisTeam.ID}}.png" alt="{{thisTeam.name}} logo">
+            <h1 class="heading-plain">{{thisTeam.name}}</h1>
             {{#if isLocal}}
             <button type="button" id="refetch-team-btn" class="match-refetch-btn" data-team-id="{{thisTeam.ID}}">
                 Refetch
@@ -14,7 +14,7 @@
         </div>
         <div class="team-details">
             {{#if teamNation}}
-            <div class="team-meta">Nation: <img class="nation-flag" src="images/logos/{{teamNation.ID}}.png" alt="">
+            <div class="team-meta">Nation: <img class="nation-flag" src="/images/logos/{{teamNation.ID}}.png" alt="">
                 {{teamNation.name}}</div>
             {{/if}}
             {{#if teamStadium}}<div class="team-meta">Stadium: {{teamStadium}}</div>{{/if}}
@@ -23,9 +23,9 @@
         <div class="team-info stat">
             <div class="team-competitions">
                 {{#each teamStats.[0].leagues}}
-                <div onclick="window.location.href='/league?id={{this.id}}'"
+                <div onclick="window.location.href='{{leagueUrl this.id}}'"
                     style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                    <img src="images/competitions/{{this.id}}.png" class="logo-picture" />
+                    <img src="/images/competitions/{{this.id}}.png" class="logo-picture" />
                     <span>{{this.name}}</span>
                 </div>
                 {{/each}}
@@ -35,7 +35,7 @@
     </div>
     <div class="rectangle" id="team-statistics">
         {{> rect-header title="Statistics" hideExpand=true wikiInfo="How the average team rating is calculated:"
-        wikiAnchor="team-rating"}}
+        wikiArticle="average-team-rating"}}
         <div class="table-container" style="grid-column: 1 / 4; width: 100%;">
             {{> team-summary teamStats.[0] eloMonthChange=eloMonthChange}}
             {{> team-stats-table teamStats.[0]}}
@@ -63,9 +63,9 @@
             {{#if teamTopScorers.length}}Their current top {{#if (eq teamTopScorers.length 1)}}scorer is{{else}}scorers
             are{{/if}}
             {{#each teamTopScorers}}{{#unless @first}}{{#if @last}} and {{else}}, {{/if}}{{/unless}}<a
-                href="/player?id={{this.id}}">{{this.name}}</a>{{/each}}
+                href="{{playerUrl this.id this.name}}">{{this.name}}</a>{{/each}}
             with {{plural topGoals "goal"}}{{#unless (eq teamTopScorers.length 1)}} each{{/unless}}.{{/if}}
-            {{#if eloMonthChange}}Their current <a href="/gf-wiki#elo">Elo rating</a> is {{eloMonthChange.current}},
+            {{#if eloMonthChange}}Their current <a href="/wiki/elo-ratings">Elo rating</a> is {{eloMonthChange.current}},
             {{#if (eq eloMonthChange.direction "flat")}}unchanged over the last 30 days{{else}}which has changed by
             {{eloMonthChange.display}} over the last 30 days{{/if}}.{{/if}}<br /><br />
             If you are interested in the featured competitions, click on the competition icons next to the team's logo
@@ -86,10 +86,10 @@
             <h2>Players</h2>
             {{#if showAllPlayerStats}}
             <span class="team-players-scope">Showing all competitions</span>
-            <a class="more-link more-button" href="/team?ID={{thisTeam.ID}}">Show latest tournament</a>
+            <a class="more-link more-button" href="{{teamUrl thisTeam.ID thisTeam.name}}">Show latest tournament</a>
             {{else}}
             <span class="team-players-scope">Showing latest tournament: <strong>{{selectedPlayerStatsLeagueName}}</strong></span>
-            <a class="more-link more-button" href="/team?ID={{thisTeam.ID}}&allStats=1">Show all stats</a>
+            <a class="more-link more-button" href="{{teamUrl thisTeam.ID thisTeam.name allStats=1}}">Show all stats</a>
             {{/if}}
         </div>
         <div id="player-list" class="table-container">

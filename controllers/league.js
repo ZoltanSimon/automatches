@@ -9,9 +9,9 @@ const seasonSelect = document.getElementById("league-season-select");
 
 if (seasonSelect) {
 	seasonSelect.addEventListener("change", () => {
-		const leagueID = seasonSelect.dataset.leagueId;
-		const season = seasonSelect.value;
-		window.location.assign(`/league?id=${encodeURIComponent(leagueID)}&season=${encodeURIComponent(season)}`);
+		// Each option carries its canonical URL, rendered server-side.
+		const url = seasonSelect.selectedOptions[0]?.dataset.url;
+		if (url) window.location.assign(url);
 	});
 }
 

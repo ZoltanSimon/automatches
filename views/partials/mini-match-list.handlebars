@@ -21,40 +21,40 @@
         {{#each matches}}
         <tr data-round="{{this.league.round}}">
             <td class="match-list-league-logo-td">
-                <a href="league?id={{this.league.id}}"><img width=40 class="match-list-comp-logo" src="images/competitions/{{this.league.id}}.png" /></a>
+                <a href="{{leagueUrl this.league.id}}"><img width=40 class="match-list-comp-logo" src="/images/competitions/{{this.league.id}}.png" /></a>
             </td>
-            <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+            <td class="match-list-date" onclick="window.location.href='{{matchUrl this}}'">
                 {{formatDateOnly fixture.date}}
             </td>
             <td class="match-list-team-name-td" style="border-right: 0; padding-right: 0px;" id="{{teams.home.id}}"
-                onclick="window.location.href='team?ID={{teams.home.id}}'">
+                onclick="window.location.href='{{teamUrl teams.home.id teams.home.name}}'">
                 {{teams.home.name}}
             </td>
 
             <td class="match-list-logo-td" style="border-left: 0;"
-                onclick="window.location.href='team?ID={{teams.home.id}}'">
-                <img class="match-list-team-logo" src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}" title="{{teams.home.name}}" width="44px">
+                onclick="window.location.href='{{teamUrl teams.home.id teams.home.name}}'">
+                <img class="match-list-team-logo" src="/images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}" title="{{teams.home.name}}" width="44px">
             </td>
 
-            <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+            <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
                 {{goals.home}}
             </td>
 
-            <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+            <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
                 -
             </td>
 
-            <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+            <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
                 {{goals.away}}
             </td>
 
             <td class="match-list-logo-td right"
-                onclick="window.location.href='team?ID={{teams.away.id}}'">
-                <img class="match-list-team-logo" src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}" title="{{teams.away.name}}" width="44px">
+                onclick="window.location.href='{{teamUrl teams.away.id teams.away.name}}'">
+                <img class="match-list-team-logo" src="/images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}" title="{{teams.away.name}}" width="44px">
             </td>
 
             <td class="match-list-team-name-td" style="text-align:left; border-left: 0; padding-left: 0px;"
-                id="{{teams.away.id}}" onclick="window.location.href='team?ID={{teams.away.id}}'">
+                id="{{teams.away.id}}" onclick="window.location.href='{{teamUrl teams.away.id teams.away.name}}'">
                 {{teams.away.name}}
             </td>
             <td class="center-td player-pos-cell" title="{{formatPlayerPosition this.matchPosition}}">

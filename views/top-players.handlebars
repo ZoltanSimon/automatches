@@ -1,9 +1,9 @@
-<script type="module" src="./../controllers/top-players.js"></script>
+<script type="module" src="/controllers/top-players.js"></script>
 
 <div class="small-container">
   <div class="players-page-layout">
     <div class="rectangle">
-      {{> rect-header title="Top Players" link="" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" wikiInfo="Header icons are explained on the" }}
+      {{> rect-header level=1 title="Top Players" link="" leagues=leagues selectedLeagues=selectedPLeagues leaguepar="pleague" wikiInfo="Header icons are explained on the" }}
       <div id="player-list">
         {{> player-list-table big=true}}
       </div>

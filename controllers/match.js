@@ -42,9 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (matchCards.length > 0) {
 		matchCards.forEach((card) => {
 			const openMatchPage = () => {
-				const { matchId } = card.dataset;
-				if (!matchId) return;
-				window.location.href = `/match?matchID=${matchId}`;
+				const { matchId, matchUrl } = card.dataset;
+				if (!matchUrl && !matchId) return;
+				window.location.href = matchUrl || `/match?matchID=${matchId}`;
 			};
 
 			card.addEventListener("click", (event) => {

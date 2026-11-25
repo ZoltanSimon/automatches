@@ -12,7 +12,7 @@
     <ul class="league-search-list" role="listbox">
       {{#each leagues}}
       <li class="league-search-item">
-        <a class="league-search-link" href="/league?id={{this.id}}" role="option" aria-label="{{this.name}}">
+        <a class="league-search-link" href="{{leagueUrl this.id}}" role="option" aria-label="{{this.name}}">
           <img class="league-search-logo" src="/images/competitions/{{this.id}}.png" alt="{{this.name}}" />
           <span class="league-search-name">{{this.name}}</span>
         </a>

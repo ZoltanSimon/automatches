@@ -1,5 +1,5 @@
-<script src="controllers/refetch-ui.js"></script>
-<script src="controllers/match-list-table.js"></script>
+<script src="/controllers/refetch-ui.js"></script>
+<script src="/controllers/match-list-table.js"></script>
 <table class="gf-table" id="match-list">
   <thead>
     <tr class="main-table-header">
@@ -68,8 +68,8 @@
     {{#each groupedMatches}}
     <tr class="league-row">
       <td colspan="8" style="text-align:left; font-weight:bold; background:#457B9D;"><a
-          href="/league?id={{this.league.id}}" style="color: white; text-decoration: none;">
-          <img src="images/competitions/{{this.league.id}}.png" alt="{{this.league.name}}" width="24"
+          href="{{leagueUrl this.league.id}}" style="color: white; text-decoration: none;">
+          <img src="/images/competitions/{{this.league.id}}.png" alt="{{this.league.name}}" width="24"
             style="vertical-align:middle; margin-right:6px;" />
           {{this.league.name}}</a>
       </td>
@@ -77,43 +77,43 @@
 
     {{#each this.matches}}
     <tr id="{{fixture.id}}">
-      <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-date" onclick="window.location.href='{{matchUrl this}}'">
         {{formatTime fixture.date}}<br />
         <span class="match-list-status {{#if (eq fixture.status.short "NS")}}is-ns{{/if}}">{{fixture.status.short}}</span>
       </td>
 
       <td class="match-list-team-name-td left" id="{{teams.home.id}}"
-        onclick="window.location.href='team?ID={{teams.home.id}}'">
+        onclick="window.location.href='{{teamUrl teams.home.id teams.home.name}}'">
         {{teams.home.name}}
       </td>
 
-      <td class="match-list-logo-td left" onclick="window.location.href='team?ID={{teams.home.id}}'">
-        <img class="match-list-team-logo logo-picture" src="images/logos/{{teams.home.id}}.png"
+      <td class="match-list-logo-td left" onclick="window.location.href='{{teamUrl teams.home.id teams.home.name}}'">
+        <img class="match-list-team-logo logo-picture" src="/images/logos/{{teams.home.id}}.png"
           alt="{{teams.home.name}}" title="{{teams.home.name}}" width="44px">
       </td>
 
       {{#if (eq fixture.status.short "PST")}}
-      <td class="match-list-center-td" colspan="3" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" colspan="3" onclick="window.location.href='{{matchUrl this}}'">
         Postponed
       </td>
       {{else}}
       {{#if (eq fixture.status.short "CANC")}}
-      <td class="match-list-center-td" colspan="3" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" colspan="3" onclick="window.location.href='{{matchUrl this}}'">
         Canceled
       </td>
       {{else}}
-      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
         {{goals.home}}
         {{#if (expectedGoalsForTeam this teams.home.id)}}
         <span class="match-list-xg">({{expectedGoalsForTeam this teams.home.id}})</span>
         {{/if}}
       </td>
 
-      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
         -
       </td>
 
-      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
         {{goals.away}}
         {{#if (expectedGoalsForTeam this teams.away.id)}}
         <span class="match-list-xg">({{expectedGoalsForTeam this teams.away.id}})</span>
@@ -122,13 +122,13 @@
       {{/if}}
       {{/if}}
 
-      <td class="match-list-logo-td right" onclick="window.location.href='team?ID={{teams.away.id}}'">
-        <img class="match-list-team-logo logo-picture" src="images/logos/{{teams.away.id}}.png"
+      <td class="match-list-logo-td right" onclick="window.location.href='{{teamUrl teams.away.id teams.away.name}}'">
+        <img class="match-list-team-logo logo-picture" src="/images/logos/{{teams.away.id}}.png"
           alt="{{teams.away.name}}" title="{{teams.away.name}}" width="44px">
       </td>
 
       <td class="match-list-team-name-td right" id="{{teams.away.id}}"
-        onclick="window.location.href='team?ID={{teams.away.id}}'">
+        onclick="window.location.href='{{teamUrl teams.away.id teams.away.name}}'">
         {{teams.away.name}}
       </td>
     </tr>
@@ -143,42 +143,42 @@
     {{else}}
     {{#each matches}}
     <tr id="{{fixture.id}}" data-round="{{this.league.round}}" data-date="{{fixture.date}}" data-status="{{fixture.status.short}}">
-      <td class="match-list-date" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-date" onclick="window.location.href='{{matchUrl this}}'">
         {{formatDateOnly fixture.date}}<br>{{formatTime fixture.date}}
       </td>
 
       <td class="match-list-team-name-td left" id="{{teams.home.id}}"
-        onclick="window.location.href='team?ID={{teams.home.id}}'">
+        onclick="window.location.href='{{teamUrl teams.home.id teams.home.name}}'">
         {{teams.home.name}}
       </td>
 
-      <td class="match-list-logo-td left" onclick="window.location.href='team?ID={{teams.home.id}}'">
-        <img class="match-list-team-logo" src="images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}"
+      <td class="match-list-logo-td left" onclick="window.location.href='{{teamUrl teams.home.id teams.home.name}}'">
+        <img class="match-list-team-logo" src="/images/logos/{{teams.home.id}}.png" alt="{{teams.home.name}}"
           title="{{teams.home.name}}" width="44px">
       </td>
 
       {{#if (eq fixture.status.short "PST")}}
-      <td class="match-list-center-td" colspan="3" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" colspan="3" onclick="window.location.href='{{matchUrl this}}'">
         Postponed
       </td>
       {{else}}
       {{#if (eq fixture.status.short "CANC")}}
-      <td class="match-list-center-td" colspan="3" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" colspan="3" onclick="window.location.href='{{matchUrl this}}'">
         Canceled
       </td>
       {{else}}
-      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
         {{goals.home}}
         {{#if (expectedGoalsForTeam this teams.home.id)}}
         <span class="match-list-xg">({{expectedGoalsForTeam this teams.home.id}})</span>
         {{/if}}
       </td>
 
-      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
         -
       </td>
 
-      <td class="match-list-center-td" onclick="window.location.href='match?matchID={{this.fixture.id}}'">
+      <td class="match-list-center-td" onclick="window.location.href='{{matchUrl this}}'">
         {{goals.away}}
         {{#if (expectedGoalsForTeam this teams.away.id)}}
         <span class="match-list-xg">({{expectedGoalsForTeam this teams.away.id}})</span>
@@ -187,17 +187,17 @@
       {{/if}}
       {{/if}}
 
-      <td class="match-list-logo-td right" onclick="window.location.href='team?ID={{teams.away.id}}'">
-        <img class="match-list-team-logo" src="images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}"
+      <td class="match-list-logo-td right" onclick="window.location.href='{{teamUrl teams.away.id teams.away.name}}'">
+        <img class="match-list-team-logo" src="/images/logos/{{teams.away.id}}.png" alt="{{teams.away.name}}"
           title="{{teams.away.name}}" width="44px">
       </td>
 
       <td class="match-list-team-name-td right" id="{{teams.away.id}}"
-        onclick="window.location.href='team?ID={{teams.away.id}}'">
+        onclick="window.location.href='{{teamUrl teams.away.id teams.away.name}}'">
         {{teams.away.name}}
       </td>
       <td>
-        <img class="match-list-competition-logo" src="images/competitions/{{league.id}}.png" alt="{{league.name}}" title="{{league.name}}" width="24px">
+        <img class="match-list-competition-logo" src="/images/competitions/{{league.id}}.png" alt="{{league.name}}" title="{{league.name}}" width="24px">
       </td>
     </tr>
     {{else}}

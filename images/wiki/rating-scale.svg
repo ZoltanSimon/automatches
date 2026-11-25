@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" width="800" height="160" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">Rating colour scale</title>
+  <desc id="d">Ratings are coloured red below 5, orange from 5, yellow from 6, green from 7 and dark green from 8.</desc>
+  <rect width="800" height="160" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">How ratings are coloured</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">The same scale is used for players and teams</text>
+  <rect x="32" y="84" width="142" height="48" rx="6" fill="#F44336"/>
+  <text x="103" y="114" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">Below 5</text>
+  <rect x="180" y="84" width="142" height="48" rx="6" fill="#FF9800"/>
+  <text x="251" y="114" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">5.0 – 5.9</text>
+  <rect x="328" y="84" width="142" height="48" rx="6" fill="#FFEB3B"/>
+  <text x="399" y="114" font-size="17" font-weight="700" fill="#101D30" text-anchor="middle">6.0 – 6.9</text>
+  <rect x="476" y="84" width="142" height="48" rx="6" fill="#279B65"/>
+  <text x="547" y="114" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">7.0 – 7.9</text>
+  <rect x="624" y="84" width="142" height="48" rx="6" fill="#1B6A45"/>
+  <text x="695" y="114" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">8.0 and up</text>
+</svg>

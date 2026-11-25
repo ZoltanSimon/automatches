@@ -38,9 +38,33 @@ main {
   margin-bottom: 30px;
 }
 
+h1,
 h2 {
   margin-top: 0px;
   display: inline-block;
+}
+
+// A page's main <h1> that keeps the look of the element it replaced.
+.heading-plain {
+  display: block;
+  font: inherit;
+  margin: 0;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+// Hidden on screen, still read by screen readers and search engines.
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 table {
@@ -154,38 +178,6 @@ footer {
 
 .content {
   padding: 20px;
-}
-
-.wiki-icon-list {
-  list-style: none;
-  padding: 0;
-  margin: 12px 0 16px;
-  display: grid;
-  gap: 12px;
-  color: $dark-blue;
-  --stat-icon-primary: #{$dark-blue};
-  --stat-icon-secondary: #{$lightest-blue};
-
-  li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  svg,
-  .yellow-card,
-  .red-card {
-    flex: 0 0 auto;
-  }
-}
-
-.wiki-abbr-list {
-  margin: 8px 0 16px;
-  padding-left: 1.2em;
-
-  li {
-    margin: 6px 0;
-  }
 }
 
 .wiki-info {
@@ -845,12 +837,14 @@ footer {
   }
 
 
+  h1,
   h2 {
     font-size: 24px;
     color: $dark-blue;
     margin: 0;
   }
 
+  .rect-title h1,
   .rect-title h2 {
     display: flex;
     align-items: center;
@@ -885,6 +879,7 @@ footer {
   }
 }
 
+.league-info h1,
 .league-info h2 {
   font-size: 42px;
   font-weight: 400;
@@ -3051,6 +3046,7 @@ $rating-box-height: 24px;
       }
     }
 
+    h1,
     h2 {
       font-size: 20px;
     }
@@ -3232,6 +3228,7 @@ $rating-box-height: 24px;
   #right {
     padding-inline: 0;
 
+    h1,
     h2 {
       margin-inline-start: 2px;
     }

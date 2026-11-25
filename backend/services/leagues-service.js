@@ -7,6 +7,7 @@ import { getTeamById } from "./teams-service.js";
 import { readFile } from "fs/promises";
 import path from "path";
 import { CURRENT_SEASON, defaultLeagues } from "../../shared/defaults.js";
+import { matchUrl, teamUrl } from "../lib/site-urls.js";
 
 export { CURRENT_SEASON, defaultLeagues } from "../../shared/defaults.js";
 
@@ -259,7 +260,7 @@ function resolveBracketReference(reference, nodeMap, groupMap) {
         name: reference.name || "TBD",
         goals: null,
         winner: false,
-        url: reference.id ? `/team?ID=${encodeURIComponent(reference.id)}` : "",
+        url: reference.id ? teamUrl(reference.id, reference.name) : "",
       };
     }
   }
@@ -293,7 +294,7 @@ function resolveBracketReference(reference, nodeMap, groupMap) {
       name: team.team.name || ref,
       goals: null,
       winner: false,
-      url: `/team?ID=${encodeURIComponent(team.team.id)}`,
+      url: teamUrl(team.team.id, team.team.name),
     };
   }
 
@@ -573,7 +574,7 @@ function buildWorldCupBracketNode(templateNode, actualMatch, nodeMap, groupMap, 
 
   return {
     fixtureId: actualMatch?.fixture?.id ?? templateNode.match_id,
-    matchUrl: actualMatch?.fixture?.id ? `/match?matchID=${encodeURIComponent(actualMatch.fixture.id)}` : "",
+    matchUrl: actualMatch?.fixture?.id ? matchUrl(actualMatch) : "",
     status,
     date: actualMatch?.fixture?.date || null,
     home: buildBracketTeam(resolvedHome, actualHome, homeGoals, homeWinner),

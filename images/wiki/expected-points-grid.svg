@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="t d" font-family="'Source Sans 3', 'Segoe UI', Arial, sans-serif">
+  <title id="t">Expected points from a scoreline grid</title>
+  <desc id="d">Probability of every scoreline from 0-0 to 6-6 when the home side has 1.8 xG and the away side 0.9 xG. Green cells are home wins (58.4% in total), blue cells draws (22.9%) and red cells away wins (18.5%). Home expected points are 1.98, away expected points 0.78.</desc>
+  <rect width="800" height="450" fill="#FFFFFF"/>
+  <text x="32" y="40" font-size="24" font-weight="700" fill="#1D3557" text-anchor="start">Every scoreline, weighted by chance quality</text>
+  <text x="32" y="64" font-size="16" font-weight="400" fill="#4A5A70" text-anchor="start">Probability of each result (%) for a match with xG 1.8 vs 0.9</text>
+  <text x="112" y="118" font-size="14" font-weight="700" fill="#1D3557" text-anchor="middle">0</text>
+  <text x="80" y="153" font-size="14" font-weight="700" fill="#1D3557" text-anchor="end">0</text>
+  <text x="154" y="118" font-size="14" font-weight="700" fill="#1D3557" text-anchor="middle">1</text>
+  <text x="80" y="195" font-size="14" font-weight="700" fill="#1D3557" text-anchor="end">1</text>
+  <text x="196" y="118" font-size="14" font-weight="700" fill="#1D3557" text-anchor="middle">2</text>
+  <text x="80" y="237" font-size="14" font-weight="700" fill="#1D3557" text-anchor="end">2</text>
+  <text x="238" y="118" font-size="14" font-weight="700" fill="#1D3557" text-anchor="middle">3</text>
+  <text x="80" y="279" font-size="14" font-weight="700" fill="#1D3557" text-anchor="end">3</text>
+  <text x="280" y="118" font-size="14" font-weight="700" fill="#1D3557" text-anchor="middle">4</text>
+  <text x="80" y="321" font-size="14" font-weight="700" fill="#1D3557" text-anchor="end">4</text>
+  <text x="322" y="118" font-size="14" font-weight="700" fill="#1D3557" text-anchor="middle">5</text>
+  <text x="80" y="363" font-size="14" font-weight="700" fill="#1D3557" text-anchor="end">5</text>
+  <text x="364" y="118" font-size="14" font-weight="700" fill="#1D3557" text-anchor="middle">6</text>
+  <text x="80" y="405" font-size="14" font-weight="700" fill="#1D3557" text-anchor="end">6</text>
+  <text x="239" y="96" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle">Away goals (xG 0.9)</text>
+  <text x="36" y="275" font-size="15" font-weight="600" fill="#4A5A70" text-anchor="middle" transform="rotate(-90 36 275)">Home goals (xG 1.8)</text>
+  <rect x="92" y="128" width="40" height="40" rx="4" fill="#457B9D" fill-opacity="0.60"/>
+  <text x="112" y="153" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">6.7</text>
+  <rect x="134" y="128" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.55"/>
+  <text x="154" y="153" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">6.0</text>
+  <rect x="176" y="128" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.30"/>
+  <text x="196" y="153" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">2.7</text>
+  <rect x="218" y="128" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.16"/>
+  <text x="238" y="153" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.8</text>
+  <rect x="260" y="128" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.11"/>
+  <text x="280" y="153" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.2</text>
+  <rect x="302" y="128" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="322" y="153" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="344" y="128" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="364" y="153" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="92" y="170" width="40" height="40" rx="4" fill="#279B65" fill-opacity="1.00"/>
+  <text x="112" y="195" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">12.1</text>
+  <rect x="134" y="170" width="40" height="40" rx="4" fill="#457B9D" fill-opacity="0.91"/>
+  <text x="154" y="195" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">10.9</text>
+  <rect x="176" y="170" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.46"/>
+  <text x="196" y="195" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">4.9</text>
+  <rect x="218" y="170" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.21"/>
+  <text x="238" y="195" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">1.5</text>
+  <rect x="260" y="170" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.12"/>
+  <text x="280" y="195" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.3</text>
+  <rect x="302" y="170" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="322" y="195" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.1</text>
+  <rect x="344" y="170" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="364" y="195" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="92" y="212" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.91"/>
+  <text x="112" y="237" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">10.9</text>
+  <rect x="134" y="212" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.83"/>
+  <text x="154" y="237" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">9.8</text>
+  <rect x="176" y="212" width="40" height="40" rx="4" fill="#457B9D" fill-opacity="0.43"/>
+  <text x="196" y="237" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">4.4</text>
+  <rect x="218" y="212" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.20"/>
+  <text x="238" y="237" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">1.3</text>
+  <rect x="260" y="212" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.12"/>
+  <text x="280" y="237" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.3</text>
+  <rect x="302" y="212" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="322" y="237" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.1</text>
+  <rect x="344" y="212" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="364" y="237" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="92" y="254" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.59"/>
+  <text x="112" y="279" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">6.5</text>
+  <rect x="134" y="254" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.54"/>
+  <text x="154" y="279" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">5.9</text>
+  <rect x="176" y="254" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.30"/>
+  <text x="196" y="279" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">2.6</text>
+  <rect x="218" y="254" width="40" height="40" rx="4" fill="#457B9D" fill-opacity="0.16"/>
+  <text x="238" y="279" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.8</text>
+  <rect x="260" y="254" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.11"/>
+  <text x="280" y="279" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.2</text>
+  <rect x="302" y="254" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="322" y="279" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="344" y="254" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="364" y="279" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="92" y="296" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.32"/>
+  <text x="112" y="321" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">2.9</text>
+  <rect x="134" y="296" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.30"/>
+  <text x="154" y="321" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">2.6</text>
+  <rect x="176" y="296" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.19"/>
+  <text x="196" y="321" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">1.2</text>
+  <rect x="218" y="296" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.13"/>
+  <text x="238" y="321" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.4</text>
+  <rect x="260" y="296" width="40" height="40" rx="4" fill="#457B9D" fill-opacity="0.11"/>
+  <text x="280" y="321" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.1</text>
+  <rect x="302" y="296" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="322" y="321" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="344" y="296" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="364" y="321" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="92" y="338" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.18"/>
+  <text x="112" y="363" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">1.1</text>
+  <rect x="134" y="338" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.17"/>
+  <text x="154" y="363" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">1.0</text>
+  <rect x="176" y="338" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.13"/>
+  <text x="196" y="363" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.4</text>
+  <rect x="218" y="338" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.11"/>
+  <text x="238" y="363" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.1</text>
+  <rect x="260" y="338" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.10"/>
+  <text x="280" y="363" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="302" y="338" width="40" height="40" rx="4" fill="#457B9D" fill-opacity="0.10"/>
+  <text x="322" y="363" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="344" y="338" width="40" height="40" rx="4" fill="#E63946" fill-opacity="0.10"/>
+  <text x="364" y="363" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="92" y="380" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.12"/>
+  <text x="112" y="405" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.3</text>
+  <rect x="134" y="380" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.12"/>
+  <text x="154" y="405" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.3</text>
+  <rect x="176" y="380" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.11"/>
+  <text x="196" y="405" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0.1</text>
+  <rect x="218" y="380" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.10"/>
+  <text x="238" y="405" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="260" y="380" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.10"/>
+  <text x="280" y="405" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="302" y="380" width="40" height="40" rx="4" fill="#279B65" fill-opacity="0.10"/>
+  <text x="322" y="405" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <rect x="344" y="380" width="40" height="40" rx="4" fill="#457B9D" fill-opacity="0.10"/>
+  <text x="364" y="405" font-size="13" font-weight="600" fill="#101D30" text-anchor="middle">0</text>
+  <text x="440" y="128" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Home win</text>
+  <rect x="440" y="136" width="300" height="18" rx="4" fill="#F1FAEE"/>
+  <rect x="440" y="136" width="175.2" height="18" rx="4" fill="#279B65"/>
+  <text x="750" y="151" font-size="16" font-weight="700" fill="#101D30" text-anchor="start">58.4%</text>
+  <text x="440" y="180" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Draw</text>
+  <rect x="440" y="188" width="300" height="18" rx="4" fill="#F1FAEE"/>
+  <rect x="440" y="188" width="68.7" height="18" rx="4" fill="#457B9D"/>
+  <text x="750" y="203" font-size="16" font-weight="700" fill="#101D30" text-anchor="start">22.9%</text>
+  <text x="440" y="232" font-size="16" font-weight="600" fill="#101D30" text-anchor="start">Away win</text>
+  <rect x="440" y="240" width="300" height="18" rx="4" fill="#F1FAEE"/>
+  <rect x="440" y="240" width="55.5" height="18" rx="4" fill="#E63946"/>
+  <text x="750" y="255" font-size="16" font-weight="700" fill="#101D30" text-anchor="start">18.5%</text>
+  <rect x="428" y="296" width="356" height="112" rx="8" fill="#F1FAEE" stroke="#A8DADC"/>
+  <text x="440" y="324" font-size="15" font-weight="700" fill="#4A5A70" text-anchor="start">Home xPts</text>
+  <text x="440" y="348" font-size="18" font-weight="700" fill="#1D3557" text-anchor="start">3 × 0.584 + 1 × 0.229 = 1.98</text>
+  <text x="440" y="376" font-size="15" font-weight="700" fill="#4A5A70" text-anchor="start">Away xPts</text>
+  <text x="440" y="398" font-size="18" font-weight="700" fill="#1D3557" text-anchor="start">3 × 0.185 + 1 × 0.229 = 0.78</text>
+</svg>

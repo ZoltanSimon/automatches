@@ -5,6 +5,8 @@ import { formatTeamXg } from "../lib/match-xg.js";
 import { buildMatchPitch } from "../lib/match-pitch.js";
 import { buildPlayerPitch } from "../lib/player-pitch.js";
 import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
+import { leagueUrl as buildLeagueUrl, matchUrl as buildMatchUrl, playerUrl as buildPlayerUrl, teamUrl as buildTeamUrl } from "../lib/site-urls.js";
+import { absoluteUrl as absoluteSiteUrl, wikiPath } from "../../shared/urls.js";
 
 export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;
@@ -396,3 +398,42 @@ export const isGoalEvent = (eventType, eventDetail = "") => {
 }
 
 export const expectedGoalsForTeam = (match, teamID) => formatTeamXg(match, teamID);
+// ---------------------------------------------------------------------------
+// URL helpers. Handlebars appends an options object to every call; hash
+// arguments (e.g. {{teamUrl id allStats=1}}) become the query string.
+// ---------------------------------------------------------------------------
+function splitHelperArgs(args) {
+  const options = args[args.length - 1];
+  const isOptions = options && typeof options === "object" && "hash" in options;
+  return { values: isOptions ? args.slice(0, -1) : args, hash: isOptions ? options.hash : {} };
+}
+
+export const teamUrl = (...args) => {
+  const { values: [id, name], hash } = splitHelperArgs(args);
+  return buildTeamUrl(id, name, hash);
+};
+
+export const playerUrl = (...args) => {
+  const { values: [id, name], hash } = splitHelperArgs(args);
+  return buildPlayerUrl(id, name, hash);
+};
+
+export const leagueUrl = (...args) => {
+  const { values: [id, season], hash } = splitHelperArgs(args);
+  return buildLeagueUrl(id, season, hash);
+};
+
+export const matchUrl = (...args) => {
+  const { values: [match] } = splitHelperArgs(args);
+  return buildMatchUrl(match);
+};
+
+export const wikiUrl = (...args) => {
+  const { values: [slug] } = splitHelperArgs(args);
+  return wikiPath(typeof slug === "string" ? slug : "");
+};
+
+export const startsWith = (value, prefix) => typeof value === "string" && typeof prefix === "string" && value.startsWith(prefix);
+
+// Absolute URL on the public site for a root-relative path ("/team/1/x").
+export const absUrl = (value) => (typeof value === "string" && value ? absoluteSiteUrl(value) : "");
