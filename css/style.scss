@@ -75,6 +75,12 @@ table {
   overflow: hidden;
 }
 
+// In standards mode an image sits on the text baseline, which lifts logos
+// above the middle of their cell. Centre images in table cells instead.
+td img {
+  vertical-align: middle;
+}
+
 .gf-table {
   border: 3px solid $dark-blue;
 }
