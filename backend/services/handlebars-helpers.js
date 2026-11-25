@@ -7,6 +7,7 @@ import { buildPlayerPitch } from "../lib/player-pitch.js";
 import { getTeamById, isAgeGroupNationalSide } from "./teams-service.js";
 import { leagueUrl as buildLeagueUrl, matchUrl as buildMatchUrl, playerUrl as buildPlayerUrl, teamUrl as buildTeamUrl } from "../lib/site-urls.js";
 import { absoluteUrl as absoluteSiteUrl, wikiPath } from "../../shared/urls.js";
+import { assetUrl } from "../lib/asset-version.js";
 
 export const gt = (a, b) => a > b;
 export const lt = (a, b) => a < b;
@@ -437,3 +438,5 @@ export const startsWith = (value, prefix) => typeof value === "string" && typeof
 
 // Absolute URL on the public site for a root-relative path ("/team/1/x").
 export const absUrl = (value) => (typeof value === "string" && value ? absoluteSiteUrl(value) : "");
+// "/css/style.css" -> "/css/style.css?v=<content hash>" (cache-busting).
+export const asset = (urlPath) => assetUrl(urlPath);

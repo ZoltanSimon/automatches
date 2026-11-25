@@ -1,9 +1,11 @@
-<link rel="stylesheet" href="/css/match-pitch.css" />
+<link rel="stylesheet" href="{{{asset "/css/match-pitch.css"}}}" />
 <script src="/controllers/refetch-ui.js"></script>
 <script type="module" src="/controllers/match.js"></script>
+{{#if matchInfo}}
+<h1 class="visually-hidden">{{matchInfo.teams.home.name}} vs {{matchInfo.teams.away.name}}{{#if headerLeagueName}}, {{headerLeagueName}}{{/if}}</h1>
+{{/if}}
 <div class="container match-page">
   {{#if matchInfo}}
-  <h1 class="visually-hidden">{{matchInfo.teams.home.name}} vs {{matchInfo.teams.away.name}}{{#if headerLeagueName}}, {{headerLeagueName}}{{/if}}</h1>
   <div class="match-header">
     <div class="team">
       <img class="cursor-pointer" src="/images/logos/{{matchInfo.teams.home.id}}.png" alt="{{matchInfo.teams.home.name}}"
