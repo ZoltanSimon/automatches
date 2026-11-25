@@ -2562,7 +2562,8 @@ a.event-player-link:hover {
 .match-list-date {
   text-align: center;
   cursor: pointer;
-  padding: 8px;
+  padding: 3px 6px;
+  line-height: 1.15;
   width: 10%;
 }
 
@@ -2588,7 +2589,7 @@ a.event-player-link:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0.35rem;
+  margin-top: 0.2rem;
   line-height: 1;
 }
 
@@ -2619,6 +2620,7 @@ tr td.match-list-center-td + td.match-list-center-td {
   text-align: center;
   cursor: pointer;
   width: 8%;
+  padding-block: 3px;
 }
 .match-list-logo-td.left {
   border-left: 0px;
@@ -2631,7 +2633,7 @@ tr td.match-list-center-td + td.match-list-center-td {
 .match-list-team-name-td {
   text-align: right;
   cursor: pointer;
-  padding: 10px 8px;
+  padding: 4px 8px;
   width: 32%;
 }
 .match-list-team-name-td.left {
@@ -3153,7 +3155,7 @@ tr td.match-list-center-td + td.match-list-center-td {
   }
   .match-list-date {
     width: 1%;
-    padding: 4px 2px;
+    padding: 2px;
     font-size: 0.75em;
   }
   .match-list-status {
@@ -3161,7 +3163,7 @@ tr td.match-list-center-td + td.match-list-center-td {
     padding: 0.1rem 0.25rem;
     font-size: 0.6rem;
     letter-spacing: 0.02em;
-    margin-top: 0.2rem;
+    margin-top: 0.15rem;
   }
   .match-list-center-td {
     width: 1%;
